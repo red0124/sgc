@@ -1,29 +1,30 @@
-#define INIT_VECTOR(name)                                                      \
+#define INIT_VECTOR(type_name)                                                 \
                                                                                \
-        struct vector_##name                                                   \
+        struct vector_##type_name                                              \
         {                                                                      \
                 int _vector_size;                                              \
                 int _vector_max;                                               \
-                name *_vector_elements;                                        \
+                type_name *_vector_elements;                                   \
         };                                                                     \
                                                                                \
-        typedef struct vector_##name vector_##name;                            \
+        typedef struct vector_##type_name vector_##type_name;                  \
                                                                                \
-        void vec_init_##name(vector_##name *vec)                               \
+        void vec_init_##type_name(vector_##type_name *vec)                     \
         {                                                                      \
                 vec->_vector_size = 0;                                         \
                 vec->_vector_max = 1;                                          \
-                vec->_vector_elements = malloc(sizeof(name));                  \
+                vec->_vector_elements = malloc(sizeof(type_name));             \
         }                                                                      \
                                                                                \
-        void vec_free_##name(vector_##name *vec)                               \
+        void vec_free_##type_name(vector_##type_name *vec)                     \
         {                                                                      \
                 vec->_vector_size = 0;                                         \
                 vec->_vector_max = 0;                                          \
                 free(vec->_vector_elements);                                   \
         }                                                                      \
                                                                                \
-        int vec_set_##name(vector_##name *vec, int num, name el)               \
+        int vec_set_##type_name(vector_##type_name *vec, int num,              \
+                                type_name el)                                  \
         {                                                                      \
                 int ret = 0;                                                   \
                 if(num < vec->_vector_size)                                    \
@@ -34,27 +35,27 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        void vec_push_back_##name(vector_##name *vec, name el)                 \
+        void vec_push_back_##type_name(vector_##type_name *vec, type_name el)  \
         {                                                                      \
                 if(vec->_vector_max == vec->_vector_size)                      \
                 {                                                              \
                         vec->_vector_max = vec->_vector_size * 2;              \
                         vec->_vector_elements =                                \
                             realloc(vec->_vector_elements,                     \
-                                    vec->_vector_max * sizeof(name));          \
+                                    vec->_vector_max * sizeof(type_name));     \
                 }                                                              \
                 (vec->_vector_elements)[vec->_vector_size] = el;               \
                 vec->_vector_size++;                                           \
         }                                                                      \
                                                                                \
-        name vec_pop_back_##name(vector_##name *vec)                           \
+        type_name vec_pop_back_##type_name(vector_##type_name *vec)            \
         {                                                                      \
                 return (vec->_vector_elements)[--vec->_vector_size];           \
         }                                                                      \
                                                                                \
-        name vec_get_##name(vector_##name *vec, int num)                       \
+        type_name vec_get_##type_name(vector_##type_name *vec, int num)        \
         {                                                                      \
-                name ret;                                                      \
+                type_name ret;                                                 \
                 if(num < vec->_vector_size && num >= 0)                        \
                 {                                                              \
                         ret = (vec->_vector_elements)[num];                    \
@@ -65,10 +66,11 @@
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
-        int vec_insert_##name(vector_##name *vec, int num, name el)            \
+        int vec_insert_##type_name(vector_##type_name *vec, int num,           \
+                                   type_name el)                               \
         {                                                                      \
                 int ret = 0;                                                   \
-                vec_push_back_##name(vec, el);                                 \
+                vec_push_back_##type_name(vec, el);                            \
                 if(num < vec->_vector_size && num >= 0)                        \
                 {                                                              \
                         ret = 1;                                               \
@@ -82,7 +84,7 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        int vec_erase_##name(vector_##name *vec, int num)                      \
+        int vec_erase_##type_name(vector_##type_name *vec, int num)            \
         {                                                                      \
                 int ret = 0;                                                   \
                 if(num < vec->_vector_size && num >= 0)                        \
@@ -98,7 +100,7 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        int vec_find_##name(vector_##name *vec, name el)                       \
+        int vec_find_##type_name(vector_##type_name *vec, type_name el)        \
         {                                                                      \
                 int ret = -1;                                                  \
                 for(int i = 0; i < vec->_vector_size; i++)                     \
@@ -111,7 +113,7 @@
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
-        int vec_size_##name(vector_##name *vec)                                \
+        int vec_size_##type_name(vector_##type_name *vec)                      \
         {                                                                      \
                 return vec->_vector_size;                                      \
         }
