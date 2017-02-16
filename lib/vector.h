@@ -86,20 +86,6 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        int vec_find_##type_name(const vector_##type_name *vec,                \
-                                 const type_name el)                           \
-        {                                                                      \
-                int ret = -1;                                                  \
-                for(int i = 0; i < vec->_vector_size; i++)                     \
-                {                                                              \
-                        if((vec->_vector_elements)[i] == el)                   \
-                        {                                                      \
-                                ret = i;                                       \
-                                break;                                         \
-                        }                                                      \
-                }                                                              \
-                return ret;                                                    \
-        }                                                                      \
         int vec_size_##type_name(vector_##type_name *vec)                      \
         {                                                                      \
                 return vec->_vector_size;                                      \
@@ -164,6 +150,58 @@
                 *b = tmp;                                                      \
         }                                                                      \
                                                                                \
+        void vec_print_##type_name(vector_##type_name *vec,                    \
+                                   void (*print)(const type_name))             \
+        {                                                                      \
+                for(int i = 0; i < vec->_vector_size; i++)                     \
+                {                                                              \
+                        print(vec->_vector_elements[i]);                       \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        int vec_count_##type_name(vector_##type_name *vec,                     \
+                                  int (*condition)(type_name))                 \
+        {                                                                      \
+                int ret = 0;                                                   \
+                for(int i = 0; i < vec->_vector_size; i++)                     \
+                {                                                              \
+                        ret = (condition(vec->_vector_elements[i])) ? ret + 1  \
+                                                                    : ret;     \
+                }                                                              \
+                                                                               \
+                return ret;                                                    \
+        }                                                                      \
+                                                                               \
+        type_name *vec_next_##type_name(                                       \
+            vector_##type_name *vec, int (*condition)(type_name), int begin)   \
+        {                                                                      \
+                type_name *ret = NULL;                                         \
+                for(int i = begin; i < vec->_vector_size && ret == NULL; i++)  \
+                {                                                              \
+                        if(condition(vec->_vector_elements[i]))                \
+                        {                                                      \
+                                ret = &vec->_vector_elements[i];               \
+                        }                                                      \
+                }                                                              \
+                                                                               \
+                return ret;                                                    \
+        }                                                                      \
+                                                                               \
+        int vec_group_##type_name(vector_##type_name *vec,                     \
+                                  int (*condition)(type_name))                 \
+        {                                                                      \
+                int i;                                                         \
+                for(i = 0; vec_next_##type_name(vec, condition, i) != NULL;    \
+                    i++)                                                       \
+                {                                                              \
+                        swap_##type_name(                                      \
+                            &vec->_vector_elements[i],                         \
+                            vec_next_##type_name(vec, condition, i));          \
+                }                                                              \
+                                                                               \
+                return i;                                                      \
+        }                                                                      \
+                                                                               \
         void vec_sort_interval_##type_name(                                    \
             vector_##type_name *vec, int (*condition)(type_name, type_name),   \
             const int x, const int y)                                          \
@@ -196,48 +234,4 @@
         {                                                                      \
                 vec_sort_interval_##type_name(vec, condition, 0,               \
                                               vec->_vector_size);              \
-        }                                                                      \
-                                                                               \
-        int default_condition_##type_name(type_name a, type_name b)            \
-        {                                                                      \
-                return a > b;                                                  \
-        }                                                                      \
-                                                                               \
-        void vec_default_sort_##type_name(vector_##type_name *vec)             \
-        {                                                                      \
-                vec_sort_##type_name(vec, &default_condition_##type_name);     \
-        }                                                                      \
-                                                                               \
-        void vec_default_sort_interval_##type_name(vector_##type_name *vec,    \
-                                                   const int x, const int y)   \
-        {                                                                      \
-                vec_sort_interval_##type_name(                                 \
-                    vec, &default_condition_##type_name, x, y);                \
-        }                                                                      \
-                                                                               \
-        int vec_group_##type_name(vector_##type_name *vec,                     \
-                                  int (*condition)(type_name))                 \
-        {                                                                      \
-                int ret;                                                       \
-                for(int i = 0; i < vec->_vector_size - 1; i++)                 \
-                {                                                              \
-                        if(condition((vec->_vector_elements)[i]))              \
-                        {                                                      \
-                                for(int j = i; j < vec->_vector_size - 1; j++) \
-                                {                                              \
-                                        if(!condition(                         \
-                                               (vec->_vector_elements)[j]))    \
-                                        {                                      \
-                                                swap_##type_name(              \
-                                                    &(vec->_vector_elements)   \
-                                                        [i],                   \
-                                                    &(vec->_vector_elements)   \
-                                                        [j]);                  \
-                                                ret = i;                       \
-                                                break;                         \
-                                        }                                      \
-                                }                                              \
-                        }                                                      \
-                }                                                              \
-                return ret + 1;                                                \
         }
