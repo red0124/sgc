@@ -3,7 +3,8 @@ containers for C
 
 TODO:
 
-1) Create generic vector.
+1) Create generic list.
 
+2) Create generic array list.
 
-2) Create generic list.
+3) Create generic map.
