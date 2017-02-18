@@ -172,66 +172,85 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        type_name *vec_next_##type_name(                                       \
-            vector_##type_name *vec, int (*condition)(type_name), int begin)   \
+        void vec_quick_sort_interval_##type_name(                              \
+            vector_##type_name *vec, int (*condition)(type_name, type_name),   \
+            int begin, int end)                                                \
         {                                                                      \
-                type_name *ret = NULL;                                         \
-                for(int i = begin; i < vec->_vector_size && ret == NULL; i++)  \
+                if(end > begin)                                                \
                 {                                                              \
-                        if(condition(vec->_vector_elements[i]))                \
-                        {                                                      \
-                                ret = &vec->_vector_elements[i];               \
-                        }                                                      \
-                }                                                              \
+                        int pivot = begin;                                     \
+                        int left = begin;                                      \
+                        int right = end;                                       \
                                                                                \
-                return ret;                                                    \
+                        while(left < right)                                    \
+                        {                                                      \
+                                while(                                         \
+                                    !condition(vec->_vector_elements[pivot],   \
+                                               vec->_vector_elements[left]) && \
+                                    left < end)                                \
+                                {                                              \
+                                        ++left;                                \
+                                }                                              \
+                                                                               \
+                                while(condition(vec->_vector_elements[pivot],  \
+                                                vec->_vector_elements[right])) \
+                                {                                              \
+                                        --right;                               \
+                                }                                              \
+                                                                               \
+                                if(left < right)                               \
+                                {                                              \
+                                        swap_##type_name(                      \
+                                            &vec->_vector_elements[left],      \
+                                            &vec->_vector_elements[right]);    \
+                                }                                              \
+                        }                                                      \
+                                                                               \
+                        swap_##type_name(&vec->_vector_elements[pivot],        \
+                                         &vec->_vector_elements[right]);       \
+                                                                               \
+                        vec_quick_sort_interval_##type_name(vec, condition,    \
+                                                            begin, right - 1); \
+                        vec_quick_sort_interval_##type_name(vec, condition,    \
+                                                            right + 1, end);   \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void vec_sort_interval_##type_name(                                    \
+            vector_##type_name *vec, int (*condition)(type_name, type_name),   \
+            int begin, int end)                                                \
+        {                                                                      \
+                begin = (begin > end) ? end : begin;                           \
+                end = (end > begin) ? end : begin;                             \
+                end =                                                          \
+                    (end >= vec->_vector_size) ? vec->_vector_size - 1 : end;  \
+                begin = (begin < 0) ? 0 : begin;                               \
+                vec_quick_sort_interval_##type_name(vec, condition, begin,     \
+                                                    end);                      \
         }                                                                      \
                                                                                \
         int vec_group_##type_name(vector_##type_name *vec,                     \
                                   int (*condition)(type_name))                 \
         {                                                                      \
-                int i;                                                         \
-                for(i = 0; vec_next_##type_name(vec, condition, i) != NULL;    \
-                    i++)                                                       \
+                int left = 0;                                                  \
+                int right = vec->_vector_size - 1;                             \
+                while(right > left)                                            \
                 {                                                              \
-                        swap_##type_name(                                      \
-                            &vec->_vector_elements[i],                         \
-                            vec_next_##type_name(vec, condition, i));          \
-                }                                                              \
-                                                                               \
-                return i;                                                      \
-        }                                                                      \
-                                                                               \
-        void vec_sort_interval_##type_name(                                    \
-            vector_##type_name *vec, int (*condition)(type_name, type_name),   \
-            const int x, const int y)                                          \
-        {                                                                      \
-                int begin = (x > y) ? y : x;                                   \
-                begin = (begin > 0) ? begin : 0;                               \
-                int end = (x > y) ? x : y;                                     \
-                end = (end < vec->_vector_size) ? end : vec->_vector_size;     \
-                                                                               \
-                int finished = 0;                                              \
-                while(!finished)                                               \
-                {                                                              \
-                        finished = 1;                                          \
-                        for(int i = begin; i < end - 1; i++)                   \
+                        while(condition(vec->_vector_elements[left]) &&        \
+                              left < vec->_vector_size - 1)                    \
                         {                                                      \
-                                if(condition((vec->_vector_elements[i]),       \
-                                             (vec->_vector_elements[i + 1])))  \
-                                {                                              \
-                                        swap_##type_name(                      \
-                                            &(vec->_vector_elements)[i],       \
-                                            &(vec->_vector_elements)[i + 1]);  \
-                                        finished = 0;                          \
-                                }                                              \
+                                ++left;                                        \
+                        }                                                      \
+                        while(!condition(vec->_vector_elements[right]))        \
+                        {                                                      \
+                                --right;                                       \
+                        }                                                      \
+                        if(right > left)                                       \
+                        {                                                      \
+                                swap_##type_name(&vec->_vector_elements[right],\
+                                     &vec->_vector_elements[left]);            \
                         }                                                      \
                 }                                                              \
-        }                                                                      \
                                                                                \
-        void vec_sort_##type_name(vector_##type_name *vec,                     \
-                                  int (*condition)(type_name, type_name))      \
-        {                                                                      \
-                vec_sort_interval_##type_name(vec, condition, 0,               \
-                                              vec->_vector_size);              \
+                return right;                                                  \
         }
