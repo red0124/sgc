@@ -26,7 +26,7 @@ __void container_free_type(struct container*)__ function
 If the type of the container has memory alocated dinamicly a
 function can be given to the container that will take care of
 the destruction of all the elements when the container is freed.
-__void container_set_free_type(struct container_type*, void(*destroy)(type*))__
+__void container_set_free_type(struct container_type*, void(_*destroy_)(type*))__
 This is sumular to the *C++* destruction of an object where **delete** calls
 the destructors of the container type.
 
@@ -36,22 +36,22 @@ function in the container, whitch by default is a flat copy using **memcpy**
 an array will not be copied the element in the container 
 will just point to the same array. 
 The **copy** function can be changed using the
-__void container_set_copy_type(struct container_type*, void (*copy)(type*, const T*))__
+__void container_set_copy_type(struct container_type*, void (_*copy_)(type*, const T*))__
 function.
 
 The equivalation of the elements is given by the **equ** function in the 
 container which by default is a flat compare using **memcmp**.
 The **equ** function can be changed using the
-__void container_set_equ_type(struct container_type*, int (*equ)(const type*, const type*))__
+__void container_set_equ_type(struct container_type*, int (_*equ_)(const type*, const type*))__
 function.
 
 Same goes for the sort condition used for the elements if needed
-__void container_set_comp_type(struct container_type*, int (*comp)(const void*, const void*))__
-Be carefull sine this functions take *void* as parameters, and have to be made
+__void container_set_comp_type(struct container_type*, int (_*comp_)(const void* ,const void*))__
+Be carefull sine this functions take _void*_ as parameters, and have to be made
 simular to the **C qsort** compare functions, and **memcmp** is used by default.
 
 An easy way to operate through each of the elements of a container is using the
-**void container_operate_type(struct container_type*, void (*operate)(T*))**
+__void container_operate_type(struct container_type*, void (_*operate_)(T*))__
 function. There is also an inverted version of this function.
 
 Geting certain data from the container can be done using the
