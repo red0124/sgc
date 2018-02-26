@@ -67,5 +67,5 @@ file into your program so it can be linked later on.
 ## Examples
 ### Vector
 
-![GitHub Logo](vector.png)
+![GitHub Logo](img/vector.png)
 Format: ![Alt Text](url)
