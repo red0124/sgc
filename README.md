@@ -63,3 +63,9 @@ Those containers can be compiled separately by adding every structure we want to
 use into the **generic_types.h** file, then init them into the 
 **generic_container.c** files and used by adding the **generic_container_header.h**
 file into your program so it can be linked later on.
+
+## Examples
+# Vector
+
+![GitHub Logo](/vector.png)
+Format: ![Alt Text](url)
