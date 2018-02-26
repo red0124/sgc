@@ -1,6 +1,29 @@
 #pragma once
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#ifndef _STACK_MACRO_
+#define _STACK_MACRO_
+
+#define STACKSIZE 64
+
+#define PREPARE_STACK                                                          \
+        char *stack[STACKSIZE];                                                \
+        char **stackptr = stack
+
+#define PUSH(array, limit)                                                     \
+        stackptr[0] = array;                                                   \
+        stackptr[1] = limit;                                                   \
+        stackptr += 2
+
+#define POP(array, limit)                                                      \
+        stackptr -= 2;                                                         \
+        array = stackptr[0];                                                   \
+        limit = stackptr[1]
+#endif
+
+#define THRESH 7
 
 #define INIT_LIST(T)                                                           \
                                                                                \
@@ -27,9 +50,14 @@
                 *dst = *src;                                                   \
         }                                                                      \
                                                                                \
-        static void flat_free_##T(T *data)                                     \
+        static int flat_equ_##T(const T *first, const T *second)               \
         {                                                                      \
-                (void)data;                                                    \
+                return memcmp(first, second, sizeof(T)) == 0;                  \
+        }                                                                      \
+                                                                               \
+        static int flat_comp_##T(const void *first, const void *second)        \
+        {                                                                      \
+                return memcmp(first, second, sizeof(T));                       \
         }                                                                      \
                                                                                \
         size_t list_size_##T(const struct list_##T *l)                         \
@@ -40,7 +68,8 @@
         struct list_##T list_new_##T()                                         \
         {                                                                      \
                 struct list_##T l = {                                          \
-                    0, NULL, NULL, flat_copy_##T, flat_free_##T, NULL, NULL};  \
+                    0,    NULL,          NULL,        flat_copy_##T,           \
+                    NULL, flat_comp_##T, flat_equ_##T};                        \
                 return l;                                                      \
         }                                                                      \
                                                                                \
@@ -50,9 +79,9 @@
                 l->copy = copy;                                                \
         }                                                                      \
                                                                                \
-        void list_set_free_##T(struct list_##T *l, void (*free)(T *))          \
+        void list_set_free_##T(struct list_##T *l, void (*free_)(T *))         \
         {                                                                      \
-                l->free = free;                                                \
+                l->free = free_;                                               \
         }                                                                      \
                                                                                \
         void list_set_comp_##T(struct list_##T *l,                             \
@@ -72,27 +101,31 @@
                 l->size = 0;                                                   \
                 l->head = l->tail = NULL;                                      \
                 l->copy = flat_copy_##T;                                       \
-                l->free = flat_free_##T;                                       \
-                l->comp = NULL;                                                \
-                l->equ = NULL;                                                 \
+                l->free = NULL;                                                \
+                l->comp = flat_comp_##T;                                       \
+                l->equ = flat_equ_##T;                                         \
         }                                                                      \
                                                                                \
         void list_free_##T(struct list_##T *l)                                 \
         {                                                                      \
                 struct node_##T *curr = l->head;                               \
                 struct node_##T *tmp;                                          \
-                while(curr)                                                    \
+                for(size_t i = 0; i < l->size; ++i)                            \
                 {                                                              \
                         tmp = curr;                                            \
                         curr = curr->next;                                     \
-                        l->free(&tmp->data);                                   \
+                        if(l->free)                                            \
+                        {                                                      \
+                                l->free(&tmp->data);                           \
+                        }                                                      \
                         free(tmp);                                             \
                 }                                                              \
                 l->head = l->tail = NULL;                                      \
                 l->size = 0;                                                   \
         }                                                                      \
                                                                                \
-        int list_equ_##T(struct list_##T *first, struct list_##T *second)      \
+        int list_equ_##T(const struct list_##T *first,                         \
+                         const struct list_##T *second)                        \
         {                                                                      \
                 int equal = (first == second);                                 \
                 if(first->equ == NULL)                                         \
@@ -187,7 +220,7 @@
                 l->size++;                                                     \
         }                                                                      \
                                                                                \
-        T list_back_##T(struct list_##T *l)                                    \
+        T list_back_##T(const struct list_##T *l)                              \
         {                                                                      \
                 if(l->size == 0)                                               \
                 {                                                              \
@@ -247,7 +280,7 @@
                 l->size++;                                                     \
         }                                                                      \
                                                                                \
-        T list_front_##T(struct list_##T *l)                                   \
+        T list_front_##T(const struct list_##T *l)                             \
         {                                                                      \
                 if(l->size == 0)                                               \
                 {                                                              \
@@ -302,13 +335,8 @@
         }                                                                      \
                                                                                \
         static struct node_##T *list_find_node_##T(const struct list_##T *l,   \
-                                            const T el)                        \
+                                                   const T el)                 \
         {                                                                      \
-                if(l->equ == NULL)                                             \
-                {                                                              \
-                        fprintf(stderr, "UNDEFINED EQUALITY CONDITION\n");     \
-                        return NULL;                                           \
-                }                                                              \
                 struct node_##T *location = NULL;                              \
                 for(struct node_##T *curr = l->head; curr; curr = curr->next)  \
                 {                                                              \
@@ -327,8 +355,7 @@
                 return (location != NULL);                                     \
         }                                                                      \
                                                                                \
-        void list_operate_##T(const struct list_##T *l,                        \
-                              void (*operate)(void *))                         \
+        void list_operate_##T(struct list_##T *l, void (*operate)(T *))        \
         {                                                                      \
                 for(struct node_##T *curr = l->head; curr; curr = curr->next)  \
                 {                                                              \
@@ -336,8 +363,17 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        void list_operate_inverted_##T(const struct list_##T *l,               \
-                                       void (*operate)(void *))                \
+        void list_operate_to_##T(struct list_##T *l,                           \
+                                 void (*operate)(T *, void *), void *argout)   \
+        {                                                                      \
+                for(struct node_##T *curr = l->head; curr; curr = curr->next)  \
+                {                                                              \
+                        operate(&curr->data, argout);                          \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void list_operate_inverted_##T(struct list_##T *l,                     \
+                                       void (*operate)(T *))                   \
         {                                                                      \
                 for(struct node_##T *curr = l->tail; curr; curr = curr->prev)  \
                 {                                                              \
@@ -446,17 +482,12 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        int list_is_sorted_##T(struct list_##T *l,                             \
+        int list_is_sorted_##T(const struct list_##T *l,                       \
                                int (*comp)(const void *, const void *))        \
         {                                                                      \
                 if(comp == NULL)                                               \
                 {                                                              \
                         comp = l->comp;                                        \
-                }                                                              \
-                if(comp == NULL)                                               \
-                {                                                              \
-                        fprintf(stderr, "NO SORT CONDITION GIVEN\n");          \
-                        exit(1);                                               \
                 }                                                              \
                 int sorted = 1;                                                \
                 struct node_##T *curr = l->head;                               \
@@ -475,11 +506,6 @@
                                                                                \
         int list_insert_sorted_##T(struct list_##T *l, const T el)             \
         {                                                                      \
-                if(l->comp == NULL)                                            \
-                {                                                              \
-                        fprintf(stderr, "NO SORT CONDITION GIVEN\n");          \
-                        return 0;                                              \
-                }                                                              \
                 int sorted = 1;                                                \
                 if(l->head == NULL)                                            \
                 {                                                              \
@@ -516,38 +542,123 @@
                 return sorted;                                                 \
         }                                                                      \
                                                                                \
-        void list_sort_primitive_##T(struct list_##T *l,                       \
-                                     int (*comp)(const void *, const void *))  \
+        static inline void list_memswp_##T(char *i, char *j)                   \
         {                                                                      \
-                if(l->comp == NULL)                                            \
+                T tmp;                                                         \
+                                                                               \
+                memcpy(&tmp, i, sizeof(struct node_##T *));                    \
+                memcpy(i, j, sizeof(struct node_##T *));                       \
+                memcpy(j, &tmp, sizeof(struct node_##T *));                    \
+        }                                                                      \
+                                                                               \
+        static inline int list_compare_node_##T(                               \
+            const void *first, const void *second,                             \
+            int comp(const void *, const void *))                              \
+        {                                                                      \
+                struct node_##T *first_ = *(struct node_##T **)first;          \
+                struct node_##T *second_ = *(struct node_##T **)second;        \
+                return comp(&first_->data, &second_->data);                    \
+        }                                                                      \
+                                                                               \
+        static void list_qsort_##T(void *array, size_t array_size,             \
+                                   int (*comp)(const void *, const void *))    \
+        {                                                                      \
+                char *i, *j;                                                   \
+                size_t thresh = THRESH * sizeof(struct node_##T *);            \
+                char *array_ = (char *)array;                                  \
+                char *limit = array_ + array_size * sizeof(struct node_##T *); \
+                PREPARE_STACK;                                                 \
+                                                                               \
+                while(1)                                                       \
                 {                                                              \
-                        if(comp == NULL)                                       \
+                        if((size_t)(limit - array_) > thresh)                  \
                         {                                                      \
-                                fprintf(stderr, "NO SORT CONDITION GIVEN\n");  \
-                                exit(1);                                       \
+                                i = array_ + sizeof(struct node_##T *);        \
+                                j = limit - sizeof(struct node_##T *);         \
+                                list_memswp_##T(                               \
+                                    ((((size_t)(limit - array_)) /             \
+                                      sizeof(struct node_##T *)) /             \
+                                     2) * sizeof(struct node_##T *) +          \
+                                        array_,                                \
+                                    array_);                                   \
+                                if(list_compare_node_##T(i, j, comp) > 0)      \
+                                {                                              \
+                                        list_memswp_##T(i, j);                 \
+                                }                                              \
+                                if(list_compare_node_##T(array_, j, comp) > 0) \
+                                {                                              \
+                                        list_memswp_##T(array_, j);            \
+                                }                                              \
+                                if(list_compare_node_##T(i, array_, comp) > 0) \
+                                {                                              \
+                                        list_memswp_##T(i, array_);            \
+                                }                                              \
+                                while(1)                                       \
+                                {                                              \
+                                        do                                     \
+                                        {                                      \
+                                                i +=                           \
+                                                    sizeof(struct node_##T *); \
+                                        } while(list_compare_node_##T(         \
+                                                    array_, i, comp) > 0);     \
+                                        do                                     \
+                                        {                                      \
+                                                j -=                           \
+                                                    sizeof(struct node_##T *); \
+                                        } while(list_compare_node_##T(         \
+                                                    j, array_, comp) > 0);     \
+                                        if(i > j)                              \
+                                        {                                      \
+                                                break;                         \
+                                        }                                      \
+                                        list_memswp_##T(i, j);                 \
+                                }                                              \
+                                list_memswp_##T(array_, j);                    \
+                                if(j - array_ > limit - i)                     \
+                                {                                              \
+                                        PUSH(array_, j);                       \
+                                        array_ = i;                            \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        PUSH(i, limit);                        \
+                                        limit = j;                             \
+                                }                                              \
                         }                                                      \
-                        l->comp = comp;                                        \
+                        else                                                   \
+                        {                                                      \
+                                for(j = array_,                                \
+                                i = j + sizeof(struct node_##T *);             \
+                                    i < limit;                                 \
+                                    j = i, i += sizeof(struct node_##T *))     \
+                                {                                              \
+                                        for(;                                  \
+                                            list_compare_node_##T(             \
+                                                j,                             \
+                                                j + sizeof(struct node_##T *), \
+                                                comp) > 0;                     \
+                                            j -= sizeof(struct node_##T *))    \
+                                        {                                      \
+                                                list_memswp_##T(               \
+                                                    j,                         \
+                                                    j + sizeof(struct node_##T \
+                                                                   *));        \
+                                                if(j == array_)                \
+                                                {                              \
+                                                        break;                 \
+                                                }                              \
+                                        }                                      \
+                                }                                              \
+                                if(stackptr != stack)                          \
+                                {                                              \
+                                        POP(array_, limit);                    \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        break;                                 \
+                                }                                              \
+                        }                                                      \
                 }                                                              \
-                if(comp == NULL)                                               \
-                {                                                              \
-                        comp = l->comp;                                        \
-                }                                                              \
-                T *ar = (T *)malloc(sizeof(T) * l->size);                      \
-                struct node_##T *curr = l->head;                               \
-                for(size_t i = 0; i < l->size; ++i)                            \
-                {                                                              \
-                        l->copy(&ar[i], &curr->data);                          \
-                        curr = curr->next;                                     \
-                }                                                              \
-                qsort(ar, l->size, sizeof(T), comp);                           \
-                curr = l->head;                                                \
-                for(size_t i = 0; i < l->size; ++i)                            \
-                {                                                              \
-                        l->copy(&curr->data, &ar[i]);                          \
-                        l->free(&ar[i]);                                       \
-                        curr = curr->next;                                     \
-                }                                                              \
-                free(ar);                                                      \
         }                                                                      \
                                                                                \
         static void ptr_array_to_list_##T(struct node_##T **nodes_ptr,         \
@@ -563,11 +674,11 @@
                                                                                \
                 l->tail = nodes_ptr[l->size - 1];                              \
                 l->tail->next = NULL;                                          \
-				                                               \
+                                                                               \
                 if(l->size > 1)                                                \
                 {                                                              \
                         l->head->next = nodes_ptr[1];                          \
-			l->tail->prev = nodes_ptr[l->size - 2];                \
+                        l->tail->prev = nodes_ptr[l->size - 2];                \
                 }                                                              \
                                                                                \
                 for(size_t i = 1; i < l->size - 1; i++)                        \
@@ -580,15 +691,6 @@
         void list_sort_##T(struct list_##T *l,                                 \
                            int (*comp)(const void *, const void *))            \
         {                                                                      \
-                if(l->comp == NULL)                                            \
-                {                                                              \
-                        if(comp == NULL)                                       \
-                        {                                                      \
-                                fprintf(stderr, "NO SORT CONDITION GIVEN\n");  \
-                                exit(1);                                       \
-                        }                                                      \
-                        l->comp = comp;                                        \
-                }                                                              \
                 if(comp == NULL)                                               \
                 {                                                              \
                         comp = l->comp;                                        \
@@ -603,7 +705,7 @@
                         curr = curr->next;                                     \
                 }                                                              \
                                                                                \
-                qsort(nodes_ptr, l->size, sizeof(struct node_##T *), comp);    \
+                list_qsort_##T(nodes_ptr, l->size, comp);                      \
                 ptr_array_to_list_##T(nodes_ptr, l);                           \
                 free(nodes_ptr);                                               \
         }\
