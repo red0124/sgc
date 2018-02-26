@@ -7,9 +7,9 @@ difference.
 
 First add the **generic_container.h** file into your program.
 
-Since there are no generic functions in C we manuali have to 
+Since there are no generic functions in C, we manuali have to 
 init the container using the **INIT_CONTAINER(type)** macro.
-The **type_name** has to be a single word (use typedef).
+The **type** has to be a single word (use typedef).
 The macro will generate the structures and functions of the
 container you wanted, adding **_type** at the end of 
 every structure and function to seperate them because function
@@ -17,36 +17,36 @@ overload does not exist in C.
 
 When using a container we also have to initialize it manualy since
 there are no default values in C. Either use the function
- **void container_init_type(struct container_type*)** or 
+ __void container_init_type(struct container_type*)__ or 
 **struct container_type container_new_type()**
 
 The container destruction has to be done manualy too using the
-**void container_free_type(struct container*)** function
+__void container_free_type(struct container*)__ function
 
 If the type of the container has memory alocated dinamicly a
 function can be given to the container that will take care of
 the destruction of all the elements when the container is freed.
-**void container_set_free_type(struct container_type*, void(*destroy)(type*))**
+__void container_set_free_type(struct container_type*, void(*destroy)(type*))__
 This is sumular to the *C++* destruction of an object where **delete** calls
 the destructors of the container type.
 
 The way elements are added to the container is determened by the **copy**
 function in the container, whitch by default is a flat copy using **memcpy** 
-(create new element, copy every bit of data from the source)*, 
+*(create new element, copy every bit of data from the source)*, 
 an array will not be copied the element in the container 
 will just point to the same array. 
 The **copy** function can be changed using the
-**void container_set_copy_type(struct container_type*, void (*copy)(type*, const T*))**
+__void container_set_copy_type(struct container_type*, void (*copy)(type*, const T*))__
 function.
 
 The equivalation of the elements is given by the **equ** function in the 
 container which by default is a flat compare using **memcmp**.
 The **equ** function can be changed using the
-**void container_set_equ_type(struct container_type*, int (*equ)(const type*, const type*))**
+__void container_set_equ_type(struct container_type*, int (*equ)(const type*, const type*))__
 function.
 
 Same goes for the sort condition used for the elements if needed
-**void container_set_comp_type(struct container_type*, int (*comp)(const void*, const void*))**
+__void container_set_comp_type(struct container_type*, int (*comp)(const void*, const void*))__
 Be carefull sine this functions take *void* as parameters, and have to be made
 simular to the **C qsort** compare functions, and **memcmp** is used by default.
 
