@@ -55,7 +55,7 @@
                                                                                \
         void list_operate_##T(struct list_##T *, void (*operate)(T *));        \
         void list_operate_to_##T(struct list_##T *, void (*operate)(T *, void*)\
-			, T*);                                                 \
+			, void*);                                              \
         void list_operate_inverted_##T(struct list_##T *,                      \
                                        void (*operate)(T *));                  \
                                                                                \
