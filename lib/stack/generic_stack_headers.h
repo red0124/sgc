@@ -32,6 +32,6 @@
                             const struct stack_##T *restrict);                 \
                                                                                \
         void stack_push_##T(struct stack_##T *, T);                            \
-        T stack_pop_##T(struct stack_##T *);                                   \
+        void stack_pop_##T(struct stack_##T *);                                \
         T stack_top_##T(const struct stack_##T *);                             \
         int stack_empty_##T(struct stack_##T *);

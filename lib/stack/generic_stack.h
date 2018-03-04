@@ -101,10 +101,10 @@
         void stack_copy_##T(struct stack_##T *restrict dst,                    \
                             const struct stack_##T *restrict src)              \
         {                                                                      \
+		dst->size = src->size;                                         \
+		dst->max = src->size;                                          \
                 if(src->size != 0)                                             \
                 {                                                              \
-                        dst->size = src->size;                                 \
-                        dst->max = src->size;                                  \
                         dst->data = (T *)malloc(dst->max * sizeof(T));         \
                         for(size_t i = 0; i < dst->size; ++i)                  \
                         {                                                      \
@@ -120,14 +120,7 @@
         {                                                                      \
                 if(s->size == s->max)                                          \
                 {                                                              \
-                        if(s->max == 0)                                        \
-                        {                                                      \
-                                s->max = 1;                                    \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                s->max *= 2;                                   \
-                        }                                                      \
+                        s->max = (s->max == 0) ? 1 : s->max * 2;               \
                         s->data = (T *)realloc(s->data, sizeof(T) * s->max);   \
                 }                                                              \
         }                                                                      \
@@ -147,7 +140,7 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        T stack_top_##T(struct stack_##T *s)                                   \
+        T stack_top_##T(const struct stack_##T *s)                             \
         {                                                                      \
                 if(s->size)                                                    \
                 {                                                              \
