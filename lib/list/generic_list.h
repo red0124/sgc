@@ -542,13 +542,13 @@
                 return sorted;                                                 \
         }                                                                      \
                                                                                \
-        static inline void list_memswp_##T(char *i, char *j)                   \
+        static void list_memswp_##T(char *i, char *j)                          \
         {                                                                      \
-                T tmp;                                                         \
+                char tmp[sizeof(struct node_##T*)];                            \
                                                                                \
-                memcpy(&tmp, i, sizeof(struct node_##T *));                    \
+                memcpy(tmp, i, sizeof(struct node_##T *));                     \
                 memcpy(i, j, sizeof(struct node_##T *));                       \
-                memcpy(j, &tmp, sizeof(struct node_##T *));                    \
+                memcpy(j, tmp, sizeof(struct node_##T *));                     \
         }                                                                      \
                                                                                \
         static inline int list_compare_node_##T(                               \
