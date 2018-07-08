@@ -179,8 +179,8 @@
                 return equal;                                                  \
         }                                                                      \
                                                                                \
-        void vector_copy_##T(struct vector_##T *restrict dst,                  \
-                             const struct vector_##T *restrict src)            \
+        void vector_copy_##T(struct vector_##T *__restrict__ dst,              \
+                             const struct vector_##T *__restrict__ src)        \
         {                                                                      \
                 if(src->_size != 0)                                            \
                 {                                                              \
@@ -256,7 +256,7 @@
                         operate(&v->_data[i]);                                 \
                 }                                                              \
         }                                                                      \
-	                                                                       \
+                                                                               \
         void vector_operate_to_##T(struct vector_##T *v,                       \
                                    void (*operate)(T *, void *), void *argout) \
         {                                                                      \
