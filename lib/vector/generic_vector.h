@@ -25,6 +25,36 @@
 
 #define THRESH 7
 
+#ifndef VECTOR_KILL_WARNINGS
+#warning "VECTOR: define 'VECTOR_KILL_WARNINGS' to remove all warnings"
+
+#ifndef VECTOR_KILL_INIT_WARNING
+#warning "VECTOR: using 'void' as default vector element init"
+#warning "VECTOR: define 'VECTOR_KILL_INIT_WARNING' to remove warning"
+#endif
+
+#ifndef VECTOR_KILL_COPY_WARNING
+#warning "VECTOR: using '=' as default vector element copy"
+#warning "VECTOR: define 'VECTOR_KILL_COPY_WARNING' to remove warning"
+#endif
+
+#ifndef VECTOR_KILL_COMPARE_WARNING
+#warning "VECTOR: using 'memcmp' as default vector element compare"
+#warning "VECTOR: define 'VECTOR_KILL_COMPARE_WARNING' to remove warning"
+#endif
+
+#ifndef VECTOR_KILL_EQUAL_WARNING
+#warning "VECTOR: using 'memcmp' as default vector element equal"
+#warning "VECTOR: define 'VECTOR_KILL_EQUAL_WARNING' to remove warning"
+#endif
+
+#ifndef VECTOR_KILL_FREE_WARNING
+#warning "VECTOR: using 'void' as default vector element free"
+#warning "VECTOR: define 'VECTOR_KILL_FREE_WARNING' to remove warning"
+#endif
+
+#endif
+
 #define INIT_VECTOR(T)                                                         \
                                                                                \
         struct vector_##T                                                      \
@@ -32,68 +62,80 @@
                 size_t _size;                                                  \
                 size_t _max;                                                   \
                 T *_data;                                                      \
-                void (*_copy)(T *, const T *);                                 \
-                void (*_free)(T *);                                            \
-                int (*_comp)(const void *, const void *);                      \
-                int (*_equ)(const T *, const T *);                             \
-                size_t (*size)(const struct vector_##T *);                     \
-                void (*set_copy)(struct vector_##T *,                          \
-                                 void (*copy)(T *, const T *));                \
-                void (*set_free)(struct vector_##T *, void (*free)(T *));      \
-                void (*set_comp)(struct vector_##T *,                          \
-                                 int (*comp)(const void *, const void *));     \
-                void (*set_equ)(struct vector_##T *,                           \
-                                int (*equ)(const T *, const T *));             \
-                void (*free)(struct vector_##T *);                             \
-                int (*equ)(const struct vector_##T *,                          \
-                           const struct vector_##T *);                         \
-                void (*copy)(struct vector_##T * restrict,                     \
-                             const struct vector_##T *restrict);               \
-                void (*from_array)(struct vector_##T *, const T *,             \
-                                   const size_t);                              \
-                void (*set)(struct vector_##T *, const size_t, T);             \
-                void (*operate)(struct vector_##T *, void (*operate)(T *));    \
-                void (*operate_to)(struct vector_##T *,                        \
-                                   void (*operate)(T *, void *), void *);      \
-                void (*operate_inverted)(struct vector_##T *,                  \
-                                         void (*operate)(T *));                \
-                void (*assign)(struct vector_##T *, size_t, size_t, T);        \
-                void (*push_back)(struct vector_##T *, T);                     \
-                void (*push_front)(struct vector_##T *, T);                    \
-                T *(*pop_back)(struct vector_##T *);                           \
-                void (*insert)(struct vector_##T *, const size_t, T);          \
-                T *(*at)(struct vector_##T *, const size_t);                   \
-                T *(*back)(struct vector_##T *);                               \
-                T *(*front)(struct vector_##T *);                              \
-                ssize_t (*locate)(const struct vector_##T *, const T);         \
-                int (*find)(const struct vector_##T *, const T);               \
-                size_t (*count)(const struct vector_##T *, const T);           \
-                void (*erase_at)(struct vector_##T *, const size_t);           \
-                int (*erase)(struct vector_##T *, const T);                    \
-                int (*erase_all)(struct vector_##T *, const T);                \
-                int (*is_sorted)(const struct vector_##T *,                    \
-                                 int (*comp)(const void *, const void *));     \
-                void (*sort)(struct vector_##T *,                              \
-                             int (*comp)(const void *, const void *));         \
-                struct vector_##T (*new)();                                    \
-                void (*init)(struct vector_##T *);                             \
         };                                                                     \
                                                                                \
-        static void vector_set_methods_##T(struct vector_##T *v);              \
+        void vector_init_##T(struct vector_##T *v)                             \
+        {                                                                      \
+                v->_size = v->_max = 0;                                        \
+                v->_data = NULL;                                               \
+        }                                                                      \
                                                                                \
-        static void vector_flat_copy_##T(T *dst, const T *src)                 \
+        static void vector_element_default_init_##T(T *el)                     \
+        {                                                                      \
+                (void)el;                                                      \
+        }                                                                      \
+                                                                               \
+        void (*vector_element_init_##T)(T *) =                                 \
+            vector_element_default_init_##T;                                   \
+                                                                               \
+        void vector_set_init_##T(void (*init)(T *))                            \
+        {                                                                      \
+                vector_element_init_##T = init;                                \
+        }                                                                      \
+                                                                               \
+        static void vector_element_default_copy_##T(T *dst, const T *src)      \
         {                                                                      \
                 *dst = *src;                                                   \
         }                                                                      \
                                                                                \
-        static int vector_flat_equ_##T(const T *first, const T *second)        \
+        void (*vector_element_copy_##T)(T *, const T *) =                      \
+            vector_element_default_copy_##T;                                   \
+                                                                               \
+        void vector_set_copy_##T(void (*copy)(T *, const T *))                 \
+        {                                                                      \
+                vector_element_copy_##T = copy;                                \
+        }                                                                      \
+                                                                               \
+        static int vector_element_default_equal_##T(const T *first,            \
+                                                    const T *second)           \
         {                                                                      \
                 return memcmp(first, second, sizeof(T)) == 0;                  \
         }                                                                      \
                                                                                \
-        static int vector_flat_comp_##T(const void *first, const void *second) \
+        int (*vector_element_equal_##T)(const T *, const T *) =                \
+            vector_element_default_equal_##T;                                  \
+                                                                               \
+        void vector_set_equal_##T(int (*equal)(const T *, const T *))          \
+        {                                                                      \
+                vector_element_equal_##T = equal;                              \
+        }                                                                      \
+                                                                               \
+        static int vector_element_default_compare_##T(const void *first,       \
+                                                      const void *second)      \
         {                                                                      \
                 return memcmp(first, second, sizeof(T)) > 0;                   \
+        }                                                                      \
+                                                                               \
+        int (*vector_element_compare_##T)(const void *, const void *) =        \
+            vector_element_default_compare_##T;                                \
+                                                                               \
+        void vector_set_compare_##T(                                           \
+            int (*compare)(const void *, const void *))                        \
+        {                                                                      \
+                vector_element_compare_##T = compare;                          \
+        }                                                                      \
+                                                                               \
+        static void vector_element_default_free_##T(T *el)                     \
+        {                                                                      \
+                (void)el;                                                      \
+        }                                                                      \
+                                                                               \
+        void (*vector_element_free_##T)(T *) =                                 \
+            vector_element_default_free_##T;                                   \
+                                                                               \
+        void vector_set_free_##T(void (*free)(T *))                            \
+        {                                                                      \
+                vector_element_free_##T = free;                                \
         }                                                                      \
                                                                                \
         size_t vector_size_##T(const struct vector_##T *v)                     \
@@ -101,46 +143,24 @@
                 return v->_size;                                               \
         }                                                                      \
                                                                                \
-        void vector_set_copy_##T(struct vector_##T *v,                         \
-                                 void (*copy)(T *, const T *))                 \
-        {                                                                      \
-                v->_copy = copy;                                               \
-        }                                                                      \
-                                                                               \
-        void vector_set_free_##T(struct vector_##T *v, void (*free)(T *))      \
-        {                                                                      \
-                v->_free = free;                                               \
-        }                                                                      \
-                                                                               \
-        void vector_set_comp_##T(struct vector_##T *v,                         \
-                                 int (*comp)(const void *, const void *))      \
-        {                                                                      \
-                v->_comp = comp;                                               \
-        }                                                                      \
-                                                                               \
-        void vector_set_equ_##T(struct vector_##T *v,                          \
-                                int (*equ)(const T *, const T *))              \
-        {                                                                      \
-                v->_equ = equ;                                                 \
-        }                                                                      \
-                                                                               \
         void vector_free_##T(struct vector_##T *v)                             \
         {                                                                      \
                 if(v->_data)                                                   \
                 {                                                              \
-                        if(v->_free)                                           \
+                        if(vector_element_free_##T !=                          \
+                           vector_element_default_free_##T)                    \
                         {                                                      \
                                 for(size_t i = 0; i < v->_size; ++i)           \
                                 {                                              \
-                                        v->_free(&v->_data[i]);                \
+                                        vector_element_free_##T(&v->_data[i]); \
                                 }                                              \
                         }                                                      \
                         free(v->_data);                                        \
                 }                                                              \
         }                                                                      \
                                                                                \
-        int vector_equ_##T(const struct vector_##T *first,                     \
-                           const struct vector_##T *second)                    \
+        int vector_equal_##T(const struct vector_##T *first,                   \
+                             const struct vector_##T *second)                  \
         {                                                                      \
                 int equal = (first == second);                                 \
                 if(equal == 0 && first->_size == second->_size)                \
@@ -148,8 +168,8 @@
                         equal = 1;                                             \
                         for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
-                                if(!first->_equ(&first->_data[i],              \
-                                                &second->_data[i]))            \
+                                if(!vector_element_equal_##T(                  \
+                                       &first->_data[i], &second->_data[i]))   \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -167,16 +187,21 @@
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
                         dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
-                        for(size_t i = 0; i < dst->_size; ++i)                 \
+                        if(vector_element_copy_##T ==                          \
+                           vector_element_default_copy_##T)                    \
                         {                                                      \
-                                src->_copy(&dst->_data[i], &src->_data[i]);    \
+                                memcpy(dst->_data, src->_data,                 \
+                                       src->_size * sizeof(T));                \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                for(size_t i = 0; i < dst->_size; ++i)         \
+                                {                                              \
+                                        vector_element_copy_##T(               \
+                                            &dst->_data[i], &src->_data[i]);   \
+                                }                                              \
                         }                                                      \
                 }                                                              \
-                dst->_copy = src->_copy;                                       \
-                dst->_free = src->_free;                                       \
-                dst->_comp = src->_comp;                                       \
-                dst->_equ = src->_equ;                                         \
-                vector_set_methods_##T(dst);                                   \
         }                                                                      \
                                                                                \
         void vector_from_array_##T(struct vector_##T *v, const T *arr,         \
@@ -184,9 +209,17 @@
         {                                                                      \
                 v->_max = v->_size = size;                                     \
                 v->_data = (T *)malloc(sizeof(T) * size);                      \
-                for(size_t i = 0; i < v->_size; ++i)                           \
+                if(vector_element_copy_##T == vector_element_default_copy_##T) \
                 {                                                              \
-                        v->_copy(&v->_data[i], &arr[i]);                       \
+                        memcpy(v->_data, arr, size * sizeof(T));               \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        for(size_t i = 0; i < v->_size; ++i)                   \
+                        {                                                      \
+                                vector_element_copy_##T(&v->_data[i],          \
+                                                        &arr[i]);              \
+                        }                                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -194,16 +227,17 @@
         {                                                                      \
                 if(v->_size == v->_max)                                        \
                 {                                                              \
-                        if(v->_max == 0)                                       \
-                        {                                                      \
-                                v->_max = 1;                                   \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                v->_max *= 2;                                  \
-                        }                                                      \
+                        v->_max = (v->_max == 0) ? 1 : v->_max * 2;            \
                         v->_data =                                             \
                             (T *)realloc(v->_data, sizeof(T) * v->_max);       \
+                        if(vector_element_init_##T !=                          \
+                           vector_element_default_init_##T)                    \
+                        {                                                      \
+                                for(size_t i = v->_size; i < v->_max; ++i)     \
+                                {                                              \
+                                        vector_element_init_##T(&v->_data[i]); \
+                                }                                              \
+                        }                                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -211,7 +245,7 @@
         {                                                                      \
                 if(at < v->_size)                                              \
                 {                                                              \
-                        v->_copy(&v->_data[at], &el);                          \
+                        vector_element_copy_##T(&v->_data[at], &el);           \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -222,6 +256,7 @@
                         operate(&v->_data[i]);                                 \
                 }                                                              \
         }                                                                      \
+	                                                                       \
         void vector_operate_to_##T(struct vector_##T *v,                       \
                                    void (*operate)(T *, void *), void *argout) \
         {                                                                      \
@@ -243,11 +278,11 @@
         void vector_assign_##T(struct vector_##T *v, size_t begin, size_t end, \
                                T el)                                           \
         {                                                                      \
-                if(v->_size > end && end > begin)                              \
+                if(v->_size > end)                                             \
                 {                                                              \
                         for(size_t i = begin; i < end; ++i)                    \
                         {                                                      \
-                                v->_copy(&v->_data[i], &el);                   \
+                                vector_element_copy_##T(&v->_data[i], &el);    \
                         }                                                      \
                 }                                                              \
         }                                                                      \
@@ -255,7 +290,7 @@
         void vector_push_back_##T(struct vector_##T *v, T el)                  \
         {                                                                      \
                 vector_resize_##T(v);                                          \
-                v->_copy(&v->_data[v->_size], &el);                            \
+                vector_element_copy_##T(&v->_data[v->_size], &el);             \
                 ++v->_size;                                                    \
         }                                                                      \
                                                                                \
@@ -277,9 +312,10 @@
                         vector_resize_##T(v);                                  \
                         for(size_t i = v->_size; i > at; --i)                  \
                         {                                                      \
-                                v->_copy(&v->_data[i], &v->_data[i - 1]);      \
+                                vector_element_copy_##T(&v->_data[i],          \
+                                                        &v->_data[i - 1]);     \
                         }                                                      \
-                        v->_copy(&v->_data[at], &el);                          \
+                        vector_element_copy_##T(&v->_data[at], &el);           \
                         ++v->_size;                                            \
                 }                                                              \
                 else                                                           \
@@ -318,7 +354,7 @@
                 ssize_t position = -1;                                         \
                 for(size_t i = 0; i < v->_size; ++i)                           \
                 {                                                              \
-                        if(v->_equ(&v->_data[i], &el))                         \
+                        if(vector_element_equal_##T(&v->_data[i], &el))        \
                         {                                                      \
                                 position = i;                                  \
                                 break;                                         \
@@ -337,7 +373,7 @@
                 size_t count = 0;                                              \
                 for(size_t i = 0; i < v->_size; ++i)                           \
                 {                                                              \
-                        if(v->_equ(&v->_data[i], &el))                         \
+                        if(vector_element_equal_##T(&v->_data[i], &el))        \
                         {                                                      \
                                 count++;                                       \
                         }                                                      \
@@ -351,7 +387,8 @@
                 {                                                              \
                         for(size_t i = at; i < v->_size - 1; ++i)              \
                         {                                                      \
-                                v->_copy(&v->_data[i], &v->_data[i + 1]);      \
+                                vector_element_copy_##T(&v->_data[i],          \
+                                                        &v->_data[i + 1]);     \
                         }                                                      \
                         --v->_size;                                            \
                 }                                                              \
@@ -495,67 +532,8 @@
         {                                                                      \
                 if(comp == NULL)                                               \
                 {                                                              \
-                        comp = v->_comp;                                       \
+                        comp = vector_element_compare_##T;                     \
                 }                                                              \
                 vector_qsort_##T(v->_data, v->_size, comp);                    \
-        }                                                                      \
-                                                                               \
-        struct vector_##T vector_new_##T()                                     \
-        {                                                                      \
-                struct vector_##T v = {._size = 0,                             \
-                                       ._max = 0,                              \
-                                       ._data = NULL,                          \
-                                       ._copy = vector_flat_copy_##T,          \
-                                       ._free = NULL,                          \
-                                       ._comp = vector_flat_comp_##T,          \
-                                       ._equ = vector_flat_equ_##T};           \
-                vector_set_methods_##T(&v);                                    \
-                return v;                                                      \
-        }                                                                      \
-                                                                               \
-        void vector_init_##T(struct vector_##T *v)                             \
-        {                                                                      \
-                v->_size = 0;                                                  \
-                v->_max = 0;                                                   \
-                v->_data = NULL;                                               \
-                v->_copy = vector_flat_copy_##T;                               \
-                v->_free = NULL;                                               \
-                v->_comp = vector_flat_comp_##T;                               \
-                v->_equ = vector_flat_equ_##T;                                 \
-                vector_set_methods_##T(v);                                     \
-        }                                                                      \
-                                                                               \
-        static void vector_set_methods_##T(struct vector_##T *v)               \
-        {                                                                      \
-                v->size = vector_size_##T;                                     \
-                v->set_copy = vector_set_copy_##T;                             \
-                v->set_free = vector_set_free_##T;                             \
-                v->set_comp = vector_set_comp_##T;                             \
-                v->set_equ = vector_set_equ_##T;                               \
-                v->free = vector_free_##T;                                     \
-                v->equ = vector_equ_##T;                                       \
-                v->copy = vector_copy_##T;                                     \
-                v->from_array = vector_from_array_##T;                         \
-                v->set = vector_set_##T;                                       \
-                v->operate = vector_operate_##T;                               \
-                v->operate_to = vector_operate_to_##T;                         \
-                v->operate_inverted = vector_operate_inverted_##T;             \
-                v->assign = vector_assign_##T;                                 \
-                v->push_back = vector_push_back_##T;                           \
-                v->push_front = vector_push_front_##T;                         \
-                v->pop_back = vector_pop_back_##T;                             \
-                v->insert = vector_insert_##T;                                 \
-                v->at = vector_at_##T;                                         \
-                v->back = vector_back_##T;                                     \
-                v->front = vector_front_##T;                                   \
-                v->locate = vector_locate_##T;                                 \
-                v->find = vector_find_##T;                                     \
-                v->count = vector_count_##T;                                   \
-                v->erase_at = vector_erase_at_##T;                             \
-                v->erase = vector_erase_##T;                                   \
-                v->erase_all = vector_erase_all_##T;                           \
-                v->is_sorted = vector_is_sorted_##T;                           \
-                v->sort = vector_sort_##T;                                     \
-                v->new = vector_new_##T;                                       \
-                v->init = vector_init_##T;                                     \
-        }\
+        }
+\
