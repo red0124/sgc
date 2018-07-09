@@ -2,93 +2,128 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef STACK_KILL_WARNINGS
+#warning "STACK: define 'STACK_KILL_WARNINGS' to remove all warnings"
+
+#ifndef STACK_KILL_INIT_WARNING
+#warning "STACK: using 'void' as default stack element init"
+#warning "STACK: define 'STACK_KILL_INIT_WARNING' to remove warning"
+#endif
+
+#ifndef STACK_KILL_COPY_WARNING
+#warning "STACK: using '=' as default stack element copy"
+#warning "STACK: define 'STACK_KILL_COPY_WARNING' to remove warning"
+#endif
+
+#ifndef STACK_KILL_EQUAL_WARNING
+#warning "STACK: using 'memcmp' as default stack element equal"
+#warning "STACK: define 'STACK_KILL_EQUAL_WARNING' to remove warning"
+#endif
+
+#ifndef STACK_KILL_FREE_WARNING
+#warning "STACK: using 'void' as default stack element free"
+#warning "STACK: define 'STACK_KILL_FREE_WARNING' to remove warning"
+#endif
+
+#endif
+
 #define INIT_STACK(T)                                                          \
                                                                                \
         struct stack_##T                                                       \
         {                                                                      \
-                size_t size;                                                   \
-                size_t max;                                                    \
-                T *data;                                                       \
-                void (*copy)(T *, const T *);                                  \
-                void (*free)(T *);                                             \
-                int (*equ)(const T *, const T *);                              \
+                size_t _size;                                                  \
+                size_t _max;                                                   \
+                T *_data;                                                      \
         };                                                                     \
                                                                                \
-        static void stack_flat_copy_##T(T *dst, const T *src)                  \
+        static void stack_element_default_init_##T(T *el)                      \
+        {                                                                      \
+                (void)el;                                                      \
+        }                                                                      \
+                                                                               \
+        void (*stack_element_init_##T)(T *) = stack_element_default_init_##T;  \
+                                                                               \
+        void stack_set_init_##T(void (*init)(T *))                             \
+        {                                                                      \
+                stack_element_init_##T = init;                                 \
+        }                                                                      \
+                                                                               \
+        static void stack_element_default_copy_##T(T *dst, const T *src)       \
         {                                                                      \
                 *dst = *src;                                                   \
         }                                                                      \
                                                                                \
-        static int stack_flat_equ_##T(const T *first, const T *second)         \
+        void (*stack_element_copy_##T)(T *, const T *) =                       \
+            stack_element_default_copy_##T;                                    \
+                                                                               \
+        void stack_set_copy_##T(void (*copy)(T *, const T *))                  \
+        {                                                                      \
+                stack_element_copy_##T = copy;                                 \
+        }                                                                      \
+                                                                               \
+        static int stack_element_default_equal_##T(const T *first,             \
+                                                   const T *second)            \
         {                                                                      \
                 return memcmp(first, second, sizeof(T)) == 0;                  \
         }                                                                      \
                                                                                \
+        int (*stack_element_equal_##T)(const T *, const T *) =                 \
+            stack_element_default_equal_##T;                                   \
+                                                                               \
+        void stack_set_equal_##T(int (*equal)(const T *, const T *))           \
+        {                                                                      \
+                stack_element_equal_##T = equal;                               \
+        }                                                                      \
+                                                                               \
+        static void stack_element_default_free_##T(T *el)                      \
+        {                                                                      \
+                (void)el;                                                      \
+        }                                                                      \
+                                                                               \
+        void (*stack_element_free_##T)(T *) = stack_element_default_free_##T;  \
+                                                                               \
+        void stack_set_free_##T(void (*free)(T *))                             \
+        {                                                                      \
+                stack_element_free_##T = free;                                 \
+        }                                                                      \
+                                                                               \
         size_t stack_size_##T(const struct stack_##T *s)                       \
         {                                                                      \
-                return s->size;                                                \
-        }                                                                      \
-                                                                               \
-        struct stack_##T stack_new_##T()                                       \
-        {                                                                      \
-                struct stack_##T s = {0,    0,                                 \
-                                      NULL, stack_flat_copy_##T,               \
-                                      NULL, stack_flat_equ_##T};               \
-                return s;                                                      \
-        }                                                                      \
-                                                                               \
-        void stack_set_copy_##T(struct stack_##T *s,                           \
-                                void (*copy)(T *, const T *))                  \
-        {                                                                      \
-                s->copy = copy;                                                \
-        }                                                                      \
-                                                                               \
-        void stack_set_free_##T(struct stack_##T *s, void (*free_)(T *))       \
-        {                                                                      \
-                s->free = free_;                                               \
-        }                                                                      \
-                                                                               \
-        void stack_set_equ_##T(struct stack_##T *s,                            \
-                               int (*equ)(const T *, const T *))               \
-        {                                                                      \
-                s->equ = equ;                                                  \
+                return s->_size;                                               \
         }                                                                      \
                                                                                \
         void stack_init_##T(struct stack_##T *s)                               \
         {                                                                      \
-                s->size = 0;                                                   \
-                s->max = 0;                                                    \
-                s->data = NULL;                                                \
-                s->copy = stack_flat_copy_##T;                                 \
-                s->free = NULL;                                                \
-                s->equ = stack_flat_equ_##T;                                   \
+                s->_size = s->_max = 0;                                        \
+                s->_data = NULL;                                               \
         }                                                                      \
                                                                                \
         void stack_free_##T(struct stack_##T *s)                               \
         {                                                                      \
-                if(s->data)                                                    \
+                if(s->_data)                                                   \
                 {                                                              \
-                        if(s->free)                                            \
+                        if(stack_element_free_##T !=                           \
+                           stack_element_default_free_##T)                     \
                         {                                                      \
-                                for(size_t i = 0; i < s->size; ++i)            \
+                                for(size_t i = 0; i < s->_size; ++i)           \
                                 {                                              \
-                                        s->free(&s->data[i]);                  \
+                                        stack_element_free_##T(&s->_data[i]);  \
                                 }                                              \
                         }                                                      \
-                        free(s->data);                                         \
+                        free(s->_data);                                        \
                 }                                                              \
         }                                                                      \
                                                                                \
-        int stack_equ_##T(struct stack_##T *first, struct stack_##T *second)   \
+        int stack_equal_##T(struct stack_##T *first, struct stack_##T *second) \
         {                                                                      \
                 int equal = (first == second);                                 \
-                if(equal == 0 && first->size == second->size)                  \
+                if(equal == 0 && first->_size == second->_size)                \
                 {                                                              \
                         equal = 1;                                             \
-                        for(size_t i = 0; i < first->size; ++i)                \
+                        for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
-                                if(!first->equ(&first->data[i],                \
-                                               &second->data[i]))              \
+                                if(stack_element_equal_##T(&first->_data[i],   \
+                                                           &second->_data[i])) \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -98,53 +133,70 @@
                 return equal;                                                  \
         }                                                                      \
                                                                                \
-        void stack_copy_##T(struct stack_##T *restrict dst,                    \
-                            const struct stack_##T *restrict src)              \
+        void stack_copy_##T(struct stack_##T *__restrict__ dst,                \
+                            const struct stack_##T *__restrict__ src)          \
         {                                                                      \
-		dst->size = src->size;                                         \
-		dst->max = src->size;                                          \
-                if(src->size != 0)                                             \
+                dst->_size = src->_size;                                       \
+                dst->_max = src->_size;                                        \
+                if(src->_size != 0)                                            \
                 {                                                              \
-                        dst->data = (T *)malloc(dst->max * sizeof(T));         \
-                        for(size_t i = 0; i < dst->size; ++i)                  \
+                        dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
+                        if(stack_element_copy_##T ==                           \
+                           stack_element_default_copy_##T)                     \
                         {                                                      \
-                                src->copy(&dst->data[i], &src->data[i]);       \
+                                memcpy(dst->_data, src->_data,                 \
+                                       sizeof(T) * src->_size);                \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                for(size_t i = 0; i < dst->_size; ++i)         \
+                                {                                              \
+                                        stack_element_copy_##T(                \
+                                            &dst->_data[i], &src->_data[i]);   \
+                                }                                              \
                         }                                                      \
                 }                                                              \
-                dst->copy = src->copy;                                         \
-                dst->free = src->free;                                         \
-                dst->equ = src->equ;                                           \
         }                                                                      \
                                                                                \
         static void stack_resize_##T(struct stack_##T *s)                      \
         {                                                                      \
-                if(s->size == s->max)                                          \
+                if(s->_size == s->_max)                                        \
                 {                                                              \
-                        s->max = (s->max == 0) ? 1 : s->max * 2;               \
-                        s->data = (T *)realloc(s->data, sizeof(T) * s->max);   \
+                        s->_max = (s->_max == 0) ? 1 : s->_max * 2;            \
+                        s->_data =                                             \
+                            (T *)realloc(s->_data, sizeof(T) * s->_max);       \
+                        if(stack_element_init_##T !=                           \
+                           stack_element_default_init_##T)                     \
+                        {                                                      \
+                                for(size_t i = s->_size; i < s->_max; ++i)     \
+                                {                                              \
+                                        stack_element_default_init_##T(        \
+                                            &s->_data[i]);                     \
+                                }                                              \
+                        }                                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
         void stack_push_##T(struct stack_##T *s, T el)                         \
         {                                                                      \
                 stack_resize_##T(s);                                           \
-                s->copy(&s->data[s->size], &el);                               \
-                ++s->size;                                                     \
+                stack_element_copy_##T(&s->_data[s->_size], &el);              \
+                ++s->_size;                                                    \
         }                                                                      \
                                                                                \
         void stack_pop_##T(struct stack_##T *s)                                \
         {                                                                      \
-                if(s->size)                                                    \
+                if(s->_size)                                                   \
                 {                                                              \
-                        --s->size;                                             \
+                        --s->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
         T stack_top_##T(const struct stack_##T *s)                             \
         {                                                                      \
-                if(s->size)                                                    \
+                if(s->_size)                                                   \
                 {                                                              \
-                        return s->data[s->size - 1];                           \
+                        return s->_data[s->_size - 1];                         \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -156,5 +208,5 @@
                                                                                \
         int stack_empty_##T(struct stack_##T *s)                               \
         {                                                                      \
-                return s->size == 0;                                           \
+                return s->_size == 0;                                          \
         }
