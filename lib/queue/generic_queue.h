@@ -3,68 +3,85 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef QUEUE_KILL_WARNINGS
+#warning "QUEUE: define 'QUEUE_KILL_WARNINGS' to remove all warnings"
+
+#ifndef QUEUE_KILL_COPY_WARNING
+#warning "QUEUE: using '=' as default vector element copy"
+#warning "QUEUE: define 'QUEUE_KILL_COPY_WARNING' to remove warning"
+#endif
+
+#ifndef QUEUE_KILL_EQUAL_WARNING
+#warning "QUEUE: using 'memcmp' as default vector element equal"
+#warning "QUEUE: define 'QUEUE_KILL_EQUAL_WARNING' to remove warning"
+#endif
+
+#ifndef QUEUE_KILL_FREE_WARNING
+#warning "QUEUE: using 'void' as default vector element free"
+#warning "QUEUE: define 'QUEUE_KILL_FREE_WARNING' to remove warning"
+#endif
+
+#endif
+
 #define INIT_QUEUE(T)                                                          \
                                                                                \
         struct queue_##T                                                       \
         {                                                                      \
-                size_t size;                                                   \
-                size_t max;                                                    \
-                size_t back;                                                   \
-                size_t front;                                                  \
-                T *data;                                                       \
-                void (*copy)(T *, const T *);                                  \
-                void (*free)(T *);                                             \
-                int (*equ)(const T *, const T *);                              \
+                size_t _size;                                                  \
+                size_t _max;                                                   \
+                size_t _back;                                                  \
+                size_t _front;                                                 \
+                T *_data;                                                      \
         };                                                                     \
                                                                                \
-        static void queue_flat_copy_##T(T *dst, const T *src)                  \
+        void queue_init_##T(struct queue_##T *q)                               \
+        {                                                                      \
+                q->_size = q->_max = q->_back = q->_front = 0;                 \
+                q->_data = NULL;                                               \
+        }                                                                      \
+                                                                               \
+        static void queue_element_default_copy_##T(T *dst, const T *src)       \
         {                                                                      \
                 *dst = *src;                                                   \
         }                                                                      \
                                                                                \
-        static int queue_flat_equ_##T(const T *first, const T *second)         \
+        void (*queue_element_copy_##T)(T *, const T *) =                       \
+            queue_element_default_copy_##T;                                    \
+                                                                               \
+        void queue_set_copy_##T(void (*copy)(T *, const T *))                  \
+        {                                                                      \
+                queue_element_copy_##T = copy;                                 \
+        }                                                                      \
+                                                                               \
+        static int queue_element_default_equal_##T(const T *first,             \
+                                                   const T *second)            \
         {                                                                      \
                 return memcmp(first, second, sizeof(T)) == 0;                  \
         }                                                                      \
                                                                                \
+        int (*queue_element_equal_##T)(const T *, const T *) =                 \
+            queue_element_default_equal_##T;                                   \
+                                                                               \
+        void queue_set_equal_##T(int (*equal)(const T *, const T *))           \
+        {                                                                      \
+                queue_element_equal_##T = equal;                               \
+        }                                                                      \
+                                                                               \
+        static void queue_element_default_free_##T(T *el)                      \
+        {                                                                      \
+                (void)el;                                                      \
+        }                                                                      \
+                                                                               \
+        void (*queue_element_free_##T)(T *) = queue_element_default_free_##T;  \
+                                                                               \
+        void queue_set_free_##T(void (*free)(T *))                             \
+        {                                                                      \
+                queue_element_free_##T = free;                                 \
+        }                                                                      \
+                                                                               \
         size_t queue_size_##T(const struct queue_##T *q)                       \
         {                                                                      \
-                return q->size;                                                \
-        }                                                                      \
-                                                                               \
-        struct queue_##T queue_new_##T()                                       \
-        {                                                                      \
-                struct queue_##T q = {0,    0,                                 \
-                                      0,    0,                                 \
-                                      NULL, queue_flat_copy_##T,               \
-                                      NULL, queue_flat_equ_##T};               \
-                return q;                                                      \
-        }                                                                      \
-                                                                               \
-        void queue_set_copy_##T(struct queue_##T *q,                           \
-                                void (*copy)(T *, const T *))                  \
-        {                                                                      \
-                q->copy = copy;                                                \
-        }                                                                      \
-                                                                               \
-        void queue_set_free_##T(struct queue_##T *q, void (*free_)(T *))       \
-        {                                                                      \
-                q->free = free_;                                               \
-        }                                                                      \
-                                                                               \
-        void queue_set_equ_##T(struct queue_##T *q,                            \
-                               int (*equ)(const T *, const T *))               \
-        {                                                                      \
-                q->equ = equ;                                                  \
-        }                                                                      \
-                                                                               \
-        void queue_init_##T(struct queue_##T *q)                               \
-        {                                                                      \
-                q->size = q->max = q->back = q->front = 0;                     \
-                q->data = NULL;                                                \
-                q->copy = queue_flat_copy_##T;                                 \
-                q->free = NULL;                                                \
-                q->equ = queue_flat_equ_##T;                                   \
+                return q->_size;                                               \
         }                                                                      \
                                                                                \
         static void queue_move_##T(size_t *flag, const size_t max)             \
@@ -81,40 +98,39 @@
                                                                                \
         void queue_free_##T(struct queue_##T *q)                               \
         {                                                                      \
-                if(!q->data)                                                   \
+                if(!q->_data)                                                  \
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                if(q->free)                                                    \
+                if(queue_element_free_##T != queue_element_default_free_##T)   \
                 {                                                              \
-                        size_t i = q->back;                                    \
-                        while(i != q->front)                                   \
+                        for(size_t i = q->_back; i != q->_front;)              \
                         {                                                      \
-                                q->free(&q->data[i]);                          \
-                                queue_move_##T(&i, q->max);                    \
+                                queue_element_free_##T(&q->_data[i]);          \
+                                queue_move_##T(&i, q->_max);                   \
                         }                                                      \
                 }                                                              \
-                free(q->data);                                                 \
+                free(q->_data);                                                \
         }                                                                      \
                                                                                \
-        int queue_equ_##T(struct queue_##T *first, struct queue_##T *second)   \
+        int queue_equal_##T(struct queue_##T *first, struct queue_##T *second) \
         {                                                                      \
                 int equal = (first == second);                                 \
-                if(equal == 0 && first->size == second->size)                  \
+                if(equal == 0 && first->_size == second->_size)                \
                 {                                                              \
                         equal = 1;                                             \
-                        size_t i = first->front;                               \
-                        size_t j = second->front;                              \
-                        for(size_t k = 0; k < first->size; ++k)                \
+                        size_t i = first->_front;                              \
+                        size_t j = second->_front;                             \
+                        for(size_t k = 0; k < first->_size; ++k)               \
                         {                                                      \
-                                if(!first->equ(&first->data[i],                \
-                                               &second->data[j]))              \
+                                if(queue_element_equal_##T(&first->_data[i],   \
+                                                           &second->_data[j])) \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
                                 }                                              \
-                                queue_move_##T(&i, first->max);                \
-                                queue_move_##T(&j, second->max);               \
+                                queue_move_##T(&i, first->_max);               \
+                                queue_move_##T(&j, second->_max);              \
                         }                                                      \
                 }                                                              \
                 return equal;                                                  \
@@ -123,52 +139,52 @@
         void queue_copy_##T(struct queue_##T *restrict dst,                    \
                             const struct queue_##T *restrict src)              \
         {                                                                      \
-                if(src->size != 0)                                             \
+                if(src->_size != 0)                                            \
                 {                                                              \
-                        dst->data = (T *)malloc(src->size * sizeof(T));        \
-                        size_t i = src->front;                                 \
-                        for(size_t j = 0; j < src->size; ++j)                  \
+                        dst->_data = (T *)malloc(src->_size * sizeof(T));      \
+                        size_t i = src->_front;                                \
+                        for(size_t j = 0; j < src->_size; ++j)                 \
                         {                                                      \
-                                src->copy(&dst->data[j], &src->data[i]);       \
-                                queue_move_##T(&i, src->max);                  \
+                                queue_element_copy_##T(&dst->_data[j],         \
+                                                       &src->_data[i]);        \
+                                queue_move_##T(&i, src->_max);                 \
                         }                                                      \
                 }                                                              \
                                                                                \
-                dst->size = dst->max = src->size;                              \
-                dst->back = src->size - 1;                                     \
-                dst->front = 0;                                                \
-                                                                               \
-                dst->copy = src->copy;                                         \
-                dst->free = src->free;                                         \
-                dst->equ = src->equ;                                           \
+                dst->_size = dst->_max = src->_size;                           \
+                dst->_back = src->_size - 1;                                   \
+                dst->_front = 0;                                               \
         }                                                                      \
                                                                                \
         static void queue_resize_##T(struct queue_##T *q)                      \
         {                                                                      \
-                if(q->size == q->max)                                          \
+                if(q->_size == q->_max)                                        \
                 {                                                              \
-                        q->max = (q->max == 0) ? 1 : q->max * 2;               \
+                        size_t max = q->_max;                                  \
+                        q->_max = (q->_max == 0) ? 1 : q->_max * 2;            \
                                                                                \
-                        if(q->front == 0)                                      \
+                        if(q->_front == 0)                                     \
                         {                                                      \
-                                q->data =                                      \
-                                    (T *)realloc(q->data, sizeof(T) * q->max); \
+                                q->_data = (T *)realloc(q->_data,              \
+                                                        sizeof(T) * q->_max);  \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                T *new_data = (T *)malloc(sizeof(T) * q->max); \
-                                size_t i = q->back;                            \
+                                T *new_data =                                  \
+                                    (T *)malloc(sizeof(T) * q->_max);          \
+                                size_t i = q->_front;                          \
                                 size_t j = 0;                                  \
-                                while(i != q->front)                           \
+                                do                                             \
                                 {                                              \
-                                        new_data[j] = q->data[i];              \
-                                        queue_move_##T(&i, q->max);            \
+                                        new_data[j] = q->_data[i];             \
+                                        queue_move_##T(&i, max);               \
                                         ++j;                                   \
-                                }                                              \
-                                free(q->data);                                 \
-                                q->data = new_data;                            \
-                                q->front = 0;                                  \
-                                q->back = q->size;                             \
+                                } while(i != q->_back);                        \
+                                new_data[j] = q->_data[i];                     \
+                                queue_free_##T(q);                             \
+                                q->_data = new_data;                           \
+                                q->_front = 0;                                 \
+                                q->_back = q->_size - 1;                       \
                         }                                                      \
                 }                                                              \
         }                                                                      \
@@ -176,49 +192,41 @@
         void queue_push_##T(struct queue_##T *q, T el)                         \
         {                                                                      \
                 queue_resize_##T(q);                                           \
-                queue_move_##T(&q->back, q->max);                              \
-                q->copy(&q->data[q->back], &el);                               \
-                ++q->size;                                                     \
+                queue_move_##T(&q->_back, q->_max);                            \
+                queue_element_copy_##T(&q->_data[q->_back], &el);              \
+                ++q->_size;                                                    \
         }                                                                      \
                                                                                \
-        T queue_front_##T(const struct queue_##T *q)                           \
+        T *queue_front_##T(const struct queue_##T *q)                          \
         {                                                                      \
-                if(q->size)                                                    \
+                T *ret = NULL;                                                 \
+                if(q->_size)                                                   \
                 {                                                              \
-                        return q->data[q->front];                              \
+                        ret = &q->_data[q->_front];                            \
                 }                                                              \
-                else                                                           \
-                {                                                              \
-                        fprintf(stderr,                                        \
-                                "QUEUE ERROR :: THE QUEUE IS EMPTY\n");        \
-                        exit(1);                                               \
-                }                                                              \
+                return ret;                                                    \
         }                                                                      \
                                                                                \
-        T queue_back_##T(const struct queue_##T *q)                            \
+        T *queue_back_##T(const struct queue_##T *q)                           \
         {                                                                      \
-                if(q->size)                                                    \
+                T *ret = NULL;                                                 \
+                if(q->_size)                                                   \
                 {                                                              \
-                        return q->data[q->back];                               \
+                        ret = &q->_data[q->_back];                             \
                 }                                                              \
-                else                                                           \
-                {                                                              \
-                        fprintf(stderr,                                        \
-                                "QUEUE ERROR :: THE QUEUE IS EMPTY\n");        \
-                        exit(1);                                               \
-                }                                                              \
+                return ret;                                                    \
         }                                                                      \
                                                                                \
         void queue_pop_##T(struct queue_##T *q)                                \
         {                                                                      \
-                if(q->size)                                                    \
+                if(q->_size)                                                   \
                 {                                                              \
-                        queue_move_##T(&q->front, q->max);                     \
-                        --q->size;                                             \
+                        queue_move_##T(&q->_front, q->_max);                   \
+                        --q->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
         int queue_empty_##T(const struct queue_##T *q)                         \
         {                                                                      \
-                return q->size == 0;                                           \
+                return q->_size == 0;                                          \
         }
