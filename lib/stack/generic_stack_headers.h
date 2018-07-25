@@ -17,7 +17,6 @@
         void stack_set_copy_##T(void (*copy)(T *, const T *));                 \
         void stack_set_free_##T(void (*free)(T *));                            \
         void stack_set_equal_##T(int (*equ)(const T *, const T *));            \
-        void stack_set_init_##T(void (*init)(T *));                            \
                                                                                \
         void stack_init_##T(struct stack_##T *);                               \
         void stack_free_##T(struct stack_##T *);                               \

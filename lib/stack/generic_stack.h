@@ -5,11 +5,6 @@
 #ifndef STACK_KILL_WARNINGS
 #warning "STACK: define 'STACK_KILL_WARNINGS' to remove all warnings"
 
-#ifndef STACK_KILL_INIT_WARNING
-#warning "STACK: using 'void' as default stack element init"
-#warning "STACK: define 'STACK_KILL_INIT_WARNING' to remove warning"
-#endif
-
 #ifndef STACK_KILL_COPY_WARNING
 #warning "STACK: using '=' as default stack element copy"
 #warning "STACK: define 'STACK_KILL_COPY_WARNING' to remove warning"
@@ -35,18 +30,6 @@
                 size_t _max;                                                   \
                 T *_data;                                                      \
         };                                                                     \
-                                                                               \
-        static void stack_element_default_init_##T(T *el)                      \
-        {                                                                      \
-                (void)el;                                                      \
-        }                                                                      \
-                                                                               \
-        void (*stack_element_init_##T)(T *) = stack_element_default_init_##T;  \
-                                                                               \
-        void stack_set_init_##T(void (*init)(T *))                             \
-        {                                                                      \
-                stack_element_init_##T = init;                                 \
-        }                                                                      \
                                                                                \
         static void stack_element_default_copy_##T(T *dst, const T *src)       \
         {                                                                      \
@@ -165,15 +148,6 @@
                         s->_max = (s->_max == 0) ? 1 : s->_max * 2;            \
                         s->_data =                                             \
                             (T *)realloc(s->_data, sizeof(T) * s->_max);       \
-                        if(stack_element_init_##T !=                           \
-                           stack_element_default_init_##T)                     \
-                        {                                                      \
-                                for(size_t i = s->_size; i < s->_max; ++i)     \
-                                {                                              \
-                                        stack_element_default_init_##T(        \
-                                            &s->_data[i]);                     \
-                                }                                              \
-                        }                                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
