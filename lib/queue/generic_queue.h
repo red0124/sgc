@@ -7,17 +7,17 @@
 #warning "QUEUE: define 'QUEUE_KILL_WARNINGS' to remove all warnings"
 
 #ifndef QUEUE_KILL_COPY_WARNING
-#warning "QUEUE: using '=' as default vector element copy"
+#warning "QUEUE: using '=' as default queue element copy"
 #warning "QUEUE: define 'QUEUE_KILL_COPY_WARNING' to remove warning"
 #endif
 
 #ifndef QUEUE_KILL_EQUAL_WARNING
-#warning "QUEUE: using 'memcmp' as default vector element equal"
+#warning "QUEUE: using 'memcmp' as default queue element equal"
 #warning "QUEUE: define 'QUEUE_KILL_EQUAL_WARNING' to remove warning"
 #endif
 
 #ifndef QUEUE_KILL_FREE_WARNING
-#warning "QUEUE: using 'void' as default vector element free"
+#warning "QUEUE: using 'void' as default queue element free"
 #warning "QUEUE: define 'QUEUE_KILL_FREE_WARNING' to remove warning"
 #endif
 
