@@ -163,28 +163,27 @@
                         size_t max = q->_max;                                  \
                         q->_max = (q->_max == 0) ? 1 : q->_max * 2;            \
                                                                                \
-                        if(q->_front == 0)                                     \
+                        q->_data =                                             \
+                            (T *)realloc(q->_data, sizeof(T) * q->_max);       \
+                                                                               \
+                        if(q->_front > q->_back)                               \
                         {                                                      \
-                                q->_data = (T *)realloc(q->_data,              \
-                                                        sizeof(T) * q->_max);  \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                T *new_data =                                  \
-                                    (T *)malloc(sizeof(T) * q->_max);          \
-                                size_t i = q->_front;                          \
-                                size_t j = 0;                                  \
-                                do                                             \
+                                size_t first_part = q->_back;                  \
+                                size_t second_part = max - q->_front;          \
+                                if(first_part > second_part)                   \
                                 {                                              \
-                                        new_data[j] = q->_data[i];             \
-                                        queue_move_##T(&i, max);               \
-                                        ++j;                                   \
-                                } while(i != q->_back);                        \
-                                new_data[j] = q->_data[i];                     \
-                                queue_free_##T(q);                             \
-                                q->_data = new_data;                           \
-                                q->_front = 0;                                 \
-                                q->_back = q->_size - 1;                       \
+                                        memcpy(q->_data +                      \
+                                                   (q->_max - second_part),    \
+                                               q->_data + q->_front,           \
+                                               second_part * sizeof(T));       \
+                                        q->_front = q->_front + max;           \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        memcpy(q->_data + max, q->_data,       \
+                                               (1 + first_part) * sizeof(T));  \
+                                        q->_back = q->_back + max;             \
+                                }                                              \
                         }                                                      \
                 }                                                              \
         }                                                                      \
