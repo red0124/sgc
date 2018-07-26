@@ -64,6 +64,19 @@
                 T *_data;                                                      \
         };                                                                     \
                                                                                \
+        static size_t vector_init_size_##T = 1;                                \
+        static double vector_growth_scale_##T = 2;                             \
+                                                                               \
+        void vector_set_init_size_##T(size_t init_size)                        \
+        {                                                                      \
+                vector_init_size_##T = init_size;                              \
+        }                                                                      \
+                                                                               \
+        void vector_set_growth_scale_##T(double growth_scale)                  \
+        {                                                                      \
+                vector_growth_scale_##T = growth_scale;                        \
+        }                                                                      \
+                                                                               \
         void vector_init_##T(struct vector_##T *v)                             \
         {                                                                      \
                 v->_size = v->_max = 0;                                        \
@@ -223,11 +236,26 @@
                 }                                                              \
         }                                                                      \
                                                                                \
+        void vector_shrink_##T(struct vector_##T *v)                           \
+        {                                                                      \
+                if(vector_element_free_##T != vector_element_default_free_##T) \
+                {                                                              \
+                        for(size_t i = v->_size; i < v->_max; ++i)             \
+                        {                                                      \
+                                vector_element_free_##T(&v->_data[i]);         \
+                        }                                                      \
+                        v->_data =                                             \
+                            (T *)realloc(v->_data, sizeof(T) * v->_size);      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
         static void vector_resize_##T(struct vector_##T *v)                    \
         {                                                                      \
                 if(v->_size == v->_max)                                        \
                 {                                                              \
-                        v->_max = (v->_max == 0) ? 1 : v->_max * 2;            \
+                        v->_max = (v->_max == 0)                               \
+                                      ? vector_init_size_##T                   \
+                                      : v->_max * vector_growth_scale_##T;     \
                         v->_data =                                             \
                             (T *)realloc(v->_data, sizeof(T) * v->_max);       \
                         if(vector_element_init_##T !=                          \
@@ -272,6 +300,15 @@
                 for(size_t i = v->_size; i > 0; --i)                           \
                 {                                                              \
                         operate(&v->_data[i - 1]);                             \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void vector_operate_inverted_to_##T(                                   \
+            struct vector_##T *v, void (*operate)(T *, void *), void *argout)  \
+        {                                                                      \
+                for(size_t i = v->_size; i > 0; --i)                           \
+                {                                                              \
+                        operate(&v->_data[i - 1], argout);                     \
                 }                                                              \
         }                                                                      \
                                                                                \

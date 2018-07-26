@@ -29,6 +29,8 @@
         void vector_from_array_##T(struct vector_##T *, const T *,             \
                                    const size_t);                              \
                                                                                \
+	void vector_shrink_##T(struct vector_##T*);                            \
+                                                                               \
         void vector_set_##T(struct vector_##T *, const size_t, T);             \
                                                                                \
         void vector_operate_##T(struct vector_##T *, void (*operate)(T *));    \
@@ -36,6 +38,11 @@
                                    void (*operate)(T *, void *), void *);      \
         void vector_operate_inverted_##T(struct vector_##T *,                  \
                                          void (*operate)(T *));                \
+        void vector_operate_inverted_to_##T(struct vector_##T *,               \
+                                   void (*operate)(T *, void *), void *);      \
+                                                                               \
+        void vector_set_init_size_##T(size_t)                                  \
+        void vector_set_growth_scale_##T(double)                               \
                                                                                \
         void vector_assign_##T(struct vector_##T *, size_t, size_t, T);        \
                                                                                \
