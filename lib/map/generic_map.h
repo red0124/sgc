@@ -30,6 +30,11 @@ enum
 #warning "MAP: define 'MAP_KILL_COPY_WARNING' to remove warning"
 #endif
 
+#ifndef MAP_KILL_COPY_KEY_WARNING
+#warning "MAP: using '=' as default map key copy"
+#warning "MAP: define 'MAP_KILL_COPY_KEY_WARNING' to remove warning"
+#endif
+
 #ifndef MAP_KILL_COMPARE_WARNING
 #warning "MAP: using 'memcmp' as default map element compare"
 #warning "MAP: define 'MAP_KILL_COMPARE_WARNING' to remove warning"
@@ -38,6 +43,11 @@ enum
 #ifndef MAP_KILL_EQUAL_WARNING
 #warning "MAP: using 'memcmp' as default map element equal"
 #warning "MAP: define 'MAP_KILL_EQUAL_WARNING' to remove warning"
+#endif
+
+#ifndef MAP_KILL_EQUAL_KEY_WARNING
+#warning "MAP: using 'memcmp' as default map key equal"
+#warning "MAP: define 'MAP_KILL_EQUAL_KEY_WARNING' to remove warning"
 #endif
 
 #ifndef MAP_KILL_FREE_WARNING
@@ -136,7 +146,7 @@ enum
         static int map_element_default_compare_##K##_##V(const void *first,    \
                                                          const void *second)   \
         {                                                                      \
-                return memcmp(first, second, sizeof(K)) > 0;                   \
+                return memcmp(first, second, sizeof(K));                       \
         }                                                                      \
                                                                                \
         int (*map_element_compare_##K##_##V)(const void *, const void *) =     \
@@ -162,6 +172,17 @@ enum
                 map_element_free_##K##_##V = free;                             \
         }                                                                      \
                                                                                \
+        static void node_init_##K##_##V(struct node_##K##_##V **n, const K *k, \
+                                        const V *v)                            \
+        {                                                                      \
+                *n = (struct node_##K##_##V *)malloc(                          \
+                    sizeof(struct node_##K##_##V));                            \
+                map_element_copy_key_##K##_##V(&(*n)->key, k);                 \
+                map_element_copy_##K##_##V(&(*n)->value, v);                   \
+                (*n)->left = (*n)->right = MAP_LEAF;                           \
+                (*n)->color = MAP_RED;                                         \
+        }                                                                      \
+                                                                               \
         size_t map_size_##K##_##V(const struct map_##K##_##V *m)               \
         {                                                                      \
                 return m->size;                                                \
@@ -172,7 +193,10 @@ enum
         {                                                                      \
                 m->size = 0;                                                   \
                 m->root = MAP_LEAF;                                            \
-                map_element_compare_##K##_##V = comp;                          \
+                if(comp)                                                       \
+                {                                                              \
+                        map_element_compare_##K##_##V = comp;                  \
+                }                                                              \
         }                                                                      \
                                                                                \
         static size_t map_stack_size_##K##_##V(size_t size)                    \
@@ -194,8 +218,7 @@ enum
                 {                                                              \
                         if(curr != MAP_LEAF)                                   \
                         {                                                      \
-                                stack[stack_size] = curr;                      \
-                                ++stack_size;                                  \
+                                stack[stack_size++] = curr;                    \
                                 curr = curr->left;                             \
                         }                                                      \
                         else                                                   \
@@ -204,8 +227,7 @@ enum
                                 {                                              \
                                         break;                                 \
                                 }                                              \
-                                --stack_size;                                  \
-                                curr = stack[stack_size];                      \
+                                curr = stack[--stack_size];                    \
                                 tmp = curr;                                    \
                                 curr = curr->right;                            \
                                 if(map_element_free_##K##_##V !=               \
@@ -349,6 +371,7 @@ enum
                                                                                \
                         while(stack_size > 0)                                  \
                         {                                                      \
+                                /* if left and right are leaf, go back */      \
                                 if(!((curr_src->left != MAP_LEAF &&            \
                                       curr_dst->left == MAP_LEAF) ||           \
                                      (curr_src->right != MAP_LEAF &&           \
@@ -359,8 +382,10 @@ enum
                                         curr_dst = stack_dst[stack_size];      \
                                         continue;                              \
                                 }                                              \
-                                else if(curr_src->left != MAP_LEAF &&          \
-                                        curr_dst->left == MAP_LEAF)            \
+                                                                               \
+                                /* if the left is not leaf, add left */        \
+                                if(curr_src->left != MAP_LEAF &&               \
+                                   curr_dst->left == MAP_LEAF)                 \
                                 {                                              \
                                         curr_dst->left =                       \
                                             (struct node_##K##_##V *)malloc(   \
@@ -370,6 +395,7 @@ enum
                                         tmp->parent = curr_dst;                \
                                         curr_src = curr_src->left;             \
                                 }                                              \
+                                /* if the right is not leaf, add right */      \
                                 else                                           \
                                 {                                              \
                                         curr_dst->right =                      \
@@ -398,7 +424,7 @@ enum
         }                                                                      \
                                                                                \
         void map_operate_##K##_##V(struct map_##K##_##V *m,                    \
-                                   void (*operate)(K *, V *))                  \
+                                   void (*operate)(const K *, V *))            \
         {                                                                      \
                 struct node_##K##_##V **stack =                                \
                     (struct node_##K##_##V **)malloc(                          \
@@ -431,7 +457,7 @@ enum
         }                                                                      \
                                                                                \
         void map_operate_inverted_##K##_##V(struct map_##K##_##V *m,           \
-                                            void (*operate)(K *, V *))         \
+                                            void (*operate)(const K *, V *))   \
         {                                                                      \
                 struct node_##K##_##V **stack =                                \
                     (struct node_##K##_##V **)malloc(                          \
@@ -464,7 +490,7 @@ enum
         }                                                                      \
                                                                                \
         void map_operate_to_##K##_##V(struct map_##K##_##V *m,                 \
-                                      void (*operate)(K *, V *, void *),       \
+                                      void (*operate)(const K *, V *, void *), \
                                       void *argout)                            \
         {                                                                      \
                 struct node_##K##_##V **stack =                                \
@@ -498,7 +524,7 @@ enum
         }                                                                      \
                                                                                \
         void map_operate_inverted_to_##K##_##V(                                \
-            struct map_##K##_##V *m, void (*operate)(K *, V *, void *),        \
+            struct map_##K##_##V *m, void (*operate)(const K *, V *, void *),  \
             void *argout)                                                      \
         {                                                                      \
                 struct node_##K##_##V **stack =                                \
@@ -715,17 +741,25 @@ enum
                 map_check_color_##K##_##V(m, parent);                          \
         }                                                                      \
                                                                                \
-        static void map_insert_node_##K##_##V(struct map_##K##_##V *m,         \
-                                              struct node_##K##_##V *new_node) \
+        static void map_insert_node_##K##_##V(struct map_##K##_##V *m, K *k,   \
+                                              V *v)                            \
         {                                                                      \
                 struct node_##K##_##V *parent = m->root;                       \
+                struct node_##K##_##V *new_node;                               \
                 for(;;)                                                        \
                 {                                                              \
-                        if(map_element_compare_##K##_##V(&parent->key,         \
-                                                         &new_node->key) > 0)  \
+                        int compare = \
+                          (map_element_compare_##K##_##V(&parent->key, k));\
+                        if(!compare)                                           \
+                        {                                                      \
+                                return;                                        \
+                        }                                                      \
+                                                                               \
+                        if(compare > 0)                                        \
                         {                                                      \
                                 if(parent->left == MAP_LEAF)                   \
                                 {                                              \
+                                        node_init_##K##_##V(&new_node, k, v);  \
                                         parent->left = new_node;               \
                                         break;                                 \
                                 }                                              \
@@ -735,6 +769,7 @@ enum
                         {                                                      \
                                 if(parent->right == MAP_LEAF)                  \
                                 {                                              \
+                                        node_init_##K##_##V(&new_node, k, v);  \
                                         parent->right = new_node;              \
                                         break;                                 \
                                 }                                              \
@@ -743,32 +778,25 @@ enum
                 }                                                              \
                 new_node->parent = parent;                                     \
                 map_check_color_##K##_##V(m, new_node);                        \
+                m->size++;                                                     \
         }                                                                      \
                                                                                \
-        void map_set_##K##_##V(struct map_##K##_##V *m, const K key, V value)  \
+        void map_set_##K##_##V(struct map_##K##_##V *m, K k, V v)              \
         {                                                                      \
-                /* need to check if a memeber with that key is already added   \
-                 */                                                            \
-                                                                               \
-                struct node_##K##_##V *new_node =                              \
-                    (struct node_##K##_##V *)malloc(                           \
-                        sizeof(struct node_##K##_##V));                        \
-                map_element_copy_key_##K##_##V(&new_node->key, &key);          \
-                map_element_copy_##K##_##V(&new_node->value, &value);          \
-                new_node->left = new_node->right = MAP_LEAF;                   \
                 if(m->root == MAP_LEAF)                                        \
                 {                                                              \
+                        struct node_##K##_##V *new_node;                       \
+                        node_init_##K##_##V(&new_node, &k, &v);                \
                         new_node->color = MAP_BLACK;                           \
                         new_node->parent = MAP_LEAF;                           \
                         m->root = new_node;                                    \
+                        m->size = 1;                                           \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        new_node->color = MAP_RED;                             \
-                        map_insert_node_##K##_##V(m, new_node);                \
+                        map_insert_node_##K##_##V(m, &k, &v);                  \
                         m->root->color = MAP_BLACK;                            \
                 }                                                              \
-                m->size++;                                                     \
         }
 \
 \
