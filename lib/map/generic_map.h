@@ -75,7 +75,125 @@ enum
                 struct node_##K##_##V *root;                                   \
         };                                                                     \
                                                                                \
-        static void map_element_default_init_##K##_##V(V *el)                  \
+        struct map_static_iterator_##K##_##V                                   \
+        {                                                                      \
+                struct node_##K##_##V *curr;                                   \
+                struct node_##K##_##V *next;                                   \
+        };                                                                     \
+                                                                               \
+        static struct node_##K##_##V *node_begin_##K##_##V(                    \
+            struct node_##K##_##V *n)                                          \
+        {                                                                      \
+                while(n->left)                                                 \
+                {                                                              \
+                        n = n->left;                                           \
+                }                                                              \
+                return n;                                                      \
+        }                                                                      \
+                                                                               \
+        static struct node_##K##_##V *node_end_##K##_##V(                      \
+            struct node_##K##_##V *n)                                          \
+        {                                                                      \
+                while(n->right)                                                \
+                {                                                              \
+                        n = n->right;                                          \
+                }                                                              \
+                return n;                                                      \
+        }                                                                      \
+                                                                               \
+        void map_static_iterator_next_##K##_##V(                               \
+            struct map_static_iterator_##K##_##V *i)                           \
+        {                                                                      \
+                if(!i->next)                                                   \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                i->curr = i->next;                                             \
+                if(i->next->right)                                             \
+                {                                                              \
+                        i->next = node_begin_##K##_##V(i->next->right);        \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        struct node_##K##_##V *parent = i->next->parent;       \
+                        while(parent && parent->right == i->next)              \
+                        {                                                      \
+                                i->next = parent;                              \
+                                parent = parent->parent;                       \
+                        }                                                      \
+                        if(i->next->right != parent)                           \
+                        {                                                      \
+                                i->next = parent;                              \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+	                                                                       \
+        void map_static_iterator_begin_##K##_##V(                              \
+            struct map_##K##_##V *m, struct map_static_iterator_##K##_##V *i)  \
+        {                                                                      \
+		i->curr = MAP_LEAF;\
+                i->next =                                                      \
+                    (m->root) ? node_begin_##K##_##V(m->root) : MAP_LEAF;      \
+		map_static_iterator_next_##K##_##V(i);\
+        }                                                                      \
+                                                                               \
+                                                                               \
+        void map_static_iterator_prev_##K##_##V(                               \
+            struct map_static_iterator_##K##_##V *i)                           \
+        {                                                                      \
+                if(!i->curr)                                                   \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                i->next = i->curr;                                             \
+                if(i->curr->left)                                              \
+                {                                                              \
+                        i->curr = node_end_##K##_##V(i->curr->left);           \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        struct node_##K##_##V *parent = i->curr->parent;       \
+                        while(parent && parent->left == i->curr)               \
+                        {                                                      \
+                                i->curr = parent;                              \
+                                parent = parent->parent;                       \
+                        }                                                      \
+                        if(i->curr->right != parent)                           \
+                        {                                                      \
+                                i->curr = parent;                              \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+	                                                                       \
+        void map_static_iterator_end_##K##_##V(                                \
+            struct map_##K##_##V *m, struct map_static_iterator_##K##_##V *i)  \
+        {                                                                      \
+                i->curr = (m->root) ? node_end_##K##_##V(m->root) : MAP_LEAF;  \
+		i->next = MAP_LEAF;\
+        }                                                                      \
+\
+	struct map_static_iterator_##K##_##V map_begin_##K##_##V(struct map_##K##_##V*m)\
+{\
+	struct map_static_iterator_##K##_##V i;\
+	map_static_iterator_begin_##K##_##V(m, &i);\
+	return i;\
+}\
+\
+	struct map_static_iterator_##K##_##V map_end_##K##_##V(struct map_##K##_##V*m)\
+{\
+	struct map_static_iterator_##K##_##V i;\
+	map_static_iterator_end_##K##_##V(m, &i);\
+	return i;\
+}\
+\
+	int map_static_iterator_equal_##K##_##V(struct map_static_iterator_##K##_##V\
+			first, struct map_static_iterator_##K##_##V second)\
+{\
+	return first.curr == second.curr;\
+}\
+                                                                               \
+                                                                               \
+        void map_element_default_init_##K##_##V(V *el)                         \
         {                                                                      \
                 (void)el;                                                      \
         }                                                                      \
@@ -88,7 +206,7 @@ enum
                 map_element_init_##K##_##V = init;                             \
         }                                                                      \
                                                                                \
-        static void map_element_default_copy_##K##_##V(V *dst, const V *src)   \
+        void map_element_default_copy_##K##_##V(V *dst, const V *src)          \
         {                                                                      \
                 *dst = *src;                                                   \
         }                                                                      \
@@ -101,8 +219,7 @@ enum
                 map_element_copy_##K##_##V = copy;                             \
         }                                                                      \
                                                                                \
-        static void map_element_default_copy_key_##K##_##V(K *dst,             \
-                                                           const K *src)       \
+        void map_element_default_copy_key_##K##_##V(K *dst, const K *src)      \
         {                                                                      \
                 *dst = *src;                                                   \
         }                                                                      \
@@ -115,8 +232,8 @@ enum
                 map_element_copy_key_##K##_##V = copy;                         \
         }                                                                      \
                                                                                \
-        static int map_element_default_equal_##K##_##V(const V *first,         \
-                                                       const V *second)        \
+        int map_element_default_equal_##K##_##V(const V *first,                \
+                                                const V *second)               \
         {                                                                      \
                 return memcmp(first, second, sizeof(V)) == 0;                  \
         }                                                                      \
@@ -129,8 +246,8 @@ enum
                 map_element_equal_##K##_##V = equal;                           \
         }                                                                      \
                                                                                \
-        static int map_element_default_equal_key_##K##_##V(const K *first,     \
-                                                           const K *second)    \
+        int map_element_default_equal_key_##K##_##V(const K *first,            \
+                                                    const K *second)           \
         {                                                                      \
                 return memcmp(first, second, sizeof(K)) == 0;                  \
         }                                                                      \
@@ -143,8 +260,8 @@ enum
                 map_element_equal_key_##K##_##V = equal;                       \
         }                                                                      \
                                                                                \
-        static int map_element_default_compare_##K##_##V(const void *first,    \
-                                                         const void *second)   \
+        int map_element_default_compare_##K##_##V(const void *first,           \
+                                                  const void *second)          \
         {                                                                      \
                 return memcmp(first, second, sizeof(K));                       \
         }                                                                      \
@@ -158,7 +275,7 @@ enum
                 map_element_compare_##K##_##V = compare;                       \
         }                                                                      \
                                                                                \
-        static void map_element_default_free_##K##_##V(K *k, V *v)             \
+        void map_element_default_free_##K##_##V(K *k, V *v)                    \
         {                                                                      \
                 (void)k;                                                       \
                 (void)v;                                                       \
@@ -748,8 +865,8 @@ enum
                 struct node_##K##_##V *new_node;                               \
                 for(;;)                                                        \
                 {                                                              \
-                        int compare = \
-                          (map_element_compare_##K##_##V(&parent->key, k));\
+                        int compare =                                          \
+                            (map_element_compare_##K##_##V(&parent->key, k));  \
                         if(!compare)                                           \
                         {                                                      \
                                 return;                                        \
@@ -798,6 +915,3 @@ enum
                         m->root->color = MAP_BLACK;                            \
                 }                                                              \
         }
-\
-\
-\
