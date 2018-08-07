@@ -10,10 +10,11 @@
 
 #ifndef RB_COLOR
 #define RB_COLOR
-enum
+enum map_color
 {
         MAP_RED,
-        MAP_BLACK
+        MAP_BLACK,
+        MAP_DBLACK
 };
 #endif
 
@@ -40,11 +41,6 @@ enum
 #warning "MAP: define 'MAP_KILL_COMPARE_WARNING' to remove warning"
 #endif
 
-#ifndef MAP_KILL_EQUAL_WARNING
-#warning "MAP: using 'memcmp' as default map element equal"
-#warning "MAP: define 'MAP_KILL_EQUAL_WARNING' to remove warning"
-#endif
-
 #ifndef MAP_KILL_EQUAL_KEY_WARNING
 #warning "MAP: using 'memcmp' as default map key equal"
 #warning "MAP: define 'MAP_KILL_EQUAL_KEY_WARNING' to remove warning"
@@ -66,7 +62,7 @@ enum
                 struct node_##K##_##V *right;                                  \
                 K key;                                                         \
                 V value;                                                       \
-                char color;                                                    \
+                enum map_color color;                                          \
         };                                                                     \
                                                                                \
         struct map_##K##_##V                                                   \
@@ -74,124 +70,6 @@ enum
                 size_t size;                                                   \
                 struct node_##K##_##V *root;                                   \
         };                                                                     \
-                                                                               \
-        struct map_static_iterator_##K##_##V                                   \
-        {                                                                      \
-                struct node_##K##_##V *curr;                                   \
-                struct node_##K##_##V *next;                                   \
-        };                                                                     \
-                                                                               \
-        static struct node_##K##_##V *node_begin_##K##_##V(                    \
-            struct node_##K##_##V *n)                                          \
-        {                                                                      \
-                while(n->left)                                                 \
-                {                                                              \
-                        n = n->left;                                           \
-                }                                                              \
-                return n;                                                      \
-        }                                                                      \
-                                                                               \
-        static struct node_##K##_##V *node_end_##K##_##V(                      \
-            struct node_##K##_##V *n)                                          \
-        {                                                                      \
-                while(n->right)                                                \
-                {                                                              \
-                        n = n->right;                                          \
-                }                                                              \
-                return n;                                                      \
-        }                                                                      \
-                                                                               \
-        void map_static_iterator_next_##K##_##V(                               \
-            struct map_static_iterator_##K##_##V *i)                           \
-        {                                                                      \
-                if(!i->next)                                                   \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
-                i->curr = i->next;                                             \
-                if(i->next->right)                                             \
-                {                                                              \
-                        i->next = node_begin_##K##_##V(i->next->right);        \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        struct node_##K##_##V *parent = i->next->parent;       \
-                        while(parent && parent->right == i->next)              \
-                        {                                                      \
-                                i->next = parent;                              \
-                                parent = parent->parent;                       \
-                        }                                                      \
-                        if(i->next->right != parent)                           \
-                        {                                                      \
-                                i->next = parent;                              \
-                        }                                                      \
-                }                                                              \
-        }                                                                      \
-	                                                                       \
-        void map_static_iterator_begin_##K##_##V(                              \
-            struct map_##K##_##V *m, struct map_static_iterator_##K##_##V *i)  \
-        {                                                                      \
-		i->curr = MAP_LEAF;\
-                i->next =                                                      \
-                    (m->root) ? node_begin_##K##_##V(m->root) : MAP_LEAF;      \
-		map_static_iterator_next_##K##_##V(i);\
-        }                                                                      \
-                                                                               \
-                                                                               \
-        void map_static_iterator_prev_##K##_##V(                               \
-            struct map_static_iterator_##K##_##V *i)                           \
-        {                                                                      \
-                if(!i->curr)                                                   \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
-                i->next = i->curr;                                             \
-                if(i->curr->left)                                              \
-                {                                                              \
-                        i->curr = node_end_##K##_##V(i->curr->left);           \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        struct node_##K##_##V *parent = i->curr->parent;       \
-                        while(parent && parent->left == i->curr)               \
-                        {                                                      \
-                                i->curr = parent;                              \
-                                parent = parent->parent;                       \
-                        }                                                      \
-                        if(i->curr->right != parent)                           \
-                        {                                                      \
-                                i->curr = parent;                              \
-                        }                                                      \
-                }                                                              \
-        }                                                                      \
-	                                                                       \
-        void map_static_iterator_end_##K##_##V(                                \
-            struct map_##K##_##V *m, struct map_static_iterator_##K##_##V *i)  \
-        {                                                                      \
-                i->curr = (m->root) ? node_end_##K##_##V(m->root) : MAP_LEAF;  \
-		i->next = MAP_LEAF;\
-        }                                                                      \
-\
-	struct map_static_iterator_##K##_##V map_begin_##K##_##V(struct map_##K##_##V*m)\
-{\
-	struct map_static_iterator_##K##_##V i;\
-	map_static_iterator_begin_##K##_##V(m, &i);\
-	return i;\
-}\
-\
-	struct map_static_iterator_##K##_##V map_end_##K##_##V(struct map_##K##_##V*m)\
-{\
-	struct map_static_iterator_##K##_##V i;\
-	map_static_iterator_end_##K##_##V(m, &i);\
-	return i;\
-}\
-\
-	int map_static_iterator_equal_##K##_##V(struct map_static_iterator_##K##_##V\
-			first, struct map_static_iterator_##K##_##V second)\
-{\
-	return first.curr == second.curr;\
-}\
-                                                                               \
                                                                                \
         void map_element_default_init_##K##_##V(V *el)                         \
         {                                                                      \
@@ -289,6 +167,297 @@ enum
                 map_element_free_##K##_##V = free;                             \
         }                                                                      \
                                                                                \
+        struct map_iterator_##K##_##V                                          \
+        {                                                                      \
+                struct node_##K##_##V *curr;                                   \
+                struct node_##K##_##V *next;                                   \
+        };                                                                     \
+                                                                               \
+        static struct node_##K##_##V *node_begin_##K##_##V(                    \
+            struct node_##K##_##V *n)                                          \
+        {                                                                      \
+                while(n->left)                                                 \
+                {                                                              \
+                        n = n->left;                                           \
+                }                                                              \
+                return n;                                                      \
+        }                                                                      \
+                                                                               \
+        static struct node_##K##_##V *node_end_##K##_##V(                      \
+            struct node_##K##_##V *n)                                          \
+        {                                                                      \
+                while(n->right)                                                \
+                {                                                              \
+                        n = n->right;                                          \
+                }                                                              \
+                return n;                                                      \
+        }                                                                      \
+                                                                               \
+        void map_iterator_next_##K##_##V(struct map_iterator_##K##_##V *i)     \
+        {                                                                      \
+                if(!i->next)                                                   \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                i->curr = i->next;                                             \
+                if(i->next->right)                                             \
+                {                                                              \
+                        i->next = node_begin_##K##_##V(i->next->right);        \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        struct node_##K##_##V *parent = i->next->parent;       \
+                        while(parent && parent->right == i->next)              \
+                        {                                                      \
+                                i->next = parent;                              \
+                                parent = parent->parent;                       \
+                        }                                                      \
+                        if(i->next->right != parent)                           \
+                        {                                                      \
+                                i->next = parent;                              \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void map_iterator_begin_##K##_##V(struct map_##K##_##V *m,             \
+                                          struct map_iterator_##K##_##V *i)    \
+        {                                                                      \
+                i->curr = MAP_LEAF;                                            \
+                i->next =                                                      \
+                    (m->root) ? node_begin_##K##_##V(m->root) : MAP_LEAF;      \
+                map_iterator_next_##K##_##V(i);                                \
+        }                                                                      \
+                                                                               \
+        void map_iterator_prev_##K##_##V(struct map_iterator_##K##_##V *i)     \
+        {                                                                      \
+                if(!i->curr)                                                   \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                i->next = i->curr;                                             \
+                if(i->curr->left)                                              \
+                {                                                              \
+                        i->curr = node_end_##K##_##V(i->curr->left);           \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        struct node_##K##_##V *parent = i->curr->parent;       \
+                        while(parent && parent->left == i->curr)               \
+                        {                                                      \
+                                i->curr = parent;                              \
+                                parent = parent->parent;                       \
+                        }                                                      \
+                        if(i->curr->right != parent)                           \
+                        {                                                      \
+                                i->curr = parent;                              \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void map_iterator_end_##K##_##V(struct map_##K##_##V *m,               \
+                                        struct map_iterator_##K##_##V *i)      \
+        {                                                                      \
+                i->curr = (m->root) ? node_end_##K##_##V(m->root) : MAP_LEAF;  \
+                i->next = MAP_LEAF;                                            \
+        }                                                                      \
+                                                                               \
+        struct map_iterator_##K##_##V map_begin_##K##_##V(                     \
+            struct map_##K##_##V *m)                                           \
+        {                                                                      \
+                struct map_iterator_##K##_##V i;                               \
+                map_iterator_begin_##K##_##V(m, &i);                           \
+                return i;                                                      \
+        }                                                                      \
+                                                                               \
+        struct map_iterator_##K##_##V map_end_##K##_##V(                       \
+            struct map_##K##_##V *m)                                           \
+        {                                                                      \
+                struct map_iterator_##K##_##V i;                               \
+                map_iterator_end_##K##_##V(m, &i);                             \
+                return i;                                                      \
+        }                                                                      \
+                                                                               \
+        int map_iterator_equal_##K##_##V(struct map_iterator_##K##_##V first,  \
+                                         struct map_iterator_##K##_##V second) \
+        {                                                                      \
+                return first.curr == second.curr;                              \
+        }                                                                      \
+                                                                               \
+        struct map_fast_iterator_##K##_##V                                     \
+        {                                                                      \
+                struct node_##K##_##V *curr;                                   \
+                struct node_##K##_##V *next;                                   \
+                struct node_##K##_##V **stack;                                 \
+                size_t stack_size;                                             \
+        };                                                                     \
+                                                                               \
+        static size_t map_exp_two_##K##_##V(size_t curr)                       \
+        {                                                                      \
+                size_t power = 1;                                              \
+                for(size_t i = 0; i < curr; ++i)                               \
+                {                                                              \
+                        power *= 2;                                            \
+                }                                                              \
+                return power;                                                  \
+        }                                                                      \
+                                                                               \
+        static size_t map_log_two_##K##_##V(size_t size)                       \
+        {                                                                      \
+                size_t curr = 1;                                               \
+                while(size >= map_exp_two_##K##_##V(curr))                     \
+                {                                                              \
+                        ++curr;                                                \
+                }                                                              \
+                return curr + 1;                                               \
+        }                                                                      \
+                                                                               \
+        static size_t map_stack_size_##K##_##V(size_t size)                    \
+        {                                                                      \
+                size = map_log_two_##K##_##V(size) + 1;                        \
+                return sizeof(struct node_##K##_##V *) * (size * 2);           \
+        }                                                                      \
+                                                                               \
+        static void map_fast_iterator_init_##K##_##V(                          \
+            struct map_##K##_##V *m, struct map_fast_iterator_##K##_##V *i)    \
+        {                                                                      \
+                i->stack_size = 0;                                             \
+                i->stack = (struct node_##K##_##V **)malloc(                   \
+                    map_stack_size_##K##_##V(m->size));                        \
+        }                                                                      \
+                                                                               \
+        void map_fast_iterator_free_##K##_##V(                                 \
+            struct map_fast_iterator_##K##_##V *i)                             \
+        {                                                                      \
+                if(i->stack)                                                   \
+                {                                                              \
+                        free(i->stack);                                        \
+                        i->stack = NULL;                                       \
+                        i->curr = MAP_LEAF;                                    \
+                        i->next = MAP_LEAF;                                    \
+                        i->stack_size = 0;                                     \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void map_fast_iterator_next_##K##_##V(                                 \
+            struct map_fast_iterator_##K##_##V *i)                             \
+        {                                                                      \
+                if(!i->stack_size)                                             \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                i->curr = i->next;                                             \
+                if(i->next->right)                                             \
+                {                                                              \
+                        i->stack[i->stack_size++] = i->next;                   \
+                        i->next = i->next->right;                              \
+                        while(i->next->left)                                   \
+                        {                                                      \
+                                i->stack[i->stack_size++] = i->next;           \
+                                i->next = i->next->left;                       \
+                        }                                                      \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        struct node_##K##_##V *parent =                        \
+                            i->stack[--i->stack_size];                         \
+                        while(parent && parent->right == i->next)              \
+                        {                                                      \
+                                i->next = parent;                              \
+                                parent = i->stack[--i->stack_size];            \
+                        }                                                      \
+                        if(i->next->right != parent)                           \
+                        {                                                      \
+                                i->next = parent;                              \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void map_fast_iterator_begin_##K##_##V(                                \
+            struct map_##K##_##V *m, struct map_fast_iterator_##K##_##V *i)    \
+        {                                                                      \
+                map_fast_iterator_init_##K##_##V(m, i);                        \
+                struct node_##K##_##V *curr = m->root;                         \
+                if(!curr)                                                      \
+                {                                                              \
+                        i->curr = MAP_LEAF;                                    \
+                        i->next = MAP_LEAF;                                    \
+                        return;                                                \
+                }                                                              \
+                                                                               \
+                i->stack[i->stack_size++] = MAP_LEAF;                          \
+                while(curr->left)                                              \
+                {                                                              \
+                        i->stack[i->stack_size++] = curr;                      \
+                        curr = curr->left;                                     \
+                }                                                              \
+                i->curr = MAP_LEAF;                                            \
+                i->next = curr;                                                \
+                map_fast_iterator_next_##K##_##V(i);                           \
+        }                                                                      \
+                                                                               \
+        void map_fast_iterator_prev_##K##_##V(                                 \
+            struct map_fast_iterator_##K##_##V *i)                             \
+        {                                                                      \
+                if(!i->curr)                                                   \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                i->next = i->curr;                                             \
+                if(i->curr->left)                                              \
+                {                                                              \
+                        i->stack[i->stack_size++] = i->curr;                   \
+                        i->curr = i->curr->left;                               \
+                        while(i->curr->right)                                  \
+                        {                                                      \
+                                i->stack[i->stack_size++] = i->curr;           \
+                                i->curr = i->curr->right;                      \
+                        }                                                      \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        struct node_##K##_##V *parent =                        \
+                            i->stack[--i->stack_size];                         \
+                        while(parent && parent->left == i->curr)               \
+                        {                                                      \
+                                parent = i->stack[--i->stack_size];            \
+                                i->curr = parent;                              \
+                        }                                                      \
+                        if(i->curr->right != parent)                           \
+                        {                                                      \
+                                i->curr = parent;                              \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void map_fast_iterator_end_##K##_##V(                                  \
+            struct map_##K##_##V *m, struct map_fast_iterator_##K##_##V *i)    \
+        {                                                                      \
+                map_fast_iterator_init_##K##_##V(m, i);                        \
+                struct node_##K##_##V *curr = m->root;                         \
+                if(!curr)                                                      \
+                {                                                              \
+                        i->curr = MAP_LEAF;                                    \
+                        i->next = MAP_LEAF;                                    \
+                        return;                                                \
+                }                                                              \
+                                                                               \
+                i->stack[i->stack_size++] = MAP_LEAF;                          \
+                while(curr->right)                                             \
+                {                                                              \
+                        i->stack[i->stack_size++] = curr;                      \
+                        curr = curr->right;                                    \
+                }                                                              \
+                i->curr = curr;                                                \
+                i->next = MAP_LEAF;                                            \
+        }                                                                      \
+                                                                               \
+        int map_fast_iterator_equal_##K##_##V(                                 \
+            struct map_fast_iterator_##K##_##V first,                          \
+            struct map_fast_iterator_##K##_##V second)                         \
+        {                                                                      \
+                return first.curr == second.curr;                              \
+        }                                                                      \
+                                                                               \
         static void node_init_##K##_##V(struct node_##K##_##V **n, const K *k, \
                                         const V *v)                            \
         {                                                                      \
@@ -314,11 +483,6 @@ enum
                 {                                                              \
                         map_element_compare_##K##_##V = comp;                  \
                 }                                                              \
-        }                                                                      \
-                                                                               \
-        static size_t map_stack_size_##K##_##V(size_t size)                    \
-        {                                                                      \
-                return sizeof(struct node_##K##_##V *) * (size + 1);           \
         }                                                                      \
                                                                                \
         void map_free_##K##_##V(struct map_##K##_##V *m)                       \
@@ -361,87 +525,37 @@ enum
                 m->size = 0;                                                   \
         }                                                                      \
                                                                                \
-        /* change it */                                                        \
-        int map_equal_##K##_##V(const struct map_##K##_##V *first,             \
-                                const struct map_##K##_##V *second)            \
+        int map_equal_##K##_##V(struct map_##K##_##V *first,                   \
+                                struct map_##K##_##V *second)                  \
         {                                                                      \
                 int equal = (first == second);                                 \
                 if(equal == 0 && first->size == second->size)                  \
                 {                                                              \
                         equal = 1;                                             \
+                        struct map_fast_iterator_##K##_##V it_first;           \
+                        map_fast_iterator_begin_##K##_##V(first, &it_first);   \
                                                                                \
-                        struct node_##K##_##V **stack_first =                  \
-                            (struct node_##K##_##V **)malloc(                  \
-                                map_stack_size_##K##_##V(first->size));        \
+                        struct map_fast_iterator_##K##_##V it_second;          \
+                        map_fast_iterator_begin_##K##_##V(second, &it_second); \
                                                                                \
-                        struct node_##K##_##V *curr_first = first->root;       \
-                        struct node_##K##_##V *tmp_first = first->root;        \
-                                                                               \
-                        struct node_##K##_##V **stack_second =                 \
-                            (struct node_##K##_##V **)malloc(                  \
-                                map_stack_size_##K##_##V(second->size));       \
-                                                                               \
-                        struct node_##K##_##V *curr_second = second->root;     \
-                        struct node_##K##_##V *tmp_second = second->root;      \
-                                                                               \
-                        size_t stack_size_first = 0;                           \
-                        size_t stack_size_second = 0;                          \
-                        while(1)                                               \
+                        for(size_t i = 0; i < first->size; ++i)                \
                         {                                                      \
-                                if(curr_first != MAP_LEAF)                     \
-                                {                                              \
-                                        stack_first[stack_size_first] =        \
-                                            curr_first;                        \
-                                        ++stack_size_first;                    \
-                                        curr_first = curr_first->left;         \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        if(stack_size_first == 0)              \
-                                        {                                      \
-                                                break;                         \
-                                        }                                      \
-                                        --stack_size_first;                    \
-                                        curr_first =                           \
-                                            stack_first[stack_size_first];     \
-                                                                               \
-                                        tmp_first = curr_first;                \
-                                        curr_first = curr_first->right;        \
-                                }                                              \
-                                if(curr_second != MAP_LEAF)                    \
-                                {                                              \
-                                        stack_second[stack_size_second] =      \
-                                            curr_second;                       \
-                                        ++stack_size_second;                   \
-                                        curr_second = curr_second->left;       \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        if(stack_size_second == 0)             \
-                                        {                                      \
-                                                break;                         \
-                                        }                                      \
-                                        --stack_size_second;                   \
-                                        curr_second =                          \
-                                            stack_second[stack_size_second];   \
-                                                                               \
-                                        tmp_second = curr_second;              \
-                                        curr_second = curr_second->right;      \
-                                }                                              \
-                                if((tmp_first != MAP_LEAF &&                   \
-                                    tmp_second != MAP_LEAF) &&                 \
-                                   (!map_element_equal_key_##K##_##V(          \
-                                        &tmp_first->key, &tmp_second->key) ||  \
+                                if((!map_element_equal_key_##K##_##V(          \
+                                        &it_first.curr->key,                   \
+                                        &it_second.curr->key) ||               \
                                     !map_element_equal_##K##_##V(              \
-                                        &tmp_first->value,                     \
-                                        &tmp_second->value)))                  \
+                                        &it_first.curr->value,                 \
+                                        &it_second.curr->value)))              \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
                                 }                                              \
+                                map_fast_iterator_next_##K##_##V(&it_first);   \
+                                map_fast_iterator_next_##K##_##V(&it_second);  \
                         }                                                      \
-                        free(stack_first);                                     \
-                        free(stack_second);                                    \
+                                                                               \
+                        map_fast_iterator_free_##K##_##V(&it_first);           \
+                        map_fast_iterator_free_##K##_##V(&it_second);          \
                 }                                                              \
                 return equal;                                                  \
         }                                                                      \
@@ -488,7 +602,6 @@ enum
                                                                                \
                         while(stack_size > 0)                                  \
                         {                                                      \
-                                /* if left and right are leaf, go back */      \
                                 if(!((curr_src->left != MAP_LEAF &&            \
                                       curr_dst->left == MAP_LEAF) ||           \
                                      (curr_src->right != MAP_LEAF &&           \
@@ -500,7 +613,6 @@ enum
                                         continue;                              \
                                 }                                              \
                                                                                \
-                                /* if the left is not leaf, add left */        \
                                 if(curr_src->left != MAP_LEAF &&               \
                                    curr_dst->left == MAP_LEAF)                 \
                                 {                                              \
@@ -512,7 +624,6 @@ enum
                                         tmp->parent = curr_dst;                \
                                         curr_src = curr_src->left;             \
                                 }                                              \
-                                /* if the right is not leaf, add right */      \
                                 else                                           \
                                 {                                              \
                                         curr_dst->right =                      \
@@ -543,135 +654,63 @@ enum
         void map_operate_##K##_##V(struct map_##K##_##V *m,                    \
                                    void (*operate)(const K *, V *))            \
         {                                                                      \
-                struct node_##K##_##V **stack =                                \
-                    (struct node_##K##_##V **)malloc(                          \
-                        map_stack_size_##K##_##V(m->size));                    \
+                struct map_fast_iterator_##K##_##V it;                         \
+                map_fast_iterator_begin_##K##_##V(m, &it);                     \
                                                                                \
-                struct node_##K##_##V *curr = m->root;                         \
-                                                                               \
-                size_t stack_size = 0;                                         \
-                while(1)                                                       \
+                for(size_t i = 0; i < m->size; ++i)                            \
                 {                                                              \
-                        if(curr != MAP_LEAF)                                   \
-                        {                                                      \
-                                stack[stack_size] = curr;                      \
-                                ++stack_size;                                  \
-                                curr = curr->left;                             \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                if(stack_size == 0)                            \
-                                {                                              \
-                                        break;                                 \
-                                }                                              \
-                                --stack_size;                                  \
-                                curr = stack[stack_size];                      \
-                                operate(&curr->key, &curr->value);             \
-                                curr = curr->right;                            \
-                        }                                                      \
+                        operate(&it.curr->key, &it.curr->value);               \
+                        map_fast_iterator_next_##K##_##V(&it);                 \
                 }                                                              \
-                free(stack);                                                   \
+                                                                               \
+                map_fast_iterator_free_##K##_##V(&it);                         \
         }                                                                      \
                                                                                \
         void map_operate_inverted_##K##_##V(struct map_##K##_##V *m,           \
                                             void (*operate)(const K *, V *))   \
         {                                                                      \
-                struct node_##K##_##V **stack =                                \
-                    (struct node_##K##_##V **)malloc(                          \
-                        map_stack_size_##K##_##V(m->size));                    \
+                struct map_fast_iterator_##K##_##V it;                         \
+                map_fast_iterator_end_##K##_##V(m, &it);                       \
                                                                                \
-                struct node_##K##_##V *curr = m->root;                         \
-                                                                               \
-                size_t stack_size = 0;                                         \
-                while(1)                                                       \
+                for(size_t i = 0; i < m->size; ++i)                            \
                 {                                                              \
-                        if(curr != MAP_LEAF)                                   \
-                        {                                                      \
-                                stack[stack_size] = curr;                      \
-                                ++stack_size;                                  \
-                                curr = curr->right;                            \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                if(stack_size == 0)                            \
-                                {                                              \
-                                        break;                                 \
-                                }                                              \
-                                --stack_size;                                  \
-                                curr = stack[stack_size];                      \
-                                operate(&curr->key, &curr->value);             \
-                                curr = curr->left;                             \
-                        }                                                      \
+                        operate(&it.curr->key, &it.curr->value);               \
+                        map_fast_iterator_prev_##K##_##V(&it);                 \
                 }                                                              \
-                free(stack);                                                   \
+                                                                               \
+                map_fast_iterator_free_##K##_##V(&it);                         \
         }                                                                      \
                                                                                \
         void map_operate_to_##K##_##V(struct map_##K##_##V *m,                 \
                                       void (*operate)(const K *, V *, void *), \
                                       void *argout)                            \
         {                                                                      \
-                struct node_##K##_##V **stack =                                \
-                    (struct node_##K##_##V **)malloc(                          \
-                        map_stack_size_##K##_##V(m->size));                    \
+                struct map_fast_iterator_##K##_##V it;                         \
+                map_fast_iterator_begin_##K##_##V(m, &it);                     \
                                                                                \
-                struct node_##K##_##V *curr = m->root;                         \
-                                                                               \
-                size_t stack_size = 0;                                         \
-                while(1)                                                       \
+                for(size_t i = 0; i < m->size; ++i)                            \
                 {                                                              \
-                        if(curr != MAP_LEAF)                                   \
-                        {                                                      \
-                                stack[stack_size] = curr;                      \
-                                ++stack_size;                                  \
-                                curr = curr->left;                             \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                if(stack_size == 0)                            \
-                                {                                              \
-                                        break;                                 \
-                                }                                              \
-                                --stack_size;                                  \
-                                curr = stack[stack_size];                      \
-                                operate(&curr->key, &curr->value, argout);     \
-                                curr = curr->right;                            \
-                        }                                                      \
+                        operate(&it.curr->key, &it.curr->value, argout);       \
+                        map_fast_iterator_next_##K##_##V(&it);                 \
                 }                                                              \
-                free(stack);                                                   \
+                                                                               \
+                map_fast_iterator_free_##K##_##V(&it);                         \
         }                                                                      \
                                                                                \
         void map_operate_inverted_to_##K##_##V(                                \
             struct map_##K##_##V *m, void (*operate)(const K *, V *, void *),  \
             void *argout)                                                      \
         {                                                                      \
-                struct node_##K##_##V **stack =                                \
-                    (struct node_##K##_##V **)malloc(                          \
-                        map_stack_size_##K##_##V(m->size));                    \
+                struct map_fast_iterator_##K##_##V it;                         \
+                map_fast_iterator_end_##K##_##V(m, &it);                       \
                                                                                \
-                struct node_##K##_##V *curr = m->root;                         \
-                                                                               \
-                size_t stack_size = 0;                                         \
-                while(1)                                                       \
+                for(size_t i = 0; i < m->size; ++i)                            \
                 {                                                              \
-                        if(curr != MAP_LEAF)                                   \
-                        {                                                      \
-                                stack[stack_size] = curr;                      \
-                                ++stack_size;                                  \
-                                curr = curr->right;                            \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                if(stack_size == 0)                            \
-                                {                                              \
-                                        break;                                 \
-                                }                                              \
-                                --stack_size;                                  \
-                                curr = stack[stack_size];                      \
-                                operate(&curr->key, &curr->value, argout);     \
-                                curr = curr->left;                             \
-                        }                                                      \
+                        operate(&it.curr->key, &it.curr->value, argout);       \
+                        map_fast_iterator_prev_##K##_##V(&it);                 \
                 }                                                              \
-                free(stack);                                                   \
+                                                                               \
+                map_fast_iterator_free_##K##_##V(&it);                         \
         }                                                                      \
                                                                                \
         static int map_is_left_child_##K##_##V(struct node_##K##_##V *n,       \
@@ -869,6 +908,7 @@ enum
                             (map_element_compare_##K##_##V(&parent->key, k));  \
                         if(!compare)                                           \
                         {                                                      \
+                                map_element_copy_##K##_##V(&parent->value, v); \
                                 return;                                        \
                         }                                                      \
                                                                                \
@@ -914,4 +954,93 @@ enum
                         map_insert_node_##K##_##V(m, &k, &v);                  \
                         m->root->color = MAP_BLACK;                            \
                 }                                                              \
+        }                                                                      \
+                                                                               \
+        V *map_at_##K##_##V(struct map_##K##_##V *m, K k)                      \
+        {                                                                      \
+                V *ret = NULL;                                                 \
+                if(m->root)                                                    \
+                {                                                              \
+                        struct node_##K##_##V *curr = m->root;                 \
+                        while(curr)                                            \
+                        {                                                      \
+                                int compare = (map_element_compare_##K##_##V(  \
+                                    &curr->key, &k));                          \
+                                if(!compare)                                   \
+                                {                                              \
+                                        ret = &curr->value;                    \
+                                        break;                                 \
+                                }                                              \
+                                                                               \
+                                if(compare > 0)                                \
+                                {                                              \
+                                        curr = curr->left;                     \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        curr = curr->right;                    \
+                                }                                              \
+                        }                                                      \
+                }                                                              \
+                return ret;                                                    \
+        }                                                                      \
+                                                                               \
+        static void map_erase_fixup_##K##_##V(struct map_##K##_##V *m,         \
+                                              struct node_##K##_##V *n)        \
+        {                                                                      \
+        }                                                                      \
+                                                                               \
+        struct node_##K##_##V *map_erase_##K##_##V(struct map_##K##_##V *m,    \
+                                                   struct node_##K##_##V *n)   \
+        {                                                                      \
+                struct node_##K##_##V *curr;                                   \
+                struct node_##K##_##V *tmp;                                    \
+                if(!n->left || !n->right)                                      \
+                {                                                              \
+                        tmp = n;                                               \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        tmp = n;                                               \
+                        while(tmp->right)                                      \
+                        {                                                      \
+                                tmp = tmp->right;                              \
+                        }                                                      \
+                }                                                              \
+                                                                               \
+                curr = (tmp->left) ? tmp->left : tmp->right;                   \
+                struct node_##K##_##V *parent = tmp->parent;                   \
+		if(curr)                                                       \
+		{                                                              \
+			curr->parent = parent;                                 \
+		}                                                              \
+                                                                               \
+                if(!tmp->parent)                                               \
+                {                                                              \
+                        m->root = curr;                                        \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        if(tmp == parent->left)                                \
+                        {                                                      \
+                                parent->left = curr;                           \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                parent->right = curr;                          \
+                        }                                                      \
+                }                                                              \
+                                                                               \
+                if(tmp != n)                                                   \
+                {                                                              \
+                        map_element_copy_##K##_##V(&n->value, &tmp->value);    \
+                        map_element_copy_key_##K##_##V(&n->key, &tmp->key);    \
+                }                                                              \
+		                                                               \
+                if(tmp->color == MAP_BLACK)                                    \
+                {                                                              \
+                        map_erase_fixup_##K##_##V(m, curr);                    \
+                }                                                              \
+		--m->size;                                                     \
+                return tmp;                                                    \
         }
