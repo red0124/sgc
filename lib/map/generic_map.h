@@ -985,62 +985,228 @@ enum map_color
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        static void map_erase_fixup_##K##_##V(struct map_##K##_##V *m,         \
-                                              struct node_##K##_##V *n)        \
+        static struct node_##K##_##V *map_find_##K##_##V(                      \
+            struct map_##K##_##V *m, K k)                                      \
         {                                                                      \
-        }                                                                      \
-                                                                               \
-        struct node_##K##_##V *map_erase_##K##_##V(struct map_##K##_##V *m,    \
-                                                   struct node_##K##_##V *n)   \
-        {                                                                      \
-                struct node_##K##_##V *curr;                                   \
-                struct node_##K##_##V *tmp;                                    \
-                if(!n->left || !n->right)                                      \
+                struct node_##K##_##V *ret = NULL;                             \
+                if(m->root)                                                    \
                 {                                                              \
-                        tmp = n;                                               \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        tmp = n;                                               \
-                        while(tmp->right)                                      \
+                        struct node_##K##_##V *curr = m->root;                 \
+                        while(curr)                                            \
                         {                                                      \
-                                tmp = tmp->right;                              \
+                                int compare = (map_element_compare_##K##_##V(  \
+                                    &curr->key, &k));                          \
+                                if(!compare)                                   \
+                                {                                              \
+                                        ret = curr;                            \
+                                        break;                                 \
+                                }                                              \
+                                                                               \
+                                if(compare > 0)                                \
+                                {                                              \
+                                        curr = curr->left;                     \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        curr = curr->right;                    \
+                                }                                              \
                         }                                                      \
                 }                                                              \
+                return ret;                                                    \
+        }                                                                      \
                                                                                \
-                curr = (tmp->left) ? tmp->left : tmp->right;                   \
-                struct node_##K##_##V *parent = tmp->parent;                   \
-		if(curr)                                                       \
-		{                                                              \
-			curr->parent = parent;                                 \
-		}                                                              \
-                                                                               \
-                if(!tmp->parent)                                               \
+        static void map_erase_rebalanse_##K##_##V(struct map_##K##_##V *m,     \
+                                                  struct node_##K##_##V *n,    \
+                                                  struct node_##K##_##V *p)    \
+        {                                                                      \
+                if(p)                                                          \
                 {                                                              \
-                        m->root = curr;                                        \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        if(tmp == parent->left)                                \
+                        struct node_##K##_##V *s;                              \
+                        struct node_##K##_##V *r;                              \
+                        if(p->left == n)                                       \
                         {                                                      \
-                                parent->left = curr;                           \
+                                s = p->right;                                  \
+                                if(!s)                                         \
+                                {                                              \
+                                        return;                                \
+                                }                                              \
+                                if(s->color == MAP_RED)                        \
+                                {                                              \
+                                        s->color = MAP_BLACK;                  \
+                                        p->color = MAP_RED;                    \
+                                }                                              \
+                                if((!s->right ||                               \
+                                    s->right->color == MAP_BLACK) &&           \
+                                   (!s->left || s->left->color == MAP_BLACK))  \
+                                {                                              \
+                                        s->color = MAP_RED;                    \
+                                }                                              \
+                                else if(s->right &&                            \
+                                        s->right->color == MAP_RED)            \
+                                {                                              \
+                                        r = s->right;                          \
+                                        if(r)                                  \
+                                        {                                      \
+                                                r->color = MAP_BLACK;          \
+                                        }                                      \
+                                        map_rotate_left_##K##_##V(m, s, p);    \
+                                }                                              \
+                                else if(s->left && s->left->color == MAP_RED)  \
+                                {                                              \
+                                        r = s->left;                           \
+                                        map_rotate_right_left_##K##_##V(m, r,  \
+                                                                        s, p); \
+                                }                                              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                parent->right = curr;                          \
+                                s = p->left;                                   \
+                                if(!s)                                         \
+                                {                                              \
+                                        return;                                \
+                                }                                              \
+                                if(s->color == MAP_RED)                        \
+                                {                                              \
+                                        s->color = MAP_BLACK;                  \
+                                        p->color = MAP_RED;                    \
+                                }                                              \
+                                if((!s->right ||                               \
+                                    s->right->color == MAP_BLACK) &&           \
+                                   (!s->left || s->left->color == MAP_BLACK))  \
+                                {                                              \
+                                        s->color = MAP_RED;                    \
+                                }                                              \
+                                else if(s->left && s->left->color == MAP_RED)  \
+                                {                                              \
+                                        r = s->left;                           \
+                                        if(r)                                  \
+                                        {                                      \
+                                                r->color = MAP_BLACK;          \
+                                        }                                      \
+                                        map_rotate_right_##K##_##V(m, s, p);   \
+                                }                                              \
+                                else if(s->right &&                            \
+                                        s->right->color == MAP_RED)            \
+                                {                                              \
+                                        r = s->right;                          \
+                                        map_rotate_left_right_##K##_##V(m, r,  \
+                                                                        s, p); \
+                                }                                              \
                         }                                                      \
                 }                                                              \
+        }                                                                      \
                                                                                \
-                if(tmp != n)                                                   \
+        static void node_move_##K##_##V(struct node_##K##_##V *first,          \
+                                        struct node_##K##_##V *second)         \
+        {                                                                      \
+                first->parent, second->parent;                                 \
+                first->left, second->left;                                     \
+                first->right, second->right;                                   \
+                first->color = second->color;                                  \
+                struct node_##K##_##V *p = first->parent;                      \
+                if(p)                                                          \
                 {                                                              \
-                        map_element_copy_##K##_##V(&n->value, &tmp->value);    \
-                        map_element_copy_key_##K##_##V(&n->key, &tmp->key);    \
+                        if(p->right == second)                                 \
+                        {                                                      \
+                                p->right = first;                              \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                p->left = first;                               \
+                        }                                                      \
                 }                                                              \
-		                                                               \
-                if(tmp->color == MAP_BLACK)                                    \
+                if(first->left)                                                \
                 {                                                              \
-                        map_erase_fixup_##K##_##V(m, curr);                    \
+                        first->left->parent = first;                           \
                 }                                                              \
-		--m->size;                                                     \
-                return tmp;                                                    \
-        }
+                if(first->right)                                               \
+                {                                                              \
+                        first->right->parent = first;                          \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        static struct node_##K##_##V *map_erase_node_##K##_##V(                \
+            struct map_##K##_##V *m, struct node_##K##_##V *n)                 \
+        {                                                                      \
+                struct node_##K##_##V *succ_c;                                 \
+                struct node_##K##_##V *succ;                                   \
+                if(!n->left || !n->right)                                      \
+                {                                                              \
+                        succ = n;                                              \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        succ = n->right;                                       \
+                        if(succ)                                               \
+                        {                                                      \
+                                while(succ->left)                              \
+                                {                                              \
+                                        succ = succ->left;                     \
+                                }                                              \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                succ = n->left;                                \
+                        }                                                      \
+                }                                                              \
+                succ_c = (succ->left) ? succ->left : succ->right;              \
+                struct node_##K##_##V *succ_p = succ->parent;                  \
+                if(succ_c)                                                     \
+                {                                                              \
+                        succ_c->parent = succ_p;                               \
+                }                                                              \
+                if(!succ->parent)                                              \
+                {                                                              \
+                        m->root = succ_c;                                      \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        if(succ_p->left == succ)                               \
+                        {                                                      \
+                                succ_p->left = succ_c;                         \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                succ_p->right = succ_c;                        \
+                        }                                                      \
+                }                                                              \
+                if(succ != n)                                                  \
+                {                                                              \
+                        if(map_element_copy_##K##_##V ==                       \
+                               map_element_default_copy_##K##_##V &&           \
+                           map_element_copy_key_##K##_##V ==                   \
+                               map_element_default_copy_key_##K##_##V)         \
+                        {                                                      \
+                                map_element_copy_key_##K##_##V(&n->key,        \
+                                                               &succ->key);    \
+                                map_element_copy_##K##_##V(&n->value,          \
+                                                           &succ->value);      \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                node_move_##K##_##V(n, succ);                  \
+                        }                                                      \
+                }                                                              \
+                if(succ->color == MAP_BLACK)                                   \
+                {                                                              \
+                        map_erase_rebalanse_##K##_##V(m, succ_c, succ_p);      \
+                }                                                              \
+                if(m->root)                                                    \
+                {                                                              \
+                        m->root->color = MAP_BLACK;                            \
+                }                                                              \
+                --m->size;                                                     \
+                return succ;                                                   \
+        }                                                                      \
+                                                                               \
+        int map_erase_##K##_##V(struct map_##K##_##V *m, const K key)          \
+        {                                                                      \
+                struct node_##K##_##V *n = map_find_##K##_##V(m, key);         \
+                int ret = (n) ? 1 : 0;                                         \
+                if(ret)                                                        \
+                {                                                              \
+                        free(map_erase_node_##K##_##V(m, n));                  \
+                }                                                              \
+                return ret;                                                    \
+        }\
+\
