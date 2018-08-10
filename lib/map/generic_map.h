@@ -14,7 +14,6 @@ enum map_color
 {
         MAP_RED,
         MAP_BLACK,
-        MAP_DBLACK
 };
 #endif
 
@@ -57,21 +56,21 @@ enum map_color
                                                                                \
         struct node_##K##_##V                                                  \
         {                                                                      \
-                struct node_##K##_##V *parent;                                 \
-                struct node_##K##_##V *left;                                   \
-                struct node_##K##_##V *right;                                  \
-                K key;                                                         \
-                V value;                                                       \
-                enum map_color color;                                          \
+                struct node_##K##_##V *_parent;                                \
+                struct node_##K##_##V *_left;                                  \
+                struct node_##K##_##V *_right;                                 \
+                K _key;                                                        \
+                V _value;                                                      \
+                enum map_color _color;                                         \
         };                                                                     \
                                                                                \
         struct map_##K##_##V                                                   \
         {                                                                      \
-                size_t size;                                                   \
-                struct node_##K##_##V *root;                                   \
+                size_t _size;                                                  \
+                struct node_##K##_##V *_root;                                  \
         };                                                                     \
                                                                                \
-        void map_element_default_init_##K##_##V(V *el)                         \
+        static void map_element_default_init_##K##_##V(V *el)                   \
         {                                                                      \
                 (void)el;                                                      \
         }                                                                      \
@@ -84,7 +83,7 @@ enum map_color
                 map_element_init_##K##_##V = init;                             \
         }                                                                      \
                                                                                \
-        void map_element_default_copy_##K##_##V(V *dst, const V *src)          \
+        static void map_element_default_copy_##K##_##V(V *dst, const V *src)          \
         {                                                                      \
                 *dst = *src;                                                   \
         }                                                                      \
@@ -97,7 +96,7 @@ enum map_color
                 map_element_copy_##K##_##V = copy;                             \
         }                                                                      \
                                                                                \
-        void map_element_default_copy_key_##K##_##V(K *dst, const K *src)      \
+        static void map_element_default_copy_key_##K##_##V(K *dst, const K *src)      \
         {                                                                      \
                 *dst = *src;                                                   \
         }                                                                      \
@@ -110,7 +109,7 @@ enum map_color
                 map_element_copy_key_##K##_##V = copy;                         \
         }                                                                      \
                                                                                \
-        int map_element_default_equal_##K##_##V(const V *first,                \
+        static int map_element_default_equal_##K##_##V(const V *first,                \
                                                 const V *second)               \
         {                                                                      \
                 return memcmp(first, second, sizeof(V)) == 0;                  \
@@ -124,7 +123,7 @@ enum map_color
                 map_element_equal_##K##_##V = equal;                           \
         }                                                                      \
                                                                                \
-        int map_element_default_equal_key_##K##_##V(const K *first,            \
+        static int map_element_default_equal_key_##K##_##V(const K *first,            \
                                                     const K *second)           \
         {                                                                      \
                 return memcmp(first, second, sizeof(K)) == 0;                  \
@@ -138,7 +137,7 @@ enum map_color
                 map_element_equal_key_##K##_##V = equal;                       \
         }                                                                      \
                                                                                \
-        int map_element_default_compare_##K##_##V(const void *first,           \
+        static int map_element_default_compare_##K##_##V(const void *first,           \
                                                   const void *second)          \
         {                                                                      \
                 return memcmp(first, second, sizeof(K));                       \
@@ -153,7 +152,7 @@ enum map_color
                 map_element_compare_##K##_##V = compare;                       \
         }                                                                      \
                                                                                \
-        void map_element_default_free_##K##_##V(K *k, V *v)                    \
+        static void map_element_default_free_##K##_##V(K *k, V *v)                    \
         {                                                                      \
                 (void)k;                                                       \
                 (void)v;                                                       \
@@ -173,12 +172,22 @@ enum map_color
                 struct node_##K##_##V *next;                                   \
         };                                                                     \
                                                                                \
+        K *map_iterator_key_##K##_##V(struct map_iterator_##K##_##V i)         \
+        {                                                                      \
+                return &i.curr->_key;                                          \
+        }                                                                      \
+                                                                               \
+        V *map_iterator_value_##K##_##V(struct map_iterator_##K##_##V i)       \
+        {                                                                      \
+                return &i.curr->_value;                                        \
+        }                                                                      \
+                                                                               \
         static struct node_##K##_##V *node_begin_##K##_##V(                    \
             struct node_##K##_##V *n)                                          \
         {                                                                      \
-                while(n->left)                                                 \
+                while(n->_left)                                                \
                 {                                                              \
-                        n = n->left;                                           \
+                        n = n->_left;                                          \
                 }                                                              \
                 return n;                                                      \
         }                                                                      \
@@ -186,9 +195,9 @@ enum map_color
         static struct node_##K##_##V *node_end_##K##_##V(                      \
             struct node_##K##_##V *n)                                          \
         {                                                                      \
-                while(n->right)                                                \
+                while(n->_right)                                               \
                 {                                                              \
-                        n = n->right;                                          \
+                        n = n->_right;                                         \
                 }                                                              \
                 return n;                                                      \
         }                                                                      \
@@ -200,19 +209,19 @@ enum map_color
                         return;                                                \
                 }                                                              \
                 i->curr = i->next;                                             \
-                if(i->next->right)                                             \
+                if(i->next->_right)                                            \
                 {                                                              \
-                        i->next = node_begin_##K##_##V(i->next->right);        \
+                        i->next = node_begin_##K##_##V(i->next->_right);       \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct node_##K##_##V *parent = i->next->parent;       \
-                        while(parent && parent->right == i->next)              \
+                        struct node_##K##_##V *parent = i->next->_parent;      \
+                        while(parent && parent->_right == i->next)             \
                         {                                                      \
                                 i->next = parent;                              \
-                                parent = parent->parent;                       \
+                                parent = parent->_parent;                      \
                         }                                                      \
-                        if(i->next->right != parent)                           \
+                        if(i->next->_right != parent)                          \
                         {                                                      \
                                 i->next = parent;                              \
                         }                                                      \
@@ -224,7 +233,7 @@ enum map_color
         {                                                                      \
                 i->curr = MAP_LEAF;                                            \
                 i->next =                                                      \
-                    (m->root) ? node_begin_##K##_##V(m->root) : MAP_LEAF;      \
+                    (m->_root) ? node_begin_##K##_##V(m->_root) : MAP_LEAF;    \
                 map_iterator_next_##K##_##V(i);                                \
         }                                                                      \
                                                                                \
@@ -235,19 +244,19 @@ enum map_color
                         return;                                                \
                 }                                                              \
                 i->next = i->curr;                                             \
-                if(i->curr->left)                                              \
+                if(i->curr->_left)                                             \
                 {                                                              \
-                        i->curr = node_end_##K##_##V(i->curr->left);           \
+                        i->curr = node_end_##K##_##V(i->curr->_left);          \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct node_##K##_##V *parent = i->curr->parent;       \
-                        while(parent && parent->left == i->curr)               \
+                        struct node_##K##_##V *parent = i->curr->_parent;      \
+                        while(parent && parent->_left == i->curr)              \
                         {                                                      \
                                 i->curr = parent;                              \
-                                parent = parent->parent;                       \
+                                parent = parent->_parent;                      \
                         }                                                      \
-                        if(i->curr->right != parent)                           \
+                        if(i->curr->_right != parent)                          \
                         {                                                      \
                                 i->curr = parent;                              \
                         }                                                      \
@@ -257,7 +266,8 @@ enum map_color
         void map_iterator_end_##K##_##V(struct map_##K##_##V *m,               \
                                         struct map_iterator_##K##_##V *i)      \
         {                                                                      \
-                i->curr = (m->root) ? node_end_##K##_##V(m->root) : MAP_LEAF;  \
+                i->curr =                                                      \
+                    (m->_root) ? node_end_##K##_##V(m->_root) : MAP_LEAF;      \
                 i->next = MAP_LEAF;                                            \
         }                                                                      \
                                                                                \
@@ -322,7 +332,7 @@ enum map_color
         {                                                                      \
                 i->stack_size = 0;                                             \
                 i->stack = (struct node_##K##_##V **)malloc(                   \
-                    map_stack_size_##K##_##V(m->size));                        \
+                    map_stack_size_##K##_##V(m->_size));                       \
         }                                                                      \
                                                                                \
         void map_fast_iterator_free_##K##_##V(                                 \
@@ -346,26 +356,26 @@ enum map_color
                         return;                                                \
                 }                                                              \
                 i->curr = i->next;                                             \
-                if(i->next->right)                                             \
+                if(i->next->_right)                                            \
                 {                                                              \
                         i->stack[i->stack_size++] = i->next;                   \
-                        i->next = i->next->right;                              \
-                        while(i->next->left)                                   \
+                        i->next = i->next->_right;                             \
+                        while(i->next->_left)                                  \
                         {                                                      \
                                 i->stack[i->stack_size++] = i->next;           \
-                                i->next = i->next->left;                       \
+                                i->next = i->next->_left;                      \
                         }                                                      \
                 }                                                              \
                 else                                                           \
                 {                                                              \
                         struct node_##K##_##V *parent =                        \
                             i->stack[--i->stack_size];                         \
-                        while(parent && parent->right == i->next)              \
+                        while(parent && parent->_right == i->next)             \
                         {                                                      \
                                 i->next = parent;                              \
                                 parent = i->stack[--i->stack_size];            \
                         }                                                      \
-                        if(i->next->right != parent)                           \
+                        if(i->next->_right != parent)                          \
                         {                                                      \
                                 i->next = parent;                              \
                         }                                                      \
@@ -376,7 +386,7 @@ enum map_color
             struct map_##K##_##V *m, struct map_fast_iterator_##K##_##V *i)    \
         {                                                                      \
                 map_fast_iterator_init_##K##_##V(m, i);                        \
-                struct node_##K##_##V *curr = m->root;                         \
+                struct node_##K##_##V *curr = m->_root;                        \
                 if(!curr)                                                      \
                 {                                                              \
                         i->curr = MAP_LEAF;                                    \
@@ -385,10 +395,10 @@ enum map_color
                 }                                                              \
                                                                                \
                 i->stack[i->stack_size++] = MAP_LEAF;                          \
-                while(curr->left)                                              \
+                while(curr->_left)                                             \
                 {                                                              \
                         i->stack[i->stack_size++] = curr;                      \
-                        curr = curr->left;                                     \
+                        curr = curr->_left;                                    \
                 }                                                              \
                 i->curr = MAP_LEAF;                                            \
                 i->next = curr;                                                \
@@ -403,26 +413,26 @@ enum map_color
                         return;                                                \
                 }                                                              \
                 i->next = i->curr;                                             \
-                if(i->curr->left)                                              \
+                if(i->curr->_left)                                             \
                 {                                                              \
                         i->stack[i->stack_size++] = i->curr;                   \
-                        i->curr = i->curr->left;                               \
-                        while(i->curr->right)                                  \
+                        i->curr = i->curr->_left;                              \
+                        while(i->curr->_right)                                 \
                         {                                                      \
                                 i->stack[i->stack_size++] = i->curr;           \
-                                i->curr = i->curr->right;                      \
+                                i->curr = i->curr->_right;                     \
                         }                                                      \
                 }                                                              \
                 else                                                           \
                 {                                                              \
                         struct node_##K##_##V *parent =                        \
                             i->stack[--i->stack_size];                         \
-                        while(parent && parent->left == i->curr)               \
+                        while(parent && parent->_left == i->curr)              \
                         {                                                      \
                                 parent = i->stack[--i->stack_size];            \
                                 i->curr = parent;                              \
                         }                                                      \
-                        if(i->curr->right != parent)                           \
+                        if(i->curr->_right != parent)                          \
                         {                                                      \
                                 i->curr = parent;                              \
                         }                                                      \
@@ -433,7 +443,7 @@ enum map_color
             struct map_##K##_##V *m, struct map_fast_iterator_##K##_##V *i)    \
         {                                                                      \
                 map_fast_iterator_init_##K##_##V(m, i);                        \
-                struct node_##K##_##V *curr = m->root;                         \
+                struct node_##K##_##V *curr = m->_root;                        \
                 if(!curr)                                                      \
                 {                                                              \
                         i->curr = MAP_LEAF;                                    \
@@ -442,10 +452,10 @@ enum map_color
                 }                                                              \
                                                                                \
                 i->stack[i->stack_size++] = MAP_LEAF;                          \
-                while(curr->right)                                             \
+                while(curr->_right)                                            \
                 {                                                              \
                         i->stack[i->stack_size++] = curr;                      \
-                        curr = curr->right;                                    \
+                        curr = curr->_right;                                   \
                 }                                                              \
                 i->curr = curr;                                                \
                 i->next = MAP_LEAF;                                            \
@@ -458,40 +468,50 @@ enum map_color
                 return first.curr == second.curr;                              \
         }                                                                      \
                                                                                \
-        static void node_init_##K##_##V(struct node_##K##_##V **n, const K *k, \
-                                        const V *v)                            \
+        static struct node_##K##_##V *node_new_##K##_##V(const K *k,           \
+                                                         const V *v)           \
         {                                                                      \
-                *n = (struct node_##K##_##V *)malloc(                          \
+                struct node_##K##_##V *n = (struct node_##K##_##V *)malloc(    \
                     sizeof(struct node_##K##_##V));                            \
-                map_element_copy_key_##K##_##V(&(*n)->key, k);                 \
-                map_element_copy_##K##_##V(&(*n)->value, v);                   \
-                (*n)->left = (*n)->right = MAP_LEAF;                           \
-                (*n)->color = MAP_RED;                                         \
+                map_element_copy_key_##K##_##V(&n->_key, k);                   \
+                map_element_copy_##K##_##V(&n->_value, v);                     \
+                n->_left = n->_right = MAP_LEAF;                               \
+                n->_color = MAP_RED;                                           \
+                return n;                                                      \
         }                                                                      \
                                                                                \
         size_t map_size_##K##_##V(const struct map_##K##_##V *m)               \
         {                                                                      \
-                return m->size;                                                \
+                return m->_size;                                               \
         }                                                                      \
                                                                                \
         void map_init_##K##_##V(struct map_##K##_##V *m,                       \
                                 int (*comp)(const void *, const void *))       \
         {                                                                      \
-                m->size = 0;                                                   \
-                m->root = MAP_LEAF;                                            \
+                m->_size = 0;                                                  \
+                m->_root = MAP_LEAF;                                           \
                 if(comp)                                                       \
                 {                                                              \
                         map_element_compare_##K##_##V = comp;                  \
                 }                                                              \
         }                                                                      \
                                                                                \
+        void map_default_init_##K##_##V(struct map_##K##_##V *m)               \
+        {                                                                      \
+                map_init_##K##_##V(m, NULL);                                   \
+        }                                                                      \
+                                                                               \
         void map_free_##K##_##V(struct map_##K##_##V *m)                       \
         {                                                                      \
+                if(!m->_size)                                                  \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
                 struct node_##K##_##V **stack =                                \
                     (struct node_##K##_##V **)malloc(                          \
-                        map_stack_size_##K##_##V(m->size));                    \
+                        map_stack_size_##K##_##V(m->_size));                   \
                                                                                \
-                struct node_##K##_##V *curr = m->root;                         \
+                struct node_##K##_##V *curr = m->_root;                        \
                 struct node_##K##_##V *tmp = NULL;                             \
                                                                                \
                 size_t stack_size = 0;                                         \
@@ -500,7 +520,7 @@ enum map_color
                         if(curr != MAP_LEAF)                                   \
                         {                                                      \
                                 stack[stack_size++] = curr;                    \
-                                curr = curr->left;                             \
+                                curr = curr->_left;                            \
                         }                                                      \
                         else                                                   \
                         {                                                      \
@@ -510,26 +530,26 @@ enum map_color
                                 }                                              \
                                 curr = stack[--stack_size];                    \
                                 tmp = curr;                                    \
-                                curr = curr->right;                            \
+                                curr = curr->_right;                           \
                                 if(map_element_free_##K##_##V !=               \
                                    map_element_default_free_##K##_##V)         \
                                 {                                              \
                                         map_element_free_##K##_##V(            \
-                                            &tmp->key, &tmp->value);           \
+                                            &tmp->_key, &tmp->_value);         \
                                 }                                              \
                                 free(tmp);                                     \
                         }                                                      \
                 }                                                              \
                 free(stack);                                                   \
-                m->root = MAP_LEAF;                                            \
-                m->size = 0;                                                   \
+                m->_root = MAP_LEAF;                                           \
+                m->_size = 0;                                                  \
         }                                                                      \
                                                                                \
         int map_equal_##K##_##V(struct map_##K##_##V *first,                   \
                                 struct map_##K##_##V *second)                  \
         {                                                                      \
                 int equal = (first == second);                                 \
-                if(equal == 0 && first->size == second->size)                  \
+                if(equal == 0 && first->_size == second->_size)                \
                 {                                                              \
                         equal = 1;                                             \
                         struct map_fast_iterator_##K##_##V it_first;           \
@@ -538,14 +558,14 @@ enum map_color
                         struct map_fast_iterator_##K##_##V it_second;          \
                         map_fast_iterator_begin_##K##_##V(second, &it_second); \
                                                                                \
-                        for(size_t i = 0; i < first->size; ++i)                \
+                        for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
                                 if((!map_element_equal_key_##K##_##V(          \
-                                        &it_first.curr->key,                   \
-                                        &it_second.curr->key) ||               \
+                                        &it_first.curr->_key,                  \
+                                        &it_second.curr->_key) ||              \
                                     !map_element_equal_##K##_##V(              \
-                                        &it_first.curr->value,                 \
-                                        &it_second.curr->value)))              \
+                                        &it_first.curr->_value,                \
+                                        &it_second.curr->_value)))             \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -563,49 +583,49 @@ enum map_color
         void map_copy_##K##_##V(struct map_##K##_##V *__restrict__ dst,        \
                                 const struct map_##K##_##V *__restrict__ src)  \
         {                                                                      \
-                dst->size = src->size;                                         \
-                dst->root = MAP_LEAF;                                          \
+                dst->_size = src->_size;                                       \
+                dst->_root = MAP_LEAF;                                         \
                                                                                \
-                if(src->size != 0)                                             \
+                if(src->_size != 0)                                            \
                 {                                                              \
-                        dst->root = (struct node_##K##_##V *)malloc(           \
+                        dst->_root = (struct node_##K##_##V *)malloc(          \
                             sizeof(struct node_##K##_##V));                    \
                                                                                \
-                        map_element_copy_##K##_##V(&dst->root->value,          \
-                                                   &src->root->value);         \
-                        map_element_copy_key_##K##_##V(&dst->root->key,        \
-                                                       &src->root->key);       \
-                        dst->root->color = src->root->color;                   \
-                        dst->root->left = dst->root->right =                   \
-                            dst->root->parent = MAP_LEAF;                      \
+                        map_element_copy_##K##_##V(&dst->_root->_value,        \
+                                                   &src->_root->_value);       \
+                        map_element_copy_key_##K##_##V(&dst->_root->_key,      \
+                                                       &src->_root->_key);     \
+                        dst->_root->_color = src->_root->_color;               \
+                        dst->_root->_left = dst->_root->_right =               \
+                            dst->_root->_parent = MAP_LEAF;                    \
                                                                                \
                         struct node_##K##_##V **stack_src =                    \
                             (struct node_##K##_##V **)malloc(                  \
-                                map_stack_size_##K##_##V(src->size));          \
+                                map_stack_size_##K##_##V(src->_size));         \
                                                                                \
-                        struct node_##K##_##V *curr_src = src->root;           \
+                        struct node_##K##_##V *curr_src = src->_root;          \
                                                                                \
                         struct node_##K##_##V **stack_dst =                    \
                             (struct node_##K##_##V **)malloc(                  \
-                                map_stack_size_##K##_##V(dst->size));          \
+                                map_stack_size_##K##_##V(dst->_size));         \
                                                                                \
-                        struct node_##K##_##V *curr_dst = dst->root;           \
+                        struct node_##K##_##V *curr_dst = dst->_root;          \
                                                                                \
                         struct node_##K##_##V *tmp = MAP_LEAF;                 \
                                                                                \
                         stack_src[0] = MAP_LEAF;                               \
                         stack_dst[0] = MAP_LEAF;                               \
                                                                                \
-                        stack_src[1] = src->root;                              \
-                        stack_dst[1] = dst->root;                              \
+                        stack_src[1] = src->_root;                             \
+                        stack_dst[1] = dst->_root;                             \
                         size_t stack_size = 2;                                 \
                                                                                \
                         while(stack_size > 0)                                  \
                         {                                                      \
-                                if(!((curr_src->left != MAP_LEAF &&            \
-                                      curr_dst->left == MAP_LEAF) ||           \
-                                     (curr_src->right != MAP_LEAF &&           \
-                                      curr_dst->right == MAP_LEAF)))           \
+                                if(!((curr_src->_left != MAP_LEAF &&           \
+                                      curr_dst->_left == MAP_LEAF) ||          \
+                                     (curr_src->_right != MAP_LEAF &&          \
+                                      curr_dst->_right == MAP_LEAF)))          \
                                 {                                              \
                                         --stack_size;                          \
                                         curr_src = stack_src[stack_size];      \
@@ -613,34 +633,34 @@ enum map_color
                                         continue;                              \
                                 }                                              \
                                                                                \
-                                if(curr_src->left != MAP_LEAF &&               \
-                                   curr_dst->left == MAP_LEAF)                 \
+                                if(curr_src->_left != MAP_LEAF &&              \
+                                   curr_dst->_left == MAP_LEAF)                \
                                 {                                              \
-                                        curr_dst->left =                       \
+                                        curr_dst->_left =                      \
                                             (struct node_##K##_##V *)malloc(   \
                                                 sizeof(                        \
                                                     struct node_##K##_##V));   \
-                                        tmp = curr_dst->left;                  \
-                                        tmp->parent = curr_dst;                \
-                                        curr_src = curr_src->left;             \
+                                        tmp = curr_dst->_left;                 \
+                                        tmp->_parent = curr_dst;               \
+                                        curr_src = curr_src->_left;            \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        curr_dst->right =                      \
+                                        curr_dst->_right =                     \
                                             (struct node_##K##_##V *)malloc(   \
                                                 sizeof(                        \
                                                     struct node_##K##_##V));   \
-                                        tmp = curr_dst->right;                 \
-                                        tmp->parent = curr_dst;                \
-                                        curr_src = curr_src->right;            \
+                                        tmp = curr_dst->_right;                \
+                                        tmp->_parent = curr_dst;               \
+                                        curr_src = curr_src->_right;           \
                                 }                                              \
-                                tmp->left = tmp->right = MAP_LEAF;             \
+                                tmp->_left = tmp->_right = MAP_LEAF;           \
                                 curr_dst = tmp;                                \
-                                map_element_copy_##K##_##V(&curr_dst->value,   \
-                                                           &curr_src->value);  \
+                                map_element_copy_##K##_##V(&curr_dst->_value,  \
+                                                           &curr_src->_value); \
                                 map_element_copy_key_##K##_##V(                \
-                                    &curr_dst->key, &curr_src->key);           \
-                                curr_dst->color = curr_src->color;             \
+                                    &curr_dst->_key, &curr_src->_key);         \
+                                curr_dst->_color = curr_src->_color;           \
                                 stack_src[stack_size] = curr_src;              \
                                 stack_dst[stack_size] = curr_dst;              \
                                 ++stack_size;                                  \
@@ -657,9 +677,9 @@ enum map_color
                 struct map_fast_iterator_##K##_##V it;                         \
                 map_fast_iterator_begin_##K##_##V(m, &it);                     \
                                                                                \
-                for(size_t i = 0; i < m->size; ++i)                            \
+                for(size_t i = 0; i < m->_size; ++i)                           \
                 {                                                              \
-                        operate(&it.curr->key, &it.curr->value);               \
+                        operate(&it.curr->_key, &it.curr->_value);             \
                         map_fast_iterator_next_##K##_##V(&it);                 \
                 }                                                              \
                                                                                \
@@ -672,9 +692,9 @@ enum map_color
                 struct map_fast_iterator_##K##_##V it;                         \
                 map_fast_iterator_end_##K##_##V(m, &it);                       \
                                                                                \
-                for(size_t i = 0; i < m->size; ++i)                            \
+                for(size_t i = 0; i < m->_size; ++i)                           \
                 {                                                              \
-                        operate(&it.curr->key, &it.curr->value);               \
+                        operate(&it.curr->_key, &it.curr->_value);             \
                         map_fast_iterator_prev_##K##_##V(&it);                 \
                 }                                                              \
                                                                                \
@@ -688,9 +708,9 @@ enum map_color
                 struct map_fast_iterator_##K##_##V it;                         \
                 map_fast_iterator_begin_##K##_##V(m, &it);                     \
                                                                                \
-                for(size_t i = 0; i < m->size; ++i)                            \
+                for(size_t i = 0; i < m->_size; ++i)                           \
                 {                                                              \
-                        operate(&it.curr->key, &it.curr->value, argout);       \
+                        operate(&it.curr->_key, &it.curr->_value, argout);     \
                         map_fast_iterator_next_##K##_##V(&it);                 \
                 }                                                              \
                                                                                \
@@ -704,9 +724,9 @@ enum map_color
                 struct map_fast_iterator_##K##_##V it;                         \
                 map_fast_iterator_end_##K##_##V(m, &it);                       \
                                                                                \
-                for(size_t i = 0; i < m->size; ++i)                            \
+                for(size_t i = 0; i < m->_size; ++i)                           \
                 {                                                              \
-                        operate(&it.curr->key, &it.curr->value, argout);       \
+                        operate(&it.curr->_key, &it.curr->_value, argout);     \
                         map_fast_iterator_prev_##K##_##V(&it);                 \
                 }                                                              \
                                                                                \
@@ -716,7 +736,7 @@ enum map_color
         static int map_is_left_child_##K##_##V(struct node_##K##_##V *n,       \
                                                struct node_##K##_##V *parent)  \
         {                                                                      \
-                return (n == parent->left);                                    \
+                return (n == parent->_left);                                   \
         }                                                                      \
                                                                                \
         static struct node_##K##_##V *map_brother_##K##_##V(                   \
@@ -725,8 +745,8 @@ enum map_color
                 struct node_##K##_##V *brother = NULL;                         \
                 if(parent != MAP_LEAF)                                         \
                 {                                                              \
-                        brother = (n == parent->left) ? parent->right          \
-                                                      : parent->left;          \
+                        brother = (n == parent->_left) ? parent->_right        \
+                                                       : parent->_left;        \
                 }                                                              \
                 return brother;                                                \
         }                                                                      \
@@ -734,64 +754,64 @@ enum map_color
                                               struct node_##K##_##V *parent,   \
                                               struct node_##K##_##V *gparent)  \
         {                                                                      \
-                struct node_##K##_##V *left = parent->left;                    \
-                gparent->right = left;                                         \
-                if(left != MAP_LEAF)                                           \
+                struct node_##K##_##V *_left = parent->_left;                  \
+                gparent->_right = _left;                                       \
+                if(_left != MAP_LEAF)                                          \
                 {                                                              \
-                        left->parent = gparent;                                \
+                        _left->_parent = gparent;                              \
                 }                                                              \
-                if(gparent == m->root)                                         \
+                if(gparent == m->_root)                                        \
                 {                                                              \
-                        m->root = parent;                                      \
-                        parent->parent = MAP_LEAF;                             \
+                        m->_root = parent;                                     \
+                        parent->_parent = MAP_LEAF;                            \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct node_##K##_##V *ggparent = gparent->parent;     \
-                        parent->parent = ggparent;                             \
+                        struct node_##K##_##V *ggparent = gparent->_parent;    \
+                        parent->_parent = ggparent;                            \
                         if(map_is_left_child_##K##_##V(gparent, ggparent))     \
                         {                                                      \
-                                ggparent->left = parent;                       \
+                                ggparent->_left = parent;                      \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                ggparent->right = parent;                      \
+                                ggparent->_right = parent;                     \
                         }                                                      \
                 }                                                              \
-                parent->left = gparent;                                        \
-                gparent->parent = parent;                                      \
+                parent->_left = gparent;                                       \
+                gparent->_parent = parent;                                     \
         }                                                                      \
                                                                                \
         static void map_rotate_right_##K##_##V(struct map_##K##_##V *m,        \
                                                struct node_##K##_##V *parent,  \
                                                struct node_##K##_##V *gparent) \
         {                                                                      \
-                struct node_##K##_##V *right = parent->right;                  \
-                gparent->left = right;                                         \
+                struct node_##K##_##V *right = parent->_right;                 \
+                gparent->_left = right;                                        \
                 if(right != MAP_LEAF)                                          \
                 {                                                              \
-                        right->parent = gparent;                               \
+                        right->_parent = gparent;                              \
                 }                                                              \
-                if(gparent == m->root)                                         \
+                if(gparent == m->_root)                                        \
                 {                                                              \
-                        m->root = parent;                                      \
-                        parent->parent = MAP_LEAF;                             \
+                        m->_root = parent;                                     \
+                        parent->_parent = MAP_LEAF;                            \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct node_##K##_##V *ggparent = gparent->parent;     \
-                        parent->parent = ggparent;                             \
+                        struct node_##K##_##V *ggparent = gparent->_parent;    \
+                        parent->_parent = ggparent;                            \
                         if(map_is_left_child_##K##_##V(gparent, ggparent))     \
                         {                                                      \
-                                ggparent->left = parent;                       \
+                                ggparent->_left = parent;                      \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                ggparent->right = parent;                      \
+                                ggparent->_right = parent;                     \
                         }                                                      \
                 }                                                              \
-                parent->right = gparent;                                       \
-                gparent->parent = parent;                                      \
+                parent->_right = gparent;                                      \
+                gparent->_parent = parent;                                     \
         }                                                                      \
                                                                                \
         static void map_rotate_left_right_##K##_##V(                           \
@@ -820,22 +840,22 @@ enum map_color
                         {                                                      \
                                 map_rotate_right_##K##_##V(m, parent,          \
                                                            gparent);           \
-                                n->color = MAP_RED;                            \
-                                parent->color = MAP_BLACK;                     \
+                                n->_color = MAP_RED;                           \
+                                parent->_color = MAP_BLACK;                    \
                                 struct node_##K##_##V *brother =               \
-                                    parent->right;                             \
+                                    parent->_right;                            \
                                 if(brother != MAP_LEAF)                        \
                                 {                                              \
-                                        brother->color = MAP_RED;              \
+                                        brother->_color = MAP_RED;             \
                                 }                                              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
                                 map_rotate_right_left_##K##_##V(m, n, parent,  \
                                                                 gparent);      \
-                                n->color = MAP_BLACK;                          \
-                                n->right->color = MAP_RED;                     \
-                                n->left->color = MAP_RED;                      \
+                                n->_color = MAP_BLACK;                         \
+                                n->_right->_color = MAP_RED;                   \
+                                n->_left->_color = MAP_RED;                    \
                         }                                                      \
                 }                                                              \
                 else                                                           \
@@ -843,22 +863,22 @@ enum map_color
                         if(!map_is_left_child_##K##_##V(parent, gparent))      \
                         {                                                      \
                                 map_rotate_left_##K##_##V(m, parent, gparent); \
-                                n->color = MAP_RED;                            \
-                                parent->color = MAP_BLACK;                     \
+                                n->_color = MAP_RED;                           \
+                                parent->_color = MAP_BLACK;                    \
                                 struct node_##K##_##V *brother =               \
-                                    parent->right;                             \
+                                    parent->_right;                            \
                                 if(brother != MAP_LEAF)                        \
                                 {                                              \
-                                        brother->color = MAP_RED;              \
+                                        brother->_color = MAP_RED;             \
                                 }                                              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
                                 map_rotate_left_right_##K##_##V(m, n, parent,  \
                                                                 gparent);      \
-                                n->color = MAP_BLACK;                          \
-                                n->right->color = MAP_RED;                     \
-                                n->left->color = MAP_RED;                      \
+                                n->_color = MAP_BLACK;                         \
+                                n->_right->_color = MAP_RED;                   \
+                                n->_left->_color = MAP_RED;                    \
                         }                                                      \
                 }                                                              \
         }                                                                      \
@@ -867,30 +887,30 @@ enum map_color
                                               struct node_##K##_##V *n,        \
                                               struct node_##K##_##V *parent)   \
         {                                                                      \
-                struct node_##K##_##V *gparent = parent->parent;               \
+                struct node_##K##_##V *gparent = parent->_parent;              \
                 struct node_##K##_##V *aunt =                                  \
                     map_brother_##K##_##V(parent, gparent);                    \
-                if(aunt == MAP_LEAF || aunt->color == MAP_BLACK)               \
+                if(aunt == MAP_LEAF || aunt->_color == MAP_BLACK)              \
                 {                                                              \
                         map_rotate_##K##_##V(m, n, parent, gparent);           \
                 }                                                              \
                 else if(aunt != NULL)                                          \
                 {                                                              \
-                        aunt->color = MAP_BLACK;                               \
+                        aunt->_color = MAP_BLACK;                              \
                 }                                                              \
-                gparent->color = MAP_RED;                                      \
-                parent->color = MAP_BLACK;                                     \
+                gparent->_color = MAP_RED;                                     \
+                parent->_color = MAP_BLACK;                                    \
         }                                                                      \
                                                                                \
         static void map_check_color_##K##_##V(struct map_##K##_##V *m,         \
                                               struct node_##K##_##V *n)        \
         {                                                                      \
-                if(n == m->root)                                               \
+                if(n == m->_root)                                              \
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                struct node_##K##_##V *parent = n->parent;                     \
-                if(n->color == MAP_RED && parent->color == MAP_RED)            \
+                struct node_##K##_##V *parent = n->_parent;                    \
+                if(n->_color == MAP_RED && parent->_color == MAP_RED)          \
                 {                                                              \
                         map_corect_tree_##K##_##V(m, n, parent);               \
                 }                                                              \
@@ -900,117 +920,121 @@ enum map_color
         static void map_insert_node_##K##_##V(struct map_##K##_##V *m, K *k,   \
                                               V *v)                            \
         {                                                                      \
-                struct node_##K##_##V *parent = m->root;                       \
-                struct node_##K##_##V *new_node;                               \
+                struct node_##K##_##V *parent = m->_root;                      \
+                struct node_##K##_##V *new_node = NULL;                        \
                 for(;;)                                                        \
                 {                                                              \
                         int compare =                                          \
-                            (map_element_compare_##K##_##V(&parent->key, k));  \
-                        if(!compare)                                           \
-                        {                                                      \
-                                map_element_copy_##K##_##V(&parent->value, v); \
-                                return;                                        \
-                        }                                                      \
+                            (map_element_compare_##K##_##V(&parent->_key, k)); \
                                                                                \
                         if(compare > 0)                                        \
                         {                                                      \
-                                if(parent->left == MAP_LEAF)                   \
+                                if(parent->_left == MAP_LEAF)                  \
                                 {                                              \
-                                        node_init_##K##_##V(&new_node, k, v);  \
-                                        parent->left = new_node;               \
+                                        new_node = node_new_##K##_##V(k, v);   \
+                                        parent->_left = new_node;              \
+                                        m->_size++;                            \
                                         break;                                 \
                                 }                                              \
-                                parent = parent->left;                         \
+                                parent = parent->_left;                        \
+                        }                                                      \
+                        else if(compare < 0)                                   \
+                        {                                                      \
+                                if(parent->_right == MAP_LEAF)                 \
+                                {                                              \
+                                        new_node = node_new_##K##_##V(k, v);   \
+                                        parent->_right = new_node;             \
+                                        m->_size++;                            \
+                                        break;                                 \
+                                }                                              \
+                                parent = parent->_right;                       \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                if(parent->right == MAP_LEAF)                  \
-                                {                                              \
-                                        node_init_##K##_##V(&new_node, k, v);  \
-                                        parent->right = new_node;              \
-                                        break;                                 \
-                                }                                              \
-                                parent = parent->right;                        \
+                                map_element_copy_##K##_##V(&parent->_value,    \
+                                                           v);                 \
+                                return;                                        \
                         }                                                      \
                 }                                                              \
-                new_node->parent = parent;                                     \
+                new_node->_parent = parent;                                    \
                 map_check_color_##K##_##V(m, new_node);                        \
-                m->size++;                                                     \
         }                                                                      \
                                                                                \
-        void map_set_##K##_##V(struct map_##K##_##V *m, K k, V v)              \
+        struct map_##K##_##V *map_set_##K##_##V(struct map_##K##_##V *m, K k,  \
+                                                V v)                           \
         {                                                                      \
-                if(m->root == MAP_LEAF)                                        \
+                if(m->_root == MAP_LEAF)                                       \
                 {                                                              \
-                        struct node_##K##_##V *new_node;                       \
-                        node_init_##K##_##V(&new_node, &k, &v);                \
-                        new_node->color = MAP_BLACK;                           \
-                        new_node->parent = MAP_LEAF;                           \
-                        m->root = new_node;                                    \
-                        m->size = 1;                                           \
+                        struct node_##K##_##V *new_node =                      \
+                            node_new_##K##_##V(&k, &v);                        \
+                        new_node->_color = MAP_BLACK;                          \
+                        new_node->_parent = MAP_LEAF;                          \
+                        m->_root = new_node;                                   \
+                        m->_size = 1;                                          \
                 }                                                              \
                 else                                                           \
                 {                                                              \
                         map_insert_node_##K##_##V(m, &k, &v);                  \
-                        m->root->color = MAP_BLACK;                            \
+                        m->_root->_color = MAP_BLACK;                          \
                 }                                                              \
+                return m;                                                      \
         }                                                                      \
                                                                                \
-        V *map_at_##K##_##V(struct map_##K##_##V *m, K k)                      \
+        struct map_iterator_##K##_##V map_find_##K##_##V(                      \
+            struct map_##K##_##V *m, K k)                                      \
         {                                                                      \
-                V *ret = NULL;                                                 \
-                if(m->root)                                                    \
+                struct map_iterator_##K##_##V ret = {MAP_LEAF, MAP_LEAF};      \
+                struct node_##K##_##V *prev;                                   \
+                if(m->_root)                                                   \
                 {                                                              \
-                        struct node_##K##_##V *curr = m->root;                 \
+                        struct node_##K##_##V *curr = m->_root;                \
                         while(curr)                                            \
                         {                                                      \
+                                prev = curr;                                   \
                                 int compare = (map_element_compare_##K##_##V(  \
-                                    &curr->key, &k));                          \
-                                if(!compare)                                   \
-                                {                                              \
-                                        ret = &curr->value;                    \
-                                        break;                                 \
-                                }                                              \
+                                    &curr->_key, &k));                         \
                                                                                \
                                 if(compare > 0)                                \
                                 {                                              \
-                                        curr = curr->left;                     \
+                                        curr = curr->_left;                    \
+                                }                                              \
+                                else if(compare < 0)                           \
+                                {                                              \
+                                        curr = curr->_right;                   \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        curr = curr->right;                    \
+                                        ret.next = curr;                       \
+                                        ret.curr = prev;                       \
+                                        map_iterator_next_##K##_##V(&ret);     \
+                                        break;                                 \
                                 }                                              \
                         }                                                      \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        static struct node_##K##_##V *map_find_##K##_##V(                      \
+        static struct node_##K##_##V *map_find_node_##K##_##V(                 \
             struct map_##K##_##V *m, K k)                                      \
         {                                                                      \
-                struct node_##K##_##V *ret = NULL;                             \
-                if(m->root)                                                    \
-                {                                                              \
-                        struct node_##K##_##V *curr = m->root;                 \
-                        while(curr)                                            \
-                        {                                                      \
-                                int compare = (map_element_compare_##K##_##V(  \
-                                    &curr->key, &k));                          \
-                                if(!compare)                                   \
-                                {                                              \
-                                        ret = curr;                            \
-                                        break;                                 \
-                                }                                              \
+                struct map_iterator_##K##_##V i = map_find_##K##_##V(m, k);    \
+                return i.curr;                                                 \
+        }                                                                      \
                                                                                \
-                                if(compare > 0)                                \
-                                {                                              \
-                                        curr = curr->left;                     \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        curr = curr->right;                    \
-                                }                                              \
-                        }                                                      \
+        V *map_at_##K##_##V(struct map_##K##_##V *m, K k)                      \
+        {                                                                      \
+                struct node_##K##_##V *n = map_find_node_##K##_##V(m, k);      \
+                V *ret;                                                        \
+                if(!n)                                                         \
+                {                                                              \
+                        V new_value;                                           \
+                        map_element_init_##K##_##V(&new_value);                \
+                        map_set_##K##_##V(m, k, new_value);                    \
+                        ret = map_at_##K##_##V(m, k);                          \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        ret = &n->_value;                                      \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
@@ -1023,72 +1047,76 @@ enum map_color
                 {                                                              \
                         struct node_##K##_##V *s;                              \
                         struct node_##K##_##V *r;                              \
-                        if(p->left == n)                                       \
+                        if(p->_left == n)                                      \
                         {                                                      \
-                                s = p->right;                                  \
+                                s = p->_right;                                 \
                                 if(!s)                                         \
                                 {                                              \
                                         return;                                \
                                 }                                              \
-                                if(s->color == MAP_RED)                        \
+                                if(s->_color == MAP_RED)                       \
                                 {                                              \
-                                        s->color = MAP_BLACK;                  \
-                                        p->color = MAP_RED;                    \
+                                        s->_color = MAP_BLACK;                 \
+                                        p->_color = MAP_RED;                   \
                                 }                                              \
-                                if((!s->right ||                               \
-                                    s->right->color == MAP_BLACK) &&           \
-                                   (!s->left || s->left->color == MAP_BLACK))  \
+                                if((!s->_right ||                              \
+                                    s->_right->_color == MAP_BLACK) &&         \
+                                   (!s->_left ||                               \
+                                    s->_left->_color == MAP_BLACK))            \
                                 {                                              \
-                                        s->color = MAP_RED;                    \
+                                        s->_color = MAP_RED;                   \
                                 }                                              \
-                                else if(s->right &&                            \
-                                        s->right->color == MAP_RED)            \
+                                else if(s->_right &&                           \
+                                        s->_right->_color == MAP_RED)          \
                                 {                                              \
-                                        r = s->right;                          \
+                                        r = s->_right;                         \
                                         if(r)                                  \
                                         {                                      \
-                                                r->color = MAP_BLACK;          \
+                                                r->_color = MAP_BLACK;         \
                                         }                                      \
                                         map_rotate_left_##K##_##V(m, s, p);    \
                                 }                                              \
-                                else if(s->left && s->left->color == MAP_RED)  \
+                                else if(s->_left &&                            \
+                                        s->_left->_color == MAP_RED)           \
                                 {                                              \
-                                        r = s->left;                           \
+                                        r = s->_left;                          \
                                         map_rotate_right_left_##K##_##V(m, r,  \
                                                                         s, p); \
                                 }                                              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                s = p->left;                                   \
+                                s = p->_left;                                  \
                                 if(!s)                                         \
                                 {                                              \
                                         return;                                \
                                 }                                              \
-                                if(s->color == MAP_RED)                        \
+                                if(s->_color == MAP_RED)                       \
                                 {                                              \
-                                        s->color = MAP_BLACK;                  \
-                                        p->color = MAP_RED;                    \
+                                        s->_color = MAP_BLACK;                 \
+                                        p->_color = MAP_RED;                   \
                                 }                                              \
-                                if((!s->right ||                               \
-                                    s->right->color == MAP_BLACK) &&           \
-                                   (!s->left || s->left->color == MAP_BLACK))  \
+                                if((!s->_right ||                              \
+                                    s->_right->_color == MAP_BLACK) &&         \
+                                   (!s->_left ||                               \
+                                    s->_left->_color == MAP_BLACK))            \
                                 {                                              \
-                                        s->color = MAP_RED;                    \
+                                        s->_color = MAP_RED;                   \
                                 }                                              \
-                                else if(s->left && s->left->color == MAP_RED)  \
+                                else if(s->_left &&                            \
+                                        s->_left->_color == MAP_RED)           \
                                 {                                              \
-                                        r = s->left;                           \
+                                        r = s->_left;                          \
                                         if(r)                                  \
                                         {                                      \
-                                                r->color = MAP_BLACK;          \
+                                                r->_color = MAP_BLACK;         \
                                         }                                      \
                                         map_rotate_right_##K##_##V(m, s, p);   \
                                 }                                              \
-                                else if(s->right &&                            \
-                                        s->right->color == MAP_RED)            \
+                                else if(s->_right &&                           \
+                                        s->_right->_color == MAP_RED)          \
                                 {                                              \
-                                        r = s->right;                          \
+                                        r = s->_right;                         \
                                         map_rotate_left_right_##K##_##V(m, r,  \
                                                                         s, p); \
                                 }                                              \
@@ -1099,29 +1127,29 @@ enum map_color
         static void node_move_##K##_##V(struct node_##K##_##V *first,          \
                                         struct node_##K##_##V *second)         \
         {                                                                      \
-                first->parent, second->parent;                                 \
-                first->left, second->left;                                     \
-                first->right, second->right;                                   \
-                first->color = second->color;                                  \
-                struct node_##K##_##V *p = first->parent;                      \
+                first->_parent, second->_parent;                               \
+                first->_left, second->_left;                                   \
+                first->_right, second->_right;                                 \
+                first->_color = second->_color;                                \
+                struct node_##K##_##V *p = first->_parent;                     \
                 if(p)                                                          \
                 {                                                              \
-                        if(p->right == second)                                 \
+                        if(p->_right == second)                                \
                         {                                                      \
-                                p->right = first;                              \
+                                p->_right = first;                             \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                p->left = first;                               \
+                                p->_left = first;                              \
                         }                                                      \
                 }                                                              \
-                if(first->left)                                                \
+                if(first->_left)                                               \
                 {                                                              \
-                        first->left->parent = first;                           \
+                        first->_left->_parent = first;                         \
                 }                                                              \
-                if(first->right)                                               \
+                if(first->_right)                                              \
                 {                                                              \
-                        first->right->parent = first;                          \
+                        first->_right->_parent = first;                        \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -1130,44 +1158,44 @@ enum map_color
         {                                                                      \
                 struct node_##K##_##V *succ_c;                                 \
                 struct node_##K##_##V *succ;                                   \
-                if(!n->left || !n->right)                                      \
+                if(!n->_left || !n->_right)                                    \
                 {                                                              \
                         succ = n;                                              \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        succ = n->right;                                       \
+                        succ = n->_right;                                      \
                         if(succ)                                               \
                         {                                                      \
-                                while(succ->left)                              \
+                                while(succ->_left)                             \
                                 {                                              \
-                                        succ = succ->left;                     \
+                                        succ = succ->_left;                    \
                                 }                                              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                succ = n->left;                                \
+                                succ = n->_left;                               \
                         }                                                      \
                 }                                                              \
-                succ_c = (succ->left) ? succ->left : succ->right;              \
-                struct node_##K##_##V *succ_p = succ->parent;                  \
+                succ_c = (succ->_left) ? succ->_left : succ->_right;           \
+                struct node_##K##_##V *succ_p = succ->_parent;                 \
                 if(succ_c)                                                     \
                 {                                                              \
-                        succ_c->parent = succ_p;                               \
+                        succ_c->_parent = succ_p;                              \
                 }                                                              \
-                if(!succ->parent)                                              \
+                if(!succ->_parent)                                             \
                 {                                                              \
-                        m->root = succ_c;                                      \
+                        m->_root = succ_c;                                     \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        if(succ_p->left == succ)                               \
+                        if(succ_p->_left == succ)                              \
                         {                                                      \
-                                succ_p->left = succ_c;                         \
+                                succ_p->_left = succ_c;                        \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                succ_p->right = succ_c;                        \
+                                succ_p->_right = succ_c;                       \
                         }                                                      \
                 }                                                              \
                 if(succ != n)                                                  \
@@ -1177,36 +1205,54 @@ enum map_color
                            map_element_copy_key_##K##_##V ==                   \
                                map_element_default_copy_key_##K##_##V)         \
                         {                                                      \
-                                map_element_copy_key_##K##_##V(&n->key,        \
-                                                               &succ->key);    \
-                                map_element_copy_##K##_##V(&n->value,          \
-                                                           &succ->value);      \
+                                map_element_copy_key_##K##_##V(&n->_key,       \
+                                                               &succ->_key);   \
+                                map_element_copy_##K##_##V(&n->_value,         \
+                                                           &succ->_value);     \
                         }                                                      \
                         else                                                   \
                         {                                                      \
                                 node_move_##K##_##V(n, succ);                  \
                         }                                                      \
                 }                                                              \
-                if(succ->color == MAP_BLACK)                                   \
+                if(succ->_color == MAP_BLACK)                                  \
                 {                                                              \
                         map_erase_rebalanse_##K##_##V(m, succ_c, succ_p);      \
                 }                                                              \
-                if(m->root)                                                    \
+                if(m->_root)                                                   \
                 {                                                              \
-                        m->root->color = MAP_BLACK;                            \
+                        m->_root->_color = MAP_BLACK;                          \
                 }                                                              \
-                --m->size;                                                     \
+                --m->_size;                                                    \
                 return succ;                                                   \
         }                                                                      \
                                                                                \
         int map_erase_##K##_##V(struct map_##K##_##V *m, const K key)          \
         {                                                                      \
-                struct node_##K##_##V *n = map_find_##K##_##V(m, key);         \
+                struct node_##K##_##V *n = map_find_node_##K##_##V(m, key);    \
                 int ret = (n) ? 1 : 0;                                         \
                 if(ret)                                                        \
                 {                                                              \
+                        map_element_free_##K##_##V(&n->_key, &n->_value);      \
                         free(map_erase_node_##K##_##V(m, n));                  \
                 }                                                              \
+                return ret;                                                    \
+        }                                                                      \
+                                                                               \
+        int map_iterator_erase_##K##_##V(struct map_##K##_##V *m,              \
+                                         struct map_iterator_##K##_##V *i)     \
+        {                                                                      \
+                struct map_iterator_##K##_##V tmp = {i->curr, i->next};        \
+                map_iterator_next_##K##_##V(&tmp);                             \
+                int ret = (i->curr) ? 1 : 0;                                   \
+                if(ret)                                                        \
+                {                                                              \
+                        map_element_free_##K##_##V(&i->curr->_key,             \
+                                                   &i->curr->_value);          \
+                        free(map_erase_node_##K##_##V(m, i->curr));            \
+                }                                                              \
+                i->curr = tmp.curr;                                            \
+                i->next = tmp.next;                                            \
                 return ret;                                                    \
         }\
 \
