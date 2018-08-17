@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef PRIMITIVE_FUNCTIONS
-#define PRIMITIVE_FUNCTIONS
-#include "primitive_functions.h"
-#endif
 
 #define INIT_DEQUE(T, N)                                                       \
                                                                                \
@@ -532,9 +528,8 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        /* ================ */                                                 \
-        /*  DEQUE ITERATOR  */                                                 \
-        /* ================ */                                                 \
+
+#define INIT_DEQUE_ITERATOR(T, N)                                              \
                                                                                \
         struct N##_iterator                                                    \
         {                                                                      \
