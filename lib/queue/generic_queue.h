@@ -1,31 +1,9 @@
 #pragma once
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#ifndef QUEUE_KILL_WARNINGS
-#warning "QUEUE: define 'QUEUE_KILL_WARNINGS' to remove all warnings"
 
-#ifndef QUEUE_KILL_COPY_WARNING
-#warning "QUEUE: using '=' as default queue element copy"
-#warning "QUEUE: define 'QUEUE_KILL_COPY_WARNING' to remove warning"
-#endif
-
-#ifndef QUEUE_KILL_EQUAL_WARNING
-#warning "QUEUE: using 'memcmp' as default queue element equal"
-#warning "QUEUE: define 'QUEUE_KILL_EQUAL_WARNING' to remove warning"
-#endif
-
-#ifndef QUEUE_KILL_FREE_WARNING
-#warning "QUEUE: using 'void' as default queue element free"
-#warning "QUEUE: define 'QUEUE_KILL_FREE_WARNING' to remove warning"
-#endif
-
-#endif
-
-#define INIT_QUEUE(T)                                                          \
+#define INIT_QUEUE(T, N)                                                       \
                                                                                \
-        struct queue_##T                                                       \
+        struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
                 size_t _max;                                                   \
@@ -34,57 +12,85 @@
                 T *_data;                                                      \
         };                                                                     \
                                                                                \
-        void queue_init_##T(struct queue_##T *q)                               \
+        static size_t N##_init_size = 1;                                       \
+        static double N##_growth_scale = 2;                                    \
+                                                                               \
+        void N##_set_init_size(size_t init_size)                               \
         {                                                                      \
-                q->_size = q->_max = q->_back = q->_front = 0;                 \
-                q->_data = NULL;                                               \
+                init_size = (init_size == 0) ? 1 : init_size;                  \
+                N##_init_size = init_size;                                     \
         }                                                                      \
                                                                                \
-        static void queue_element_default_copy_##T(T *dst, const T *src)       \
+        void N##_set_growth_scale(double growth_scale)                         \
+        {                                                                      \
+                growth_scale = (growth_scale == 0) ? 1 : growth_scale;         \
+                N##_growth_scale = growth_scale;                               \
+        }                                                                      \
+                                                                               \
+        int N##_is_static()                                                    \
+        {                                                                      \
+                return 0;                                                      \
+        }                                                                      \
+                                                                               \
+        /* =================== */                                              \
+        /*  ELEMENT FUNCTIONS  */                                              \
+        /* =================== */                                              \
+                                                                               \
+        static void (*N##_element_copy)(T *, const T *const) = T##_copy;       \
+                                                                               \
+        void N##_set_copy(void (*copy)(T *, const T *const))                   \
+        {                                                                      \
+                N##_element_copy = copy;                                       \
+        }                                                                      \
+                                                                               \
+        static void N##_flat_copy(T *dst, const T *const src)                  \
         {                                                                      \
                 *dst = *src;                                                   \
         }                                                                      \
                                                                                \
-        void (*queue_element_copy_##T)(T *, const T *) =                       \
-            queue_element_default_copy_##T;                                    \
-                                                                               \
-        void queue_set_copy_##T(void (*copy)(T *, const T *))                  \
+        void N##_set_share(int is_shared)                                      \
         {                                                                      \
-                queue_element_copy_##T = copy;                                 \
+                if(is_shared)                                                  \
+                {                                                              \
+                        N##_set_copy(N##_flat_copy);                           \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        N##_set_copy(T##_copy);                                \
+                }                                                              \
         }                                                                      \
                                                                                \
-        static int queue_element_default_equal_##T(const T *first,             \
-                                                   const T *second)            \
+        static int (*N##_element_equal)(const T *const, const T *const) =      \
+            T##_equal;                                                         \
+                                                                               \
+        void N##_set_equal(int (*equal)(const T *const, const T *const))       \
         {                                                                      \
-                return memcmp(first, second, sizeof(T)) == 0;                  \
+                N##_element_equal = equal;                                     \
         }                                                                      \
                                                                                \
-        int (*queue_element_equal_##T)(const T *, const T *) =                 \
-            queue_element_default_equal_##T;                                   \
+        static void (*N##_element_free)(T *) = T##_free;                       \
                                                                                \
-        void queue_set_equal_##T(int (*equal)(const T *, const T *))           \
+        void N##_set_free(void (*free)(T *))                                   \
         {                                                                      \
-                queue_element_equal_##T = equal;                               \
+                N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
-        static void queue_element_default_free_##T(T *el)                      \
-        {                                                                      \
-                (void)el;                                                      \
-        }                                                                      \
+        /* ================= */                                                \
+        /*  QUEUE FUNCTIONS  */                                                \
+        /* ================= */                                                \
                                                                                \
-        void (*queue_element_free_##T)(T *) = queue_element_default_free_##T;  \
-                                                                               \
-        void queue_set_free_##T(void (*free)(T *))                             \
-        {                                                                      \
-                queue_element_free_##T = free;                                 \
-        }                                                                      \
-                                                                               \
-        size_t queue_size_##T(const struct queue_##T *q)                       \
+        size_t N##_size(const struct N *const q)                               \
         {                                                                      \
                 return q->_size;                                               \
         }                                                                      \
                                                                                \
-        static void queue_move_##T(size_t *flag, const size_t max)             \
+        void N##_init(struct N *q)                                             \
+        {                                                                      \
+                q->_size = q->_max = q->_front = q->_back = 0;                 \
+                q->_data = NULL;                                               \
+        }                                                                      \
+                                                                               \
+        static void N##_move(size_t *flag, size_t max)                         \
         {                                                                      \
                 if(*flag + 1 == max)                                           \
                 {                                                              \
@@ -96,24 +102,25 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        void queue_free_##T(struct queue_##T *q)                               \
+        void N##_free(struct N *q)                                             \
         {                                                                      \
-                if(!q->_data)                                                  \
+                if(q->_data)                                                   \
                 {                                                              \
-                        return;                                                \
-                }                                                              \
-                if(queue_element_free_##T != queue_element_default_free_##T)   \
-                {                                                              \
-                        for(size_t i = q->_back; i != q->_front;)              \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
-                                queue_element_free_##T(&q->_data[i]);          \
-                                queue_move_##T(&i, q->_max);                   \
+                                for(size_t i = q->_back; i != q->_front;)      \
+                                {                                              \
+                                        N##_element_free(&q->_data[i]);        \
+                                        N##_move(&i, q->_max);                 \
+                                }                                              \
                         }                                                      \
+                        free(q->_data);                                        \
                 }                                                              \
-                free(q->_data);                                                \
         }                                                                      \
                                                                                \
-        int queue_equal_##T(struct queue_##T *first, struct queue_##T *second) \
+        int N##_equal(const struct N *const first,                             \
+                      const struct N *const second)                            \
         {                                                                      \
                 int equal = (first == second);                                 \
                 if(equal == 0 && first->_size == second->_size)                \
@@ -123,31 +130,56 @@
                         size_t j = second->_front;                             \
                         for(size_t k = 0; k < first->_size; ++k)               \
                         {                                                      \
-                                if(queue_element_equal_##T(&first->_data[i],   \
-                                                           &second->_data[j])) \
+                                if(N##_element_equal(&first->_data[i],         \
+                                                     &second->_data[j]))       \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
                                 }                                              \
-                                queue_move_##T(&i, first->_max);               \
-                                queue_move_##T(&j, second->_max);              \
+                                N##_move(&i, first->_max);                     \
+                                N##_move(&j, second->_max);                    \
                         }                                                      \
                 }                                                              \
                 return equal;                                                  \
         }                                                                      \
                                                                                \
-        void queue_copy_##T(struct queue_##T *restrict dst,                    \
-                            const struct queue_##T *restrict src)              \
+        void N##_copy(struct N *restrict dst,                                  \
+                      const struct N *__restrict__ const src)                  \
         {                                                                      \
                 if(src->_size != 0)                                            \
                 {                                                              \
                         dst->_data = (T *)malloc(src->_size * sizeof(T));      \
-                        size_t i = src->_front;                                \
-                        for(size_t j = 0; j < src->_size; ++j)                 \
+                        if(T##_is_static() ||                                  \
+                           N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
-                                queue_element_copy_##T(&dst->_data[j],         \
-                                                       &src->_data[i]);        \
-                                queue_move_##T(&i, src->_max);                 \
+                                if(src->_front < src->_back)                   \
+                                {                                              \
+                                        memcpy(dst->_data,                     \
+                                               src->_data + src->_front,       \
+                                               src->_size * sizeof(T));        \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        size_t first_part = src->_back;        \
+                                        size_t second_part =                   \
+                                            src->_max - src->_front;           \
+                                        memcpy(dst->_data,                     \
+                                               src->_data + src->_front,       \
+                                               second_part * sizeof(T));       \
+                                        memcpy(dst->_data + second_part,       \
+                                               src->_data,                     \
+                                               (1 + first_part) * sizeof(T));  \
+                                }                                              \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                for(size_t j = 0; j < src->_size; ++j)         \
+                                {                                              \
+                                        size_t i = src->_front;                \
+                                        N##_element_copy(&dst->_data[j],       \
+                                                         &src->_data[i]);      \
+                                        N##_move(&i, src->_max);               \
+                                }                                              \
                         }                                                      \
                 }                                                              \
                                                                                \
@@ -156,12 +188,13 @@
                 dst->_front = 0;                                               \
         }                                                                      \
                                                                                \
-        static void queue_resize_##T(struct queue_##T *q)                      \
+        static void N##_resize(struct N *q)                                    \
         {                                                                      \
                 if(q->_size == q->_max)                                        \
                 {                                                              \
                         size_t max = q->_max;                                  \
-                        q->_max = (q->_max == 0) ? 1 : q->_max * 2;            \
+                        q->_max = (q->_max == 0) ? N##_init_size               \
+                                                 : q->_max * N##_growth_scale; \
                                                                                \
                         q->_data =                                             \
                             (T *)realloc(q->_data, sizeof(T) * q->_max);       \
@@ -188,15 +221,15 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        void queue_push_##T(struct queue_##T *q, T el)                         \
+        void N##_push(struct N *q, T el)                                       \
         {                                                                      \
-                queue_resize_##T(q);                                           \
-                queue_move_##T(&q->_back, q->_max);                            \
-                queue_element_copy_##T(&q->_data[q->_back], &el);              \
+                N##_resize(q);                                                 \
+                N##_move(&q->_back, q->_max);                                  \
+                N##_element_copy(&q->_data[q->_back], &el);                    \
                 ++q->_size;                                                    \
         }                                                                      \
                                                                                \
-        T *queue_front_##T(const struct queue_##T *q)                          \
+        T *N##_front(struct N *q)                                              \
         {                                                                      \
                 T *ret = NULL;                                                 \
                 if(q->_size)                                                   \
@@ -205,8 +238,26 @@
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
+	                                                                       \
+	void N##_set_front(struct N *q, T new_el)                              \
+        {                                                                      \
+                if(q->_size)                                                   \
+                {                                                              \
+                        T *el = &q->_data[q->_front];                          \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(el);                          \
+                                N##_element_copy(el, &new_el);                 \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                *el = new_el;                                  \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
                                                                                \
-        T *queue_back_##T(const struct queue_##T *q)                           \
+        T *N##_back(struct N *q)                                               \
         {                                                                      \
                 T *ret = NULL;                                                 \
                 if(q->_size)                                                   \
@@ -215,17 +266,41 @@
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
-                                                                               \
-        void queue_pop_##T(struct queue_##T *q)                                \
+	                                                                       \
+        void N##_set_back(struct N *q, T new_el)                               \
         {                                                                      \
                 if(q->_size)                                                   \
                 {                                                              \
-                        queue_move_##T(&q->_front, q->_max);                   \
+                        T *el = &q->_data[q->_back];                           \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(el);                          \
+                                N##_element_copy(el, &new_el);                 \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                *el = new_el;                                  \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_pop(struct N *q)                                              \
+        {                                                                      \
+                if(q->_size)                                                   \
+                {                                                              \
+                        T *el = &q->_data[q->_front];                          \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(el);                          \
+                        }                                                      \
+                        N##_move(&q->_front, q->_max);                         \
                         --q->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
-        int queue_empty_##T(const struct queue_##T *q)                         \
+        int N##_empty(const struct N *const q)                                 \
         {                                                                      \
                 return q->_size == 0;                                          \
         }
