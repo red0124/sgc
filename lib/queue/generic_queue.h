@@ -12,6 +12,8 @@
                 T *_data;                                                      \
         };                                                                     \
                                                                                \
+	typedef struct N N;                                                    \
+                                                                               \
         static size_t N##_init_size = 1;                                       \
         static double N##_growth_scale = 2;                                    \
                                                                                \
