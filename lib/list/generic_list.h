@@ -1,11 +1,8 @@
 #pragma once
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#ifndef _STACK_MACRO_
-#define _STACK_MACRO_
 
+#ifndef __STACK
+#define __STACK
 #define STACKSIZE 64
 
 #define PREPARE_STACK                                                          \
@@ -21,351 +18,357 @@
         stackptr -= 2;                                                         \
         array = stackptr[0];                                                   \
         limit = stackptr[1]
-#endif
 
 #define THRESH 7
-
-#ifndef LIST_KILL_WARNINGS
-#warning "LIST: define 'LIST_KILL_WARNINGS' to remove all warnings"
-
-#ifndef LIST_KILL_INIT_WARNING
-#warning "LIST: using 'void' as default list element init"
-#warning "LIST: define 'LIST_KILL_INIT_WARNING' to remove warning"
 #endif
 
-#ifndef LIST_KILL_COPY_WARNING
-#warning "LIST: using '=' as default list element copy"
-#warning "LIST: define 'LIST_KILL_COPY_WARNING' to remove warning"
-#endif
 
-#ifndef LIST_KILL_COMPARE_WARNING
-#warning "LIST: using 'memcmp' as default list element compare"
-#warning "LIST: define 'LIST_KILL_COMPARE_WARNING' to remove warning"
-#endif
-
-#ifndef LIST_KILL_EQUAL_WARNING
-#warning "LIST: using 'memcmp' as default list element equal"
-#warning "LIST: define 'LIST_KILL_EQUAL_WARNING' to remove warning"
-#endif
-
-#ifndef LIST_KILL_FREE_WARNING
-#warning "LIST: using 'void' as default list element free"
-#warning "LIST: define 'LIST_KILL_FREE_WARNING' to remove warning"
-#endif
-
-#endif
-
-#define INIT_LIST(T)                                                           \
+#define INIT_LIST(T, N)                                                        \
                                                                                \
-        struct node_##T                                                        \
+        struct N##_node                                                        \
         {                                                                      \
-                T data;                                                        \
-                struct node_##T *next;                                         \
-                struct node_##T *prev;                                         \
+                T _data;                                                       \
+                struct N##_node *_next;                                        \
+                struct N##_node *_prev;                                        \
         };                                                                     \
                                                                                \
-        struct list_##T                                                        \
+        struct N                                                               \
         {                                                                      \
-                size_t size;                                                   \
-                struct node_##T *head;                                         \
-                struct node_##T *tail;                                         \
+                size_t _size;                                                  \
+                struct N##_node *_head;                                        \
+                struct N##_node *_tail;                                        \
         };                                                                     \
                                                                                \
-        static void list_element_default_init_##T(T *el)                       \
+        typedef struct N N;                                                    \
+                                                                               \
+        int N##_is_static()                                                    \
         {                                                                      \
-                (void)el;                                                      \
+                return 0;                                                      \
         }                                                                      \
                                                                                \
-        void (*list_element_init_##T)(T *) = list_element_default_init_##T;    \
+        /* =================== */                                              \
+        /*  ELEMENT FUNCTIONS  */                                              \
+        /* =================== */                                              \
                                                                                \
-        void list_set_init_##T(void (*init)(T *))                              \
+        static void (*N##_element_copy)(T *, const T *const) = T##_copy;       \
+                                                                               \
+        void N##_set_copy(void (*copy)(T *, const T *const))                   \
         {                                                                      \
-                list_element_init_##T = init;                                  \
+                N##_element_copy = copy;                                       \
         }                                                                      \
                                                                                \
-        static void list_element_default_copy_##T(T *dst, const T *src)        \
+        static void N##_flat_copy(T *dst, const T *const src)                  \
         {                                                                      \
                 *dst = *src;                                                   \
         }                                                                      \
                                                                                \
-        void (*list_element_copy_##T)(T *, const T *) =                        \
-            list_element_default_copy_##T;                                     \
-                                                                               \
-        void list_set_copy_##T(void (*copy)(T *, const T *))                   \
+        void N##_set_share(int is_shared)                                      \
         {                                                                      \
-                list_element_copy_##T = copy;                                  \
+                if(is_shared)                                                  \
+                {                                                              \
+                        N##_set_copy(N##_flat_copy);                           \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        N##_set_copy(T##_copy);                                \
+                }                                                              \
         }                                                                      \
                                                                                \
-        static int list_element_default_equal_##T(const T *first,              \
-                                                  const T *second)             \
+        static int (*N##_element_equal)(const T *const, const T *const) =      \
+            T##_equal;                                                         \
+                                                                               \
+        void N##_set_equal(int (*equal)(const T *const, const T *const))       \
         {                                                                      \
-                return memcmp(first, second, sizeof(T)) == 0;                  \
+                N##_element_equal = equal;                                     \
         }                                                                      \
                                                                                \
-        int (*list_element_equal_##T)(const T *, const T *) =                  \
-            list_element_default_equal_##T;                                    \
+        static void (*N##_element_free)(T *) = T##_free;                       \
                                                                                \
-        void list_set_equal_##T(int (*equal)(const T *, const T *))            \
+        void N##_set_free(void (*free)(T *))                                   \
         {                                                                      \
-                list_element_equal_##T = equal;                                \
+                N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
-        static int list_element_default_compare_##T(const void *first,         \
-                                                    const void *second)        \
+        /* ================ */                                                 \
+        /*  LIST FUNCTIONS  */                                                 \
+        /* ================ */                                                 \
+                                                                               \
+        size_t N##_size(const struct N *const l)                               \
         {                                                                      \
-                return memcmp(first, second, sizeof(T)) > 0;                   \
+                return l->_size;                                               \
         }                                                                      \
                                                                                \
-        int (*list_element_compare_##T)(const void *, const void *) =          \
-            list_element_default_compare_##T;                                  \
-                                                                               \
-        void list_set_compare_##T(int (*compare)(const void *, const void *))  \
+        void N##_init(struct N *l)                                             \
         {                                                                      \
-                list_element_compare_##T = compare;                            \
+                l->_size = 0;                                                  \
+                l->_head = l->_tail = NULL;                                    \
         }                                                                      \
                                                                                \
-        static void list_element_default_free_##T(T *el)                       \
+        void N##_free(struct N *l)                                             \
         {                                                                      \
-                (void)el;                                                      \
-        }                                                                      \
-                                                                               \
-        void (*list_element_free_##T)(T *) = list_element_default_free_##T;    \
-                                                                               \
-        void list_set_free_##T(void (*free)(T *))                              \
-        {                                                                      \
-                list_element_free_##T = free;                                  \
-        }                                                                      \
-                                                                               \
-        size_t list_size_##T(const struct list_##T *l)                         \
-        {                                                                      \
-                return l->size;                                                \
-        }                                                                      \
-                                                                               \
-        void list_init_##T(struct list_##T *l)                                 \
-        {                                                                      \
-                l->size = 0;                                                   \
-                l->head = l->tail = NULL;                                      \
-        }                                                                      \
-                                                                               \
-        void list_free_##T(struct list_##T *l)                                 \
-        {                                                                      \
-                struct node_##T *curr = l->head;                               \
-                struct node_##T *tmp;                                          \
-                for(size_t i = 0; i < l->size; ++i)                            \
+                struct N##_node *curr = l->_head;                              \
+                struct N##_node *tmp;                                          \
+                for(size_t i = 0; i < l->_size; ++i)                           \
                 {                                                              \
                         tmp = curr;                                            \
-                        curr = curr->next;                                     \
-                        if(list_element_free_##T !=                            \
-                           list_element_default_free_##T)                      \
+                        curr = curr->_next;                                    \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
-                                list_element_free_##T(&tmp->data);             \
+                                N##_element_free(&tmp->_data);                 \
                         }                                                      \
                         free(tmp);                                             \
                 }                                                              \
-                l->head = l->tail = NULL;                                      \
-                l->size = 0;                                                   \
+                l->_head = l->_tail = NULL;                                    \
+                l->_size = 0;                                                  \
         }                                                                      \
                                                                                \
-        int list_equal_##T(const struct list_##T *first,                       \
-                           const struct list_##T *second)                      \
+        int N##_equal(const struct N *const first,                             \
+                      const struct N *const second)                            \
         {                                                                      \
                 int equal = (first == second);                                 \
-                if(equal == 0 && first->size == second->size)                  \
+                if(equal == 0 && first->_size == second->_size)                \
                 {                                                              \
-                        struct node_##T *curr_first = first->head;             \
-                        struct node_##T *curr_second = second->head;           \
+                        struct N##_node *curr_first = first->_head;            \
+                        struct N##_node *curr_second = second->_head;          \
                         equal = 1;                                             \
                         while(curr_first)                                      \
                         {                                                      \
-                                if(!list_element_equal_##T(                    \
-                                       &curr_first->data, &curr_second->data)) \
+                                if(!N##_element_equal(&curr_first->_data,      \
+                                                      &curr_second->_data))    \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
                                 }                                              \
-                                curr_first = curr_first->next;                 \
-                                curr_second = curr_second->next;               \
+                                curr_first = curr_first->_next;                \
+                                curr_second = curr_second->_next;              \
                         }                                                      \
                 }                                                              \
                 return equal;                                                  \
         }                                                                      \
                                                                                \
-        void list_copy_##T(struct list_##T *__restrict__ dst,                  \
-                           const struct list_##T *__restrict__ src)            \
+        void N##_copy(struct N *__restrict__ dst,                              \
+                      const struct N *__restrict__ const src)                  \
         {                                                                      \
-                if(src->size != 0)                                             \
+                if(src->_size != 0)                                            \
                 {                                                              \
-                        dst->head = (struct node_##T *)malloc(                 \
-                            sizeof(struct node_##T));                          \
-                        list_element_copy_##T(&dst->head->data,                \
-                                              &src->head->data);               \
-                        struct node_##T *curr_src = src->head;                 \
-                        struct node_##T *curr_dst = dst->head;                 \
-                        struct node_##T *tmp_src = NULL;                       \
-                        struct node_##T *tmp_dst = NULL;                       \
+                        dst->_head = (struct N##_node *)malloc(                \
+                            sizeof(struct N##_node));                          \
+                        N##_element_copy(&dst->_head->_data,                   \
+                                         &src->_head->_data);                  \
+                        struct N##_node *curr_src = src->_head;                \
+                        struct N##_node *curr_dst = dst->_head;                \
+                        struct N##_node *tmp_src = NULL;                       \
+                        struct N##_node *tmp_dst = NULL;                       \
                         while(curr_src)                                        \
                         {                                                      \
-                                tmp_src = curr_src->next;                      \
+                                tmp_src = curr_src->_next;                     \
                                 if(!tmp_src)                                   \
                                 {                                              \
                                         break;                                 \
                                 }                                              \
-                                tmp_dst = (struct node_##T *)malloc(           \
-                                    sizeof(struct node_##T));                  \
-                                list_element_copy_##T(&tmp_dst->data,          \
-                                                      &tmp_src->data);         \
-                                tmp_dst->prev = curr_dst;                      \
-                                curr_dst->next = tmp_dst;                      \
+                                tmp_dst = (struct N##_node *)malloc(           \
+                                    sizeof(struct N##_node));                  \
+                                N##_element_copy(&tmp_dst->_data,              \
+                                                 &tmp_src->_data);             \
+                                tmp_dst->_prev = curr_dst;                     \
+                                curr_dst->_next = tmp_dst;                     \
                                 curr_dst = tmp_dst;                            \
                                 curr_src = tmp_src;                            \
                         }                                                      \
-                        dst->tail = curr_dst;                                  \
-                        dst->tail->next = dst->head->prev = NULL;              \
+                        dst->_tail = curr_dst;                                 \
+                        dst->_tail->_next = dst->_head->_prev = NULL;          \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        dst->head = dst->tail = NULL;                          \
+                        dst->_head = dst->_tail = NULL;                        \
                 }                                                              \
-                dst->size = src->size;                                         \
+                dst->_size = src->_size;                                       \
         }                                                                      \
                                                                                \
-        void list_push_back_##T(struct list_##T *l, T el)                      \
+        void N##_push_back(struct N *l, T el)                                  \
         {                                                                      \
-                struct node_##T *new_el =                                      \
-                    (struct node_##T *)malloc(sizeof(struct node_##T));        \
-                list_element_copy_##T(&new_el->data, &el);                     \
-                new_el->next = NULL;                                           \
-                switch(l->size)                                                \
+                struct N##_node *new_el =                                      \
+                    (struct N##_node *)malloc(sizeof(struct N##_node));        \
+                N##_element_copy(&new_el->_data, &el);                         \
+                new_el->_next = NULL;                                          \
+                switch(l->_size)                                               \
                 {                                                              \
                 case 0:                                                        \
-                        new_el->prev = NULL;                                   \
-                        l->head = l->tail = new_el;                            \
+                        new_el->_prev = NULL;                                  \
+                        l->_head = l->_tail = new_el;                          \
                         break;                                                 \
                 case 1:                                                        \
-                        l->tail = new_el;                                      \
-                        l->head->next = l->tail;                               \
-                        l->tail->prev = l->head;                               \
+                        l->_tail = new_el;                                     \
+                        l->_head->_next = l->_tail;                            \
+                        l->_tail->_prev = l->_head;                            \
                         break;                                                 \
                 default:                                                       \
-                        new_el->prev = l->tail;                                \
-                        l->tail->next = new_el;                                \
-                        l->tail = l->tail->next;                               \
+                        new_el->_prev = l->_tail;                              \
+                        l->_tail->_next = new_el;                              \
+                        l->_tail = l->_tail->_next;                            \
                         break;                                                 \
                 }                                                              \
-                l->size++;                                                     \
+                l->_size++;                                                    \
         }                                                                      \
                                                                                \
-        T list_back_##T(const struct list_##T *l)                              \
-        {                                                                      \
-                if(l->size == 0)                                               \
-                {                                                              \
-                        fprintf(stderr,                                        \
-                                "LIST_BACK ERROR: THE LIST IS EMPTY\n");       \
-                        exit(1);                                               \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        return l->tail->data;                                  \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        T list_pop_back_##T(struct list_##T *l)                                \
-        {                                                                      \
-                if(l->size == 0)                                               \
-                {                                                              \
-                        fprintf(stderr,                                        \
-                                "POP_BACK ERROR: THE LIST IS EMPTY\n");        \
-                        exit(1);                                               \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        T ret = l->tail->data;                                 \
-                        struct node_##T *tmp = l->tail;                        \
-                        l->tail = l->tail->prev;                               \
-                        list_element_free_##T(&tmp->data);                     \
-                        free(tmp);                                             \
-                        l->tail->next = NULL;                                  \
-                        return ret;                                            \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        void list_push_front_##T(struct list_##T *l, const T el)               \
-        {                                                                      \
-                struct node_##T *new_el =                                      \
-                    (struct node_##T *)malloc(sizeof(struct node_##T));        \
-                list_element_copy_##T(&new_el->data, &el);                     \
-                new_el->prev = NULL;                                           \
-                switch(l->size)                                                \
-                {                                                              \
-                case 0:                                                        \
-                        new_el->next = NULL;                                   \
-                        l->head = l->tail = new_el;                            \
-                        break;                                                 \
-                case 1:                                                        \
-                        l->head = new_el;                                      \
-                        l->head->next = l->tail;                               \
-                        l->tail->prev = l->head;                               \
-                        break;                                                 \
-                default:                                                       \
-                        l->head->prev = new_el;                                \
-                        new_el->next = l->head;                                \
-                        l->head = l->head->prev;                               \
-                        break;                                                 \
-                }                                                              \
-                l->size++;                                                     \
-        }                                                                      \
-                                                                               \
-        T list_front_##T(const struct list_##T *l)                             \
-        {                                                                      \
-                if(l->size == 0)                                               \
-                {                                                              \
-                        fprintf(stderr,                                        \
-                                "LIST_FRONT ERROR: THE LIST IS EMPTY\n");      \
-                        exit(1);                                               \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        return l->head->data;                                  \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        T *list_pop_front_##T(struct list_##T *l)                              \
+        T *N##_back(struct N *l)                                               \
         {                                                                      \
                 T *ret = NULL;                                                 \
-                if(l->size)                                                    \
+                if(l->_size)                                                   \
                 {                                                              \
-                        struct node_##T *tmp = l->head;                        \
-                        ret = &l->head->data;                                  \
-                        l->head = l->head->next;                               \
-                        list_element_free_##T(&tmp->data);                     \
-                        free(tmp);                                             \
-                        l->head->prev = NULL;                                  \
+                        ret = &l->_tail->_data;                                \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        T *list_at_##T(const struct list_##T *l, const size_t at)              \
+        void N##_set_back(struct N *l, T new_el)                               \
+        {                                                                      \
+                if(l->_size)                                                   \
+                {                                                              \
+                        T *el = &l->_tail->_data;                              \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(el);                          \
+                                N##_element_copy(el, &new_el);                 \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                *el = new_el;                                  \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_pop_back(struct N *l)                                         \
+        {                                                                      \
+                if(l->_size)                                                   \
+                {                                                              \
+                        struct N##_node *tmp = l->_tail;                       \
+                        l->_tail = l->_tail->_prev;                            \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(&tmp->_data);                 \
+                        }                                                      \
+                        free(tmp);                                             \
+                        l->_tail->_next = NULL;                                \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_push_front(struct N *l, const T el)                           \
+        {                                                                      \
+                struct N##_node *new_el =                                      \
+                    (struct N##_node *)malloc(sizeof(struct N##_node));        \
+                N##_element_copy(&new_el->_data, &el);                         \
+                new_el->_prev = NULL;                                          \
+                switch(l->_size)                                               \
+                {                                                              \
+                case 0:                                                        \
+                        new_el->_next = NULL;                                  \
+                        l->_head = l->_tail = new_el;                          \
+                        break;                                                 \
+                case 1:                                                        \
+                        l->_head = new_el;                                     \
+                        l->_head->_next = l->_tail;                            \
+                        l->_tail->_prev = l->_head;                            \
+                        break;                                                 \
+                default:                                                       \
+                        l->_head->_prev = new_el;                              \
+                        new_el->_next = l->_head;                              \
+                        l->_head = l->_head->_prev;                            \
+                        break;                                                 \
+                }                                                              \
+                l->_size++;                                                    \
+        }                                                                      \
+                                                                               \
+        T *N##_front(struct N *l)                                              \
         {                                                                      \
                 T *ret = NULL;                                                 \
-                if(!(at >= l->size || l->size == 0))                           \
+                if(l->_size)                                                   \
                 {                                                              \
-                        struct node_##T *curr = l->head;                       \
+                        ret = &l->_head->_data;                                \
+                }                                                              \
+                return ret;                                                    \
+        }                                                                      \
+                                                                               \
+        T *N##_set_front(struct N *l, T new_el)                                \
+        {                                                                      \
+                T *ret = NULL;                                                 \
+                if(l->_size)                                                   \
+                {                                                              \
+                        T *el = &l->_head->_data;                              \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(el);                          \
+                                N##_element_copy(el, &new_el);                 \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                *el = new_el;                                  \
+                        }                                                      \
+                }                                                              \
+                return ret;                                                    \
+        }                                                                      \
+                                                                               \
+        void N##_pop_front(struct N *l)                                        \
+        {                                                                      \
+                if(l->_size)                                                   \
+                {                                                              \
+                        struct N##_node *tmp = l->_head;                       \
+                        l->_head = l->_head->_next;                            \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(&tmp->_data);                 \
+                        }                                                      \
+                        free(tmp);                                             \
+                        l->_head->_prev = NULL;                                \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        T *N##_at(struct N *l, const size_t at)                                \
+        {                                                                      \
+                T *ret = NULL;                                                 \
+                if(!(at >= l->_size || l->_size == 0))                         \
+                {                                                              \
+                        struct N##_node *curr = l->_head;                      \
                         for(size_t i = 0; i < at; ++i)                         \
                         {                                                      \
-                                curr = curr->next;                             \
+                                curr = curr->_next;                            \
                         }                                                      \
-                        ret = &curr->data;                                     \
+                        ret = &curr->_data;                                    \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        static struct node_##T *list_find_node_##T(const struct list_##T *l,   \
-                                                   const T el)                 \
+        void N##_set_at(struct N *l, const size_t at, T new_el)                \
         {                                                                      \
-                struct node_##T *location = NULL;                              \
-                for(struct node_##T *curr = l->head; curr; curr = curr->next)  \
+                T *el = N##_at(l, at);                                         \
+                if(el)                                                         \
                 {                                                              \
-                        if(list_element_equal_##T(&curr->data, &el))           \
+                        if(!T##_is_static() &&                                 \
+                           N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(el);                          \
+                                N##_element_copy(el, &new_el);                 \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                *el = new_el;                                  \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        static struct N##_node *N##_find_node(const struct N *const l,         \
+                                              const T el)                      \
+        {                                                                      \
+                struct N##_node *location = NULL;                              \
+                for(struct N##_node *curr = l->_head; curr;                    \
+                    curr = curr->_next)                                        \
+                {                                                              \
+                        if(N##_element_equal(&curr->_data, &el))               \
                         {                                                      \
                                 location = curr;                               \
                                 break;                                         \
@@ -374,282 +377,209 @@
                 return location;                                               \
         }                                                                      \
                                                                                \
-        int list_find_##T(const struct list_##T *l, const T el)                \
+        static void N##_node_erase(struct N##_node *n)                         \
         {                                                                      \
-                struct node_##T *location = list_find_node_##T(l, el);         \
-                return (location != NULL);                                     \
-        }                                                                      \
-                                                                               \
-        void list_operate_##T(struct list_##T *l, void (*operate)(T *))        \
-        {                                                                      \
-                for(struct node_##T *curr = l->head; curr; curr = curr->next)  \
+                if(n->_next)                                                   \
                 {                                                              \
-                        operate(&curr->data);                                  \
+                        n->_next->_prev = n->_prev;                            \
                 }                                                              \
-        }                                                                      \
-                                                                               \
-        void list_operate_to_##T(struct list_##T *l,                           \
-                                 void (*operate)(T *, void *), void *argout)   \
-        {                                                                      \
-                for(struct node_##T *curr = l->head; curr; curr = curr->next)  \
+                if(n->_prev)                                                   \
                 {                                                              \
-                        operate(&curr->data, argout);                          \
+                        n->_prev->_next = n->_next;                            \
                 }                                                              \
-        }                                                                      \
-                                                                               \
-        void list_operate_inverted_##T(struct list_##T *l,                     \
-                                       void (*operate)(T *))                   \
-        {                                                                      \
-                for(struct node_##T *curr = l->tail; curr; curr = curr->prev)  \
+                if(!T##_is_static() && N##_element_copy != N##_flat_copy)      \
                 {                                                              \
-                        operate(&curr->data);                                  \
+                        N##_element_free(&n->_data);                           \
                 }                                                              \
-        }                                                                      \
-                                                                               \
-        void list_operate_inverted_to_##T(                                     \
-            struct list_##T *l, void (*operate)(T *, void *), void *argout)    \
-        {                                                                      \
-                for(struct node_##T *curr = l->tail; curr; curr = curr->prev)  \
-                {                                                              \
-                        operate(&curr->data, argout);                          \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        static void node_erase_##T(struct node_##T *n)                         \
-        {                                                                      \
-                if(n->next)                                                    \
-                {                                                              \
-                        n->next->prev = n->prev;                               \
-                }                                                              \
-                if(n->prev)                                                    \
-                {                                                              \
-                        n->prev->next = n->next;                               \
-                }                                                              \
-                list_element_free_##T(&n->data);                               \
                 free(n);                                                       \
                 n = NULL;                                                      \
         }                                                                      \
                                                                                \
-        int list_erase_##T(struct list_##T *l, const T el)                     \
+        int N##_erase_el(struct N *l, const T el)                              \
         {                                                                      \
-                struct node_##T *n = list_find_node_##T(l, el);                \
+                struct N##_node *n = N##_find_node(l, el);                     \
                 int erase = (n != NULL);                                       \
                 if(erase)                                                      \
                 {                                                              \
-                        node_erase_##T(n);                                     \
-                        l->size--;                                             \
+                        N##_node_erase(n);                                     \
+                        l->_size--;                                            \
                 }                                                              \
                 return erase;                                                  \
         }                                                                      \
                                                                                \
-        int list_erase_all_##T(struct list_##T *l, const T el)                 \
+        int N##_erase(struct N *l, size_t at)                                  \
         {                                                                      \
-                int erase = 0;                                                 \
-                while(list_erase_##T(l, el))                                   \
-                {                                                              \
-                        erase = 1;                                             \
-                }                                                              \
-                return erase;                                                  \
-        }                                                                      \
-                                                                               \
-        int list_erase_at_##T(struct list_##T *l, size_t at)                   \
-        {                                                                      \
-                int erase = (at - 1 < l->size && at != 0);                     \
+                int erase = (at - 1 < l->_size && at != 0);                    \
                 if(erase)                                                      \
                 {                                                              \
-                        struct node_##T *curr = l->head;                       \
+                        struct N##_node *curr = l->_head;                      \
                         for(size_t i = 0; i < at - 1; ++i)                     \
                         {                                                      \
-                                curr = curr->next;                             \
+                                curr = curr->_next;                            \
                         }                                                      \
-                        if(curr == l->head)                                    \
+                        if(curr == l->_head)                                   \
                         {                                                      \
-                                l->head = l->head->next;                       \
+                                l->_head = l->_head->_next;                    \
                         }                                                      \
-                        if(curr == l->tail)                                    \
+                        if(curr == l->_tail)                                   \
                         {                                                      \
-                                l->tail = l->tail->prev;                       \
+                                l->_tail = l->_tail->_prev;                    \
                         }                                                      \
-                        node_erase_##T(curr);                                  \
-                        l->size--;                                             \
+                        N##_node_erase(curr);                                  \
+                        l->_size--;                                            \
                 }                                                              \
                 return erase;                                                  \
         }                                                                      \
                                                                                \
-        int list_is_empty_##T(const struct list_##T *l)                        \
+        int N##_is_empty(const struct N *l)                                    \
         {                                                                      \
-                return (l->size == 0);                                         \
+                return (l->_size == 0);                                        \
         }                                                                      \
                                                                                \
-        static void list_insert_node_##T(                                      \
-            struct node_##T *__restrict__ curr,                                \
-            struct node_##T *__restrict__ node_new)                            \
+        static void N##_insert_node(                                           \
+            struct N##_node *__restrict__ curr,                                \
+            struct N##_node *__restrict__ const node_new)                      \
         {                                                                      \
-                struct node_##T *tmp = curr->next;                             \
-                node_new->prev = curr;                                         \
-                node_new->next = tmp;                                          \
-                tmp->prev = node_new;                                          \
-                curr->next = node_new;                                         \
+                struct N##_node *tmp = curr->_next;                            \
+                node_new->_prev = curr;                                        \
+                node_new->_next = tmp;                                         \
+                tmp->_prev = node_new;                                         \
+                curr->_next = node_new;                                        \
         }                                                                      \
                                                                                \
-        void list_insert_##T(struct list_##T *l, const size_t at, const T el)  \
+        void N##_insert(struct N *l, const size_t at, const T el)              \
         {                                                                      \
                 if(at == 0)                                                    \
                 {                                                              \
-                        list_push_front_##T(l, el);                            \
+                        N##_push_front(l, el);                                 \
                 }                                                              \
-                else if(at >= l->size)                                         \
+                else if(at >= l->_size)                                        \
                 {                                                              \
-                        list_push_back_##T(l, el);                             \
+                        N##_push_back(l, el);                                  \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct node_##T *new_node = (struct node_##T *)malloc( \
-                            sizeof(struct node_##T));                          \
-                        list_element_copy_##T(&new_node->data, &el);           \
-                        struct node_##T *curr = l->head;                       \
+                        struct N##_node *new_node = (struct N##_node *)malloc( \
+                            sizeof(struct N##_node));                          \
+                        N##_element_copy(&new_node->_data, &el);               \
+                        struct N##_node *curr = l->_head;                      \
                         for(size_t i = 0; i < at - 1; ++i)                     \
                         {                                                      \
-                                curr = curr->next;                             \
+                                curr = curr->_next;                            \
                         }                                                      \
-                        list_insert_node_##T(curr, new_node);                  \
-                        l->size++;                                             \
+                        N##_insert_node(curr, new_node);                       \
+                        l->_size++;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
-        int list_is_sorted_##T(const struct list_##T *l,                       \
-                               int (*comp)(const void *, const void *))        \
-        {                                                                      \
-                if(comp == NULL)                                               \
-                {                                                              \
-                        comp = list_element_compare_##T;                       \
-                }                                                              \
-                int sorted = 1;                                                \
-                struct node_##T *curr = l->head;                               \
-                struct node_##T *tmp;                                          \
-                while(curr && sorted)                                          \
-                {                                                              \
-                        tmp = curr->next;                                      \
-                        if(tmp && comp(&curr->data, &tmp->data))               \
-                        {                                                      \
-                                sorted = 0;                                    \
-                        }                                                      \
-                        curr = tmp;                                            \
-                }                                                              \
-                return sorted;                                                 \
-        }                                                                      \
-                                                                               \
-        int list_insert_sorted_##T(struct list_##T *l, const T el)             \
+        int N##_insert_sorted(struct N *l, const T el,                         \
+                              int (*compare)(const T *const, const T *const))  \
         {                                                                      \
                 int sorted = 1;                                                \
-                if(l->head == NULL)                                            \
+                if(l->_head == NULL)                                           \
                 {                                                              \
-                        list_push_front_##T(l, el);                            \
+                        N##_push_front(l, el);                                 \
                 }                                                              \
-                else if(l->tail && l->head != l->tail &&                       \
-                        !list_element_compare_##T(&l->tail->data,              \
-                                                  &l->head->data))             \
+                else if(l->_tail && l->_head != l->_tail &&                    \
+                        !compare(&l->_tail->_data, &l->_head->_data))          \
                 {                                                              \
-                        fprintf(stderr, "LIST_INSERT_SORTED ERROR: LIST NOT "  \
-                                        "SORTED BY GIVEN CONDITION\n");        \
                         sorted = 0;                                            \
                 }                                                              \
-                else if((list_element_compare_##T)(&l->head->data, &el))       \
+                else if((compare)(&l->_head->_data, &el))                      \
                 {                                                              \
-                        list_push_front_##T(l, el);                            \
+                        N##_push_front(l, el);                                 \
                 }                                                              \
-                else if(!(list_element_compare_##T)(&l->tail->data, &el))      \
+                else if(!(compare)(&l->_tail->_data, &el))                     \
                 {                                                              \
-                        list_push_back_##T(l, el);                             \
+                        N##_push_back(l, el);                                  \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct node_##T *new_node = (struct node_##T *)malloc( \
-                            sizeof(struct node_##T));                          \
-                        list_element_copy_##T(&new_node->data, &el);           \
-                        struct node_##T *curr = l->head;                       \
-                        while(!list_element_compare_##T(&curr->data, &el))     \
+                        struct N##_node *new_node = (struct N##_node *)malloc( \
+                            sizeof(struct N##_node));                          \
+                        N##_element_copy(&new_node->_data, &el);               \
+                        struct N##_node *curr = l->_head;                      \
+                        while(!compare(&curr->_data, &el))                     \
                         {                                                      \
-                                curr = curr->next;                             \
+                                curr = curr->_next;                            \
                         }                                                      \
-                        list_insert_node_##T(curr->prev, new_node);            \
-                        l->size++;                                             \
+                        N##_insert_node(curr->_prev, new_node);                \
+                        l->_size++;                                            \
                 }                                                              \
                 return sorted;                                                 \
         }                                                                      \
                                                                                \
-        static void list_memswp_##T(char *i, char *j)                          \
+        static void N##_memswp(char *i, char *j)                               \
         {                                                                      \
-                char tmp[sizeof(struct node_##T *)];                           \
+                char tmp[sizeof(struct N##_node *)];                           \
                                                                                \
-                memcpy(tmp, i, sizeof(struct node_##T *));                     \
-                memcpy(i, j, sizeof(struct node_##T *));                       \
-                memcpy(j, tmp, sizeof(struct node_##T *));                     \
+                memcpy(tmp, i, sizeof(struct N##_node *));                     \
+                memcpy(i, j, sizeof(struct N##_node *));                       \
+                memcpy(j, tmp, sizeof(struct N##_node *));                     \
         }                                                                      \
                                                                                \
-        static inline int list_compare_node_##T(                               \
+        static inline int N##_compare_node(                                    \
             const void *first, const void *second,                             \
             int comp(const void *, const void *))                              \
         {                                                                      \
-                struct node_##T *first_ = *(struct node_##T **)first;          \
-                struct node_##T *second_ = *(struct node_##T **)second;        \
-                return comp(&first_->data, &second_->data);                    \
+                struct N##_node *first_ = *(struct N##_node **)first;          \
+                struct N##_node *second_ = *(struct N##_node **)second;        \
+                return comp(&first_->_data, &second_->_data);                  \
         }                                                                      \
                                                                                \
-        static void list_qsort_##T(void *array, size_t array_size,             \
-                                   int (*comp)(const void *, const void *))    \
+        static void N##_qsort(void *array, size_t array_size,                  \
+                              int (*comp)(const void *, const void *))         \
         {                                                                      \
                 char *i, *j;                                                   \
-                size_t thresh = THRESH * sizeof(struct node_##T *);            \
+                size_t thresh = THRESH * sizeof(struct N##_node *);            \
                 char *array_ = (char *)array;                                  \
-                char *limit = array_ + array_size * sizeof(struct node_##T *); \
+                char *limit = array_ + array_size * sizeof(struct N##_node *); \
                 PREPARE_STACK;                                                 \
                                                                                \
                 while(1)                                                       \
                 {                                                              \
                         if((size_t)(limit - array_) > thresh)                  \
                         {                                                      \
-                                i = array_ + sizeof(struct node_##T *);        \
-                                j = limit - sizeof(struct node_##T *);         \
-                                list_memswp_##T(                               \
-                                    ((((size_t)(limit - array_)) /             \
-                                      sizeof(struct node_##T *)) /             \
-                                     2) * sizeof(struct node_##T *) +          \
-                                        array_,                                \
-                                    array_);                                   \
-                                if(list_compare_node_##T(i, j, comp) > 0)      \
+                                i = array_ + sizeof(struct N##_node *);        \
+                                j = limit - sizeof(struct N##_node *);         \
+                                N##_memswp(((((size_t)(limit - array_)) /      \
+                                             sizeof(struct N##_node *)) /      \
+                                            2) * sizeof(struct N##_node *) +   \
+                                               array_,                         \
+                                           array_);                            \
+                                if(N##_compare_node(i, j, comp) > 0)           \
                                 {                                              \
-                                        list_memswp_##T(i, j);                 \
+                                        N##_memswp(i, j);                      \
                                 }                                              \
-                                if(list_compare_node_##T(array_, j, comp) > 0) \
+                                if(N##_compare_node(array_, j, comp) > 0)      \
                                 {                                              \
-                                        list_memswp_##T(array_, j);            \
+                                        N##_memswp(array_, j);                 \
                                 }                                              \
-                                if(list_compare_node_##T(i, array_, comp) > 0) \
+                                if(N##_compare_node(i, array_, comp) > 0)      \
                                 {                                              \
-                                        list_memswp_##T(i, array_);            \
+                                        N##_memswp(i, array_);                 \
                                 }                                              \
                                 while(1)                                       \
                                 {                                              \
                                         do                                     \
                                         {                                      \
                                                 i +=                           \
-                                                    sizeof(struct node_##T *); \
-                                        } while(list_compare_node_##T(         \
-                                                    array_, i, comp) > 0);     \
+                                                    sizeof(struct N##_node *); \
+                                        } while(N##_compare_node(array_, i,    \
+                                                                 comp) > 0);   \
                                         do                                     \
                                         {                                      \
                                                 j -=                           \
-                                                    sizeof(struct node_##T *); \
-                                        } while(list_compare_node_##T(         \
-                                                    j, array_, comp) > 0);     \
+                                                    sizeof(struct N##_node *); \
+                                        } while(N##_compare_node(j, array_,    \
+                                                                 comp) > 0);   \
                                         if(i > j)                              \
                                         {                                      \
                                                 break;                         \
                                         }                                      \
-                                        list_memswp_##T(i, j);                 \
+                                        N##_memswp(i, j);                      \
                                 }                                              \
-                                list_memswp_##T(array_, j);                    \
+                                N##_memswp(array_, j);                         \
                                 if(j - array_ > limit - i)                     \
                                 {                                              \
                                         PUSH(array_, j);                       \
@@ -664,20 +594,20 @@
                         else                                                   \
                         {                                                      \
                                 for(j = array_,                                \
-                                i = j + sizeof(struct node_##T *);             \
+                                i = j + sizeof(struct N##_node *);             \
                                     i < limit;                                 \
-                                    j = i, i += sizeof(struct node_##T *))     \
+                                    j = i, i += sizeof(struct N##_node *))     \
                                 {                                              \
                                         for(;                                  \
-                                            list_compare_node_##T(             \
+                                            N##_compare_node(                  \
                                                 j,                             \
-                                                j + sizeof(struct node_##T *), \
+                                                j + sizeof(struct N##_node *), \
                                                 comp) > 0;                     \
-                                            j -= sizeof(struct node_##T *))    \
+                                            j -= sizeof(struct N##_node *))    \
                                         {                                      \
-                                                list_memswp_##T(               \
+                                                N##_memswp(                    \
                                                     j,                         \
-                                                    j + sizeof(struct node_##T \
+                                                    j + sizeof(struct N##_node \
                                                                    *));        \
                                                 if(j == array_)                \
                                                 {                              \
@@ -697,51 +627,131 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        static void ptr_array_to_list_##T(struct node_##T **nodes_ptr,         \
-                                          struct list_##T *l)                  \
+        static void N##_ptr_array_to_list(struct N##_node **nodes_ptr,         \
+                                          struct N *l)                         \
         {                                                                      \
-                if(!l->size)                                                   \
+                if(!l->_size)                                                  \
                 {                                                              \
                         return;                                                \
                 }                                                              \
                                                                                \
-                l->head = nodes_ptr[0];                                        \
-                l->head->prev = NULL;                                          \
+                l->_head = nodes_ptr[0];                                       \
+                l->_head->_prev = NULL;                                        \
                                                                                \
-                l->tail = nodes_ptr[l->size - 1];                              \
-                l->tail->next = NULL;                                          \
+                l->_tail = nodes_ptr[l->_size - 1];                            \
+                l->_tail->_next = NULL;                                        \
                                                                                \
-                if(l->size > 1)                                                \
+                if(l->_size > 1)                                               \
                 {                                                              \
-                        l->head->next = nodes_ptr[1];                          \
-                        l->tail->prev = nodes_ptr[l->size - 2];                \
+                        l->_head->_next = nodes_ptr[1];                        \
+                        l->_tail->_prev = nodes_ptr[l->_size - 2];             \
                 }                                                              \
                                                                                \
-                for(size_t i = 1; i < l->size - 1; i++)                        \
+                for(size_t i = 1; i < l->_size - 1; i++)                       \
                 {                                                              \
-                        nodes_ptr[i]->prev = nodes_ptr[i - 1];                 \
-                        nodes_ptr[i]->next = nodes_ptr[i + 1];                 \
+                        nodes_ptr[i]->_prev = nodes_ptr[i - 1];                \
+                        nodes_ptr[i]->_next = nodes_ptr[i + 1];                \
                 }                                                              \
         }                                                                      \
                                                                                \
-        void list_sort_##T(struct list_##T *l,                                 \
-                           int (*comp)(const void *, const void *))            \
+        void N##_sort(struct N *l, int (*comp)(const void *, const void *))    \
         {                                                                      \
-                if(comp == NULL)                                               \
-                {                                                              \
-                        comp = list_element_compare_##T;                       \
-                }                                                              \
-                struct node_##T **nodes_ptr = (struct node_##T **)malloc(      \
-                    sizeof(struct node_##T *) * l->size);                      \
-                struct node_##T *curr = l->head;                               \
+                struct N##_node **nodes_ptr = (struct N##_node **)malloc(      \
+                    sizeof(struct N##_node *) * l->_size);                     \
+                struct N##_node *curr = l->_head;                              \
                                                                                \
-                for(size_t i = 0; i < l->size; i++)                            \
+                for(size_t i = 0; i < l->_size; i++)                           \
                 {                                                              \
                         nodes_ptr[i] = curr;                                   \
-                        curr = curr->next;                                     \
+                        curr = curr->_next;                                    \
                 }                                                              \
                                                                                \
-                list_qsort_##T(nodes_ptr, l->size, comp);                      \
-                ptr_array_to_list_##T(nodes_ptr, l);                           \
+                N##_qsort(nodes_ptr, l->_size, comp);                          \
+                N##_ptr_array_to_list(nodes_ptr, l);                           \
                 free(nodes_ptr);                                               \
-        }\
+        }                                                                      \
+                                                                               \
+        /* =============== */                                                  \
+        /*  LIST ITERATOR  */                                                  \
+        /* =============== */                                                  \
+                                                                               \
+        struct N##_iterator                                                    \
+        {                                                                      \
+                struct N##_node *_curr;                                        \
+        };                                                                     \
+                                                                               \
+        T *N##_iterator_value(struct N##_iterator i)                           \
+        {                                                                      \
+                return &i._curr->_data;                                        \
+        }                                                                      \
+                                                                               \
+        const T *N##_iterator_cvalue(const struct N##_iterator i)              \
+        {                                                                      \
+                return &i._curr->_data;                                        \
+        }                                                                      \
+                                                                               \
+        void N##_iterator_next(struct N##_iterator *i)                         \
+        {                                                                      \
+                i->_curr = i->_curr->_next;                                    \
+        }                                                                      \
+                                                                               \
+        void N##_iterator_prev(struct N##_iterator *i)                         \
+        {                                                                      \
+                i->_curr = i->_curr->_prev;                                    \
+        }                                                                      \
+                                                                               \
+        void N##_iterator_begin(struct N *l, struct N##_iterator *i)           \
+        {                                                                      \
+                i->_curr = l->_head;                                           \
+        }                                                                      \
+                                                                               \
+        void N##_iterator_cbegin(const struct N *const l,                      \
+                                 struct N##_iterator *i)                       \
+        {                                                                      \
+                i->_curr = l->_head;                                           \
+        }                                                                      \
+                                                                               \
+        struct N##_iterator N##_begin(struct N *l)                             \
+        {                                                                      \
+                struct N##_iterator i;                                         \
+                N##_iterator_begin(l, &i);                                     \
+                return i;                                                      \
+        }                                                                      \
+                                                                               \
+        struct N##_iterator N##_cbegin(const struct N *const l)                \
+        {                                                                      \
+                struct N##_iterator i;                                         \
+                N##_iterator_cbegin(l, &i);                                    \
+                return i;                                                      \
+        }                                                                      \
+                                                                               \
+        void N##_iterator_end(struct N *l, struct N##_iterator *i)             \
+        {                                                                      \
+                i->_curr = l->_tail;                                           \
+        }                                                                      \
+                                                                               \
+        void N##_iterator_cend(const struct N *const l,                        \
+                               struct N##_iterator *i)                         \
+        {                                                                      \
+                i->_curr = l->_tail;                                           \
+        }                                                                      \
+                                                                               \
+        struct N##_iterator N##_end(struct N *l)                               \
+        {                                                                      \
+                struct N##_iterator i;                                         \
+                N##_iterator_end(l, &i);                                       \
+                return i;                                                      \
+        }                                                                      \
+                                                                               \
+        struct N##_iterator N##_cend(const struct N *const l)                  \
+        {                                                                      \
+                struct N##_iterator i;                                         \
+                N##_iterator_cend(l, &i);                                      \
+                return i;                                                      \
+        }                                                                      \
+                                                                               \
+        int N##_iterator_equal(const struct N##_iterator first,                \
+                               const struct N##_iterator second)               \
+        {                                                                      \
+                return first._curr == second._curr;                            \
+        }
