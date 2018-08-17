@@ -9,6 +9,8 @@
                 T _data[S];                                                    \
         };                                                                     \
                                                                                \
+	typedef struct N N;                                                    \
+                                                                               \
         int N##_is_static()                                                    \
         {                                                                      \
                 return T##_is_static();                                        \
