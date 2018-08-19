@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef MAP_LEAF
 #define MAP_LEAF NULL
 #endif
@@ -13,7 +12,6 @@ enum map_color
         MAP_BLACK,
 };
 #endif
-
 
 #define INIT_MAP(K, V, N)                                                      \
                                                                                \
@@ -1133,35 +1131,6 @@ enum map_color
                 }                                                              \
         }                                                                      \
                                                                                \
-        static void N##_node_move(struct N##_node *first,                      \
-                                  struct N##_node *second)                     \
-        {                                                                      \
-                first->_parent, second->_parent;                               \
-                first->_left, second->_left;                                   \
-                first->_right, second->_right;                                 \
-                first->_color = second->_color;                                \
-                struct N##_node *p = first->_parent;                           \
-                if(p)                                                          \
-                {                                                              \
-                        if(p->_right == second)                                \
-                        {                                                      \
-                                p->_right = first;                             \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                p->_left = first;                              \
-                        }                                                      \
-                }                                                              \
-                if(first->_left)                                               \
-                {                                                              \
-                        first->_left->_parent = first;                         \
-                }                                                              \
-                if(first->_right)                                              \
-                {                                                              \
-                        first->_right->_parent = first;                        \
-                }                                                              \
-        }                                                                      \
-                                                                               \
         static struct N##_node *N##_erase_node(struct N *m,                    \
                                                struct N##_node *n)             \
         {                                                                      \
@@ -1209,7 +1178,16 @@ enum map_color
                 }                                                              \
                 if(succ != n)                                                  \
                 {                                                              \
-                        N##_node_move(n, succ);                                \
+                        N##_element_copy(&n->_value, &succ->_value);           \
+                        N##_element_copy_key(&n->_key, &succ->_key);           \
+                        if(N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(&succ->_value);               \
+                        }                                                      \
+                        if(N##_element_copy_key != N##_flat_copy_key)          \
+                        {                                                      \
+                                N##_element_free_key(&succ->_key);             \
+                        }                                                      \
                 }                                                              \
                 if(succ->_color == MAP_BLACK)                                  \
                 {                                                              \
