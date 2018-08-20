@@ -961,6 +961,8 @@ enum map_color
                                         v = &new_node->_value;                 \
                                         parent->_left = new_node;              \
                                         m->_size++;                            \
+                                        new_node->_parent = parent;            \
+                                        N##_check_color(m, new_node);          \
                                         break;                                 \
                                 }                                              \
                                 parent = parent->_left;                        \
@@ -974,6 +976,8 @@ enum map_color
                                         v = &new_node->_value;                 \
                                         parent->_right = new_node;             \
                                         m->_size++;                            \
+                                        new_node->_parent = parent;            \
+                                        N##_check_color(m, new_node);          \
                                         break;                                 \
                                 }                                              \
                                 parent = parent->_right;                       \
@@ -981,10 +985,9 @@ enum map_color
                         else                                                   \
                         {                                                      \
                                 v = &parent->_value;                           \
+                                break;                                         \
                         }                                                      \
                 }                                                              \
-                new_node->_parent = parent;                                    \
-                N##_check_color(m, new_node);                                  \
                 return v;                                                      \
         }                                                                      \
                                                                                \
