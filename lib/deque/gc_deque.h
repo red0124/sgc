@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define INIT_DEQUE(T, N)                                                       \
                                                                                \
         struct N                                                               \
@@ -492,7 +491,7 @@
                            N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
-				N##_element_copy(el, &new_el);                 \
+                                N##_element_copy(el, &new_el);                 \
                         }                                                      \
                         else                                                   \
                         {                                                      \
@@ -526,8 +525,7 @@
                         }                                                      \
                 }                                                              \
                 return ret;                                                    \
-        }                                                                      \
-                                                                               \
+        }
 
 #define INIT_DEQUE_ITERATOR(T, N)                                              \
                                                                                \
@@ -558,90 +556,90 @@
                 i->_curr = (i->_curr == 0) ? i->_max - 1 : i->_curr - 1;       \
         }                                                                      \
                                                                                \
-        void N##_iterator_begin(struct N *v, struct N##_iterator *i)           \
+        void N##_iterator_begin(struct N *d, struct N##_iterator *i)           \
         {                                                                      \
-                i->_data = v->_data;                                           \
-                i->_max = v->_max;                                             \
-                i->_curr = v->_front;                                          \
+                i->_data = d->_data;                                           \
+                i->_max = d->_max;                                             \
+                i->_curr = d->_front;                                          \
         }                                                                      \
                                                                                \
-        void N##_iterator_cbegin(const struct N *const v,                      \
+        void N##_iterator_cbegin(const struct N *const d,                      \
                                  struct N##_iterator *i)                       \
         {                                                                      \
-                i->_data = v->_data;                                           \
-                i->_max = v->_max;                                             \
-                i->_curr = v->_front;                                          \
+                i->_data = d->_data;                                           \
+                i->_max = d->_max;                                             \
+                i->_curr = d->_front;                                          \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_begin(struct N *v)                             \
+        struct N##_iterator N##_begin(struct N *d)                             \
         {                                                                      \
                 struct N##_iterator i;                                         \
-                N##_iterator_begin(v, &i);                                     \
+                N##_iterator_begin(d, &i);                                     \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_cbegin(const struct N *const v)                \
+        struct N##_iterator N##_cbegin(const struct N *const d)                \
         {                                                                      \
                 struct N##_iterator i;                                         \
-                N##_iterator_cbegin(v, &i);                                    \
+                N##_iterator_cbegin(d, &i);                                    \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        void N##_iterator_end(struct N *v, struct N##_iterator *i)             \
+        void N##_iterator_end(struct N *d, struct N##_iterator *i)             \
         {                                                                      \
-                i->_data = v->_data;                                           \
-                i->_max = v->_max;                                             \
-                i->_curr = v->_back;                                           \
+                i->_data = d->_data;                                           \
+                i->_max = d->_max;                                             \
+                i->_curr = d->_back;                                           \
         }                                                                      \
                                                                                \
-        void N##_iterator_cend(const struct N *const v,                        \
+        void N##_iterator_cend(const struct N *const d,                        \
                                struct N##_iterator *i)                         \
         {                                                                      \
-                i->_data = v->_data;                                           \
-                i->_max = v->_max;                                             \
-                i->_curr = v->_back;                                           \
+                i->_data = d->_data;                                           \
+                i->_max = d->_max;                                             \
+                i->_curr = d->_back;                                           \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_end(struct N *v)                               \
+        struct N##_iterator N##_end(struct N *d)                               \
         {                                                                      \
                 struct N##_iterator i;                                         \
-                N##_iterator_end(v, &i);                                       \
+                N##_iterator_end(d, &i);                                       \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_cend(const struct N *const v)                  \
+        struct N##_iterator N##_cend(const struct N *const d)                  \
         {                                                                      \
                 struct N##_iterator i;                                         \
-                N##_iterator_cend(v, &i);                                      \
+                N##_iterator_cend(d, &i);                                      \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        void N##_iterator_from(struct N *v, struct N##_iterator *i, size_t at) \
+        void N##_iterator_from(struct N *d, struct N##_iterator *i, size_t at) \
         {                                                                      \
-                i->_data = v->_data;                                           \
-                i->_max = v->_max;                                             \
-                i->_curr = (v->_front + at) % v->_max;                         \
+                i->_data = d->_data;                                           \
+                i->_max = d->_max;                                             \
+                i->_curr = (d->_front + at) % d->_max;                         \
         }                                                                      \
                                                                                \
-        void N##_iterator_cfrom(const struct N *const v,                       \
+        void N##_iterator_cfrom(const struct N *const d,                       \
                                 struct N##_iterator *i, size_t at)             \
         {                                                                      \
-                i->_data = v->_data;                                           \
-                i->_max = v->_max;                                             \
-                i->_curr = (v->_front + at) % v->_max;                         \
+                i->_data = d->_data;                                           \
+                i->_max = d->_max;                                             \
+                i->_curr = (d->_front + at) % d->_max;                         \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_from(struct N *v, size_t at)                   \
+        struct N##_iterator N##_from(struct N *d, size_t at)                   \
         {                                                                      \
                 struct N##_iterator i;                                         \
-                N##_iterator_from(v, &i, at);                                  \
+                N##_iterator_from(d, &i, at);                                  \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_cfrom(const struct N *const v, size_t at)      \
+        struct N##_iterator N##_cfrom(const struct N *const d, size_t at)      \
         {                                                                      \
                 struct N##_iterator i;                                         \
-                N##_iterator_cfrom(v, &i, at);                                 \
+                N##_iterator_cfrom(d, &i, at);                                 \
                 return i;                                                      \
         }                                                                      \
                                                                                \
@@ -662,4 +660,3 @@
         {                                                                      \
                 return second._curr - first._curr;                             \
         }
-
