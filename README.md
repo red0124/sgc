@@ -25,3 +25,9 @@ __void name_free(struct name_container*)__ function.
 Those containers can be compiled separately.
 
 More comming soon.
+
+## Examples
+### MAP
+
+![GitHub Logo](img/map.png)
+Format: ![Alt Text](url)
