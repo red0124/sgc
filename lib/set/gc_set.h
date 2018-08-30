@@ -63,13 +63,6 @@ enum map_color
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
                                                                                \
-        void (*N##_element_init)(V *) = V##_init;                              \
-                                                                               \
-        void N##_set_init(void (*init)(V *))                                   \
-        {                                                                      \
-                N##_element_init = init;                                       \
-        }                                                                      \
-                                                                               \
         void (*N##_element_copy)(V *, const V *const) = V##_copy;              \
                                                                                \
         void N##_set_copy(void (*copy)(V *, const V *const))                   \
@@ -647,26 +640,34 @@ enum map_color
         static int N##_is_left_child(const struct N##_node *const n,           \
                                      const struct N##_node *const parent)      \
         {                                                                      \
-                return (n == parent->_left);                                   \
+                int ret = 0;                                                   \
+                if(parent)                                                     \
+                {                                                              \
+                        ret = (n == parent->_left);                            \
+                }                                                              \
+                return ret;                                                    \
         }                                                                      \
                                                                                \
-        static struct N##_node *N##_brother(                                   \
+        static struct N##_node *N##_sibling(                                   \
             const struct N##_node *const n,                                    \
             const struct N##_node *const parent)                               \
         {                                                                      \
-                struct N##_node *brother = NULL;                               \
+                struct N##_node *sibling = NULL;                               \
                 if(parent != MAP_LEAF)                                         \
                 {                                                              \
-                        brother = (n == parent->_left) ? parent->_right        \
+                        sibling = (n == parent->_left) ? parent->_right        \
                                                        : parent->_left;        \
                 }                                                              \
-                return brother;                                                \
+                return sibling;                                                \
         }                                                                      \
         static void N##_rotate_left(struct N *m, struct N##_node *parent,      \
                                     struct N##_node *gparent)                  \
         {                                                                      \
                 struct N##_node *_left = parent->_left;                        \
-                gparent->_right = _left;                                       \
+                if(gparent)                                                    \
+                {                                                              \
+                        gparent->_right = _left;                               \
+                }                                                              \
                 if(_left != MAP_LEAF)                                          \
                 {                                                              \
                         _left->_parent = gparent;                              \
@@ -691,6 +692,8 @@ enum map_color
                 }                                                              \
                 parent->_left = gparent;                                       \
                 gparent->_parent = parent;                                     \
+		parent->_color = MAP_BLACK;\
+		gparent->_color = MAP_RED;\
         }                                                                      \
                                                                                \
         static void N##_rotate_right(struct N *m, struct N##_node *parent,     \
@@ -722,6 +725,8 @@ enum map_color
                 }                                                              \
                 parent->_right = gparent;                                      \
                 gparent->_parent = parent;                                     \
+		parent->_color = MAP_BLACK;\
+		gparent->_color = MAP_RED;\
         }                                                                      \
                                                                                \
         static void N##_rotate_left_right(struct N *m, struct N##_node *n,     \
@@ -751,10 +756,10 @@ enum map_color
                                 N##_rotate_right(m, parent, gparent);          \
                                 n->_color = MAP_RED;                           \
                                 parent->_color = MAP_BLACK;                    \
-                                struct N##_node *brother = parent->_right;     \
-                                if(brother != MAP_LEAF)                        \
+                                struct N##_node *sibling = parent->_right;     \
+                                if(sibling != MAP_LEAF)                        \
                                 {                                              \
-                                        brother->_color = MAP_RED;             \
+                                        sibling->_color = MAP_RED;             \
                                 }                                              \
                         }                                                      \
                         else                                                   \
@@ -772,10 +777,10 @@ enum map_color
                                 N##_rotate_left(m, parent, gparent);           \
                                 n->_color = MAP_RED;                           \
                                 parent->_color = MAP_BLACK;                    \
-                                struct N##_node *brother = parent->_right;     \
-                                if(brother != MAP_LEAF)                        \
+                                struct N##_node *sibling = parent->_right;     \
+                                if(sibling != MAP_LEAF)                        \
                                 {                                              \
-                                        brother->_color = MAP_RED;             \
+                                        sibling->_color = MAP_RED;             \
                                 }                                              \
                         }                                                      \
                         else                                                   \
@@ -789,34 +794,38 @@ enum map_color
         }                                                                      \
                                                                                \
         static void N##_corect_tree(struct N *m, struct N##_node *n,           \
-                                    struct N##_node *parent)                   \
+                                    struct N##_node *p, struct N##_node *gp)   \
         {                                                                      \
-                struct N##_node *gparent = parent->_parent;                    \
-                struct N##_node *aunt = N##_brother(parent, gparent);          \
-                if(aunt == MAP_LEAF || aunt->_color == MAP_BLACK)              \
+                struct N##_node *u = N##_sibling(p, gp);                       \
+                if(u == MAP_LEAF || u->_color == MAP_BLACK)                    \
                 {                                                              \
-                        N##_rotate(m, n, parent, gparent);                     \
+                        N##_rotate(m, n, p, gp);                               \
                 }                                                              \
-                else if(aunt != NULL)                                          \
+                else                                                           \
                 {                                                              \
-                        aunt->_color = MAP_BLACK;                              \
+                        u->_color = MAP_BLACK;                                 \
+                        p->_color = MAP_BLACK;                                 \
+                        gp->_color = MAP_RED;                                  \
                 }                                                              \
-                gparent->_color = MAP_RED;                                     \
-                parent->_color = MAP_BLACK;                                    \
         }                                                                      \
                                                                                \
         static void N##_check_color(struct N *m, struct N##_node *n)           \
         {                                                                      \
                 if(n == m->_root)                                              \
                 {                                                              \
+                        m->_root->_color = MAP_BLACK;                          \
                         return;                                                \
                 }                                                              \
-                struct N##_node *parent = n->_parent;                          \
-                if(n->_color == MAP_RED && parent->_color == MAP_RED)          \
+                struct N##_node *p = n->_parent;                               \
+                struct N##_node *gp = p->_parent;                              \
+                if(p->_color == MAP_RED && n->_color == MAP_RED)               \
                 {                                                              \
-                        N##_corect_tree(m, n, parent);                         \
+                        N##_corect_tree(m, n, p, gp);                          \
                 }                                                              \
-                N##_check_color(m, parent);                                    \
+                if(gp)                                                         \
+                {                                                              \
+                        N##_check_color(m, gp);                                \
+                }                                                              \
         }                                                                      \
                                                                                \
         static void N##_insert_node(struct N *m, V *v)                         \
@@ -881,7 +890,6 @@ enum map_color
                 else                                                           \
                 {                                                              \
                         N##_insert_node(m, &v);                                \
-                        m->_root->_color = MAP_BLACK;                          \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -1053,7 +1061,7 @@ enum map_color
                 }                                                              \
                 if(succ != n)                                                  \
                 {                                                              \
-			N##_element_copy(&n->_value, &succ->_value);           \
+                        N##_element_copy(&n->_value, &succ->_value);           \
                         if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&succ->_value);               \
