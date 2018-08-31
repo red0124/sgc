@@ -692,8 +692,8 @@ enum map_color
                 }                                                              \
                 parent->_left = gparent;                                       \
                 gparent->_parent = parent;                                     \
-		parent->_color = MAP_BLACK;\
-		gparent->_color = MAP_RED;\
+                parent->_color = MAP_BLACK;                                    \
+                gparent->_color = MAP_RED;                                     \
         }                                                                      \
                                                                                \
         static void N##_rotate_right(struct N *m, struct N##_node *parent,     \
@@ -725,8 +725,8 @@ enum map_color
                 }                                                              \
                 parent->_right = gparent;                                      \
                 gparent->_parent = parent;                                     \
-		parent->_color = MAP_BLACK;\
-		gparent->_color = MAP_RED;\
+                parent->_color = MAP_BLACK;                                    \
+                gparent->_color = MAP_RED;                                     \
         }                                                                      \
                                                                                \
         static void N##_rotate_left_right(struct N *m, struct N##_node *n,     \
@@ -939,33 +939,32 @@ enum map_color
                 {                                                              \
                         struct N##_node *s;                                    \
                         struct N##_node *r;                                    \
-                        if(p->_left == n)                                      \
+                        if(p->_left == n && p->_right)                         \
                         {                                                      \
                                 s = p->_right;                                 \
-                                if(!s)                                         \
-                                {                                              \
-                                        return;                                \
-                                }                                              \
                                 if(s->_color == MAP_RED)                       \
                                 {                                              \
+                                        N##_rotate_left(m, s, p);              \
                                         s->_color = MAP_BLACK;                 \
-                                        p->_color = MAP_RED;                   \
+                                        p->_color = MAP_BLACK;                 \
+                                        if(p->_right)                          \
+                                        {                                      \
+                                                p->_right->_color = MAP_RED;   \
+                                        }                                      \
                                 }                                              \
-                                if((!s->_right ||                              \
-                                    s->_right->_color == MAP_BLACK) &&         \
-                                   (!s->_left ||                               \
-                                    s->_left->_color == MAP_BLACK))            \
+                                else if((!s->_right ||                         \
+                                         s->_right->_color == MAP_BLACK) &&    \
+                                        (!s->_left ||                          \
+                                         s->_left->_color == MAP_BLACK))       \
                                 {                                              \
                                         s->_color = MAP_RED;                   \
+                                        N##_erase_rebalanse(m, p, p->_parent); \
                                 }                                              \
                                 else if(s->_right &&                           \
                                         s->_right->_color == MAP_RED)          \
                                 {                                              \
                                         r = s->_right;                         \
-                                        if(r)                                  \
-                                        {                                      \
-                                                r->_color = MAP_BLACK;         \
-                                        }                                      \
+                                        r->_color = MAP_BLACK;                 \
                                         N##_rotate_left(m, s, p);              \
                                 }                                              \
                                 else if(s->_left &&                            \
@@ -984,15 +983,21 @@ enum map_color
                                 }                                              \
                                 if(s->_color == MAP_RED)                       \
                                 {                                              \
+                                        N##_rotate_right(m, s, p);             \
                                         s->_color = MAP_BLACK;                 \
-                                        p->_color = MAP_RED;                   \
+                                        p->_color = MAP_BLACK;                 \
+                                        if(p->_left)                           \
+                                        {                                      \
+                                                p->_left->_color = MAP_RED;    \
+                                        }                                      \
                                 }                                              \
-                                if((!s->_right ||                              \
-                                    s->_right->_color == MAP_BLACK) &&         \
-                                   (!s->_left ||                               \
-                                    s->_left->_color == MAP_BLACK))            \
+                                else if((!s->_right ||                         \
+                                         s->_right->_color == MAP_BLACK) &&    \
+                                        (!s->_left ||                          \
+                                         s->_left->_color == MAP_BLACK))       \
                                 {                                              \
                                         s->_color = MAP_RED;                   \
+                                        N##_erase_rebalanse(m, p, p->_parent); \
                                 }                                              \
                                 else if(s->_left &&                            \
                                         s->_left->_color == MAP_RED)           \
@@ -1017,8 +1022,9 @@ enum map_color
         static struct N##_node *N##_erase_node(struct N *m,                    \
                                                struct N##_node *n)             \
         {                                                                      \
-                struct N##_node *succ_c;                                       \
                 struct N##_node *succ;                                         \
+                struct N##_node *succ_p;                                       \
+                struct N##_node *succ_c = MAP_LEAF;                            \
                 if(!n->_left || !n->_right)                                    \
                 {                                                              \
                         succ = n;                                              \
@@ -1038,17 +1044,28 @@ enum map_color
                                 succ = n->_left;                               \
                         }                                                      \
                 }                                                              \
-                succ_c = (succ->_left) ? succ->_left : succ->_right;           \
-                struct N##_node *succ_p = succ->_parent;                       \
-                if(succ_c)                                                     \
+                if(succ != n)                                                  \
                 {                                                              \
+                        N##_element_copy(&n->_value, &succ->_value);           \
+                        if(N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(&succ->_value);               \
+                        }                                                      \
+                        /* relinking nodes would be better */                  \
+                }                                                              \
+                                                                               \
+                succ_p = succ->_parent;                                        \
+                if(succ->_left)                                                \
+                {                                                              \
+                        succ_c = succ->_left;                                  \
                         succ_c->_parent = succ_p;                              \
                 }                                                              \
-                if(!succ->_parent)                                             \
+                else if(succ->_right)                                          \
                 {                                                              \
-                        m->_root = succ_c;                                     \
+                        succ_c = succ->_right;                                 \
+                        succ_c->_parent = succ_p;                              \
                 }                                                              \
-                else                                                           \
+                if(succ_p)                                                     \
                 {                                                              \
                         if(succ_p->_left == succ)                              \
                         {                                                      \
@@ -1059,15 +1076,21 @@ enum map_color
                                 succ_p->_right = succ_c;                       \
                         }                                                      \
                 }                                                              \
-                if(succ != n)                                                  \
+                else                                                           \
                 {                                                              \
-                        N##_element_copy(&n->_value, &succ->_value);           \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        m->_root = (m->_root->_left) ? m->_root->_left         \
+                                                     : m->_root->_right;       \
+                }                                                              \
+                                                                               \
+                if((succ_c && succ_c->_color == MAP_RED) ||                    \
+                   succ->_color == MAP_RED)                                    \
+                {                                                              \
+                        if(succ_c)                                             \
                         {                                                      \
-                                N##_element_free(&succ->_value);               \
+                                succ_c->_color = MAP_BLACK;                    \
                         }                                                      \
                 }                                                              \
-                if(succ->_color == MAP_BLACK)                                  \
+                else                                                           \
                 {                                                              \
                         N##_erase_rebalanse(m, succ_c, succ_p);                \
                 }                                                              \
