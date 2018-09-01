@@ -322,10 +322,7 @@
                         ret = d->_data;                                        \
                 }                                                              \
                 return ret;                                                    \
-        }
-
-
-#define INIT_VECTOR_ITERATOR(T, N)                                             \
+        }                                                                      \
                                                                                \
         struct N##_iterator                                                    \
         {                                                                      \
