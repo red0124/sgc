@@ -882,6 +882,7 @@ static size_t gc_log_two(size_t size)
                                 {                                              \
                                         ret._next = curr;                      \
                                         ret._curr = prev;                      \
+					ret._is_valid = 1;                     \
                                         N##_iterator_next(&ret);               \
                                         break;                                 \
                                 }                                              \
@@ -1104,6 +1105,7 @@ static size_t gc_log_two(size_t size)
                 }                                                              \
                 i->_curr = tmp._curr;                                          \
                 i->_next = tmp._next;                                          \
+                i->_is_valid = tmp._is_valid;                                  \
                 return ret;                                                    \
         }                                                                      \
                                                                                \
