@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define INIT_STATIC_STACK(T, S, N)                                             \
                                                                                \
         struct N                                                               \
@@ -9,11 +8,16 @@
                 T _data[S];                                                    \
         };                                                                     \
                                                                                \
-	typedef struct N N;                                                    \
+        typedef struct N N;                                                    \
                                                                                \
         int N##_is_static()                                                    \
         {                                                                      \
                 return T##_is_static();                                        \
+        }                                                                      \
+                                                                               \
+        size_t N##_max()                                                       \
+        {                                                                      \
+                return S;                                                      \
         }                                                                      \
                                                                                \
         /* =================== */                                              \
@@ -139,11 +143,11 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-	void N##_pop(struct N *s)                                              \
+        void N##_pop(struct N *s)                                              \
         {                                                                      \
                 if(s->_size)                                                   \
                 {                                                              \
-			T *el = &s->_data[s->_size - 1];                       \
+                        T *el = &s->_data[s->_size - 1];                       \
                         if(!T##_is_static() &&                                 \
                            N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
@@ -184,5 +188,5 @@
         int N##_empty(struct N *s)                                             \
         {                                                                      \
                 return s->_size == 0;                                          \
-        }\
+        }
 
