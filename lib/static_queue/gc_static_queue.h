@@ -17,6 +17,11 @@
                 return T##_is_static();                                        \
         }                                                                      \
                                                                                \
+        size_t N##_max()                                                       \
+        {                                                                      \
+                return S;                                                      \
+        }                                                                      \
+                                                                               \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
@@ -258,3 +263,4 @@
         {                                                                      \
                 return q->_size == 0;                                          \
         }
+
