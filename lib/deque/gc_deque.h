@@ -427,7 +427,11 @@
                         size_t shift_back = 0;                                 \
                         size_t shift_end = 0;                                  \
                         size_t shift_begin = 0;                                \
-                        if(2 * at > d->_size)                                  \
+			if(d->_size == 1)                                      \
+			{                                                      \
+				d->_front = d->_back = 0;                      \
+			}                                                      \
+                        else if(2 * at > d->_size)                             \
                         {                                                      \
                                 if(_at <= d->_back)                            \
                                 {                                              \
