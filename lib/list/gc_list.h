@@ -429,7 +429,7 @@
                 return erase;                                                  \
         }                                                                      \
                                                                                \
-        int N##_is_empty(const struct N *l)                                    \
+        int N##_empty(const struct N *l)                                       \
         {                                                                      \
                 return (l->_size == 0);                                        \
         }                                                                      \
@@ -758,3 +758,4 @@
         {                                                                      \
                 return i._curr != NULL;                                        \
         }
+
