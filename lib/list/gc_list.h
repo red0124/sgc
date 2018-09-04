@@ -4,7 +4,7 @@
 #define GC_STACK
 #define GC_STACK_SIZE 64
 
-#define PREPARE_STACK                                                          \
+#define GC_PREPARE_STACK                                                       \
         char *stack[GC_STACK_SIZE];                                            \
         char **stackptr = stack
 
@@ -532,7 +532,7 @@
                 size_t thresh = THRESH * sizeof(struct N##_node *);            \
                 char *array_ = (char *)array;                                  \
                 char *limit = array_ + array_size * sizeof(struct N##_node *); \
-                PREPARE_STACK;                                                 \
+                GC_PREPARE_STACK;                                              \
                                                                                \
                 while(1)                                                       \
                 {                                                              \
