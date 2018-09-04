@@ -774,4 +774,10 @@ size_t gc_next_prime(size_t n)
                         ret = N##_bucket_node_size(u->_data[n]);               \
                 }                                                              \
                 return ret;                                                    \
-        }\
+        }                                                                      \
+                                                                               \
+        int N##_empty(const struct N *const u)                                 \
+        {                                                                      \
+                return u._size == 0;                                           \
+        }                                                                      \
+        }
