@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define INIT_STACK(T, N)                                                       \
                                                                                \
         struct N                                                               \
@@ -28,6 +27,11 @@
         int N##_is_static()                                                    \
         {                                                                      \
                 return 0;                                                      \
+        }                                                                      \
+                                                                               \
+        size_t N##_max()                                                       \
+        {                                                                      \
+                return S;                                                      \
         }                                                                      \
                                                                                \
         /* =================== */                                              \
@@ -153,8 +157,8 @@
         {                                                                      \
                 if(s->_size == s->_max)                                        \
                 {                                                              \
-			s->_max = (s->_max == 0) ? N##_init_size               \
-						 : s->_max * N##_growth_scale; \
+                        s->_max = (s->_max == 0) ? N##_init_size               \
+                                                 : s->_max * N##_growth_scale; \
                                                                                \
                         s->_data =                                             \
                             (T *)realloc(s->_data, sizeof(T) * s->_max);       \
@@ -172,7 +176,7 @@
         {                                                                      \
                 if(s->_size)                                                   \
                 {                                                              \
-			T *el = &s->_data[s->_size - 1];                       \
+                        T *el = &s->_data[s->_size - 1];                       \
                         if(!T##_is_static() &&                                 \
                            N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
@@ -214,3 +218,4 @@
         {                                                                      \
                 return s->_size == 0;                                          \
         }
+
