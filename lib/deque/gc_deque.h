@@ -525,15 +525,14 @@
                         }                                                      \
                 }                                                              \
                 return ret;                                                    \
-        }
-
-#define INIT_DEQUE_ITERATOR(T, N)                                              \
+        }                                                                      \
                                                                                \
         struct N##_iterator                                                    \
         {                                                                      \
                 size_t _max;                                                   \
                 size_t _curr;                                                  \
                 T *_data;                                                      \
+                int _is_valid;                                                 \
         };                                                                     \
                                                                                \
         T *N##_iterator_value(struct N##_iterator i)                           \
@@ -548,12 +547,26 @@
                                                                                \
         void N##_iterator_next(struct N##_iterator *i)                         \
         {                                                                      \
-                i->_curr = (i->_curr + 1 == i->_max) ? 0 : i->_curr + 1;       \
+                if(i->_curr + 1 == i->_max)                                    \
+                {                                                              \
+                        i->_is_valid = 0;                                      \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        ++i->_curr;                                            \
+                }                                                              \
         }                                                                      \
                                                                                \
         void N##_iterator_prev(struct N##_iterator *i)                         \
         {                                                                      \
-                i->_curr = (i->_curr == 0) ? i->_max - 1 : i->_curr - 1;       \
+                if(i->_curr == 0)                                              \
+                {                                                              \
+                        i->_is_valid = 0;                                      \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        --i->_curr;                                            \
+                }                                                              \
         }                                                                      \
                                                                                \
         void N##_iterator_begin(struct N *d, struct N##_iterator *i)           \
@@ -561,6 +574,7 @@
                 i->_data = d->_data;                                           \
                 i->_max = d->_max;                                             \
                 i->_curr = d->_front;                                          \
+                i->_is_valid = (d->_size) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cbegin(const struct N *const d,                      \
@@ -569,6 +583,7 @@
                 i->_data = d->_data;                                           \
                 i->_max = d->_max;                                             \
                 i->_curr = d->_front;                                          \
+                i->_is_valid = (d->_size) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_begin(struct N *d)                             \
@@ -590,6 +605,7 @@
                 i->_data = d->_data;                                           \
                 i->_max = d->_max;                                             \
                 i->_curr = d->_back;                                           \
+                i->_is_valid = (d->_size) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cend(const struct N *const d,                        \
@@ -598,6 +614,7 @@
                 i->_data = d->_data;                                           \
                 i->_max = d->_max;                                             \
                 i->_curr = d->_back;                                           \
+                i->_is_valid = (d->_size) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_end(struct N *d)                               \
@@ -619,6 +636,7 @@
                 i->_data = d->_data;                                           \
                 i->_max = d->_max;                                             \
                 i->_curr = (d->_front + at) % d->_max;                         \
+                i->_is_valid = (d->_size < at) ? 1 : 0;                        \
         }                                                                      \
                                                                                \
         void N##_iterator_cfrom(const struct N *const d,                       \
@@ -627,6 +645,7 @@
                 i->_data = d->_data;                                           \
                 i->_max = d->_max;                                             \
                 i->_curr = (d->_front + at) % d->_max;                         \
+                i->_is_valid = (d->_size < at) ? 1 : 0;                        \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_from(struct N *d, size_t at)                   \
@@ -659,4 +678,10 @@
                                    const struct N##_iterator second)           \
         {                                                                      \
                 return second._curr - first._curr;                             \
-        }
+        }                                                                      \
+                                                                               \
+        int N##_iterator_valid(const struct N##_iterator it)                   \
+        {                                                                      \
+                return it._is_valid;                                           \
+        }\
+
