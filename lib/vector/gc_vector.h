@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define INIT_VECTOR(T, N)                                                      \
                                                                                \
         struct N                                                               \
@@ -9,8 +8,8 @@
                 size_t _max;                                                   \
                 T *_data;                                                      \
         };                                                                     \
-	                                                                       \
-	typedef struct N N;                                                    \
+                                                                               \
+        typedef struct N N;                                                    \
                                                                                \
         static size_t N##_init_size = 1;                                       \
         static double N##_growth_scale = 2;                                    \
@@ -288,7 +287,7 @@
                                                                                \
         void N##_set_front(struct N *v, T new_el)                              \
         {                                                                      \
-		N##_set_at(v, 0, new_el);                                      \
+                N##_set_at(v, 0, new_el);                                      \
         }                                                                      \
                                                                                \
         void N##_erase(struct N *v, const size_t at)                           \
@@ -327,6 +326,8 @@
         struct N##_iterator                                                    \
         {                                                                      \
                 T *_curr;                                                      \
+		T *_end;                                                       \
+		T *_begin;                                                     \
         };                                                                     \
                                                                                \
         T *N##_iterator_value(struct N##_iterator i)                           \
@@ -352,12 +353,16 @@
         void N##_iterator_begin(struct N *v, struct N##_iterator *i)           \
         {                                                                      \
                 i->_curr = v->_data;                                           \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cbegin(const struct N *const v,                      \
                                  struct N##_iterator *i)                       \
         {                                                                      \
                 i->_curr = v->_data;                                           \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_begin(struct N *v)                             \
@@ -377,12 +382,16 @@
         void N##_iterator_end(struct N *v, struct N##_iterator *i)             \
         {                                                                      \
                 i->_curr = v->_data + v->_size - 1;                            \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cend(const struct N *const v,                        \
                                struct N##_iterator *i)                         \
         {                                                                      \
                 i->_curr = v->_data + v->_size - 1;                            \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_end(struct N *v)                               \
@@ -402,12 +411,16 @@
         void N##_iterator_from(struct N *v, struct N##_iterator *i, size_t at) \
         {                                                                      \
                 i->_curr = v->_data + at;                                      \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cfrom(const struct N *const v,                       \
                                 struct N##_iterator *i, size_t at)             \
         {                                                                      \
                 i->_curr = v->_data + at;                                      \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_from(struct N *v, size_t at)                   \
@@ -439,4 +452,9 @@
                                    const struct N##_iterator second)           \
         {                                                                      \
                 return second._curr - first._curr;                             \
+        }                                                                      \
+                                                                               \
+        int N##_iterator_valid(const struct N##_iterator i)                    \
+        {                                                                      \
+                return i._curr <= i._end && i._curr >= i._begin;               \
         }
