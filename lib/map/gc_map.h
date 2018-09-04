@@ -882,7 +882,7 @@ static size_t gc_log_two(size_t size)
                                 {                                              \
                                         ret._next = curr;                      \
                                         ret._curr = prev;                      \
-					ret._is_valid = 1;                     \
+                                        ret._is_valid = 1;                     \
                                         N##_iterator_next(&ret);               \
                                         break;                                 \
                                 }                                              \
@@ -923,7 +923,15 @@ static size_t gc_log_two(size_t size)
                                          s->_left->_color == MAP_BLACK))       \
                                 {                                              \
                                         s->_color = MAP_RED;                   \
-                                        N##_erase_rebalanse(m, p, p->_parent); \
+                                        if(p->_color == MAP_RED)               \
+                                        {                                      \
+                                                p->_color = MAP_BLACK;         \
+                                        }                                      \
+                                        else                                   \
+                                        {                                      \
+                                                N##_erase_rebalanse(           \
+                                                    m, p, p->_parent);         \
+                                        }                                      \
                                 }                                              \
                                 else if(s->_right &&                           \
                                         s->_right->_color == MAP_RED)          \
@@ -972,7 +980,14 @@ static size_t gc_log_two(size_t size)
                                         {                                      \
                                                 r->_color = MAP_BLACK;         \
                                         }                                      \
-                                        N##_rotate_right(m, s, p);             \
+                                        if(p->_color == MAP_RED)               \
+                                        {                                      \
+                                                p->_color = MAP_BLACK;         \
+                                        }                                      \
+                                        else                                   \
+                                        {                                      \
+                                                N##_rotate_right(m, s, p);     \
+                                        }                                      \
                                 }                                              \
                                 else if(s->_right &&                           \
                                         s->_right->_color == MAP_RED)          \
