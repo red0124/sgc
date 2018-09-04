@@ -18,7 +18,7 @@
         array = stackptr[0];                                                   \
         limit = stackptr[1]
 
-#define THRESH 7
+#define GC_STACK_THRESH 7
 #endif
 
 #define INIT_LIST(T, N)                                                        \
@@ -529,7 +529,7 @@
                               int (*comp)(const void *, const void *))         \
         {                                                                      \
                 char *i, *j;                                                   \
-                size_t thresh = THRESH * sizeof(struct N##_node *);            \
+                size_t thresh = GC_STACK_THRESH * sizeof(struct N##_node *);            \
                 char *array_ = (char *)array;                                  \
                 char *limit = array_ + array_size * sizeof(struct N##_node *); \
                 GC_PREPARE_STACK;                                              \
