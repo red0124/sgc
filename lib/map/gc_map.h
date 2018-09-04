@@ -1,16 +1,35 @@
 #pragma once
 
-#ifndef MAP_LEAF
+#ifndef GC_MAP
+#define GC_MAP
 #define MAP_LEAF NULL
-#endif
 
-#ifndef MAP_RB_COLOR
-#define MAP_RB_COLOR
 enum map_color
 {
         MAP_RED,
         MAP_BLACK,
 };
+
+static size_t gc_exp_two(size_t curr)
+{
+        size_t power = 1;
+        for(size_t i = 0; i < curr; ++i)
+        {
+                power *= 2;
+        }
+        return power;
+}
+
+static size_t gc_log_two(size_t size)
+{
+        size_t curr = 1;
+        while(size >= gc_exp_two(curr))
+        {
+                ++curr;
+        }
+        return curr + 1;
+}
+
 #endif
 
 #define INIT_MAP(K, V, N)                                                      \
@@ -32,28 +51,6 @@ enum map_color
                 size_t _size;                                                  \
                 struct N##_node *_root;                                        \
         };                                                                     \
-                                                                               \
-        /* ================ */                                                 \
-        /*  NODE FUNCTIONS  */                                                 \
-        /* ================ */                                                 \
-                                                                               \
-        static struct N##_node *N##_node_begin(struct N##_node *n)             \
-        {                                                                      \
-                while(n->_left)                                                \
-                {                                                              \
-                        n = n->_left;                                          \
-                }                                                              \
-                return n;                                                      \
-        }                                                                      \
-                                                                               \
-        static struct N##_node *N##_node_end(struct N##_node *n)               \
-        {                                                                      \
-                while(n->_right)                                               \
-                {                                                              \
-                        n = n->_right;                                         \
-                }                                                              \
-                return n;                                                      \
-        }                                                                      \
                                                                                \
         int N##_is_static()                                                    \
         {                                                                      \
@@ -156,6 +153,28 @@ enum map_color
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
+        /* ================ */                                                 \
+        /*  NODE FUNCTIONS  */                                                 \
+        /* ================ */                                                 \
+                                                                               \
+        static struct N##_node *N##_node_begin(struct N##_node *n)             \
+        {                                                                      \
+                while(n->_left)                                                \
+                {                                                              \
+                        n = n->_left;                                          \
+                }                                                              \
+                return n;                                                      \
+        }                                                                      \
+                                                                               \
+        static struct N##_node *N##_node_end(struct N##_node *n)               \
+        {                                                                      \
+                while(n->_right)                                               \
+                {                                                              \
+                        n = n->_right;                                         \
+                }                                                              \
+                return n;                                                      \
+        }                                                                      \
+                                                                               \
         static struct N##_node *N##_node_new(const K *const k,                 \
                                              const V *const v)                 \
         {                                                                      \
@@ -174,98 +193,115 @@ enum map_color
                                                                                \
         struct N##_iterator                                                    \
         {                                                                      \
-                struct N##_node *curr;                                         \
-                struct N##_node *next;                                         \
+                struct N##_node *_curr;                                        \
+                struct N##_node *_next;                                        \
+                int _is_valid;                                                 \
         };                                                                     \
                                                                                \
         K *N##_iterator_key(struct N##_iterator i)                             \
         {                                                                      \
-                return &i.curr->_key;                                          \
+                return &i._curr->_key;                                         \
+        }                                                                      \
+                                                                               \
+        const K *N##_iterator_ckey(struct N##_iterator i)                      \
+        {                                                                      \
+                return &i._curr->_key;                                         \
         }                                                                      \
                                                                                \
         V *N##_iterator_value(struct N##_iterator i)                           \
         {                                                                      \
-                return &i.curr->_value;                                        \
+                return &i._curr->_value;                                       \
+        }                                                                      \
+                                                                               \
+        const V *N##_iterator_cvalue(struct N##_iterator i)                    \
+        {                                                                      \
+                return &i._curr->_value;                                       \
         }                                                                      \
                                                                                \
         void N##_iterator_next(struct N##_iterator *i)                         \
         {                                                                      \
-                if(!i->next)                                                   \
+                if(!i->_next)                                                  \
                 {                                                              \
+                        i->_is_valid = 0;                                      \
                         return;                                                \
                 }                                                              \
-                i->curr = i->next;                                             \
-                if(i->next->_right)                                            \
+                i->_curr = i->_next;                                           \
+                if(i->_next->_right)                                           \
                 {                                                              \
-                        i->next = N##_node_begin(i->next->_right);             \
+                        i->_next = N##_node_begin(i->_next->_right);           \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct N##_node *parent = i->next->_parent;            \
-                        while(parent && parent->_right == i->next)             \
+                        struct N##_node *parent = i->_next->_parent;           \
+                        while(parent && parent->_right == i->_next)            \
                         {                                                      \
-                                i->next = parent;                              \
+                                i->_next = parent;                             \
                                 parent = parent->_parent;                      \
                         }                                                      \
-                        if(i->next->_right != parent)                          \
+                        if(i->_next->_right != parent)                         \
                         {                                                      \
-                                i->next = parent;                              \
+                                i->_next = parent;                             \
                         }                                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
         void N##_iterator_begin(struct N *m, struct N##_iterator *i)           \
         {                                                                      \
-                i->curr = MAP_LEAF;                                            \
-                i->next = (m->_root) ? N##_node_begin(m->_root) : MAP_LEAF;    \
+                i->_curr = MAP_LEAF;                                           \
+                i->_next = (m->_root) ? N##_node_begin(m->_root) : MAP_LEAF;   \
+                i->_is_valid = 1;                                              \
                 N##_iterator_next(i);                                          \
         }                                                                      \
                                                                                \
         void N##_iterator_cbegin(const struct N *const m,                      \
                                  struct N##_iterator *i)                       \
         {                                                                      \
-                i->curr = MAP_LEAF;                                            \
-                i->next = (m->_root) ? N##_node_begin(m->_root) : MAP_LEAF;    \
+                i->_curr = MAP_LEAF;                                           \
+                i->_next = (m->_root) ? N##_node_begin(m->_root) : MAP_LEAF;   \
+                i->_is_valid = 1;                                              \
                 N##_iterator_next(i);                                          \
         }                                                                      \
                                                                                \
         void N##_iterator_prev(struct N##_iterator *i)                         \
         {                                                                      \
-                if(!i->curr)                                                   \
+                if(!i->_curr)                                                  \
                 {                                                              \
+                        i->_is_valid = 0;                                      \
                         return;                                                \
                 }                                                              \
-                i->next = i->curr;                                             \
-                if(i->curr->_left)                                             \
+                i->_next = i->_curr;                                           \
+                if(i->_curr->_left)                                            \
                 {                                                              \
-                        i->curr = N##_node_end(i->curr->_left);                \
+                        i->_curr = N##_node_end(i->_curr->_left);              \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct N##_node *parent = i->curr->_parent;            \
-                        while(parent && parent->_left == i->curr)              \
+                        struct N##_node *parent = i->_curr->_parent;           \
+                        while(parent && parent->_left == i->_curr)             \
                         {                                                      \
-                                i->curr = parent;                              \
+                                i->_curr = parent;                             \
                                 parent = parent->_parent;                      \
                         }                                                      \
-                        if(i->curr->_right != parent)                          \
+                        if(i->_curr->_right != parent)                         \
                         {                                                      \
-                                i->curr = parent;                              \
+                                i->_curr = parent;                             \
                         }                                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
         void N##_iterator_end(struct N *m, struct N##_iterator *i)             \
         {                                                                      \
-                i->curr = (m->_root) ? N##_node_end(m->_root) : MAP_LEAF;      \
-                i->next = MAP_LEAF;                                            \
+                i->_curr = (m->_root) ? N##_node_end(m->_root) : MAP_LEAF;     \
+                i->_next = MAP_LEAF;                                           \
+                i->_is_valid = (i->_curr) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cend(const struct N *const m,                        \
                                struct N##_iterator *i)                         \
         {                                                                      \
-                i->curr = (m->_root) ? N##_node_end(m->_root) : MAP_LEAF;      \
-                i->next = MAP_LEAF;                                            \
+                i->_curr = (m->_root) ? N##_node_end(m->_root) : MAP_LEAF;     \
+                i->_next = MAP_LEAF;                                           \
+                i->_is_valid = (i->_curr) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_begin(struct N *m)                             \
@@ -299,228 +335,23 @@ enum map_color
         int N##_iterator_equal(const struct N##_iterator first,                \
                                const struct N##_iterator second)               \
         {                                                                      \
-                return first.curr == second.curr;                              \
+                return first._curr == second._curr;                            \
         }                                                                      \
                                                                                \
-        /* =============== */                                                  \
-        /*  FAST ITERATOR  */                                                  \
-        /* =============== */                                                  \
-                                                                               \
-        struct N##_fast_iterator                                               \
+        int N##_iterator_valid(const struct N##_iterator i)                    \
         {                                                                      \
-                struct N##_node *curr;                                         \
-                struct N##_node *next;                                         \
-                struct N##_node **stack;                                       \
-                size_t stack_size;                                             \
-        };                                                                     \
-                                                                               \
-        static size_t N##_exp_two(size_t curr)                                 \
-        {                                                                      \
-                size_t power = 1;                                              \
-                for(size_t i = 0; i < curr; ++i)                               \
-                {                                                              \
-                        power *= 2;                                            \
-                }                                                              \
-                return power;                                                  \
-        }                                                                      \
-                                                                               \
-        static size_t N##_log_two(size_t size)                                 \
-        {                                                                      \
-                size_t curr = 1;                                               \
-                while(size >= N##_exp_two(curr))                               \
-                {                                                              \
-                        ++curr;                                                \
-                }                                                              \
-                return curr + 1;                                               \
-        }                                                                      \
-                                                                               \
-        static size_t N##_stack_size(size_t size)                              \
-        {                                                                      \
-                size = N##_log_two(size) + 1;                                  \
-                return sizeof(struct N##_node *) * (size * 2);                 \
-        }                                                                      \
-                                                                               \
-        static void N##_fast_iterator_init(const struct N *const m,            \
-                                           struct N##_fast_iterator *i)        \
-        {                                                                      \
-                i->stack_size = 0;                                             \
-                i->stack =                                                     \
-                    (struct N##_node **)malloc(N##_stack_size(m->_size));      \
-        }                                                                      \
-                                                                               \
-        void N##_fast_iterator_free(struct N##_fast_iterator *i)               \
-        {                                                                      \
-                if(i->stack)                                                   \
-                {                                                              \
-                        free(i->stack);                                        \
-                        i->stack = NULL;                                       \
-                        i->curr = MAP_LEAF;                                    \
-                        i->next = MAP_LEAF;                                    \
-                        i->stack_size = 0;                                     \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        void N##_fast_iterator_next(struct N##_fast_iterator *i)               \
-        {                                                                      \
-                if(!i->stack_size)                                             \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
-                i->curr = i->next;                                             \
-                if(i->next->_right)                                            \
-                {                                                              \
-                        i->stack[i->stack_size++] = i->next;                   \
-                        i->next = i->next->_right;                             \
-                        while(i->next->_left)                                  \
-                        {                                                      \
-                                i->stack[i->stack_size++] = i->next;           \
-                                i->next = i->next->_left;                      \
-                        }                                                      \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        struct N##_node *parent = i->stack[--i->stack_size];   \
-                        while(parent && parent->_right == i->next)             \
-                        {                                                      \
-                                i->next = parent;                              \
-                                parent = i->stack[--i->stack_size];            \
-                        }                                                      \
-                        if(i->next->_right != parent)                          \
-                        {                                                      \
-                                i->next = parent;                              \
-                        }                                                      \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        void N##_fast_iterator_begin(struct N *m, struct N##_fast_iterator *i) \
-        {                                                                      \
-                N##_fast_iterator_init(m, i);                                  \
-                struct N##_node *curr = m->_root;                              \
-                if(!curr)                                                      \
-                {                                                              \
-                        i->curr = MAP_LEAF;                                    \
-                        i->next = MAP_LEAF;                                    \
-                        return;                                                \
-                }                                                              \
-                                                                               \
-                i->stack[i->stack_size++] = MAP_LEAF;                          \
-                while(curr->_left)                                             \
-                {                                                              \
-                        i->stack[i->stack_size++] = curr;                      \
-                        curr = curr->_left;                                    \
-                }                                                              \
-                i->curr = MAP_LEAF;                                            \
-                i->next = curr;                                                \
-                N##_fast_iterator_next(i);                                     \
-        }                                                                      \
-                                                                               \
-        void N##_fast_iterator_cbegin(const struct N *const m,                 \
-                                      struct N##_fast_iterator *i)             \
-        {                                                                      \
-                N##_fast_iterator_init(m, i);                                  \
-                struct N##_node *curr = m->_root;                              \
-                if(!curr)                                                      \
-                {                                                              \
-                        i->curr = MAP_LEAF;                                    \
-                        i->next = MAP_LEAF;                                    \
-                        return;                                                \
-                }                                                              \
-                                                                               \
-                i->stack[i->stack_size++] = MAP_LEAF;                          \
-                while(curr->_left)                                             \
-                {                                                              \
-                        i->stack[i->stack_size++] = curr;                      \
-                        curr = curr->_left;                                    \
-                }                                                              \
-                i->curr = MAP_LEAF;                                            \
-                i->next = curr;                                                \
-                N##_fast_iterator_next(i);                                     \
-        }                                                                      \
-                                                                               \
-        void N##_fast_iterator_prev(struct N##_fast_iterator *i)               \
-        {                                                                      \
-                if(!i->curr)                                                   \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
-                i->next = i->curr;                                             \
-                if(i->curr->_left)                                             \
-                {                                                              \
-                        i->stack[i->stack_size++] = i->curr;                   \
-                        i->curr = i->curr->_left;                              \
-                        while(i->curr->_right)                                 \
-                        {                                                      \
-                                i->stack[i->stack_size++] = i->curr;           \
-                                i->curr = i->curr->_right;                     \
-                        }                                                      \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        struct N##_node *parent = i->stack[--i->stack_size];   \
-                        while(parent && parent->_left == i->curr)              \
-                        {                                                      \
-                                parent = i->stack[--i->stack_size];            \
-                                i->curr = parent;                              \
-                        }                                                      \
-                        if(i->curr->_right != parent)                          \
-                        {                                                      \
-                                i->curr = parent;                              \
-                        }                                                      \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        void N##_fast_iterator_end(struct N *m, struct N##_fast_iterator *i)   \
-        {                                                                      \
-                N##_fast_iterator_init(m, i);                                  \
-                struct N##_node *curr = m->_root;                              \
-                if(!curr)                                                      \
-                {                                                              \
-                        i->curr = MAP_LEAF;                                    \
-                        i->next = MAP_LEAF;                                    \
-                        return;                                                \
-                }                                                              \
-                                                                               \
-                i->stack[i->stack_size++] = MAP_LEAF;                          \
-                while(curr->_right)                                            \
-                {                                                              \
-                        i->stack[i->stack_size++] = curr;                      \
-                        curr = curr->_right;                                   \
-                }                                                              \
-                i->curr = curr;                                                \
-                i->next = MAP_LEAF;                                            \
-        }                                                                      \
-                                                                               \
-        void N##_fast_iterator_cend(const struct N *const m,                   \
-                                    struct N##_fast_iterator *i)               \
-        {                                                                      \
-                N##_fast_iterator_init(m, i);                                  \
-                struct N##_node *curr = m->_root;                              \
-                if(!curr)                                                      \
-                {                                                              \
-                        i->curr = MAP_LEAF;                                    \
-                        i->next = MAP_LEAF;                                    \
-                        return;                                                \
-                }                                                              \
-                                                                               \
-                i->stack[i->stack_size++] = MAP_LEAF;                          \
-                while(curr->_right)                                            \
-                {                                                              \
-                        i->stack[i->stack_size++] = curr;                      \
-                        curr = curr->_right;                                   \
-                }                                                              \
-                i->curr = curr;                                                \
-                i->next = MAP_LEAF;                                            \
-        }                                                                      \
-                                                                               \
-        int N##_fast_iterator_equal(const struct N##_fast_iterator first,      \
-                                    const struct N##_fast_iterator second)     \
-        {                                                                      \
-                return first.curr == second.curr;                              \
+                return i._is_valid;                                            \
         }                                                                      \
                                                                                \
         /* =============== */                                                  \
         /*  MAP FUNCTIONS  */                                                  \
         /* =============== */                                                  \
+                                                                               \
+        static size_t N##_stack_size(size_t size)                              \
+        {                                                                      \
+                size = gc_log_two(size) + 1;                                   \
+                return sizeof(struct N##_node *) * (size * 2);                 \
+        }                                                                      \
                                                                                \
         size_t N##_size(const struct N *const m)                               \
         {                                                                      \
@@ -585,30 +416,27 @@ enum map_color
                 if(equal == 0 && first->_size == second->_size)                \
                 {                                                              \
                         equal = 1;                                             \
-                        struct N##_fast_iterator it_first;                     \
-                        N##_fast_iterator_cbegin(first, &it_first);            \
+                        struct N##_iterator it_first;                          \
+                        N##_iterator_cbegin(first, &it_first);                 \
                                                                                \
-                        struct N##_fast_iterator it_second;                    \
-                        N##_fast_iterator_cbegin(second, &it_second);          \
+                        struct N##_iterator it_second;                         \
+                        N##_iterator_cbegin(second, &it_second);               \
                                                                                \
                         for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
                                 if((!N##_element_equal_key(                    \
-                                        &it_first.curr->_key,                  \
-                                        &it_second.curr->_key) ||              \
+                                        &it_first._curr->_key,                 \
+                                        &it_second._curr->_key) ||             \
                                     !N##_element_equal(                        \
-                                        &it_first.curr->_value,                \
-                                        &it_second.curr->_value)))             \
+                                        &it_first._curr->_value,               \
+                                        &it_second._curr->_value)))            \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
                                 }                                              \
-                                N##_fast_iterator_next(&it_first);             \
-                                N##_fast_iterator_next(&it_second);            \
+                                N##_iterator_next(&it_first);                  \
+                                N##_iterator_next(&it_second);                 \
                         }                                                      \
-                                                                               \
-                        N##_fast_iterator_free(&it_first);                     \
-                        N##_fast_iterator_free(&it_second);                    \
                 }                                                              \
                 return equal;                                                  \
         }                                                                      \
@@ -701,7 +529,7 @@ enum map_color
                         free(stack_dst);                                       \
                 }                                                              \
         }                                                                      \
-	                                                                       \
+                                                                               \
         static int N##_is_left_child(const struct N##_node *const n,           \
                                      const struct N##_node *const parent)      \
         {                                                                      \
@@ -1031,7 +859,7 @@ enum map_color
                                                                                \
         struct N##_iterator N##_find(struct N *m, K k)                         \
         {                                                                      \
-                struct N##_iterator ret = {MAP_LEAF, MAP_LEAF};                \
+                struct N##_iterator ret = {MAP_LEAF, MAP_LEAF, 0};             \
                 struct N##_node *prev;                                         \
                 if(m->_root)                                                   \
                 {                                                              \
@@ -1052,8 +880,8 @@ enum map_color
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        ret.next = curr;                       \
-                                        ret.curr = prev;                       \
+                                        ret._next = curr;                      \
+                                        ret._curr = prev;                      \
                                         N##_iterator_next(&ret);               \
                                         break;                                 \
                                 }                                              \
@@ -1065,7 +893,7 @@ enum map_color
         static struct N##_node *N##_find_node(struct N *m, K k)                \
         {                                                                      \
                 struct N##_iterator i = N##_find(m, k);                        \
-                return i.curr;                                                 \
+                return i._curr;                                                \
         }                                                                      \
                                                                                \
         static void N##_erase_rebalanse(struct N *m, struct N##_node *n,       \
@@ -1259,23 +1087,28 @@ enum map_color
                                                                                \
         int N##_iterator_erase(struct N *m, struct N##_iterator *i)            \
         {                                                                      \
-                struct N##_iterator tmp = {i->curr, i->next};                  \
+                struct N##_iterator tmp = {i->_curr, i->_next, i->_is_valid};  \
                 N##_iterator_next(&tmp);                                       \
-                int ret = (i->curr) ? 1 : 0;                                   \
+                int ret = i->_is_valid;                                        \
                 if(ret)                                                        \
                 {                                                              \
                         if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
-                                N##_element_free(&i->curr->_value);            \
+                                N##_element_free(&i->_curr->_value);           \
                         }                                                      \
                         if(N##_element_copy_key != N##_flat_copy_key)          \
                         {                                                      \
-                                N##_element_free_key(&i->curr->_key);          \
+                                N##_element_free_key(&i->_curr->_key);         \
                         }                                                      \
-                        free(N##_erase_node(m, i->curr));                      \
+                        free(N##_erase_node(m, i->_curr));                     \
                 }                                                              \
-                i->curr = tmp.curr;                                            \
-                i->next = tmp.next;                                            \
+                i->_curr = tmp._curr;                                          \
+                i->_next = tmp._next;                                          \
                 return ret;                                                    \
-        }\
-\
+        }                                                                      \
+                                                                               \
+        int N##_empty(const struct N *const m)                                 \
+        {                                                                      \
+                return m->_size == 0;                                          \
+        }
+
