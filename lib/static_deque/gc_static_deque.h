@@ -17,6 +17,11 @@
                 return T##_is_static();                                        \
         }                                                                      \
                                                                                \
+        size_t N##_max()                                                       \
+        {                                                                      \
+                return S;                                                      \
+        }                                                                      \
+                                                                               \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
@@ -382,7 +387,11 @@
                         size_t shift_back = 0;                                 \
                         size_t shift_end = 0;                                  \
                         size_t shift_begin = 0;                                \
-                        if(2 * at > d->_size)                                  \
+                        if(d->_size == 1)                                      \
+                        {                                                      \
+                                d->_front = d->_back = 0;                      \
+                        }                                                      \
+                        else if(2 * at > d->_size)                             \
                         {                                                      \
                                 if(_at <= d->_back)                            \
                                 {                                              \
@@ -480,14 +489,13 @@
                         }                                                      \
                 }                                                              \
                 return ret;                                                    \
-        }
-
-#define INIT_STATIC_DEQUE_ITERATOR(T, S, N)                                    \
+        }                                                                      \
                                                                                \
         struct N##_iterator                                                    \
         {                                                                      \
                 size_t _curr;                                                  \
                 T *_data;                                                      \
+                int _is_valid;                                                 \
         };                                                                     \
                                                                                \
         T *N##_iterator_value(struct N##_iterator i)                           \
@@ -502,18 +510,33 @@
                                                                                \
         void N##_iterator_next(struct N##_iterator *i)                         \
         {                                                                      \
-                i->_curr = (i->_curr + 1 == S) ? 0 : i->_curr + 1;             \
+                if(i->_curr + 1 == S)                                          \
+                {                                                              \
+                        i->_is_valid = 0;                                      \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        ++i->_curr;                                            \
+                }                                                              \
         }                                                                      \
                                                                                \
         void N##_iterator_prev(struct N##_iterator *i)                         \
         {                                                                      \
-                i->_curr = (i->_curr == 0) ? S - 1 : i->_curr - 1;             \
+                if(i->_curr == 0)                                              \
+                {                                                              \
+                        i->_is_valid = 0;                                      \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        --i->_curr;                                            \
+                }                                                              \
         }                                                                      \
                                                                                \
         void N##_iterator_begin(struct N *d, struct N##_iterator *i)           \
         {                                                                      \
                 i->_data = (T *)d->_data;                                      \
                 i->_curr = d->_front;                                          \
+                i->_is_valid = (d->_size) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cbegin(const struct N *const d,                      \
@@ -521,6 +544,7 @@
         {                                                                      \
                 i->_data = (T *)d->_data;                                      \
                 i->_curr = d->_front;                                          \
+                i->_is_valid = (d->_size) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_begin(struct N *d)                             \
@@ -541,6 +565,7 @@
         {                                                                      \
                 i->_data = (T *)d->_data;                                      \
                 i->_curr = d->_back;                                           \
+                i->_is_valid = (d->_size) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cend(const struct N *const d,                        \
@@ -548,6 +573,7 @@
         {                                                                      \
                 i->_data = (T *)d->_data;                                      \
                 i->_curr = d->_back;                                           \
+                i->_is_valid = (d->_size) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_end(struct N *d)                               \
@@ -568,6 +594,7 @@
         {                                                                      \
                 i->_data = (T *)d->_data;                                      \
                 i->_curr = (d->_front + at) % S;                               \
+                i->_is_valid = (d->_size < at) ? 1 : 0;                        \
         }                                                                      \
                                                                                \
         void N##_iterator_cfrom(const struct N *const d,                       \
@@ -575,6 +602,7 @@
         {                                                                      \
                 i->_data = (T *)d->_data;                                      \
                 i->_curr = (d->_front + at) % S;                               \
+                i->_is_valid = (d->_size < at) ? 1 : 0;                        \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_from(struct N *d, size_t at)                   \
@@ -607,4 +635,9 @@
                                    const struct N##_iterator second)           \
         {                                                                      \
                 return second._curr - first._curr;                             \
+        }                                                                      \
+                                                                               \
+        int N##_iterator_valid(const struct N##_iterator it)                   \
+        {                                                                      \
+                return it._is_valid;                                           \
         }
