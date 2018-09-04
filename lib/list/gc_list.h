@@ -1,27 +1,25 @@
 #pragma once
 
-
-#ifndef __STACK
-#define __STACK
-#define STACKSIZE 64
+#ifndef GC_STACK
+#define GC_STACK
+#define GC_STACK_SIZE 64
 
 #define PREPARE_STACK                                                          \
-        char *stack[STACKSIZE];                                                \
+        char *stack[GC_STACK_SIZE];                                            \
         char **stackptr = stack
 
-#define PUSH(array, limit)                                                     \
+#define GC_STACK_PUSH(array, limit)                                            \
         stackptr[0] = array;                                                   \
         stackptr[1] = limit;                                                   \
         stackptr += 2
 
-#define POP(array, limit)                                                      \
+#define GC_STACK_POP(array, limit)                                             \
         stackptr -= 2;                                                         \
         array = stackptr[0];                                                   \
         limit = stackptr[1]
 
 #define THRESH 7
 #endif
-
 
 #define INIT_LIST(T, N)                                                        \
                                                                                \
@@ -395,7 +393,7 @@
                 n = NULL;                                                      \
         }                                                                      \
                                                                                \
-        int N##_erase_el(struct N *l, const T el)                              \
+        int N##_erase(struct N *l, const T el)                                 \
         {                                                                      \
                 struct N##_node *n = N##_find_node(l, el);                     \
                 int erase = (n != NULL);                                       \
@@ -407,7 +405,7 @@
                 return erase;                                                  \
         }                                                                      \
                                                                                \
-        int N##_erase(struct N *l, size_t at)                                  \
+        int N##_erase_at(struct N *l, size_t at)                               \
         {                                                                      \
                 int erase = (at - 1 < l->_size && at != 0);                    \
                 if(erase)                                                      \
@@ -582,12 +580,12 @@
                                 N##_memswp(array_, j);                         \
                                 if(j - array_ > limit - i)                     \
                                 {                                              \
-                                        PUSH(array_, j);                       \
+                                        GC_STACK_PUSH(array_, j);              \
                                         array_ = i;                            \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        PUSH(i, limit);                        \
+                                        GC_STACK_PUSH(i, limit);               \
                                         limit = j;                             \
                                 }                                              \
                         }                                                      \
@@ -617,7 +615,7 @@
                                 }                                              \
                                 if(stackptr != stack)                          \
                                 {                                              \
-                                        POP(array_, limit);                    \
+                                        GC_STACK_POP(array_, limit);           \
                                 }                                              \
                                 else                                           \
                                 {                                              \
@@ -754,4 +752,9 @@
                                const struct N##_iterator second)               \
         {                                                                      \
                 return first._curr == second._curr;                            \
+        }                                                                      \
+                                                                               \
+        int N##_iterator_valid(const struct N##_iterator i)                    \
+        {                                                                      \
+                return i._curr != NULL;                                        \
         }
