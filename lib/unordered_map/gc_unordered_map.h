@@ -237,11 +237,11 @@ size_t gc_next_prime(size_t n)
                                         ret = tmp->_next;                      \
                                 }                                              \
                                 prev->_next = tmp->_next;                      \
-                                if(N##_element_copy_key == N##_flat_copy_key)  \
+                                if(N##_element_copy_key != N##_flat_copy_key)  \
                                 {                                              \
                                         N##_element_free_key(&tmp->_key);      \
                                 }                                              \
-                                if(N##_element_copy == N##_flat_copy)          \
+                                if(N##_element_copy != N##_flat_copy)          \
                                 {                                              \
                                         N##_element_free(&tmp->_value);        \
                                 }                                              \
@@ -265,6 +265,31 @@ size_t gc_next_prime(size_t n)
                         next = curr->_next;                                    \
                 }                                                              \
                 return curr;                                                   \
+        }                                                                      \
+									       \
+        size_t N##_bucket_count(const struct N *const u)                       \
+        {                                                                      \
+                return u->_max;                                                \
+        }                                                                      \
+                                                                               \
+        size_t N##_bucket_size(const struct N *const u, size_t n)              \
+        {                                                                      \
+                size_t ret = 0;                                                \
+                if(u->_data)                                                   \
+                {                                                              \
+                        ret = N##_bucket_node_size(u->_data[n]);               \
+                }                                                              \
+                return ret;                                                    \
+        }                                                                      \
+                                                                               \
+        size_t N##_buckets_used(const struct N *const u)                       \
+        {                                                                      \
+                size_t ret = 0;                                                \
+                for(size_t i = 0; i < u->_max; ++i)                            \
+                {                                                              \
+                        ret += (u->_data[i] == NULL) ? 0 : 1;                  \
+                }                                                              \
+                return ret;                                                    \
         }                                                                      \
                                                                                \
         /* ========== */                                                       \
@@ -631,6 +656,48 @@ size_t gc_next_prime(size_t n)
                 }                                                              \
         }                                                                      \
                                                                                \
+	void N##_rehash(struct N *u, size_t new_max)                           \
+        {                                                                      \
+                struct N##_node **new_data = (struct N##_node **)malloc(       \
+                    sizeof(struct N##_node *) * new_max);                      \
+                for(size_t i = 0; i < new_max; ++i)                            \
+                {                                                              \
+                        new_data[i] = NULL;                                    \
+                }                                                              \
+                                                                               \
+                V *value;                                                      \
+                size_t position;                                               \
+                struct N##_iterator tmp = N##_begin(u);                        \
+                struct N##_node *next;                                         \
+                for(size_t i = 0; i < u->_size; ++i)                           \
+                {                                                              \
+                        value = &tmp._curr->_value;                            \
+                        position = N##_element_hash(value) % new_max;          \
+                        next = tmp._curr->_next;                               \
+                        tmp._curr->_next = NULL;                               \
+                        if(new_data[position])                                 \
+                        {                                                      \
+                                N##_bucket_insert(new_data[position],          \
+                                                  tmp._curr);                  \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                new_data[position] = tmp._curr;                \
+                        }                                                      \
+                        if(next)                                               \
+                        {                                                      \
+                                tmp._curr = next;                              \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                N##_iterator_next(&tmp);                       \
+                        }                                                      \
+                }                                                              \
+                free(u->_data);                                                \
+                u->_data = new_data;                                           \
+                u->_max = new_max;                                             \
+        }                                                                      \
+                                                                               \
         static void N##_resize(struct N *u)                                    \
         {                                                                      \
                 size_t max, new_max;                                           \
@@ -761,23 +828,8 @@ size_t gc_next_prime(size_t n)
                 }                                                              \
         }                                                                      \
                                                                                \
-        size_t N##_bucket_count(const struct N *const u)                       \
-        {                                                                      \
-                return u->_max;                                                \
-        }                                                                      \
-                                                                               \
-        size_t N##_bucket_size(const struct N *const u, size_t n)              \
-        {                                                                      \
-                size_t ret = 0;                                                \
-                if(u->_data)                                                   \
-                {                                                              \
-                        ret = N##_bucket_node_size(u->_data[n]);               \
-                }                                                              \
-                return ret;                                                    \
-        }                                                                      \
-                                                                               \
         int N##_empty(const struct N *const u)                                 \
         {                                                                      \
-                return u._size == 0;                                           \
+                return u->_size == 0;                                          \
         }                                                                      \
-        }
+
