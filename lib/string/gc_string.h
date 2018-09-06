@@ -65,7 +65,7 @@
                         *s = (N)malloc(sizeof(char) * (size));                 \
                         memcpy(*s, buff, sizeof(char) * (size));               \
                 }                                                              \
-                return *(int *)tmp;                                            \
+                return (int)(*tmp);                                            \
         }                                                                      \
         /*                                                                     \
 static int N##_char_compare(const void *const first,                           \
