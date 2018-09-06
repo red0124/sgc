@@ -374,7 +374,7 @@ static size_t gc_log_two(size_t size)
                 }                                                              \
                 return equal;                                                  \
         }                                                                      \
-	\
+	                                                                       \
         void N##_copy(struct N *__restrict__ dst,                              \
                       const struct N *__restrict__ const src)                  \
         {                                                                      \
@@ -714,6 +714,58 @@ static size_t gc_log_two(size_t size)
                 else                                                           \
                 {                                                              \
                         N##_insert_node(m, &v);                                \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        static void N##_insert_multiple_node(struct N *m, V *v)                \
+        {                                                                      \
+                struct N##_node *parent = m->_root;                            \
+                struct N##_node *new_node = NULL;                              \
+                for(;;)                                                        \
+                {                                                              \
+                        int compare =                                          \
+                            (N##_element_compare(&parent->_value, v));         \
+                                                                               \
+                        if(compare > 0)                                        \
+                        {                                                      \
+                                if(parent->_left == MAP_LEAF)                  \
+                                {                                              \
+                                        new_node = N##_node_new(v);            \
+                                        parent->_left = new_node;              \
+                                        m->_size++;                            \
+                                        break;                                 \
+                                }                                              \
+                                parent = parent->_left;                        \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                if(parent->_right == MAP_LEAF)                 \
+                                {                                              \
+                                        new_node = N##_node_new(v);            \
+                                        parent->_right = new_node;             \
+                                        m->_size++;                            \
+                                        break;                                 \
+                                }                                              \
+                                parent = parent->_right;                       \
+                        }                                                      \
+                }                                                              \
+                new_node->_parent = parent;                                    \
+                N##_check_color(m, new_node);                                  \
+        }                                                                      \
+                                                                               \
+        void N##_insert_multiple(struct N *m, V v)                             \
+        {                                                                      \
+                if(m->_root == MAP_LEAF)                                       \
+                {                                                              \
+                        struct N##_node *new_node = N##_node_new(&v);          \
+                        new_node->_color = MAP_BLACK;                          \
+                        new_node->_parent = MAP_LEAF;                          \
+                        m->_root = new_node;                                   \
+                        m->_size = 1;                                          \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        N##_insert_multiple_node(m, &v);                       \
                 }                                                              \
         }                                                                      \
                                                                                \
