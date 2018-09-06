@@ -309,8 +309,18 @@ size_t gc_next_prime(size_t n)
         {                                                                      \
                 return &i._curr->_key;                                         \
         }                                                                      \
+	                                                                       \
+        const K *N##_iterator_ckey(struct N##_iterator i)                      \
+        {                                                                      \
+                return &i._curr->_key;                                         \
+        }                                                                      \
                                                                                \
         V *N##_iterator_value(struct N##_iterator i)                           \
+        {                                                                      \
+                return &i._curr->_value;                                       \
+        }                                                                      \
+                                                                               \
+        const V *N##_iterator_cvalue(struct N##_iterator i)                    \
         {                                                                      \
                 return &i._curr->_value;                                       \
         }                                                                      \
