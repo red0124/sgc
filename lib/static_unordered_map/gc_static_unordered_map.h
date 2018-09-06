@@ -349,7 +349,7 @@ enum node_state
                                                                                \
         void N##_free(struct N *u)                                             \
         {                                                                      \
-                if(u->_size && !K##_is_static() && !V##_is_static())           \
+                if(u->_size && !(K##_is_static() && V##_is_static()))          \
                 {                                                              \
                         for(size_t i = 0; i < S; ++i)                          \
                         {                                                      \
