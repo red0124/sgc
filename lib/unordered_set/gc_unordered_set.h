@@ -185,7 +185,7 @@ size_t gc_next_prime(size_t n)
                                         ret = tmp->_next;                      \
                                 }                                              \
                                 prev->_next = tmp->_next;                      \
-                                if(N##_element_copy == N##_flat_copy)          \
+                                if(N##_element_copy != N##_flat_copy)          \
                                 {                                              \
                                         N##_element_free(&tmp->_value);        \
                                 }                                              \
