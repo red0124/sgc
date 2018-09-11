@@ -67,44 +67,6 @@
                 }                                                              \
                 return (int)(*tmp);                                            \
         }                                                                      \
-        /*                                                                     \
-static int N##_char_compare(const void *const first,                           \
-const void *const second)                                                      \
-{                                                                              \
-return *(char *)first - *(char *)second;                                       \
-}                                                                              \
-                         \                                                     \
-static int N##_char_binary_find(char *del, char c)                             \
-{                                                                              \
-int ret = 0;                                                                   \
-size_t size = strlen(del);                                                     \
-qsort(del, size, sizeof(char), N##_char_compare);                              \
-printf("%s\n", del);                                                           \
-if(c >= del[0] && c <= del[size - 1])                                          \
-{                                                                              \
-size_t l = 0;                                                                  \
-size_t r = size - 1;                                                           \
-size_t m;                                                                      \
-while(l <= r)                                                                  \
-{                                                                              \
-m = l + (r - l) / 2;                                                           \
-if(del[m] < c)                                                                 \
-{                                                                              \
-l = m + 1;                                                                     \
-}                                                                              \
-else if(del[m] > c)                                                            \
-{                                                                              \
-r = m - 1;                                                                     \
-}                                                                              \
-else                                                                           \
-{                                                                              \
-ret = 1;                                                                       \
-break;                                                                         \
-}                                                                              \
-}                                                                              \
-}                                                                              \
-return ret;                                                                    \
-} */                                                                           \
                                                                                \
         static int N##_char_find(const char *const del, char c)                \
         {                                                                      \
