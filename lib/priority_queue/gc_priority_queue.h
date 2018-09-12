@@ -220,19 +220,28 @@
                                                                                \
         static void N##_fix_erase(struct N *p)                                 \
         {                                                                      \
-                size_t curr = 0;                                               \
-                while((curr + 1) * 2 < p->_size)                               \
+		size_t curr = 0;                                               \
+                while((curr + 1) * 2 <= p->_size)                              \
                 {                                                              \
                         size_t right = (curr + 1) * 2;                         \
                         size_t left = right - 1;                               \
                         size_t tmp = right;                                    \
-                        if(N##_element_compare(&p->_data[left],                \
+                        if(right == p->_size ||                                \
+                           N##_element_compare(&p->_data[left],                \
                                                &p->_data[right]) > 0)          \
                         {                                                      \
                                 tmp = left;                                    \
                         }                                                      \
-                        N##_memswp(&p->_data[curr], &p->_data[tmp]);           \
-                        curr = tmp;                                            \
+                        if(N##_element_compare(&p->_data[tmp],                 \
+                                               &p->_data[curr]) > 0)           \
+                        {                                                      \
+                                N##_memswp(&p->_data[curr], &p->_data[tmp]);   \
+                                curr = tmp;                                    \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                break;                                         \
+                        }                                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -241,19 +250,7 @@
                 if(p->_size)                                                   \
                 {                                                              \
                         N##_memswp(&p->_data[0], &p->_data[--p->_size]);       \
-                        if(p->_size == 2)                                      \
-                        {                                                      \
-                                if(N##_element_compare(&p->_data[0],           \
-                                                       &p->_data[1]) < 0)      \
-                                {                                              \
-                                        N##_memswp(&p->_data[0],               \
-                                                   &p->_data[1]);              \
-                                }                                              \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                N##_fix_erase(p);                              \
-                        }                                                      \
+			N##_fix_erase(p);                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
