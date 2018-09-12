@@ -220,7 +220,7 @@
                                                                                \
         static void N##_fix_erase(struct N *p)                                 \
         {                                                                      \
-		size_t curr = 0;                                               \
+                size_t curr = 0;                                               \
                 while((curr + 1) * 2 <= p->_size)                              \
                 {                                                              \
                         size_t right = (curr + 1) * 2;                         \
@@ -250,7 +250,11 @@
                 if(p->_size)                                                   \
                 {                                                              \
                         N##_memswp(&p->_data[0], &p->_data[--p->_size]);       \
-			N##_fix_erase(p);                                      \
+                        if(N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(&p->_data[p->_size]);         \
+                        }                                                      \
+                        N##_fix_erase(p);                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -297,5 +301,4 @@
                         p->_max = p->_size = 0;                                \
                         p->_data = NULL;                                       \
                 }                                                              \
-        }\
-
+        }
