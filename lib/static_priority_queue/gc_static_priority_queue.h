@@ -214,6 +214,10 @@
                 if(p->_size)                                                   \
                 {                                                              \
                         N##_memswp(&p->_data[0], &p->_data[--p->_size]);       \
+                        if(N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(&p->_data[p->_size]);         \
+                        }                                                      \
                         N##_fix_erase(p);                                      \
                 }                                                              \
         }                                                                      \
