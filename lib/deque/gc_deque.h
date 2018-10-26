@@ -531,6 +531,10 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
+        /* ================ */                                                 \
+        /*  DEQUE ITERATOR  */                                                 \
+        /* ================ */                                                 \
+                                                                               \
         struct N##_iterator                                                    \
         {                                                                      \
                 size_t _max;                                                   \
