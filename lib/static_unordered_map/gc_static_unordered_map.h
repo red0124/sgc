@@ -476,7 +476,6 @@ enum node_state
                                                                                \
         void N##_iterator_erase(struct N *u, struct N##_iterator *i)           \
         {                                                                      \
-                (void *)(u);                                                   \
                 if(N##_iterator_valid(*i))                                     \
                 {                                                              \
                         K *key = N##_iterator_key(*i);                         \
@@ -491,6 +490,7 @@ enum node_state
                         {                                                      \
                                 N##_element_free(value);                       \
                         }                                                      \
+			--u->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
