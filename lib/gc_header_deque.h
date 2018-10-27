@@ -12,9 +12,6 @@
                                                                                \
         typedef struct N N;                                                    \
                                                                                \
-        static size_t N##_init_size = 1;                                       \
-        static double N##_growth_scale = 2;                                    \
-                                                                               \
         void N##_set_init_size(size_t init_size);                              \
                                                                                \
         void N##_set_growth_scale(double growth_scale);                        \
@@ -24,8 +21,6 @@
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
-                                                                               \
-        static void (*N##_element_copy)(T *, const T *const) = T##_copy;       \
                                                                                \
         void N##_set_copy(void (*copy)(T *, const T *const));                  \
                                                                                \
