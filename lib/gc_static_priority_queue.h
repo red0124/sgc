@@ -63,7 +63,7 @@
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
-        int (*N##_element_compare)(const T *const, const T *const) =           \
+        static int (*N##_element_compare)(const T *const, const T *const) =    \
             T##_compare;                                                       \
                                                                                \
         void N##_set_compare(int (*compare)(const T *const, const T *const))   \

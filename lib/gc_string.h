@@ -133,6 +133,7 @@
                 size_t size;                                                   \
                 size_t max;                                                    \
         };                                                                     \
+	                                                                       \
         typedef struct N##_array N##_array;                                    \
                                                                                \
         static void N##_array_push_back(N##_array *a, N el)                    \

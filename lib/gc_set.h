@@ -32,14 +32,13 @@ static size_t gc_log_two(size_t size)
 
 #endif
 
-#define INIT_MAP(K, V, N)                                                      \
+#define INIT_SET(V, N)                                                         \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
                 struct N##_node *_parent;                                      \
                 struct N##_node *_left;                                        \
                 struct N##_node *_right;                                       \
-                K _key;                                                        \
                 V _value;                                                      \
                 enum map_color _color;                                         \
         };                                                                     \
@@ -61,14 +60,7 @@ static size_t gc_log_two(size_t size)
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
                                                                                \
-        void (*N##_element_init)(V *) = V##_init;                              \
-                                                                               \
-        void N##_set_init(void (*init)(V *))                                   \
-        {                                                                      \
-                N##_element_init = init;                                       \
-        }                                                                      \
-                                                                               \
-        void (*N##_element_copy)(V *, const V *const) = V##_copy;              \
+        static void (*N##_element_copy)(V *, const V *const) = V##_copy;       \
                                                                                \
         void N##_set_copy(void (*copy)(V *, const V *const))                   \
         {                                                                      \
@@ -92,61 +84,23 @@ static size_t gc_log_two(size_t size)
                 }                                                              \
         }                                                                      \
                                                                                \
-        void (*N##_element_copy_key)(K *, const K *const) = K##_copy;          \
-                                                                               \
-        void N##_set_copy_key(void (*copy)(K *, const K *const))               \
-        {                                                                      \
-                N##_element_copy_key = copy;                                   \
-        }                                                                      \
-                                                                               \
-        static void N##_flat_copy_key(K *dst, const K *const src)              \
-        {                                                                      \
-                *dst = *src;                                                   \
-        }                                                                      \
-                                                                               \
-        void N##_set_share_key(int is_shared)                                  \
-        {                                                                      \
-                if(is_shared)                                                  \
-                {                                                              \
-                        N##_set_copy_key(N##_flat_copy_key);                   \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        N##_set_copy_key(K##_copy);                            \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        int (*N##_element_equal)(const V *const, const V *const) = V##_equal;  \
+        static int (*N##_element_equal)(const V *const, const V *const) =      \
+            V##_equal;                                                         \
                                                                                \
         void N##_set_equal(int (*equal)(const V *const, const V *const))       \
         {                                                                      \
                 N##_element_equal = equal;                                     \
         }                                                                      \
                                                                                \
-        int (*N##_element_equal_key)(const K *const, const K *const) =         \
-            K##_equal;                                                         \
+        static int (*N##_element_compare)(const V *const, const V *const) =    \
+            V##_compare;                                                       \
                                                                                \
-        void N##_set_equal_key(int (*equal)(const K *const, const K *const))   \
-        {                                                                      \
-                N##_element_equal_key = equal;                                 \
-        }                                                                      \
-                                                                               \
-        int (*N##_element_compare)(const K *const, const K *const) =           \
-            K##_compare;                                                       \
-                                                                               \
-        void N##_set_compare(int (*compare)(const K *const, const K *const))   \
+        void N##_set_compare(int (*compare)(const V *const, const V *const))   \
         {                                                                      \
                 N##_element_compare = compare;                                 \
         }                                                                      \
                                                                                \
-        void (*N##_element_free_key)(K *) = K##_free;                          \
-                                                                               \
-        void N##_set_free_key(void (*free)(K *))                               \
-        {                                                                      \
-                N##_element_free_key = free;                                   \
-        }                                                                      \
-                                                                               \
-        void (*N##_element_free)(V *) = V##_free;                              \
+        static void (*N##_element_free)(V *) = V##_free;                       \
                                                                                \
         void N##_set_free(void (*free)(V *))                                   \
         {                                                                      \
@@ -175,12 +129,10 @@ static size_t gc_log_two(size_t size)
                 return n;                                                      \
         }                                                                      \
                                                                                \
-        static struct N##_node *N##_node_new(const K *const k,                 \
-                                             const V *const v)                 \
+        static struct N##_node *N##_node_new(const V *const v)                 \
         {                                                                      \
                 struct N##_node *n =                                           \
                     (struct N##_node *)malloc(sizeof(struct N##_node));        \
-                N##_element_copy_key(&n->_key, k);                             \
                 N##_element_copy(&n->_value, v);                               \
                 n->_left = n->_right = MAP_LEAF;                               \
                 n->_color = MAP_RED;                                           \
@@ -197,16 +149,6 @@ static size_t gc_log_two(size_t size)
                 struct N##_node *_next;                                        \
                 int _is_valid;                                                 \
         };                                                                     \
-                                                                               \
-        K *N##_iterator_key(struct N##_iterator i)                             \
-        {                                                                      \
-                return &i._curr->_key;                                         \
-        }                                                                      \
-                                                                               \
-        const K *N##_iterator_ckey(struct N##_iterator i)                      \
-        {                                                                      \
-                return &i._curr->_key;                                         \
-        }                                                                      \
                                                                                \
         V *N##_iterator_value(struct N##_iterator i)                           \
         {                                                                      \
@@ -397,10 +339,6 @@ static size_t gc_log_two(size_t size)
                                 {                                              \
                                         N##_element_free(&tmp->_value);        \
                                 }                                              \
-                                if(N##_element_copy_key != N##_flat_copy_key)  \
-                                {                                              \
-                                        N##_element_free_key(&tmp->_key);      \
-                                }                                              \
                                 free(tmp);                                     \
                         }                                                      \
                 }                                                              \
@@ -424,12 +362,9 @@ static size_t gc_log_two(size_t size)
                                                                                \
                         for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
-                                if((!N##_element_equal_key(                    \
-                                        &it_first._curr->_key,                 \
-                                        &it_second._curr->_key) ||             \
-                                    !N##_element_equal(                        \
-                                        &it_first._curr->_value,               \
-                                        &it_second._curr->_value)))            \
+                                if(N##_element_equal(                          \
+                                       &it_first._curr->_value,                \
+                                       &it_second._curr->_value))              \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -454,8 +389,6 @@ static size_t gc_log_two(size_t size)
                                                                                \
                         N##_element_copy(&dst->_root->_value,                  \
                                          &src->_root->_value);                 \
-                        N##_element_copy_key(&dst->_root->_key,                \
-                                             &src->_root->_key);               \
                         dst->_root->_color = src->_root->_color;               \
                         dst->_root->_left = dst->_root->_right =               \
                             dst->_root->_parent = MAP_LEAF;                    \
@@ -517,8 +450,6 @@ static size_t gc_log_two(size_t size)
                                 curr_dst = tmp;                                \
                                 N##_element_copy(&curr_dst->_value,            \
                                                  &curr_src->_value);           \
-                                N##_element_copy_key(&curr_dst->_key,          \
-                                                     &curr_src->_key);         \
                                 curr_dst->_color = curr_src->_color;           \
                                 stack_src[stack_size] = curr_src;              \
                                 stack_dst[stack_size] = curr_dst;              \
@@ -553,6 +484,7 @@ static size_t gc_log_two(size_t size)
                 }                                                              \
                 return sibling;                                                \
         }                                                                      \
+                                                                               \
         static void N##_rotate_left(struct N *m, struct N##_node *parent,      \
                                     struct N##_node *gparent)                  \
         {                                                                      \
@@ -721,19 +653,20 @@ static size_t gc_log_two(size_t size)
                 }                                                              \
         }                                                                      \
                                                                                \
-        static void N##_insert_node(struct N *m, K *k, V *v)                   \
+        static void N##_insert_node(struct N *m, V *v)                         \
         {                                                                      \
                 struct N##_node *parent = m->_root;                            \
                 struct N##_node *new_node = NULL;                              \
                 for(;;)                                                        \
                 {                                                              \
-                        int compare = (N##_element_compare(&parent->_key, k)); \
+                        int compare =                                          \
+                            (N##_element_compare(&parent->_value, v));         \
                                                                                \
                         if(compare > 0)                                        \
                         {                                                      \
                                 if(parent->_left == MAP_LEAF)                  \
                                 {                                              \
-                                        new_node = N##_node_new(k, v);         \
+                                        new_node = N##_node_new(v);            \
                                         parent->_left = new_node;              \
                                         m->_size++;                            \
                                         break;                                 \
@@ -744,7 +677,7 @@ static size_t gc_log_two(size_t size)
                         {                                                      \
                                 if(parent->_right == MAP_LEAF)                 \
                                 {                                              \
-                                        new_node = N##_node_new(k, v);         \
+                                        new_node = N##_node_new(v);            \
                                         parent->_right = new_node;             \
                                         m->_size++;                            \
                                         break;                                 \
@@ -769,11 +702,11 @@ static size_t gc_log_two(size_t size)
                 N##_check_color(m, new_node);                                  \
         }                                                                      \
                                                                                \
-        void N##_set_at(struct N *m, K k, V v)                                 \
+        void N##_insert(struct N *m, V v)                                      \
         {                                                                      \
                 if(m->_root == MAP_LEAF)                                       \
                 {                                                              \
-                        struct N##_node *new_node = N##_node_new(&k, &v);      \
+                        struct N##_node *new_node = N##_node_new(&v);          \
                         new_node->_color = MAP_BLACK;                          \
                         new_node->_parent = MAP_LEAF;                          \
                         m->_root = new_node;                                   \
@@ -781,83 +714,63 @@ static size_t gc_log_two(size_t size)
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        N##_insert_node(m, &k, &v);                            \
-                        m->_root->_color = MAP_BLACK;                          \
+                        N##_insert_node(m, &v);                                \
                 }                                                              \
         }                                                                      \
                                                                                \
-        V *N##_insert_or_get_node(struct N *m, K *k)                           \
+        static void N##_insert_multiple_node(struct N *m, V *v)                \
         {                                                                      \
-                V new_el;                                                      \
-                V *v = &new_el;                                                \
                 struct N##_node *parent = m->_root;                            \
                 struct N##_node *new_node = NULL;                              \
                 for(;;)                                                        \
                 {                                                              \
-                        int compare = (N##_element_compare(&parent->_key, k)); \
+                        int compare =                                          \
+                            (N##_element_compare(&parent->_value, v));         \
                                                                                \
                         if(compare > 0)                                        \
                         {                                                      \
                                 if(parent->_left == MAP_LEAF)                  \
                                 {                                              \
-                                        N##_element_init(v);                   \
-                                        new_node = N##_node_new(k, v);         \
-                                        v = &new_node->_value;                 \
+                                        new_node = N##_node_new(v);            \
                                         parent->_left = new_node;              \
                                         m->_size++;                            \
-                                        new_node->_parent = parent;            \
-                                        N##_check_color(m, new_node);          \
                                         break;                                 \
                                 }                                              \
                                 parent = parent->_left;                        \
                         }                                                      \
-                        else if(compare < 0)                                   \
+                        else                                                   \
                         {                                                      \
                                 if(parent->_right == MAP_LEAF)                 \
                                 {                                              \
-                                        N##_element_init(v);                   \
-                                        new_node = N##_node_new(k, v);         \
-                                        v = &new_node->_value;                 \
+                                        new_node = N##_node_new(v);            \
                                         parent->_right = new_node;             \
                                         m->_size++;                            \
-                                        new_node->_parent = parent;            \
-                                        N##_check_color(m, new_node);          \
                                         break;                                 \
                                 }                                              \
                                 parent = parent->_right;                       \
                         }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                v = &parent->_value;                           \
-                                break;                                         \
-                        }                                                      \
                 }                                                              \
-                return v;                                                      \
+                new_node->_parent = parent;                                    \
+                N##_check_color(m, new_node);                                  \
         }                                                                      \
                                                                                \
-        V *N##_at(struct N *m, K k)                                            \
+        void N##_insert_multiple(struct N *m, V v)                             \
         {                                                                      \
-                V *ret = NULL;                                                 \
                 if(m->_root == MAP_LEAF)                                       \
                 {                                                              \
-                        V v;                                                   \
-                        N##_element_init(&v);                                  \
-                        struct N##_node *new_node = N##_node_new(&k, &v);      \
+                        struct N##_node *new_node = N##_node_new(&v);          \
                         new_node->_color = MAP_BLACK;                          \
                         new_node->_parent = MAP_LEAF;                          \
                         m->_root = new_node;                                   \
                         m->_size = 1;                                          \
-                        ret = &m->_root->_value;                               \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        ret = N##_insert_or_get_node(m, &k);                   \
-                        m->_root->_color = MAP_BLACK;                          \
+                        N##_insert_multiple_node(m, &v);                       \
                 }                                                              \
-                return ret;                                                    \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_find(struct N *m, K k)                         \
+        struct N##_iterator N##_find(struct N *m, V v)                         \
         {                                                                      \
                 struct N##_iterator ret = {MAP_LEAF, MAP_LEAF, 0};             \
                 struct N##_node *prev;                                         \
@@ -868,7 +781,7 @@ static size_t gc_log_two(size_t size)
                         {                                                      \
                                 prev = curr;                                   \
                                 int compare =                                  \
-                                    (N##_element_compare(&curr->_key, &k));    \
+                                    (N##_element_compare(&curr->_value, &v));  \
                                                                                \
                                 if(compare > 0)                                \
                                 {                                              \
@@ -891,9 +804,9 @@ static size_t gc_log_two(size_t size)
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        static struct N##_node *N##_find_node(struct N *m, K k)                \
+        static struct N##_node *N##_find_node(struct N *m, V v)                \
         {                                                                      \
-                struct N##_iterator i = N##_find(m, k);                        \
+                struct N##_iterator i = N##_find(m, v);                        \
                 return i._curr;                                                \
         }                                                                      \
                                                                                \
@@ -970,7 +883,15 @@ static size_t gc_log_two(size_t size)
                                          s->_left->_color == MAP_BLACK))       \
                                 {                                              \
                                         s->_color = MAP_RED;                   \
-                                        N##_erase_rebalanse(m, p, p->_parent); \
+                                        if(p->_color == MAP_RED)               \
+                                        {                                      \
+                                                p->_color = MAP_BLACK;         \
+                                        }                                      \
+                                        else                                   \
+                                        {                                      \
+                                                N##_erase_rebalanse(           \
+                                                    m, p, p->_parent);         \
+                                        }                                      \
                                 }                                              \
                                 else if(s->_left &&                            \
                                         s->_left->_color == MAP_RED)           \
@@ -980,14 +901,7 @@ static size_t gc_log_two(size_t size)
                                         {                                      \
                                                 r->_color = MAP_BLACK;         \
                                         }                                      \
-                                        if(p->_color == MAP_RED)               \
-                                        {                                      \
-                                                p->_color = MAP_BLACK;         \
-                                        }                                      \
-                                        else                                   \
-                                        {                                      \
-                                                N##_rotate_right(m, s, p);     \
-                                        }                                      \
+                                        N##_rotate_right(m, s, p);             \
                                 }                                              \
                                 else if(s->_right &&                           \
                                         s->_right->_color == MAP_RED)          \
@@ -1082,19 +996,15 @@ static size_t gc_log_two(size_t size)
                 return succ;                                                   \
         }                                                                      \
                                                                                \
-        int N##_erase(struct N *m, const K key)                                \
+        int N##_erase(struct N *m, const V value)                              \
         {                                                                      \
-                struct N##_node *n = N##_find_node(m, key);                    \
+                struct N##_node *n = N##_find_node(m, value);                  \
                 int ret = (n) ? 1 : 0;                                         \
                 if(ret)                                                        \
                 {                                                              \
                         if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&n->_value);                  \
-                        }                                                      \
-                        if(N##_element_copy_key != N##_flat_copy_key)          \
-                        {                                                      \
-                                N##_element_free_key(&n->_key);                \
                         }                                                      \
                         free(N##_erase_node(m, n));                            \
                 }                                                              \
@@ -1112,10 +1022,6 @@ static size_t gc_log_two(size_t size)
                         {                                                      \
                                 N##_element_free(&i->_curr->_value);           \
                         }                                                      \
-                        if(N##_element_copy_key != N##_flat_copy_key)          \
-                        {                                                      \
-                                N##_element_free_key(&i->_curr->_key);         \
-                        }                                                      \
                         free(N##_erase_node(m, i->_curr));                     \
                 }                                                              \
                 i->_curr = tmp._curr;                                          \
@@ -1128,4 +1034,3 @@ static size_t gc_log_two(size_t size)
         {                                                                      \
                 return m->_size == 0;                                          \
         }
-

@@ -12,11 +12,10 @@ enum node_state
 
 #endif
 
-#define INIT_STATIC_UNORDERED_MAP(K, V, S, N)                                  \
+#define INIT_STATIC_UNORDERED_SET(V, S, N)                                     \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
-                K _key;                                                        \
                 V _value;                                                      \
                 char _state;                                                   \
         };                                                                     \
@@ -43,14 +42,14 @@ enum node_state
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
                                                                                \
-        void (*N##_element_init)(V *) = V##_init;                              \
+        static void (*N##_element_init)(V *) = V##_init;                       \
                                                                                \
         void N##_set_init(void (*init)(V *))                                   \
         {                                                                      \
                 N##_element_init = init;                                       \
         }                                                                      \
                                                                                \
-        void (*N##_element_copy)(V *, const V *const) = V##_copy;              \
+        static void (*N##_element_copy)(V *, const V *const) = V##_copy;       \
                                                                                \
         void N##_set_copy(void (*copy)(V *, const V *const))                   \
         {                                                                      \
@@ -74,60 +73,22 @@ enum node_state
                 }                                                              \
         }                                                                      \
                                                                                \
-        void (*N##_element_copy_key)(K *, const K *const) = K##_copy;          \
-                                                                               \
-        void N##_set_copy_key(void (*copy)(K *, const K *const))               \
-        {                                                                      \
-                N##_element_copy_key = copy;                                   \
-        }                                                                      \
-                                                                               \
-        static void N##_flat_copy_key(K *dst, const K *const src)              \
-        {                                                                      \
-                *dst = *src;                                                   \
-        }                                                                      \
-                                                                               \
-        void N##_set_share_key(int is_shared)                                  \
-        {                                                                      \
-                if(is_shared)                                                  \
-                {                                                              \
-                        N##_set_copy_key(N##_flat_copy_key);                   \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        N##_set_copy_key(K##_copy);                            \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        int (*N##_element_equal)(const V *const, const V *const) = V##_equal;  \
+        static int (*N##_element_equal)(const V *const, const V *const) =      \
+            V##_equal;                                                         \
                                                                                \
         void N##_set_equal(int (*equal)(const V *const, const V *const))       \
         {                                                                      \
                 N##_element_equal = equal;                                     \
         }                                                                      \
                                                                                \
-        int (*N##_element_equal_key)(const K *const, const K *const) =         \
-            K##_equal;                                                         \
+        static size_t (*N##_element_hash)(const V *const) = V##_hash;          \
                                                                                \
-        void N##_set_equal_key(int (*equal)(const K *const, const K *const))   \
-        {                                                                      \
-                N##_element_equal_key = equal;                                 \
-        }                                                                      \
-                                                                               \
-        size_t (*N##_element_hash)(const K *const) = K##_hash;                 \
-                                                                               \
-        void N##_set_hash(size_t (*hash)(const K *const))                      \
+        void N##_set_hash(size_t (*hash)(const V *const))                      \
         {                                                                      \
                 N##_element_hash = hash;                                       \
         }                                                                      \
                                                                                \
-        void (*N##_element_free_key)(K *) = K##_free;                          \
-                                                                               \
-        void N##_set_free_key(void (*free)(K *))                               \
-        {                                                                      \
-                N##_element_free_key = free;                                   \
-        }                                                                      \
-                                                                               \
-        void (*N##_element_free)(V *) = V##_free;                              \
+        static void (*N##_element_free)(V *) = V##_free;                       \
                                                                                \
         void N##_set_free(void (*free)(V *))                                   \
         {                                                                      \
@@ -144,16 +105,6 @@ enum node_state
                 struct N##_node *_data;                                        \
                 int _is_valid;                                                 \
         };                                                                     \
-                                                                               \
-        const K *N##_iterator_ckey(struct N##_iterator i)                      \
-        {                                                                      \
-                return &i._data[i._curr]._key;                                 \
-        }                                                                      \
-                                                                               \
-        K *N##_iterator_key(struct N##_iterator i)                             \
-        {                                                                      \
-                return &i._data[i._curr]._key;                                 \
-        }                                                                      \
                                                                                \
         const V *N##_iterator_cvalue(struct N##_iterator i)                    \
         {                                                                      \
@@ -287,7 +238,7 @@ enum node_state
         }                                                                      \
                                                                                \
         /* =============== */                                                  \
-        /*  MAP FUNCTIONS  */                                                  \
+        /*  SET FUNCTIONS  */                                                  \
         /* =============== */                                                  \
                                                                                \
         size_t N##_size(const struct N *const u)                               \
@@ -313,10 +264,7 @@ enum node_state
                         struct N##_iterator it_second = N##_cbegin(second);    \
                         while(N##_iterator_valid(it_first))                    \
                         {                                                      \
-                                if(!N##_element_equal_key(                     \
-                                       N##_iterator_ckey(it_first),            \
-                                       N##_iterator_ckey(it_second)) ||        \
-                                   !N##_element_equal(                         \
+                                if(!N##_element_equal(                         \
                                        N##_iterator_cvalue(it_first),          \
                                        N##_iterator_cvalue(it_second)))        \
                                 {                                              \
@@ -338,8 +286,6 @@ enum node_state
                 {                                                              \
                         if(src->_data[i]._state == STATE_USED)                 \
                         {                                                      \
-                                N##_element_copy_key(&dst->_data[i]._key,      \
-                                                     &src->_data[i]._key);     \
                                 N##_element_copy(&dst->_data[i]._value,        \
                                                  &src->_data[i]._value);       \
                         }                                                      \
@@ -349,18 +295,12 @@ enum node_state
                                                                                \
         void N##_free(struct N *u)                                             \
         {                                                                      \
-                if(u->_size && !(K##_is_static() && V##_is_static()))          \
+                if(u->_size && !V##_is_static())                               \
                 {                                                              \
                         for(size_t i = 0; i < S; ++i)                          \
                         {                                                      \
                                 if(u->_data[i]._state == STATE_USED)           \
                                 {                                              \
-                                        if(N##_element_copy_key !=             \
-                                           N##_flat_copy_key)                  \
-                                        {                                      \
-                                                N##_element_free_key(          \
-                                                    &u->_data[i]._key);        \
-                                        }                                      \
                                         if(N##_element_copy != N##_flat_copy)  \
                                         {                                      \
                                                 N##_element_free(              \
@@ -372,7 +312,7 @@ enum node_state
         }                                                                      \
                                                                                \
         static struct N##_iterator N##_find_by_hash(                           \
-            struct N *u, const K *const k, size_t hash)                        \
+            struct N *u, const V *const v, size_t hash)                        \
         {                                                                      \
                 struct N##_iterator ret = {0, NULL, 0};                        \
                 if(u->_size)                                                   \
@@ -381,8 +321,8 @@ enum node_state
                         while(u->_data[position]._state != STATE_OPEN)         \
                         {                                                      \
                                 if(u->_data[position]._state == STATE_USED &&  \
-                                   N##_element_equal_key(                      \
-                                       &u->_data[position]._key, k))           \
+                                   N##_element_equal(                          \
+                                       &u->_data[position]._value, v))         \
                                 {                                              \
                                         ret = (struct N##_iterator){           \
                                             position,                          \
@@ -401,25 +341,17 @@ enum node_state
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_find(struct N *u, const K k)                   \
+        struct N##_iterator N##_find(struct N *u, const V v)                   \
         {                                                                      \
-                size_t hash = N##_element_hash(&k);                            \
-                return N##_find_by_hash(u, &k, hash);                          \
+                size_t hash = N##_element_hash(&v);                            \
+                return N##_find_by_hash(u, &v, hash);                          \
         }                                                                      \
                                                                                \
-        void N##_set_at(struct N *u, const K k, const V v)                     \
+        void N##_insert(struct N *u, const V v)                                \
         {                                                                      \
-                size_t hash = N##_element_hash(&k);                            \
-                struct N##_iterator i = N##_find_by_hash(u, &k, hash);         \
-                if(i._is_valid)                                                \
-                {                                                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
-                        {                                                      \
-                                N##_element_free(&i._data[i._curr]._value);    \
-                        }                                                      \
-                        N##_element_copy(&i._data[i._curr]._value, &v);        \
-                }                                                              \
-                else if(u->_size < S - 1)                                      \
+                size_t hash = N##_element_hash(&v);                            \
+                struct N##_iterator i = N##_find_by_hash(u, &v, hash);         \
+                if(!i._is_valid && u->_size < S - 1)                           \
                 {                                                              \
                         size_t position = hash % S;                            \
                         while(u->_data[position]._state == STATE_USED)         \
@@ -434,26 +366,16 @@ enum node_state
                                 }                                              \
                         }                                                      \
                         N##_element_copy(&u->_data[position]._value, &v);      \
-                        N##_element_copy_key(&u->_data[position]._key, &k);    \
                         u->_data[position]._state = STATE_USED;                \
                         ++u->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
-        V *N##_at(struct N *u, const K k)                                      \
+        void N##_insert_multiple(struct N *u, const V v)                       \
         {                                                                      \
-                size_t hash = N##_element_hash(&k);                            \
-                struct N##_iterator i = N##_find_by_hash(u, &k, hash);         \
-                V *ret = NULL;                                                 \
-                if(i._is_valid)                                                \
+                if(u->_size < S - 1)                                           \
                 {                                                              \
-                        ret = &i._data[i._curr]._value;                        \
-                }                                                              \
-                else if(u->_size < S - 1)                                      \
-                {                                                              \
-                        V v;                                                   \
-                        N##_element_init(&v);                                  \
-                        size_t position = hash % S;                            \
+                        size_t position = N##_element_hash(&v) % S;            \
                         while(u->_data[position]._state == STATE_USED)         \
                         {                                                      \
                                 if(position == S - 1)                          \
@@ -466,37 +388,29 @@ enum node_state
                                 }                                              \
                         }                                                      \
                         N##_element_copy(&u->_data[position]._value, &v);      \
-                        N##_element_copy_key(&u->_data[position]._key, &k);    \
                         u->_data[position]._state = STATE_USED;                \
                         ++u->_size;                                            \
-                        ret = &u->_data[position]._value;                      \
                 }                                                              \
-                return ret;                                                    \
         }                                                                      \
                                                                                \
         void N##_iterator_erase(struct N *u, struct N##_iterator *i)           \
         {                                                                      \
+                (void *)(u);                                                   \
                 if(N##_iterator_valid(*i))                                     \
                 {                                                              \
-                        K *key = N##_iterator_key(*i);                         \
                         V *value = N##_iterator_value(*i);                     \
                         i->_data[i->_curr]._state = STATE_ERASED;              \
                         N##_iterator_next(i);                                  \
-                        if(N##_element_copy_key != N##_flat_copy_key)          \
-                        {                                                      \
-                                N##_element_free_key(key);                     \
-                        }                                                      \
                         if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(value);                       \
                         }                                                      \
-			--u->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_erase(struct N *u, const K k)                                 \
+        void N##_erase(struct N *u, const V v)                                 \
         {                                                                      \
-                struct N##_iterator i = N##_find(u, k);                        \
+                struct N##_iterator i = N##_find(u, v);                        \
                 if(i._is_valid)                                                \
                 {                                                              \
                         N##_iterator_erase(u, &i);                             \

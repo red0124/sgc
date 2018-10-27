@@ -1,23 +1,34 @@
 #pragma once
 
-#define INIT_STATIC_VECTOR(T, S, N)                                            \
+#define INIT_VECTOR(T, N)                                                      \
                                                                                \
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
-                T _data[S];                                                    \
+                size_t _max;                                                   \
+                T *_data;                                                      \
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
                                                                                \
-        int N##_is_static()                                                    \
+        static size_t N##_init_size = 1;                                       \
+        static double N##_growth_scale = 2;                                    \
+                                                                               \
+        void N##_set_init_size(size_t init_size)                               \
         {                                                                      \
-                return T##_is_static();                                        \
+                init_size = (init_size == 0) ? 1 : init_size;                  \
+                N##_init_size = init_size;                                     \
         }                                                                      \
                                                                                \
-        size_t N##_max()                                                       \
+        void N##_set_growth_scale(double growth_scale)                         \
         {                                                                      \
-                return S;                                                      \
+                growth_scale = (growth_scale == 0) ? 1 : growth_scale;         \
+                N##_growth_scale = growth_scale;                               \
+        }                                                                      \
+                                                                               \
+        int N##_is_static()                                                    \
+        {                                                                      \
+                return 0;                                                      \
         }                                                                      \
                                                                                \
         /* =================== */                                              \
@@ -63,23 +74,24 @@
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
-        /* ========================= */                                        \
-        /*  STATIC VECTOR FUNCTIONS  */                                        \
-        /* ========================= */                                        \
+        /* ================== */                                               \
+        /*  VECTOR FUNCTIONS  */                                               \
+        /* ================== */                                               \
                                                                                \
         void N##_init(struct N *v)                                             \
         {                                                                      \
-                v->_size = 0;                                                  \
+                v->_size = v->_max = 0;                                        \
+                v->_data = NULL;                                               \
         }                                                                      \
                                                                                \
-        size_t N##_size(const struct N *const v)                               \
+        size_t N##_size(const struct N *v)                                     \
         {                                                                      \
                 return v->_size;                                               \
         }                                                                      \
                                                                                \
         void N##_free(struct N *v)                                             \
         {                                                                      \
-                if(v->_size)                                                   \
+                if(v->_data)                                                   \
                 {                                                              \
                         if(!T##_is_static() &&                                 \
                            N##_element_copy != N##_flat_copy)                  \
@@ -89,6 +101,7 @@
                                         N##_element_free(&v->_data[i]);        \
                                 }                                              \
                         }                                                      \
+                        free(v->_data);                                        \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -118,6 +131,8 @@
                 if(src->_size != 0)                                            \
                 {                                                              \
                         dst->_size = src->_size;                               \
+                        dst->_max = src->_size;                                \
+                        dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
                         if(T##_is_static() ||                                  \
                            N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
@@ -135,12 +150,60 @@
                 }                                                              \
         }                                                                      \
                                                                                \
+        void N##_from_array(struct N *v, const T *const arr,                   \
+                            const size_t size)                                 \
+        {                                                                      \
+                if(size)                                                       \
+                {                                                              \
+                        v->_max = v->_size = size;                             \
+                        v->_data = (T *)malloc(sizeof(T) * size);              \
+                        if(T##_is_static() ||                                  \
+                           N##_element_copy == N##_flat_copy)                  \
+                        {                                                      \
+                                memcpy(v->_data, arr, size * sizeof(T));       \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                for(size_t i = 0; i < v->_size; ++i)           \
+                                {                                              \
+                                        N##_element_copy(&v->_data[i],         \
+                                                         &arr[i]);             \
+                                }                                              \
+                        }                                                      \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        v->_max = v->_size = 0;                                \
+                        v->_data = NULL;                                       \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_shrink(struct N *v)                                           \
+        {                                                                      \
+                if(!T##_is_static() || N##_element_copy != N##_flat_copy)      \
+                {                                                              \
+                        for(size_t i = v->_size; i < v->_max; ++i)             \
+                        {                                                      \
+                                N##_element_free(&v->_data[i]);                \
+                        }                                                      \
+                }                                                              \
+                v->_data = (T *)realloc(v->_data, sizeof(T) * v->_size);       \
+        }                                                                      \
+                                                                               \
+        static void N##_resize(struct N *v)                                    \
+        {                                                                      \
+                if(v->_size == v->_max)                                        \
+                {                                                              \
+                        v->_max = (v->_max == 0) ? N##_init_size               \
+                                                 : v->_max * N##_growth_scale; \
+                        v->_data =                                             \
+                            (T *)realloc(v->_data, sizeof(T) * v->_max);       \
+                }                                                              \
+        }                                                                      \
+                                                                               \
         void N##_push_back(struct N *v, T el)                                  \
         {                                                                      \
-                if(v->_size == S)                                              \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
+                N##_resize(v);                                                 \
                 N##_element_copy(&v->_data[v->_size], &el);                    \
                 ++v->_size;                                                    \
         }                                                                      \
@@ -160,12 +223,9 @@
                                                                                \
         void N##_insert(struct N *v, const size_t at, T el)                    \
         {                                                                      \
-                if(v->_size == S)                                              \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
                 if(at < v->_size)                                              \
                 {                                                              \
+                        N##_resize(v);                                         \
                         memmove(v->_data + at + 1, v->_data + at,              \
                                 (v->_size - at) * sizeof(T));                  \
                         N##_element_copy(&v->_data[at], &el);                  \
@@ -258,10 +318,14 @@
                 T *ret = NULL;                                                 \
                 if(d->_size)                                                   \
                 {                                                              \
-                        ret = (T *)d->_data;                                   \
+                        ret = d->_data;                                        \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
+                                                                               \
+        /* ================= */                                                \
+        /*  VECTOR ITERATOR  */                                                \
+        /* ================= */                                                \
                                                                                \
         struct N##_iterator                                                    \
         {                                                                      \
@@ -292,17 +356,17 @@
                                                                                \
         void N##_iterator_begin(struct N *v, struct N##_iterator *i)           \
         {                                                                      \
-                i->_curr = (T *)v->_data;                                      \
-                i->_begin = (T *)v->_data;                                     \
-                i->_end = (T *)v->_data + v->_size - 1;                        \
+                i->_curr = v->_data;                                           \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cbegin(const struct N *const v,                      \
                                  struct N##_iterator *i)                       \
         {                                                                      \
-                i->_curr = (T *)v->_data;                                      \
-                i->_begin = (T *)v->_data;                                     \
-                i->_end = (T *)v->_data + v->_size - 1;                        \
+                i->_curr = v->_data;                                           \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_begin(struct N *v)                             \
@@ -321,17 +385,17 @@
                                                                                \
         void N##_iterator_end(struct N *v, struct N##_iterator *i)             \
         {                                                                      \
-                i->_curr = (T *)v->_data + v->_size - 1;                       \
-                i->_begin = (T *)v->_data;                                     \
-                i->_end = (T *)v->_data + v->_size - 1;                        \
+                i->_curr = v->_data + v->_size - 1;                            \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cend(const struct N *const v,                        \
                                struct N##_iterator *i)                         \
         {                                                                      \
-                i->_curr = (T *)v->_data + v->_size - 1;                       \
-                i->_begin = (T *)v->_data;                                     \
-                i->_end = (T *)v->_data + v->_size - 1;                        \
+                i->_curr = v->_data + v->_size - 1;                            \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_end(struct N *v)                               \
@@ -350,17 +414,17 @@
                                                                                \
         void N##_iterator_from(struct N *v, struct N##_iterator *i, size_t at) \
         {                                                                      \
-                i->_curr = (T *)v->_data + at;                                 \
-                i->_begin = (T *)v->_data;                                     \
-                i->_end = (T *)v->_data + v->_size - 1;                        \
+                i->_curr = v->_data + at;                                      \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         void N##_iterator_cfrom(const struct N *const v,                       \
                                 struct N##_iterator *i, size_t at)             \
         {                                                                      \
-                i->_curr = (T *)v->_data + at;                                 \
-                i->_begin = (T *)v->_data;                                     \
-                i->_end = (T *)v->_data + v->_size - 1;                        \
+                i->_curr = v->_data + at;                                      \
+                i->_begin = v->_data;                                          \
+                i->_end = v->_data + v->_size - 1;                             \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_from(struct N *v, size_t at)                   \
