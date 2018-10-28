@@ -676,14 +676,14 @@ static size_t gc_next_prime(size_t n)
                         new_data[i] = NULL;                                    \
                 }                                                              \
                                                                                \
-                V *value;                                                      \
+		K *key;                                                        \
                 size_t position;                                               \
                 struct N##_iterator tmp = N##_begin(u);                        \
                 struct N##_node *next;                                         \
                 for(size_t i = 0; i < u->_size; ++i)                           \
                 {                                                              \
-                        value = &tmp._curr->_value;                            \
-                        position = N##_element_hash(value) % new_max;          \
+			key = &tmp._curr->_key;                                \
+                        position = N##_element_hash(key) % new_max;            \
                         next = tmp._curr->_next;                               \
                         tmp._curr->_next = NULL;                               \
                         if(new_data[position])                                 \
