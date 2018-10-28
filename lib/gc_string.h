@@ -11,8 +11,9 @@
                                                                                \
         void N##_copy(N *first, const N *const second)                         \
         {                                                                      \
-                *first = (N)malloc(sizeof(char) * (1 + strlen(*second)));      \
-                strcpy(*first, *second);                                       \
+		size_t size = strlen(*second) + 1;                             \
+                *first = (N)malloc(sizeof(char) * size);                       \
+                memcpy(*first, *second, size);                                 \
         }                                                                      \
                                                                                \
         void N##_init(N *s)                                                    \

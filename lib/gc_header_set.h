@@ -1,5 +1,14 @@
 #pragma once
 
+#ifndef GC_MAP_COLOR
+#define GC_MAP_COLOR
+enum map_color
+{
+        MAP_RED,
+        MAP_BLACK,
+};
+#endif
+
 #define INIT_HEADER_SET(V, N)                                                  \
         struct N##_node                                                        \
         {                                                                      \

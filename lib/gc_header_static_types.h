@@ -1,3 +1,5 @@
+#pragma once
+
 #define INIT_HEADER_STATIC(T, N)                                               \
         void N##_init(T *el);                                                  \
                                                                                \

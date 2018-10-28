@@ -3,13 +3,19 @@
 #ifndef GC_MAP
 #define GC_MAP
 #define MAP_LEAF NULL
+#endif
 
+#ifndef GC_MAP_COLOR
+#define GC_MAP_COLOR
 enum map_color
 {
         MAP_RED,
         MAP_BLACK,
 };
+#endif
 
+#ifndef GC_MAP_LOG
+#define GC_MAP_LOG
 static size_t gc_exp_two(size_t curr)
 {
         size_t power = 1;
@@ -29,7 +35,6 @@ static size_t gc_log_two(size_t size)
         }
         return curr + 1;
 }
-
 #endif
 
 #define INIT_MAP(K, V, N)                                                      \

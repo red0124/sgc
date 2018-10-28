@@ -1,3 +1,12 @@
+#pragma once
+
+#ifndef GC_ST
+#define GC_ST
+#warning "header contains function definitions                                 \
+		whitch may cause multiple definition errors,                   \
+		define GC_STATIC_TYPES to kill warning"
+#endif
+
 #define INIT_STATIC(T, N)                                                      \
                                                                                \
         void N##_init(T *el)                                                   \
@@ -48,7 +57,6 @@ INIT_STATIC(float, float);
 INIT_STATIC(double, double);
 INIT_STATIC(long double, long_double);
 
-
 #define INIT_HASH(T, N)                                                        \
                                                                                \
         size_t N##_hash(const T *const el)                                     \
@@ -64,7 +72,6 @@ INIT_HASH(int, int);
 INIT_HASH(unsigned int, unsigned_int);
 INIT_HASH(long, long);
 INIT_HASH(unsigned long, unsigned_long);
-
 
 #define INIT_STATIC_STRUCT(T, N)                                               \
                                                                                \
