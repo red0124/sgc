@@ -557,7 +557,7 @@
         {                                                                      \
                 if(i->_curr + 1 == i->_max)                                    \
                 {                                                              \
-                        i->_is_valid = 0;                                      \
+			i->_curr = 0;                                          \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -569,7 +569,7 @@
         {                                                                      \
                 if(i->_curr == 0)                                              \
                 {                                                              \
-                        i->_is_valid = 0;                                      \
+                        i->_curr = i->_max - 1;                                \
                 }                                                              \
                 else                                                           \
                 {                                                              \
