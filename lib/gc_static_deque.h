@@ -110,7 +110,7 @@
                         if(!T##_is_static() &&                                 \
                            N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
-                                for(size_t i = d->_back; i != d->_front;)      \
+                                for(size_t i = d->_front; i != d->_back;)      \
                                 {                                              \
                                         N##_element_free(&d->_data[i]);        \
                                         N##_move(&i);                          \
