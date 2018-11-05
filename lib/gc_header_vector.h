@@ -14,8 +14,6 @@
                                                                                \
         void N##_set_growth_scale(double growth_scale);                        \
                                                                                \
-        int N##_is_static();                                                   \
-                                                                               \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
@@ -65,7 +63,7 @@
                                                                                \
         void N##_set_front(struct N *v, T new_el);                             \
                                                                                \
-        void N##_erase(struct N *v, const size_t at);                          \
+        void N##_erase_at(struct N *v, const size_t at);                       \
                                                                                \
         int N##_empty(const struct N *const d);                                \
                                                                                \

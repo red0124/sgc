@@ -26,11 +26,6 @@
                 N##_growth_scale = growth_scale;                               \
         }                                                                      \
                                                                                \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
-        }                                                                      \
-                                                                               \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
@@ -93,8 +88,7 @@
         {                                                                      \
                 if(v->_data)                                                   \
                 {                                                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 for(size_t i = 0; i < v->_size; ++i)           \
                                 {                                              \
@@ -133,8 +127,7 @@
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
                         dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
-                        if(T##_is_static() ||                                  \
-                           N##_element_copy == N##_flat_copy)                  \
+                        if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \
                                        src->_size * sizeof(T));                \
@@ -157,8 +150,7 @@
                 {                                                              \
                         v->_max = v->_size = size;                             \
                         v->_data = (T *)malloc(sizeof(T) * size);              \
-                        if(T##_is_static() ||                                  \
-                           N##_element_copy == N##_flat_copy)                  \
+                        if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 memcpy(v->_data, arr, size * sizeof(T));       \
                         }                                                      \
@@ -180,7 +172,7 @@
                                                                                \
         void N##_shrink(struct N *v)                                           \
         {                                                                      \
-                if(!T##_is_static() || N##_element_copy != N##_flat_copy)      \
+                if(N##_element_copy != N##_flat_copy)                          \
                 {                                                              \
                         for(size_t i = v->_size; i < v->_max; ++i)             \
                         {                                                      \
@@ -213,8 +205,7 @@
                 if(v->_size)                                                   \
                 {                                                              \
                         T *el = &v->_data[--v->_size];                         \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                         }                                                      \
@@ -257,8 +248,7 @@
                 if(at < v->_size)                                              \
                 {                                                              \
                         T *el = &v->_data[at];                                 \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -290,20 +280,16 @@
                 N##_set_at(v, 0, new_el);                                      \
         }                                                                      \
                                                                                \
-        void N##_erase(struct N *v, const size_t at)                           \
+        void N##_erase_at(struct N *v, const size_t at)                        \
         {                                                                      \
                 if(at < v->_size)                                              \
                 {                                                              \
-                        if(T##_is_static() ||                                  \
-                           N##_element_copy == N##_flat_copy)                  \
-                        {                                                      \
-                                memmove(v->_data + at, v->_data + at + 1,      \
-                                        (v->_size - at) * sizeof(T));          \
-                        }                                                      \
-                        else                                                   \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&v->_data[at]);               \
                         }                                                      \
+                        memmove(v->_data + at, v->_data + at + 1,              \
+                                (v->_size - at) * sizeof(T));                  \
                         --v->_size;                                            \
                 }                                                              \
         }                                                                      \

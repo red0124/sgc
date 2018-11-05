@@ -38,11 +38,6 @@
                                                                                \
         typedef struct N N;                                                    \
                                                                                \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
-        }                                                                      \
-                                                                               \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
@@ -109,8 +104,7 @@
                 {                                                              \
                         tmp = curr;                                            \
                         curr = curr->_next;                                    \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&tmp->_data);                 \
                         }                                                      \
@@ -247,13 +241,16 @@
                 {                                                              \
                         struct N##_node *tmp = l->_tail;                       \
                         l->_tail = N##_prev(l->_head, l->_tail);               \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&tmp->_data);                 \
                         }                                                      \
                         free(tmp);                                             \
-                        l->_tail->_next = NULL;                                \
+                        if(l->_tail)                                           \
+                        {                                                      \
+                                l->_tail->_next = NULL;                        \
+                        }                                                      \
+                        --l->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -311,12 +308,12 @@
                 {                                                              \
                         struct N##_node *tmp = l->_head;                       \
                         l->_head = l->_head->_next;                            \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&tmp->_data);                 \
                         }                                                      \
                         free(tmp);                                             \
+                        --l->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -340,8 +337,7 @@
                 T *el = N##_at(l, at);                                         \
                 if(el)                                                         \
                 {                                                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \

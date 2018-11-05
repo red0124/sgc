@@ -39,11 +39,6 @@
                                                                                \
         typedef struct N N;                                                    \
                                                                                \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
-        }                                                                      \
-                                                                               \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
@@ -110,8 +105,7 @@
                 {                                                              \
                         tmp = curr;                                            \
                         curr = curr->_next;                                    \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&tmp->_data);                 \
                         }                                                      \
@@ -225,8 +219,7 @@
                 if(l->_size)                                                   \
                 {                                                              \
                         T *el = &l->_tail->_data;                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -244,13 +237,16 @@
                 {                                                              \
                         struct N##_node *tmp = l->_tail;                       \
                         l->_tail = l->_tail->_prev;                            \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&tmp->_data);                 \
                         }                                                      \
                         free(tmp);                                             \
-                        l->_tail->_next = NULL;                                \
+                        if(l->_tail)                                           \
+                        {                                                      \
+                                l->_tail->_next = NULL;                        \
+                        }                                                      \
+                        --l->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -296,8 +292,7 @@
                 if(l->_size)                                                   \
                 {                                                              \
                         T *el = &l->_head->_data;                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -316,13 +311,16 @@
                 {                                                              \
                         struct N##_node *tmp = l->_head;                       \
                         l->_head = l->_head->_next;                            \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&tmp->_data);                 \
                         }                                                      \
                         free(tmp);                                             \
-                        l->_head->_prev = NULL;                                \
+                        if(l->_head)                                           \
+                        {                                                      \
+                                l->_head->_prev = NULL;                        \
+                        }                                                      \
+                        --l->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -346,8 +344,7 @@
                 T *el = N##_at(l, at);                                         \
                 if(el)                                                         \
                 {                                                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -385,7 +382,7 @@
                 {                                                              \
                         n->_prev->_next = n->_next;                            \
                 }                                                              \
-                if(!T##_is_static() && N##_element_copy != N##_flat_copy)      \
+                if(N##_element_copy != N##_flat_copy)                          \
                 {                                                              \
                         N##_element_free(&n->_data);                           \
                 }                                                              \
@@ -399,16 +396,31 @@
                 int erase = (n != NULL);                                       \
                 if(erase)                                                      \
                 {                                                              \
-                        N##_node_erase(n);                                     \
-                        l->_size--;                                            \
+                        if(l->_head == n)                                      \
+                        {                                                      \
+                                N##_pop_front(l);                              \
+                        }                                                      \
+                        else if(l->_tail == n)                                 \
+                        {                                                      \
+                                N##_pop_back(l);                               \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                N##_node_erase(n);                             \
+                                l->_size--;                                    \
+                        }                                                      \
                 }                                                              \
                 return erase;                                                  \
         }                                                                      \
                                                                                \
         int N##_erase_at(struct N *l, size_t at)                               \
         {                                                                      \
-                int erase = (at - 1 < l->_size && at != 0);                    \
-                if(erase)                                                      \
+                int erase = (at - 1 < l->_size || at == 0);                    \
+                if(at == 0)                                                    \
+                {                                                              \
+                        N##_pop_front(l);                                      \
+                }                                                              \
+                else if(erase)                                                 \
                 {                                                              \
                         struct N##_node *curr = l->_head;                      \
                         for(size_t i = 0; i < at - 1; ++i)                     \
@@ -479,15 +491,15 @@
                         N##_push_front(l, el);                                 \
                 }                                                              \
                 else if(l->_tail && l->_head != l->_tail &&                    \
-                        !compare(&l->_tail->_data, &l->_head->_data))          \
+                        compare(&l->_tail->_data, &l->_head->_data) <= 0)      \
                 {                                                              \
                         sorted = 0;                                            \
                 }                                                              \
-                else if((compare)(&l->_head->_data, &el))                      \
+                else if((compare)(&l->_head->_data, &el) > 0)                  \
                 {                                                              \
                         N##_push_front(l, el);                                 \
                 }                                                              \
-                else if(!(compare)(&l->_tail->_data, &el))                     \
+                else if((compare)(&l->_tail->_data, &el) <= 0)                 \
                 {                                                              \
                         N##_push_back(l, el);                                  \
                 }                                                              \
@@ -497,7 +509,7 @@
                             sizeof(struct N##_node));                          \
                         N##_element_copy(&new_node->_data, &el);               \
                         struct N##_node *curr = l->_head;                      \
-                        while(!compare(&curr->_data, &el))                     \
+                        while(compare(&curr->_data, &el) <= 0)                 \
                         {                                                      \
                                 curr = curr->_next;                            \
                         }                                                      \
@@ -529,7 +541,7 @@
                               int (*comp)(const void *, const void *))         \
         {                                                                      \
                 char *i, *j;                                                   \
-                size_t thresh = GC_STACK_THRESH * sizeof(struct N##_node *);            \
+                size_t thresh = GC_STACK_THRESH * sizeof(struct N##_node *);   \
                 char *array_ = (char *)array;                                  \
                 char *limit = array_ + array_size * sizeof(struct N##_node *); \
                 GC_PREPARE_STACK;                                              \
@@ -758,4 +770,3 @@
         {                                                                      \
                 return i._curr != NULL;                                        \
         }
-

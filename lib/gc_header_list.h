@@ -17,8 +17,6 @@
                                                                                \
         typedef struct N N;                                                    \
                                                                                \
-        int N##_is_static();                                                   \
-                                                                               \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
