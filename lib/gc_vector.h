@@ -10,6 +10,9 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+        typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
                                                                                \
         static size_t N##_init_size = 1;                                       \
         static double N##_growth_scale = 2;                                    \
@@ -67,6 +70,15 @@
         void N##_set_free(void (*free)(T *))                                   \
         {                                                                      \
                 N##_element_free = free;                                       \
+        }                                                                      \
+                                                                               \
+        void N##_push_back(struct N *, T);                                     \
+                                                                               \
+        static void (*N##_default_insert)(struct N *, T) = N##_push_back;      \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T))                    \
+        {                                                                      \
+                N##_default_insert = insert;                                   \
         }                                                                      \
                                                                                \
         /* ================== */                                               \

@@ -9,6 +9,9 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+	typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
                                                                                \
         void N##_set_init_size(size_t init_size);                              \
                                                                                \
@@ -21,6 +24,12 @@
         void N##_set_copy(void (*copy)(T *, const T *const));                  \
                                                                                \
         void N##_set_share(int is_shared);                                     \
+                                                                               \
+        void N##_set_equal(int (*equal)(const T *const, const T *const));      \
+                                                                               \
+        void N##_set_free(int (*free)(T *));                                   \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T));                   \
                                                                                \
         /* ================== */                                               \
         /*  VECTOR FUNCTIONS  */                                               \
