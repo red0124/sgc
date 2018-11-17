@@ -12,6 +12,9 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+        typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
                                                                                \
         static size_t N##_init_size = 1;                                       \
         static double N##_growth_scale = 2;                                    \
@@ -26,11 +29,6 @@
         {                                                                      \
                 growth_scale = (growth_scale == 0) ? 1 : growth_scale;         \
                 N##_growth_scale = growth_scale;                               \
-        }                                                                      \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
         }                                                                      \
                                                                                \
         /* =================== */                                              \
@@ -76,6 +74,15 @@
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
+        void N##_push_back(struct N *, T);                                     \
+                                                                               \
+        static void (*N##_default_insert)(struct N *, T) = N##_push_back;      \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T))                    \
+        {                                                                      \
+                N##_default_insert = insert;                                   \
+        }                                                                      \
+                                                                               \
         /* ================= */                                                \
         /*  DEQUE FUNCTIONS  */                                                \
         /* ================= */                                                \
@@ -119,14 +126,15 @@
         {                                                                      \
                 if(d->_data)                                                   \
                 {                                                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
-                                for(size_t i = d->_front; i != d->_back;)      \
+                                size_t i;                                      \
+                                for(i = d->_front; i != d->_back;)             \
                                 {                                              \
                                         N##_element_free(&d->_data[i]);        \
                                         N##_move(&i, d->_max);                 \
                                 }                                              \
+                                N##_element_free(&d->_data[i]);                \
                         }                                                      \
                         free(d->_data);                                        \
                 }                                                              \
@@ -162,8 +170,7 @@
                 if(src->_size != 0)                                            \
                 {                                                              \
                         dst->_data = (T *)malloc(src->_size * sizeof(T));      \
-                        if(T##_is_static() ||                                  \
-                           N##_element_copy == N##_flat_copy)                  \
+                        if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 if(src->_front < src->_back)                   \
                                 {                                              \
@@ -186,9 +193,9 @@
                         }                                                      \
                         else                                                   \
                         {                                                      \
+                                size_t i = src->_front;                        \
                                 for(size_t j = 0; j < src->_size; ++j)         \
                                 {                                              \
-                                        size_t i = src->_front;                \
                                         N##_element_copy(&dst->_data[j],       \
                                                          &src->_data[i]);      \
                                         N##_move(&i, src->_max);               \
@@ -265,8 +272,7 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_front];                          \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -293,8 +299,7 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_back];                           \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -311,8 +316,7 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_front];                          \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                         }                                                      \
@@ -326,8 +330,7 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_back];                           \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                         }                                                      \
@@ -415,7 +418,7 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_erase(struct N *d, const size_t at)                           \
+        void N##_erase_at(struct N *d, const size_t at)                        \
         {                                                                      \
                 if(at < d->_size && d->_size > 0)                              \
                 {                                                              \
@@ -427,10 +430,10 @@
                         size_t shift_back = 0;                                 \
                         size_t shift_end = 0;                                  \
                         size_t shift_begin = 0;                                \
-			if(d->_size == 1)                                      \
-			{                                                      \
-				d->_front = d->_back = 0;                      \
-			}                                                      \
+                        if(d->_size == 1)                                      \
+                        {                                                      \
+                                d->_front = d->_back = 0;                      \
+                        }                                                      \
                         else if(2 * at > d->_size)                             \
                         {                                                      \
                                 if(_at <= d->_back)                            \
@@ -491,8 +494,7 @@
                 if(at < d->_size)                                              \
                 {                                                              \
                         T *el = &d->_data[(d->_front + at) % d->_max];         \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -557,7 +559,7 @@
         {                                                                      \
                 if(i->_curr + 1 == i->_max)                                    \
                 {                                                              \
-			i->_curr = 0;                                          \
+                        i->_curr = 0;                                          \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -691,5 +693,4 @@
         int N##_iterator_valid(const struct N##_iterator it)                   \
         {                                                                      \
                 return it._is_valid;                                           \
-        }\
-
+        }
