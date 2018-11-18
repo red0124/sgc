@@ -22,14 +22,15 @@ enum map_color
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+	typedef V N##_type;                                                    \
+        typedef V N##_value;                                                   \
+        typedef K N##_key;                                                     \
                                                                                \
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
                 struct N##_node *_root;                                        \
         };                                                                     \
-                                                                               \
-        int N##_is_static();                                                   \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
@@ -54,6 +55,10 @@ enum map_color
         void N##_set_free_key(void (*free)(K *));                              \
                                                                                \
         void N##_set_free(void (*free)(V *));                                  \
+	                                                                       \
+	void N##_set_default_insert(void (*insert)(N *, K))                    \
+	                                                                       \
+	void N##_set_default_insert_pair(void (*insert)(N *, K, V))            \
                                                                                \
         /* ================ */                                                 \
         /*  NODE FUNCTIONS  */                                                 \
@@ -121,9 +126,13 @@ enum map_color
         void N##_copy(struct N *__restrict__ dst,                              \
                       const struct N *__restrict__ const src);                 \
                                                                                \
+        void N##_defaul_insert_pair(struct N *m, K k, V v);                    \
+                                                                               \
         void N##_set_at(struct N *m, K k, V v);                                \
                                                                                \
         V *N##_insert_or_get_node(struct N *m, K *k);                          \
+                                                                               \
+        void N##_default_insert(struct N *m, K k);                             \
                                                                                \
         V *N##_at(struct N *m, K k);                                           \
                                                                                \

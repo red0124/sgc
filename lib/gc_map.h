@@ -50,17 +50,15 @@ static size_t gc_log_two(size_t size)
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+        typedef V N##_type;                                                    \
+        typedef V N##_value;                                                   \
+        typedef K N##_key;                                                     \
                                                                                \
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
                 struct N##_node *_root;                                        \
         };                                                                     \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
-        }                                                                      \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
@@ -157,6 +155,41 @@ static size_t gc_log_two(size_t size)
         void N##_set_free(void (*free)(V *))                                   \
         {                                                                      \
                 N##_element_free = free;                                       \
+        }                                                                      \
+                                                                               \
+        V *N##_at(struct N *, K);                                              \
+                                                                               \
+        static void N##_at_wrap(struct N *m, K k)                              \
+        {                                                                      \
+                N##_at(m, k);                                                  \
+        }                                                                      \
+                                                                               \
+        static void (*N##_default_insert_function)(struct N *, K) =            \
+            N##_at_wrap;                                                       \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, K))                    \
+        {                                                                      \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, K k)                              \
+        {                                                                      \
+                N##_default_insert_function(d, k);                             \
+        }                                                                      \
+                                                                               \
+        void N##_set_at(struct N *, K, V);                                     \
+                                                                               \
+        static void (*N##_default_insert_pair_function)(struct N *, K, V) =    \
+            N##_set_at;                                                        \
+                                                                               \
+        void N##_set_default_insert_pair(void (*insert)(N *, K, V))            \
+        {                                                                      \
+                N##_default_insert_pair_function = insert;                     \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert_pair(struct N *d, K k, V v)                    \
+        {                                                                      \
+                N##_default_insert_pair_function(d, k, v);                     \
         }                                                                      \
                                                                                \
         /* ================ */                                                 \
@@ -757,7 +790,7 @@ static size_t gc_log_two(size_t size)
                                 }                                              \
                                 parent = parent->_right;                       \
                         }                                                      \
-                        else                                                   \
+                        else if(!N##_element_equal(&parent->_value, v))        \
                         {                                                      \
                                 if(N##_element_copy != N##_flat_copy)          \
                                 {                                              \
@@ -768,6 +801,10 @@ static size_t gc_log_two(size_t size)
                                 {                                              \
                                         parent->_value = *v;                   \
                                 }                                              \
+                                return;                                        \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
                                 return;                                        \
                         }                                                      \
                 }                                                              \
