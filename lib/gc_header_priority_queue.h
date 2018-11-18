@@ -29,6 +29,8 @@
                                                                                \
         void N##_set_free(int (*free)(T *));                                   \
                                                                                \
+	void N##_set_compare(int (*compare)(const T *const, const T *const));  \
+                                                                               \
         void N##_set_default_insert(void (*insert)(N *, T));                   \
                                                                                \
         /* ==========================*/                                        \
