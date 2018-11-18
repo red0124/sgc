@@ -49,6 +49,8 @@
         void N##_copy(struct N *restrict dst,                                  \
                       const struct N *__restrict__ const src);                 \
                                                                                \
+        void N##_default_insert(struct N *d, T el);                            \
+                                                                               \
         void N##_push_back(struct N *d, T el);                                 \
                                                                                \
         void N##_push_front(struct N *d, T el);                                \

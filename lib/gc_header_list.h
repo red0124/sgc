@@ -16,14 +16,14 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-	typedef T N##_type;                                                    \
+        typedef T N##_type;                                                    \
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
-									       \
+                                                                               \
         void N##_set_copy(void (*copy)(T *, const T *const));                  \
                                                                                \
         void N##_set_share(int is_shared);                                     \
@@ -49,6 +49,8 @@
                                                                                \
         void N##_copy(struct N *__restrict__ dst,                              \
                       const struct N *__restrict__ const src);                 \
+                                                                               \
+        void N##_default_insert(struct N *l, T el);                            \
                                                                                \
         void N##_push_back(struct N *l, T el);                                 \
                                                                                \

@@ -37,6 +37,9 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+        typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
@@ -79,6 +82,15 @@
         void N##_set_free(void (*free)(T *))                                   \
         {                                                                      \
                 N##_element_free = free;                                       \
+        }                                                                      \
+                                                                               \
+        void N##_push_back(struct N *, T);                                     \
+                                                                               \
+        static void (*N##_default_insert)(struct N *, T) = N##_push_back;      \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T))                    \
+        {                                                                      \
+                N##_default_insert = insert;                                   \
         }                                                                      \
                                                                                \
         /* ================ */                                                 \
@@ -386,16 +398,31 @@
                 int erase = (n != NULL);                                       \
                 if(erase)                                                      \
                 {                                                              \
-                        N##_node_erase(l, n);                                  \
-                        l->_size--;                                            \
+                        if(l->_head == n)                                      \
+                        {                                                      \
+                                N##_pop_front(l);                              \
+                        }                                                      \
+                        else if(l->_tail == n)                                 \
+                        {                                                      \
+                                N##_pop_back(l);                               \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                N##_node_erase(l, n);                          \
+                                l->_size--;                                    \
+                        }                                                      \
                 }                                                              \
                 return erase;                                                  \
         }                                                                      \
                                                                                \
         int N##_erase_at(struct N *l, size_t at)                               \
         {                                                                      \
-                int erase = (at - 1 < l->_size && at != 0);                    \
-                if(erase)                                                      \
+                int erase = (at - 1 < l->_size || at == 0);                    \
+                if(at == 0)                                                    \
+                {                                                              \
+                        N##_pop_front(l);                                      \
+                }                                                              \
+                else if(erase)                                                 \
                 {                                                              \
                         struct N##_node *curr = l->_head;                      \
                         for(size_t i = 0; i < at - 1; ++i)                     \
@@ -464,15 +491,15 @@
                         N##_push_front(l, el);                                 \
                 }                                                              \
                 else if(l->_tail && l->_head != l->_tail &&                    \
-                        !compare(&l->_tail->_data, &l->_head->_data))          \
+                        compare(&l->_tail->_data, &l->_head->_data) <= 0)      \
                 {                                                              \
                         sorted = 0;                                            \
                 }                                                              \
-                else if((compare)(&l->_head->_data, &el))                      \
+                else if((compare)(&l->_head->_data, &el) > 0)                  \
                 {                                                              \
                         N##_push_front(l, el);                                 \
                 }                                                              \
-                else if(!(compare)(&l->_tail->_data, &el))                     \
+                else if((compare)(&l->_tail->_data, &el) <= 0)                 \
                 {                                                              \
                         N##_push_back(l, el);                                  \
                 }                                                              \
@@ -482,7 +509,7 @@
                             sizeof(struct N##_node));                          \
                         N##_element_copy(&new_node->_data, &el);               \
                         struct N##_node *curr = l->_head;                      \
-                        while(!compare(&curr->_data, &el))                     \
+                        while(compare(&curr->_data, &el) <= 0)                 \
                         {                                                      \
                                 curr = curr->_next;                            \
                         }                                                      \

@@ -38,7 +38,7 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-	typedef T N##_type;                                                    \
+        typedef T N##_type;                                                    \
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
                                                                                \
@@ -85,13 +85,19 @@
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
-	void N##_push_back(struct N *, T);                                     \
+        void N##_push_back(struct N *, T);                                     \
                                                                                \
-        static void (*N##_default_insert)(struct N *, T) = N##_push_back;      \
+        static void (*N##_default_insert_function)(struct N *, T) =            \
+            N##_push_back;                                                     \
                                                                                \
         void N##_set_default_insert(void (*insert)(N *, T))                    \
         {                                                                      \
-                N##_default_insert = insert;                                   \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, T el)                             \
+        {                                                                      \
+                N##_default_insert_function(d, el);                            \
         }                                                                      \
                                                                                \
         /* ================ */                                                 \
