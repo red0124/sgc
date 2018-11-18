@@ -1070,9 +1070,14 @@ static size_t gc_log_two(size_t size)
                 if(succ != n)                                                  \
                 {                                                              \
                         N##_element_copy(&n->_value, &succ->_value);           \
+                        N##_element_copy_key(&n->_key, &succ->_key);           \
                         if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&succ->_value);               \
+                        }                                                      \
+                        if(N##_element_copy_key != N##_flat_copy_key)          \
+                        {                                                      \
+                                N##_element_free_key(&succ->_key);             \
                         }                                                      \
                         /* relinking nodes would be better */                  \
                 }                                                              \

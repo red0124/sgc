@@ -6,9 +6,16 @@
                                                                                \
         void N##_copy(N *first, const N *const second)                         \
         {                                                                      \
-		size_t size = strlen(*second) + 1;                             \
-                *first = (N)malloc(sizeof(char) * size);                       \
-                memcpy(*first, *second, size);                                 \
+                if(*second)                                                    \
+                {                                                              \
+                        size_t size = strlen(*second) + 1;                     \
+                        *first = (N)malloc(sizeof(char) * size);               \
+                        memcpy(*first, *second, size);                         \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        *first = NULL;                                         \
+                }                                                              \
         }                                                                      \
                                                                                \
         void N##_init(N *s)                                                    \
@@ -23,7 +30,12 @@
                                                                                \
         int N##_equal(const N *const first, const N *const second)             \
         {                                                                      \
-                return strcmp(*first, *second) == 0;                           \
+                int ret = 0;                                                   \
+                if(*first && *second)                                          \
+                {                                                              \
+                        ret = strcmp(*first, *second) == 0;                    \
+                }                                                              \
+		return ret;                                                    \
         }                                                                      \
                                                                                \
         int N##_compare(const N *const first, const N *const second)           \
@@ -129,7 +141,7 @@
                 size_t size;                                                   \
                 size_t max;                                                    \
         };                                                                     \
-	                                                                       \
+                                                                               \
         typedef struct N##_array N##_array;                                    \
                                                                                \
         static void N##_array_push_back(N##_array *a, N el)                    \

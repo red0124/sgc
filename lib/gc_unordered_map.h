@@ -55,11 +55,9 @@ static size_t gc_next_prime(size_t n)
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
-        }                                                                      \
+	typedef V N##_type;                                                    \
+        typedef V N##_value;                                                   \
+        typedef K N##_key;                                                     \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
@@ -155,6 +153,41 @@ static size_t gc_next_prime(size_t n)
         void N##_set_free(void (*free)(V *))                                   \
         {                                                                      \
                 N##_element_free = free;                                       \
+        }                                                                      \
+                                                                               \
+	V *N##_at(struct N *, K);                                              \
+                                                                               \
+        static void N##_at_wrap(struct N *m, K k)                              \
+        {                                                                      \
+                N##_at(m, k);                                                  \
+        }                                                                      \
+                                                                               \
+        static void (*N##_default_insert_function)(struct N *, K) =            \
+            N##_at_wrap;                                                       \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, K))                    \
+        {                                                                      \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, K k)                              \
+        {                                                                      \
+                N##_default_insert_function(d, k);                             \
+        }                                                                      \
+                                                                               \
+        void N##_set_at(struct N *, K, V);                                     \
+                                                                               \
+        static void (*N##_default_insert_pair_function)(struct N *, K, V) =    \
+            N##_set_at;                                                        \
+                                                                               \
+        void N##_set_default_insert_pair(void (*insert)(N *, K, V))            \
+        {                                                                      \
+                N##_default_insert_pair_function = insert;                     \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert_pair(struct N *d, K k, V v)                    \
+        {                                                                      \
+                N##_default_insert_pair_function(d, k, v);                     \
         }                                                                      \
                                                                                \
         /* ================== */                                               \
