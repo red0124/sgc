@@ -9,6 +9,11 @@
                 T *_data;                                                      \
         };                                                                     \
                                                                                \
+        typedef struct N N;                                                    \
+        typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
+                                                                               \
         static size_t N##_init_size = 1;                                       \
         static double N##_growth_scale = 2;                                    \
                                                                                \
@@ -22,11 +27,6 @@
         {                                                                      \
                 growth_scale = (growth_scale == 0) ? 1 : growth_scale;         \
                 N##_growth_scale = growth_scale;                               \
-        }                                                                      \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
         }                                                                      \
                                                                                \
         /* =================== */                                              \
@@ -72,6 +72,20 @@
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
+        void N##_push(struct N *, T);                                          \
+                                                                               \
+        static void (*N##_default_insert_function)(struct N *, T) = N##_push;  \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T))                    \
+        {                                                                      \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, T el)                             \
+        {                                                                      \
+                N##_default_insert_function(d, el);                            \
+        }                                                                      \
+                                                                               \
         /* ================= */                                                \
         /*  STACK FUNCTIONS  */                                                \
         /* ================= */                                                \
@@ -91,8 +105,7 @@
         {                                                                      \
                 if(s->_data)                                                   \
                 {                                                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 for(size_t i = 0; i < s->_size; ++i)           \
                                 {                                              \
@@ -112,8 +125,8 @@
                         equal = 1;                                             \
                         for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
-                                if(N##_element_equal(&first->_data[i],         \
-                                                     &second->_data[i]))       \
+                                if(!N##_element_equal(&first->_data[i],        \
+                                                      &second->_data[i]))      \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -131,8 +144,7 @@
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
                         dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
-                        if(T##_is_static() ||                                  \
-                           N##_element_copy == N##_flat_copy)                  \
+                        if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \
                                        src->_size * sizeof(T));                \
@@ -152,8 +164,8 @@
         {                                                                      \
                 if(s->_size == s->_max)                                        \
                 {                                                              \
-			s->_max = (s->_max == 0) ? N##_init_size               \
-						 : s->_max * N##_growth_scale; \
+                        s->_max = (s->_max == 0) ? N##_init_size               \
+                                                 : s->_max * N##_growth_scale; \
                                                                                \
                         s->_data =                                             \
                             (T *)realloc(s->_data, sizeof(T) * s->_max);       \
@@ -171,9 +183,8 @@
         {                                                                      \
                 if(s->_size)                                                   \
                 {                                                              \
-			T *el = &s->_data[s->_size - 1];                       \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        T *el = &s->_data[s->_size - 1];                       \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                         }                                                      \
@@ -196,8 +207,7 @@
                 if(s->_size)                                                   \
                 {                                                              \
                         T *el = &s->_data[s->_size - 1];                       \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -213,4 +223,3 @@
         {                                                                      \
                 return s->_size == 0;                                          \
         }
-

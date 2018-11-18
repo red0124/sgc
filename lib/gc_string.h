@@ -4,11 +4,6 @@
                                                                                \
         typedef char *N;                                                       \
                                                                                \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
-        }                                                                      \
-                                                                               \
         void N##_copy(N *first, const N *const second)                         \
         {                                                                      \
 		size_t size = strlen(*second) + 1;                             \

@@ -11,11 +11,9 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return T##_is_static();                                        \
-        }                                                                      \
+        typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
                                                                                \
         size_t N##_max()                                                       \
         {                                                                      \
@@ -65,6 +63,20 @@
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
+        void N##_push(struct N *, T);                                          \
+                                                                               \
+        static void (*N##_default_insert_function)(struct N *, T) = N##_push;  \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T))                    \
+        {                                                                      \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, T el)                             \
+        {                                                                      \
+                N##_default_insert_function(d, el);                            \
+        }                                                                      \
+                                                                               \
         /* ================= */                                                \
         /*  QUEUE FUNCTIONS  */                                                \
         /* ================= */                                                \
@@ -95,14 +107,15 @@
         {                                                                      \
                 if(q->_data)                                                   \
                 {                                                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
-                                for(size_t i = q->_front; i != q->_back;)      \
+                                size_t i;                                      \
+                                for(i = q->_front; i != q->_back;)             \
                                 {                                              \
                                         N##_element_free(&q->_data[i]);        \
                                         N##_move(&i);                          \
                                 }                                              \
+                                N##_element_free(&q->_data[i]);                \
                         }                                                      \
                 }                                                              \
         }                                                                      \
@@ -118,8 +131,8 @@
                         size_t j = second->_front;                             \
                         for(size_t k = 0; k < first->_size; ++k)               \
                         {                                                      \
-                                if(N##_element_equal(&first->_data[i],         \
-                                                     &second->_data[j]))       \
+                                if(!N##_element_equal(&first->_data[i],        \
+                                                      &second->_data[j]))      \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -136,8 +149,7 @@
         {                                                                      \
                 if(src->_size != 0)                                            \
                 {                                                              \
-                        if(T##_is_static() ||                                  \
-                           N##_element_copy == N##_flat_copy)                  \
+                        if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 if(src->_front < src->_back)                   \
                                 {                                              \
@@ -159,9 +171,9 @@
                         }                                                      \
                         else                                                   \
                         {                                                      \
+                                size_t i = src->_front;                        \
                                 for(size_t j = 0; j < src->_size; ++j)         \
                                 {                                              \
-                                        size_t i = src->_front;                \
                                         N##_element_copy(&dst->_data[j],       \
                                                          &src->_data[i]);      \
                                         N##_move(&i);                          \
@@ -203,8 +215,7 @@
                 if(q->_size)                                                   \
                 {                                                              \
                         T *el = &q->_data[q->_front];                          \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -231,8 +242,7 @@
                 if(q->_size)                                                   \
                 {                                                              \
                         T *el = &q->_data[q->_back];                           \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -249,8 +259,7 @@
                 if(q->_size)                                                   \
                 {                                                              \
                         T *el = &q->_data[q->_front];                          \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                         }                                                      \
@@ -263,4 +272,3 @@
         {                                                                      \
                 return q->_size == 0;                                          \
         }
-
