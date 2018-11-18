@@ -15,20 +15,39 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-                                                                               \
-        int N##_is_static();                                                   \
+	typedef V N##_type;                                                    \
+        typedef V N##_value;                                                   \
+        typedef K N##_key;                                                     \
                                                                                \
         size_t N##_max();                                                      \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
-                                                                               \
+									       \
         void N##_set_init(void (*init)(V *));                                  \
+                                                                               \
+        void N##_set_copy(void (*copy)(V *, const V *const));                  \
                                                                                \
         void N##_set_share(int is_shared);                                     \
                                                                                \
+        void N##_set_copy_key(void (*copy)(K *, const K *const));              \
+                                                                               \
         void N##_set_share_key(int is_shared);                                 \
+                                                                               \
+        void N##_set_equal(int (*equal)(const V *const, const V *const));      \
+                                                                               \
+        void N##_set_equal_key(int (*equal)(const K *const, const K *const));  \
+                                                                               \
+        void N##_set_free_key(void (*free)(K *));                              \
+                                                                               \
+        void N##_set_free(void (*free)(V *));                                  \
+	                                                                       \
+	void N##_set_default_insert(void (*insert)(N *, K));                   \
+	                                                                       \
+	void N##_set_default_insert_pair(void (*insert)(N *, K, V));           \
+                                                                               \
+	void N##_set_hash(size_t (*hash)(const K *const));                     \
                                                                                \
         /* ========== */                                                       \
         /*  ITERATOR  */                                                       \
@@ -92,7 +111,11 @@
                                                                                \
         struct N##_iterator N##_find(struct N *u, const K k);                  \
                                                                                \
+	void N##_defaul_insert_pair(struct N *m, K k, V v);                    \
+                                                                               \
         void N##_set_at(struct N *u, const K k, const V v);                    \
+                                                                               \
+	void N##_default_insert(struct N *m, K k);                             \
                                                                                \
         V *N##_at(struct N *u, const K k);                                     \
                                                                                \
