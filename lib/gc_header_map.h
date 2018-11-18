@@ -56,9 +56,9 @@ enum map_color
                                                                                \
         void N##_set_free(void (*free)(V *));                                  \
 	                                                                       \
-	void N##_set_default_insert(void (*insert)(N *, K))                    \
+	void N##_set_default_insert(void (*insert)(N *, K));                   \
 	                                                                       \
-	void N##_set_default_insert_pair(void (*insert)(N *, K, V))            \
+	void N##_set_default_insert_pair(void (*insert)(N *, K, V));           \
                                                                                \
         /* ================ */                                                 \
         /*  NODE FUNCTIONS  */                                                 \
