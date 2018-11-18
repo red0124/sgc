@@ -9,11 +9,9 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return T##_is_static();                                        \
-        }                                                                      \
+        typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
                                                                                \
         size_t N##_max()                                                       \
         {                                                                      \
@@ -63,6 +61,20 @@
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
+        void N##_push(struct N *, T);                                          \
+                                                                               \
+        static void (*N##_default_insert_function)(struct N *, T) = N##_push;  \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T))                    \
+        {                                                                      \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, T el)                             \
+        {                                                                      \
+                N##_default_insert_function(d, el);                            \
+        }                                                                      \
+                                                                               \
         /* ======================== */                                         \
         /*  STATIC STACK FUNCTIONS  */                                         \
         /* ======================== */                                         \
@@ -81,8 +93,7 @@
         {                                                                      \
                 if(s->_size)                                                   \
                 {                                                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 for(size_t i = 0; i < s->_size; ++i)           \
                                 {                                              \
@@ -117,8 +128,7 @@
                 if(src->_size != 0)                                            \
                 {                                                              \
                         dst->_size = src->_size;                               \
-                        if(T##_is_static() ||                                  \
-                           N##_element_copy == N##_flat_copy)                  \
+                        if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \
                                        src->_size * sizeof(T));                \
@@ -148,8 +158,7 @@
                 if(s->_size)                                                   \
                 {                                                              \
                         T *el = &s->_data[s->_size - 1];                       \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                         }                                                      \
@@ -172,8 +181,7 @@
                 if(s->_size)                                                   \
                 {                                                              \
                         T *el = &s->_data[s->_size - 1];                       \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(el);                          \
                                 N##_element_copy(el, &new_el);                 \
@@ -189,4 +197,3 @@
         {                                                                      \
                 return s->_size == 0;                                          \
         }
-

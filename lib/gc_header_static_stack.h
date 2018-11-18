@@ -8,18 +8,25 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-                                                                               \
-        int N##_is_static();                                                   \
+        typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
                                                                                \
         size_t N##_max();                                                      \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
-                                                                               \
+									       \
         void N##_set_copy(void (*copy)(T *, const T *const));                  \
                                                                                \
         void N##_set_share(int is_shared);                                     \
+                                                                               \
+        void N##_set_equal(int (*equal)(const T *const, const T *const));      \
+                                                                               \
+        void N##_set_free(int (*free)(T *));                                   \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T));                   \
                                                                                \
         /* ======================== */                                         \
         /*  STATIC STACK FUNCTIONS  */                                         \
@@ -35,6 +42,8 @@
                                                                                \
         void N##_copy(struct N *__restrict__ dst,                              \
                       const struct N *__restrict__ const src);                 \
+                                                                               \
+        void N##_default_insert(struct N *s, T el);                            \
                                                                                \
         void N##_push(struct N *s, T el);                                      \
                                                                                \
