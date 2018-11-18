@@ -49,17 +49,15 @@ static size_t gc_log_two(size_t size)
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+        typedef V N##_type;                                                    \
+        typedef V N##_value;                                                   \
+        typedef V N##_key;                                                     \
                                                                                \
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
                 struct N##_node *_root;                                        \
         };                                                                     \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
-        }                                                                      \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
@@ -110,6 +108,21 @@ static size_t gc_log_two(size_t size)
         void N##_set_free(void (*free)(V *))                                   \
         {                                                                      \
                 N##_element_free = free;                                       \
+        }                                                                      \
+                                                                               \
+        void N##_insert(struct N *, V);                                        \
+                                                                               \
+        static void (*N##_default_insert_function)(struct N *, V) =            \
+            N##_insert;                                                        \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, V))                    \
+        {                                                                      \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, V el)                             \
+        {                                                                      \
+                N##_default_insert_function(d, el);                            \
         }                                                                      \
                                                                                \
         /* ================ */                                                 \
@@ -367,7 +380,7 @@ static size_t gc_log_two(size_t size)
                                                                                \
                         for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
-                                if(N##_element_equal(                          \
+                                if(!N##_element_equal(                         \
                                        &it_first._curr->_value,                \
                                        &it_second._curr->_value))              \
                                 {                                              \
@@ -689,7 +702,7 @@ static size_t gc_log_two(size_t size)
                                 }                                              \
                                 parent = parent->_right;                       \
                         }                                                      \
-                        else                                                   \
+                        else if(!N##_element_equal(&parent->_value, v))        \
                         {                                                      \
                                 if(N##_element_copy != N##_flat_copy)          \
                                 {                                              \
@@ -700,6 +713,10 @@ static size_t gc_log_two(size_t size)
                                 {                                              \
                                         parent->_value = *v;                   \
                                 }                                              \
+                                return;                                        \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
                                 return;                                        \
                         }                                                      \
                 }                                                              \

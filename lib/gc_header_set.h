@@ -20,6 +20,9 @@ enum map_color
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+	typedef V N##_type;                                                    \
+        typedef V N##_value;                                                   \
+        typedef V N##_key;                                                     \
                                                                                \
         struct N                                                               \
         {                                                                      \
@@ -27,7 +30,6 @@ enum map_color
                 struct N##_node *_root;                                        \
         };                                                                     \
                                                                                \
-        int N##_is_static();                                                   \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
@@ -36,6 +38,18 @@ enum map_color
         void N##_set_copy(void (*copy)(V *, const V *const));                  \
                                                                                \
         void N##_set_share(int is_shared);                                     \
+                                                                               \
+        void N##_set_equal(int (*equal)(const V *const, const V *const));      \
+                                                                               \
+        void N##_set_compare(int (*compare)(const V *const, const V *const));  \
+                                                                               \
+        void N##_set_free(void (*free)(V *));                                  \
+                                                                               \
+        void N##_insert(struct N *, V);                                        \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, V));                   \
+                                                                               \
+        void N##_default_insert(struct N *d, V el);                            \
                                                                                \
         /* ================ */                                                 \
         /*  NODE FUNCTIONS  */                                                 \
