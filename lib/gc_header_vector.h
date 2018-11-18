@@ -52,6 +52,8 @@
                                                                                \
         void N##_shrink(struct N *v);                                          \
                                                                                \
+        void N##_default_insert(struct N *v, T el);                            \
+                                                                               \
         void N##_push_back(struct N *v, T el);                                 \
                                                                                \
         void N##_pop_back(struct N *v);                                        \

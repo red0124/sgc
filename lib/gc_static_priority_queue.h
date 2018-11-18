@@ -9,15 +9,13 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+        typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
                                                                                \
         size_t N##_max()                                                       \
         {                                                                      \
                 return S;                                                      \
-        }                                                                      \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 1;                                                      \
         }                                                                      \
                                                                                \
         /* =================== */                                              \
@@ -70,6 +68,20 @@
         {                                                                      \
                 N##_element_compare = compare;                                 \
         }                                                                      \
+									       \
+        void N##_push(struct N *, T);                                          \
+                                                                               \
+        static void (*N##_default_insert_function)(struct N *, T) = N##_push;  \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T))                    \
+        {                                                                      \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, T el)                             \
+        {                                                                      \
+                N##_default_insert_function(d, el);                            \
+        }                                                                      \
                                                                                \
         /* ==========================*/                                        \
         /*  PRIOITY QUEUE FUNCTIONS  */                                        \
@@ -89,7 +101,7 @@
         {                                                                      \
                 if(p->_data)                                                   \
                 {                                                              \
-                        if(!T##_is_static() &&                                 \
+                        if(                            \
                            N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 for(size_t i = 0; i < p->_size; ++i)           \
@@ -126,7 +138,7 @@
                 if(src->_size != 0)                                            \
                 {                                                              \
                         dst->_size = src->_size;                               \
-                        if(T##_is_static() ||                                  \
+                        if(                           \
                            N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \

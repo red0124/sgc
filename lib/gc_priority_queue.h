@@ -10,6 +10,9 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
+        typedef T N##_type;                                                    \
+        typedef T N##_value;                                                   \
+        typedef T N##_key;                                                     \
                                                                                \
         static size_t N##_init_size = 1;                                       \
         static double N##_growth_scale = 2;                                    \
@@ -24,11 +27,6 @@
         {                                                                      \
                 growth_scale = (growth_scale == 0) ? 1 : growth_scale;         \
                 N##_growth_scale = growth_scale;                               \
-        }                                                                      \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
         }                                                                      \
                                                                                \
         /* =================== */                                              \
@@ -82,6 +80,20 @@
                 N##_element_compare = compare;                                 \
         }                                                                      \
                                                                                \
+        void N##_push(struct N *, T);                                          \
+                                                                               \
+        static void (*N##_default_insert_function)(struct N *, T) = N##_push;  \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, T))                    \
+        {                                                                      \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, T el)                             \
+        {                                                                      \
+                N##_default_insert_function(d, el);                            \
+        }                                                                      \
+                                                                               \
         /* ==========================*/                                        \
         /*  PRIOITY QUEUE FUNCTIONS  */                                        \
         /* ==========================*/                                        \
@@ -101,8 +113,7 @@
         {                                                                      \
                 if(p->_data)                                                   \
                 {                                                              \
-                        if(!T##_is_static() &&                                 \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 for(size_t i = 0; i < p->_size; ++i)           \
                                 {                                              \
@@ -141,8 +152,7 @@
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
                         dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
-                        if(T##_is_static() ||                                  \
-                           N##_element_copy == N##_flat_copy)                  \
+                        if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \
                                        src->_size * sizeof(T));                \
@@ -160,7 +170,7 @@
                                                                                \
         void N##_shrink(struct N *p)                                           \
         {                                                                      \
-                if(!T##_is_static() || N##_element_copy != N##_flat_copy)      \
+                if(N##_element_copy != N##_flat_copy)                          \
                 {                                                              \
                         for(size_t i = p->_size; i < p->_max; ++i)             \
                         {                                                      \

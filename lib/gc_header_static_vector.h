@@ -44,6 +44,8 @@
         void N##_copy(struct N *__restrict__ dst,                              \
                       const struct N *__restrict__ const src);                 \
                                                                                \
+        void N##_default_insert(struct N *v, T el);                            \
+                                                                               \
         void N##_push_back(struct N *v, T el);                                 \
                                                                                \
         void N##_pop_back(struct N *v);                                        \

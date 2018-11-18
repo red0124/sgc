@@ -184,9 +184,9 @@
                         }                                                      \
                         else                                                   \
                         {                                                      \
+				size_t i = src->_front;                        \
                                 for(size_t j = 0; j < src->_size; ++j)         \
                                 {                                              \
-                                        size_t i = src->_front;                \
                                         N##_element_copy(&dst->_data[j],       \
                                                          &src->_data[i]);      \
                                         N##_move(&i);                          \

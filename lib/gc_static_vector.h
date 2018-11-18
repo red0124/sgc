@@ -63,12 +63,17 @@
 	                                                                       \
 	void N##_push_back(struct N*, T);                                      \
                                                                                \
-        static void (*N##_default_insert)(struct N *, T) =                     \
+        static void (*N##_default_insert_function)(struct N *, T) =            \
             N##_push_back;                                                     \
                                                                                \
-        void N##_set_default_insert(void (*insert)(N *, T))                    \
+        void N##_set_default_insert_function(void (*insert)(N *, T))           \
         {                                                                      \
-                N##_default_insert = insert;                                   \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+	void N##_default_insert(struct N *d, T el)                             \
+        {                                                                      \
+                N##_default_insert_function(d, el);                            \
         }                                                                      \
                                                                                \
         /* ========================= */                                        \
