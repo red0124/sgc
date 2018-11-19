@@ -2,9 +2,8 @@
 
 #ifndef GC_ST
 #define GC_ST
-#warning "header contains function definitions                                 \
-		whitch may cause multiple definition errors,                   \
-		define GC_STATIC_TYPES to kill warning"
+#warning                                                                       \
+    "header contains function definitions whitch may cause multiple definition errors, define GC_STATIC_TYPES to kill warning"
 #endif
 
 #define INIT_STATIC(T, N)                                                      \
@@ -39,11 +38,6 @@
         {                                                                      \
                 return (int)(*(T *)first - *(T *)second);                      \
         }                                                                      \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 1;                                                      \
-        }
 
 INIT_STATIC(char, char);
 INIT_STATIC(unsigned char, unsigned_char);
