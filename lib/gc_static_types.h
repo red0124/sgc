@@ -88,3 +88,4 @@ INIT_HASH(unsigned long, unsigned_long);
         {                                                                      \
                 return memcmp(first, second, sizeof(T)) == 0;                  \
         }\
+
