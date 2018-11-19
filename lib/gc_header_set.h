@@ -113,6 +113,8 @@ enum map_color
         void N##_copy(struct N *__restrict__ dst,                              \
                       const struct N *__restrict__ const src);                 \
                                                                                \
+        void N##_default_insert(struct N *m, V v);                             \
+                                                                               \
         void N##_insert(struct N *m, V v);                                     \
                                                                                \
         void N##_insert_multiple(struct N *m, V v);                            \

@@ -270,6 +270,7 @@ static size_t gc_next_prime(size_t n)
                 {                                                              \
                         struct N##_node *tmp = i->_curr;                       \
                         ++i->_curr_bucket;                                     \
+			i->_is_valid = (i->_curr_bucket != i->_max);           \
                         while(i->_curr_bucket < i->_max)                       \
                         {                                                      \
                                 i->_curr = i->_data[i->_curr_bucket];          \

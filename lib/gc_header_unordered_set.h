@@ -15,16 +15,31 @@
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-                                                                               \
-        int N##_is_static();                                                   \
+	typedef V N##_type;                                                    \
+        typedef V N##_value;                                                   \
+        typedef V N##_key;                                                     \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
-                                                                               \
+									       \
         void N##_set_copy(void (*copy)(V *, const V *const));                  \
                                                                                \
         void N##_set_share(int is_shared);                                     \
+                                                                               \
+        void N##_set_equal(int (*equal)(const V *const, const V *const));      \
+                                                                               \
+        void N##_set_compare(int (*compare)(const V *const, const V *const));  \
+                                                                               \
+        void N##_set_free(void (*free)(V *));                                  \
+                                                                               \
+        void N##_insert(struct N *, V);                                        \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, V));                   \
+                                                                               \
+        void N##_default_insert(struct N *d, V el);                            \
+                                                                               \
+	void N##_set_hash(size_t (*hash)(const K *const));                     \
                                                                                \
         /* ================== */                                               \
         /*  BUCKET FUNCTIONS  */                                               \
@@ -98,6 +113,8 @@
         struct N##_iterator N##_find(struct N *u, const V v);                  \
                                                                                \
         void N##_rehash(struct N *u, size_t new_max);                          \
+                                                                               \
+        void N##_defaulti_nsert(struct N *u, const V v);                       \
                                                                                \
         void N##_insert(struct N *u, const V v);                               \
                                                                                \
