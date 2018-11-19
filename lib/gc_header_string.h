@@ -3,8 +3,6 @@
 #define INIT_HEADER_STRING(N)                                                  \
         typedef char *N;                                                       \
                                                                                \
-        int N##_is_static();                                                   \
-                                                                               \
         void N##_copy(N *first, const N *const second);                        \
                                                                                \
         void N##_init(N *s);                                                   \

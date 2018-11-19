@@ -54,11 +54,9 @@ static size_t gc_next_prime(size_t n)
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-                                                                               \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 0;                                                      \
-        }                                                                      \
+	typedef V N##_type;                                                    \
+        typedef V N##_value;                                                   \
+        typedef V N##_key;                                                     \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
@@ -108,6 +106,21 @@ static size_t gc_next_prime(size_t n)
         void N##_set_free(void (*free)(V *))                                   \
         {                                                                      \
                 N##_element_free = free;                                       \
+        }                                                                      \
+									       \
+        void N##_insert(struct N *, V);                                        \
+                                                                               \
+        static void (*N##_default_insert_function)(struct N *, V) =            \
+            N##_insert;                                                        \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, V))                    \
+        {                                                                      \
+                N##_default_insert_function = insert;                          \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert(struct N *d, V el)                             \
+        {                                                                      \
+                N##_default_insert_function(d, el);                            \
         }                                                                      \
                                                                                \
         /* ================== */                                               \
