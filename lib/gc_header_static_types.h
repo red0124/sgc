@@ -11,9 +11,8 @@
                                                                                \
         int N##_compare(const T *const first, const T *const second);          \
                                                                                \
-        int N##_void_compare(const void *const first,                          \
-                             const void *const second);                        \
-                                                                               \
+        int N##_void_compare(const void *const first, const void *const second);
+
 INIT_HEADER_STATIC(char, char);
 INIT_HEADER_STATIC(unsigned char, unsigned_char);
 INIT_HEADER_STATIC(short, short);
@@ -45,5 +44,5 @@ INIT_HEADER_HASH(unsigned long, unsigned_long);
                                                                                \
         void N##_copy(T *dst, const T *const src);                             \
                                                                                \
-        int N##_equal(const T *const first, const T *const second);            \
-                                                                               \
+        int N##_equal(const T *const first, const T *const second);
+\

@@ -37,7 +37,7 @@
                              const void *const second)                         \
         {                                                                      \
                 return (int)(*(T *)first - *(T *)second);                      \
-        }                                                                      \
+        }
 
 INIT_STATIC(char, char);
 INIT_STATIC(unsigned char, unsigned_char);
@@ -87,4 +87,4 @@ INIT_HASH(unsigned long, unsigned_long);
         int N##_equal(const T *const first, const T *const second)             \
         {                                                                      \
                 return memcmp(first, second, sizeof(T)) == 0;                  \
-        }                                                                      \
+        }\
