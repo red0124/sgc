@@ -28,11 +28,6 @@ enum node_state
                                                                                \
         typedef struct N N;                                                    \
                                                                                \
-        int N##_is_static()                                                    \
-        {                                                                      \
-                return 1;                                                      \
-        }                                                                      \
-                                                                               \
         size_t N##_max()                                                       \
         {                                                                      \
                 return S;                                                      \
@@ -41,13 +36,6 @@ enum node_state
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
-                                                                               \
-        static void (*N##_element_init)(V *) = V##_init;                       \
-                                                                               \
-        void N##_set_init(void (*init)(V *))                                   \
-        {                                                                      \
-                N##_element_init = init;                                       \
-        }                                                                      \
                                                                                \
         static void (*N##_element_copy)(V *, const V *const) = V##_copy;       \
                                                                                \
@@ -295,7 +283,7 @@ enum node_state
                                                                                \
         void N##_free(struct N *u)                                             \
         {                                                                      \
-                if(u->_size && !V##_is_static())                               \
+                if(u->_size)                                                   \
                 {                                                              \
                         for(size_t i = 0; i < S; ++i)                          \
                         {                                                      \
@@ -405,6 +393,7 @@ enum node_state
                         {                                                      \
                                 N##_element_free(value);                       \
                         }                                                      \
+			--u->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \
