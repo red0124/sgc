@@ -253,12 +253,7 @@
                                                                                \
         T *N##_at(struct N *v, size_t at)                                      \
         {                                                                      \
-                T *ret = NULL;                                                 \
-                if(at < v->_size)                                              \
-                {                                                              \
-                        ret = &v->_data[at];                                   \
-                }                                                              \
-                return ret;                                                    \
+		return &v->_data[at];                                          \
         }                                                                      \
                                                                                \
         void N##_set_at(struct N *v, size_t at, T new_el)                      \
