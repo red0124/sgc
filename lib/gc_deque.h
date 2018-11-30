@@ -652,7 +652,7 @@
                 i->_data = d->_data;                                           \
                 i->_max = d->_max;                                             \
                 i->_curr = (d->_front + at) % d->_max;                         \
-                i->_is_valid = (d->_size < at) ? 1 : 0;                        \
+                i->_is_valid = (d->_size > at) ? 1 : 0;                        \
         }                                                                      \
                                                                                \
         void N##_iterator_cfrom(const struct N *const d,                       \
@@ -661,7 +661,7 @@
                 i->_data = d->_data;                                           \
                 i->_max = d->_max;                                             \
                 i->_curr = (d->_front + at) % d->_max;                         \
-                i->_is_valid = (d->_size < at) ? 1 : 0;                        \
+                i->_is_valid = (d->_size > at) ? 1 : 0;                        \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_from(struct N *d, size_t at)                   \

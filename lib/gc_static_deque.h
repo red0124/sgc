@@ -606,7 +606,7 @@
         {                                                                      \
                 i->_data = (T *)d->_data;                                      \
                 i->_curr = (d->_front + at) % S;                               \
-                i->_is_valid = (d->_size < at) ? 1 : 0;                        \
+                i->_is_valid = (d->_size > at) ? 1 : 0;                        \
         }                                                                      \
                                                                                \
         void N##_iterator_cfrom(const struct N *const d,                       \
@@ -614,7 +614,7 @@
         {                                                                      \
                 i->_data = (T *)d->_data;                                      \
                 i->_curr = (d->_front + at) % S;                               \
-                i->_is_valid = (d->_size < at) ? 1 : 0;                        \
+                i->_is_valid = (d->_size > at) ? 1 : 0;                        \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_from(struct N *d, size_t at)                   \
