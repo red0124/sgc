@@ -9,8 +9,6 @@
 #include "../lib/gc_static_types.h"
 #include "../lib/gc_deque.h"
 
-#include "../lib/gc_static_types.h"
-
 //#define __UNITY
 #ifndef __UNITY
 #include "./Unity/src/unity.h"
