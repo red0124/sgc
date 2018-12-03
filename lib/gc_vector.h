@@ -253,7 +253,7 @@
                                                                                \
         T *N##_at(struct N *v, size_t at)                                      \
         {                                                                      \
-		return &v->_data[at];                                          \
+                return &v->_data[at];                                          \
         }                                                                      \
                                                                                \
         void N##_set_at(struct N *v, size_t at, T new_el)                      \
@@ -459,5 +459,6 @@
                                                                                \
         int N##_iterator_valid(const struct N##_iterator i)                    \
         {                                                                      \
-                return i._curr <= i._end && i._curr >= i._begin;               \
+                return i._begin != NULL && i._curr <= i._end &&                \
+                       i._curr >= i._begin;                                    \
         }

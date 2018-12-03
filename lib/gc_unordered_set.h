@@ -54,7 +54,7 @@ static size_t gc_next_prime(size_t n)
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-	typedef V N##_type;                                                    \
+        typedef V N##_type;                                                    \
         typedef V N##_value;                                                   \
         typedef V N##_key;                                                     \
                                                                                \
@@ -107,7 +107,7 @@ static size_t gc_next_prime(size_t n)
         {                                                                      \
                 N##_element_free = free;                                       \
         }                                                                      \
-									       \
+                                                                               \
         void N##_insert(struct N *, V);                                        \
                                                                                \
         static void (*N##_default_insert_function)(struct N *, V) =            \
@@ -283,7 +283,7 @@ static size_t gc_next_prime(size_t n)
                 {                                                              \
                         struct N##_node *tmp = i->_curr;                       \
                         ++i->_curr_bucket;                                     \
-			i->_is_valid = (i->_curr_bucket != i->_max);           \
+                        i->_is_valid = (i->_curr_bucket != i->_max);           \
                         while(i->_curr_bucket < i->_max)                       \
                         {                                                      \
                                 i->_curr = i->_data[i->_curr_bucket];          \
@@ -574,18 +574,15 @@ static size_t gc_next_prime(size_t n)
                 {                                                              \
                         size_t position = hash % u->_max;                      \
                         struct N##_node *tmp = u->_data[position];             \
-                        if(tmp)                                                \
+                        while(tmp)                                             \
                         {                                                      \
-                                while(tmp)                                     \
+                                if(N##_element_equal(&tmp->_value, v))         \
                                 {                                              \
-                                        if(N##_element_equal(&tmp->_value, v)) \
-                                        {                                      \
-                                                ret = (struct N##_iterator){   \
-                                                    u->_data, tmp, position,   \
-                                                    u->_max, 1};               \
-                                        }                                      \
-                                        tmp = tmp->_next;                      \
+                                        ret = (struct N##_iterator){           \
+                                            u->_data, tmp, position, u->_max,  \
+                                            1};                                \
                                 }                                              \
+                                tmp = tmp->_next;                              \
                         }                                                      \
                 }                                                              \
                 return ret;                                                    \

@@ -3,6 +3,9 @@
 #define INIT_STRING(N)                                                         \
                                                                                \
         typedef char *N;                                                       \
+        typedef char N##_value;                                                \
+        typedef char N##_type;                                                 \
+        typedef char N##_key;                                                  \
                                                                                \
         void N##_copy(N *first, const N *const second)                         \
         {                                                                      \
@@ -49,10 +52,10 @@
                 return strcmp(*(N *)first, *(N *)second);                      \
         }                                                                      \
                                                                                \
-        size_t N##_hash(const string *const s)                                 \
+        size_t N##_hash(const N *const s)                                      \
         {                                                                      \
                 size_t hash = 5381;                                            \
-                string str = *s;                                               \
+                N str = *s;                                               \
                 int c;                                                         \
                                                                                \
                 while((c = *str++))                                            \
@@ -91,6 +94,15 @@
                 if(len)                                                        \
                 {                                                              \
                         (*s)[len - 1] = '\0';                                  \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_from_cstring(N *first, const char* const second)              \
+        {                                                                      \
+                if(*second)                                                    \
+                {                                                              \
+			char* const second_p = (char*)second;\
+			N##_copy(first, &second_p);\
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -164,37 +176,6 @@
                 int ret = N##_read_untill(s, f, "");                           \
                 fclose(f);                                                     \
                 return ret;                                                    \
-        }                                                                      \
-                                                                               \
-        struct N##_array                                                       \
-        {                                                                      \
-                N *data;                                                       \
-                size_t size;                                                   \
-                size_t max;                                                    \
-        };                                                                     \
-                                                                               \
-        typedef struct N##_array N##_array;                                    \
-                                                                               \
-        static void N##_array_push_back(N##_array *a, N el)                    \
-        {                                                                      \
-                if(a->size == a->max)                                          \
-                {                                                              \
-                        a->max = (a->max) ? 2 * (a->max) : 1;                  \
-                        a->data = (N *)realloc(a->data, sizeof(N) * a->max);   \
-                }                                                              \
-                a->data[a->size++] = el;                                       \
-        }                                                                      \
-                                                                               \
-        N##_array N##_split(N s, const char *const del)                        \
-        {                                                                      \
-                N##_array a = {NULL, 0, 0};                                    \
-                N tmp = strtok(s, del);                                        \
-                while(tmp)                                                     \
-                {                                                              \
-                        N##_array_push_back(&a, tmp);                          \
-                        tmp = strtok(NULL, del);                               \
-                }                                                              \
-                return a;                                                      \
         }                                                                      \
                                                                                \
         struct N##_iterator                                                    \
@@ -314,5 +295,6 @@
                                                                                \
         int N##_iterator_valid(const struct N##_iterator i)                    \
         {                                                                      \
+		(void)i;\
                 return 1;                                                      \
         }
