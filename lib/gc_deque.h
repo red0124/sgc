@@ -170,7 +170,7 @@
                 return equal;                                                  \
         }                                                                      \
                                                                                \
-        void N##_copy(struct N *restrict dst,                                  \
+        void N##_copy(struct N *__restrict__ dst,                              \
                       const struct N *__restrict__ const src)                  \
         {                                                                      \
                 if(src->_size != 0)                                            \

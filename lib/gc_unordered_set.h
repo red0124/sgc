@@ -358,9 +358,9 @@ static size_t gc_next_prime(size_t n)
                 else                                                           \
                 {                                                              \
                         struct N##_node *tmp = i->_curr;                       \
-                        while(i->_curr_bucket > 0)                             \
+			--i->_curr_bucket;                                     \
+                        while(1)                                               \
                         {                                                      \
-                                --i->_curr_bucket;                             \
                                 i->_curr = i->_data[i->_curr_bucket];          \
                                 if(i->_curr)                                   \
                                 {                                              \

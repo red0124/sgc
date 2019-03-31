@@ -383,7 +383,7 @@ enum node_state
                                                                                \
         void N##_iterator_erase(struct N *u, struct N##_iterator *i)           \
         {                                                                      \
-                (void *)(u);                                                   \
+                (void)(u);                                                     \
                 if(N##_iterator_valid(*i))                                     \
                 {                                                              \
                         V *value = N##_iterator_value(*i);                     \

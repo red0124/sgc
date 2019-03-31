@@ -480,7 +480,7 @@
 #define GC_STACK
 #define GC_STACK_SIZE 64
 
-#define PREPARE_STACK                                                          \
+#define GC_PREPARE_STACK                                                       \
         char *stack[GC_STACK_SIZE];                                            \
         char **stackptr = stack
 
@@ -515,7 +515,7 @@
                 size_t thresh = GC_STACK_THRESH * sizeof(N##_type);            \
                 char *array_ = (char *)array;                                  \
                 char *limit = array_ + array_size * sizeof(N##_type);          \
-                PREPARE_STACK;                                                 \
+                GC_PREPARE_STACK;                                              \
                                                                                \
                 while(1)                                                       \
                 {                                                              \
@@ -605,127 +605,20 @@
                 N##_qsort(N##_array(c), N##_size(c), comp);                    \
         }
 
-#define INIT_CONDITIONS(COND, IN, N)                                           \
-        int N##_any(const IN *in)                                              \
-        {                                                                      \
-                int any = 0;                                                   \
-                IN##_value v;                                                  \
-                struct IN##_iterator begin = IN##_cbegin(in);                  \
-                struct IN##_iterator end = IN##_cend(in);                      \
-                if(!IN##_iterator_equal(begin, end))                           \
-                {                                                              \
-                        v = *IN##_iterator_value(begin);                       \
-                        if(COND)                                               \
-                        {                                                      \
-                                any = 1;                                       \
-                        }                                                      \
-                }                                                              \
-                while(!any && !IN##_iterator_equal(begin, end))                \
-                {                                                              \
-                        IN##_iterator_next(&begin);                            \
-                        v = *IN##_iterator_value(begin);                       \
-                        if(COND)                                               \
-                        {                                                      \
-                                any = 1;                                       \
-                        }                                                      \
-                }                                                              \
-                return any;                                                    \
-        }                                                                      \
-                                                                               \
-        int N##_all(const IN *in)                                              \
-        {                                                                      \
-                int all = 1;                                                   \
-                IN##_value v;                                                  \
-                struct IN##_iterator begin = IN##_cbegin(in);                  \
-                struct IN##_iterator end = IN##_cend(in);                      \
-                if(!IN##_iterator_equal(begin, end))                           \
-                {                                                              \
-                        v = *IN##_iterator_value(begin);                       \
-                        if(!(COND))                                            \
-                        {                                                      \
-                                all = 0;                                       \
-                        }                                                      \
-                }                                                              \
-                while(all && !IN##_iterator_equal(begin, end))                 \
-                {                                                              \
-                        IN##_iterator_next(&begin);                            \
-                        v = *IN##_iterator_value(begin);                       \
-                        if(!(COND))                                            \
-                        {                                                      \
-                                all = 0;                                       \
-                        }                                                      \
-                }                                                              \
-                return all;                                                    \
-        }
-
-#define INIT_CONDITIONS_PAIR(COND, IN, N)                                      \
-        int N##_any(const IN *in)                                              \
-        {                                                                      \
-                int any = 0;                                                   \
-                IN##_value v;                                                  \
-                IN##_key k;                                                    \
-                struct IN##_iterator begin = IN##_cbegin(in);                  \
-                struct IN##_iterator end = IN##_cend(in);                      \
-                if(!IN##_iterator_equal(begin, end))                           \
-                {                                                              \
-                        v = *IN##_iterator_value(begin);                       \
-                        k = *IN##_iterator_key(begin);                         \
-                        if(COND)                                               \
-                        {                                                      \
-                                any = 1;                                       \
-                        }                                                      \
-                }                                                              \
-                while(!any && !IN##_iterator_equal(begin, end))                \
-                {                                                              \
-                        IN##_iterator_next(&begin);                            \
-                        v = *IN##_iterator_value(begin);                       \
-                        k = *IN##_iterator_key(begin);                         \
-                        if(COND)                                               \
-                        {                                                      \
-                                any = 1;                                       \
-                        }                                                      \
-                }                                                              \
-                return any;                                                    \
-        }                                                                      \
-                                                                               \
-        int N##_all(const IN *in)                                              \
-        {                                                                      \
-                int all = 1;                                                   \
-                IN##_value v;                                                  \
-                IN##_key k;                                                    \
-                struct IN##_iterator begin = IN##_cbegin(in);                  \
-                struct IN##_iterator end = IN##_cend(in);                      \
-                if(!IN##_iterator_equal(begin, end))                           \
-                {                                                              \
-                        v = *IN##_iterator_value(begin);                       \
-                        k = *IN##_iterator_key(begin);                         \
-                        if(!(COND))                                            \
-                        {                                                      \
-                                all = 0;                                       \
-                        }                                                      \
-                }                                                              \
-                while(all && !IN##_iterator_equal(begin, end))                 \
-                {                                                              \
-                        IN##_iterator_next(&begin);                            \
-                        v = *IN##_iterator_value(begin);                       \
-                        k = *IN##_iterator_key(begin);                         \
-                        if(!(COND))                                            \
-                        {                                                      \
-                                all = 0;                                       \
-                        }                                                      \
-                }                                                              \
-                return all;                                                    \
-        }
-
-#define GC_FOR_EACH(EL, C, N, ACT)                                             \
+#define GC_FOR_EACH(N, C, EL, ACT)                                             \
         do                                                                     \
         {                                                                      \
-                N##_type EL;                                                   \
+                N##_type* EL;                                                  \
                 struct N##_iterator __gc_it_begin = N##_cbegin(&C);            \
                 struct N##_iterator __gc_it_end = N##_cend(&C);                \
+                if(!N##_iterator_valid(__gc_it_begin) || 		       \
+				!N##_iterator_valid(__gc_it_end))              \
+                {                                                              \
+                        break;                                                 \
+                }                                                              \
                 if(!N##_iterator_equal(__gc_it_begin, __gc_it_end))            \
                 {                                                              \
-                        EL = *N##_iterator_value(__gc_it_begin);               \
+                        EL = N##_iterator_value(__gc_it_begin);                \
                         do                                                     \
                         {                                                      \
                                 ACT;                                           \
@@ -734,7 +627,7 @@
                 while(!N##_iterator_equal(__gc_it_begin, __gc_it_end))         \
                 {                                                              \
                         N##_iterator_next(&__gc_it_begin);                     \
-                        EL = *N##_iterator_value(__gc_it_begin);               \
+                        EL = N##_iterator_value(__gc_it_begin);                \
                         do                                                     \
                         {                                                      \
                                 ACT;                                           \
@@ -742,17 +635,22 @@
                 }                                                              \
         } while(0);
 
-#define GC_FOR_EACH_PAIR(K, V, C, N, ACT)                                      \
+#define GC_FOR_EACH_PAIR(N, C, K, V, ACT)                                      \
         do                                                                     \
         {                                                                      \
-                N##_key K;                                                     \
-                N##_value V;                                                   \
+                const N##_key* K;                                              \
+                N##_value* V;                                                  \
                 struct N##_iterator __gc_it_begin = N##_cbegin(&C);            \
                 struct N##_iterator __gc_it_end = N##_cend(&C);                \
+                if(!N##_iterator_valid(__gc_it_begin) || 		       \
+				!N##_iterator_valid(__gc_it_end))              \
+                {                                                              \
+                        break;                                                 \
+                }                                                              \
                 if(!N##_iterator_equal(__gc_it_begin, __gc_it_end))            \
                 {                                                              \
-                        V = *N##_iterator_value(__gc_it_begin);                \
-                        K = *N##_iterator_key(__gc_it_begin);                  \
+                        V = N##_iterator_value(__gc_it_begin);                 \
+                        K = N##_iterator_key(__gc_it_begin);                   \
                         do                                                     \
                         {                                                      \
                                 ACT;                                           \
@@ -760,13 +658,13 @@
                 }                                                              \
                 while(!N##_iterator_equal(__gc_it_begin, __gc_it_end))         \
                 {                                                              \
-                        V = *N##_iterator_value(__gc_it_begin);                \
-                        K = *N##_iterator_key(__gc_it_begin);                  \
+                        N##_iterator_next(&__gc_it_begin);                     \
+                        V = N##_iterator_value(__gc_it_begin);                 \
+                        K = N##_iterator_key(__gc_it_begin);                   \
                         do                                                     \
                         {                                                      \
                                 ACT;                                           \
                         } while(0);                                            \
-                        N##_iterator_next(&__gc_it_begin);                     \
                 }                                                              \
         } while(0);
 
@@ -849,10 +747,10 @@
         do                                                                     \
         {                                                                      \
 		OUT_C##_init(&OUT);                                            \
-                STR __GC_##STR##_tmp = strtok(S, DEL);                         \
-                while(__GC_##STR##_tmp)                                        \
+                STR __gc_str_tmp = strtok(S, DEL);                         \
+                while(__gc_str_tmp)                                        \
                 {                                                              \
-                        OUT_C##_default_insert(&OUT, __GC_##STR##_tmp);        \
-                        __GC_##STR##_tmp = strtok(NULL, DEL);                  \
+                        OUT_C##_default_insert(&OUT, __gc_str_tmp);        \
+                        __gc_str_tmp = strtok(NULL, DEL);                  \
                 }                                                              \
         } while(0);

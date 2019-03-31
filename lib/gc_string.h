@@ -105,6 +105,13 @@
 			N##_copy(first, &second_p);\
                 }                                                              \
         }                                                                      \
+	\
+        N N##_create(const char* const second)                     \
+        {                                                                      \
+		N ret = NULL;\
+		N##_from_cstring(&ret, second);\
+		return ret;\
+        }                                                                      \
                                                                                \
         int N##_read_buffer(N *s, FILE *f, char *buff, size_t buff_size)       \
         {                                                                      \
@@ -134,7 +141,7 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        int N##_read_untill(N *s, FILE *f, char *del)                          \
+        int N##_read_untill(N *s, FILE *f, const char * const del)             \
         {                                                                      \
                 *s = NULL;                                                     \
                 char c;                                                        \
