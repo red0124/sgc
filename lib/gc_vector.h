@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_VECTOR(T, N)                                                      \
+#define SGC_INIT_VECTOR(T, N)                                                      \
                                                                                \
         struct N                                                               \
         {                                                                      \

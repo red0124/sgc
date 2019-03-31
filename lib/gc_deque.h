@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_DEQUE(T, N)                                                       \
+#define SGC_INIT_DEQUE(T, N)                                                   \
                                                                                \
         struct N                                                               \
         {                                                                      \

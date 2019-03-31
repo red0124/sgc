@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_HEADER_STATIC_PRIORITY_QUEUE(T, S, N)                             \
+#define SGC_INIT_HEADER_STATIC_PRIORITY_QUEUE(T, S, N)                             \
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \

@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_QUEUE(T, N)                                                       \
+#define SGC_INIT_QUEUE(T, N)                                                       \
                                                                                \
         struct N                                                               \
         {                                                                      \

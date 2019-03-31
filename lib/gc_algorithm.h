@@ -1,8 +1,6 @@
 #pragma once
 
-#define INIT_NONE(N)
-
-#define INIT_ITERATE(N)                                                        \
+#define SGC_INIT_ITERATE(N)                                                    \
         void N##_fold_range(                                                   \
             struct N##_iterator begin, struct N##_iterator end,                \
             void (*fun)(const N##_type *const, void *), void *argout)          \
@@ -139,7 +137,7 @@
                                         file);                                 \
         }
 
-#define INIT_FIND(N)                                                           \
+#define SGC_INIT_FIND(N)                                                       \
         N##_type *N##_find_el_range(struct N##_iterator begin,                 \
                                     struct N##_iterator end,                   \
                                     const N##_type el)                         \
@@ -222,11 +220,11 @@
                 return ret;                                                    \
         }
 
-#define INIT_ALGORITHM(N)                                                      \
-        INIT_ITERATE(N)                                                        \
-        INIT_FIND(N)
+#define SGC_INIT_ALGORITHM(N)                                                  \
+        SGC_INIT_ITERATE(N)                                                    \
+        SGC_INIT_FIND(N)
 
-#define INIT_FIND_ITERATOR(N)                                                  \
+#define SGC_INIT_FIND_ITERATOR(N)                                              \
         struct N##_iterator N##_find_range(struct N##_iterator begin,          \
                                            struct N##_iterator end,            \
                                            const N##_type el)                  \
@@ -260,7 +258,7 @@
                 return N##_find_range(N##_cbegin(c), N##_cend(c), el);         \
         }
 
-#define INIT_BINARY_FIND(T, N)                                                 \
+#define SGC_INIT_BINARY_FIND(T, N)                                             \
         N##_type *N##_binary_find_el(struct N *c, const N##_type el)           \
         {                                                                      \
                 N##_type *ret = NULL;                                          \
@@ -323,7 +321,7 @@
                 return ret;                                                    \
         }
 
-#define INIT_ITERATE_PAIR(N)                                                   \
+#define SGC_INIT_ITERATE_PAIR(N)                                               \
         void N##_fold_range_pair(                                              \
             struct N##_iterator begin, struct N##_iterator end,                \
             void (*fun)(const N##_key *const, const N##_value *const, void *), \
@@ -476,29 +474,29 @@
                                              format, file);                    \
         }
 
-#ifndef GC_STACK
-#define GC_STACK
-#define GC_STACK_SIZE 64
+#ifndef SGC_STACK
+#define SGC_STACK
+#define SGC_STACK_SIZE 64
 
-#define GC_PREPARE_STACK                                                       \
-        char *stack[GC_STACK_SIZE];                                            \
+#define SGC_PREPARE_STACK                                                      \
+        char *stack[SGC_STACK_SIZE];                                           \
         char **stackptr = stack
 
-#define GC_STACK_PUSH(array, limit)                                            \
+#define SGC_STACK_PUSH(array, limit)                                           \
         stackptr[0] = array;                                                   \
         stackptr[1] = limit;                                                   \
         stackptr += 2
 
-#define GC_STACK_POP(array, limit)                                             \
+#define SGC_STACK_POP(array, limit)                                            \
         stackptr -= 2;                                                         \
         array = stackptr[0];                                                   \
         limit = stackptr[1]
 
-#define GC_STACK_THRESH 7
+#define SGC_STACK_THRESH 7
 
 #endif
 
-#define INIT_QSORT(T, N)                                                       \
+#define SGC_INIT_QSORT(T, N)                                                   \
         static void N##_memswp(char *i, char *j)                               \
         {                                                                      \
                 N##_type tmp;                                                  \
@@ -512,10 +510,10 @@
                               int (*comp)(const void *, const void *))         \
         {                                                                      \
                 char *i, *j;                                                   \
-                size_t thresh = GC_STACK_THRESH * sizeof(N##_type);            \
+                size_t thresh = SGC_STACK_THRESH * sizeof(N##_type);           \
                 char *array_ = (char *)array;                                  \
                 char *limit = array_ + array_size * sizeof(N##_type);          \
-                GC_PREPARE_STACK;                                              \
+                SGC_PREPARE_STACK;                                             \
                                                                                \
                 while(1)                                                       \
                 {                                                              \
@@ -559,12 +557,12 @@
                                 N##_memswp(array_, j);                         \
                                 if(j - array_ > limit - i)                     \
                                 {                                              \
-                                        GC_STACK_PUSH(array_, j);              \
+                                        SGC_STACK_PUSH(array_, j);             \
                                         array_ = i;                            \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        GC_STACK_PUSH(i, limit);               \
+                                        SGC_STACK_PUSH(i, limit);              \
                                         limit = j;                             \
                                 }                                              \
                         }                                                      \
@@ -587,7 +585,7 @@
                                 }                                              \
                                 if(stackptr != stack)                          \
                                 {                                              \
-                                        GC_STACK_POP(array_, limit);           \
+                                        SGC_STACK_POP(array_, limit);          \
                                 }                                              \
                                 else                                           \
                                 {                                              \
@@ -605,14 +603,14 @@
                 N##_qsort(N##_array(c), N##_size(c), comp);                    \
         }
 
-#define GC_FOR_EACH(N, C, EL, ACT)                                             \
+#define SGC_FOR_EACH(N, C, EL, ACT)                                            \
         do                                                                     \
         {                                                                      \
-                N##_type* EL;                                                  \
+                N##_type *EL;                                                  \
                 struct N##_iterator __gc_it_begin = N##_cbegin(&C);            \
                 struct N##_iterator __gc_it_end = N##_cend(&C);                \
-                if(!N##_iterator_valid(__gc_it_begin) || 		       \
-				!N##_iterator_valid(__gc_it_end))              \
+                if(!N##_iterator_valid(__gc_it_begin) ||                       \
+                   !N##_iterator_valid(__gc_it_end))                           \
                 {                                                              \
                         break;                                                 \
                 }                                                              \
@@ -635,15 +633,15 @@
                 }                                                              \
         } while(0);
 
-#define GC_FOR_EACH_PAIR(N, C, K, V, ACT)                                      \
+#define SGC_FOR_EACH_PAIR(N, C, K, V, ACT)                                     \
         do                                                                     \
         {                                                                      \
-                const N##_key* K;                                              \
-                N##_value* V;                                                  \
+                const N##_key *K;                                              \
+                N##_value *V;                                                  \
                 struct N##_iterator __gc_it_begin = N##_cbegin(&C);            \
                 struct N##_iterator __gc_it_end = N##_cend(&C);                \
-                if(!N##_iterator_valid(__gc_it_begin) || 		       \
-				!N##_iterator_valid(__gc_it_end))              \
+                if(!N##_iterator_valid(__gc_it_begin) ||                       \
+                   !N##_iterator_valid(__gc_it_end))                           \
                 {                                                              \
                         break;                                                 \
                 }                                                              \
@@ -668,7 +666,7 @@
                 }                                                              \
         } while(0);
 
-#define GC_LC7(OUT_C, OUT, IN_C, IN, V, ACT, COND)                             \
+#define SGC_LC7(OUT_C, OUT, IN_C, IN, V, ACT, COND)                            \
         struct OUT_C OUT;                                                      \
         do                                                                     \
         {                                                                      \
@@ -695,7 +693,7 @@
                 }                                                              \
         } while(0);
 
-#define GC_LC6(OUT_C, OUT, IN_C, IN, V, ACT)                                   \
+#define SGC_LC6(OUT_C, OUT, IN_C, IN, V, ACT)                                  \
         struct OUT_C OUT;                                                      \
         do                                                                     \
         {                                                                      \
@@ -716,7 +714,7 @@
                 }                                                              \
         } while(0);
 
-#define GC_LC4(OUT_C, OUT, IN_C, IN)                                           \
+#define SGC_LC4(OUT_C, OUT, IN_C, IN)                                          \
         struct OUT_C OUT;                                                      \
         do                                                                     \
         {                                                                      \
@@ -737,20 +735,19 @@
         } while(0);
 
 #define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
-#define GC_LC(...)                                                             \
-        GET_MACRO(__VA_ARGS__, GC_LC7, GC_LC6, NONE, GC_LC4)                   \
+#define SGC_LC(...)                                                            \
+        GET_MACRO(__VA_ARGS__, SGC_LC7, SGC_LC6, NONE, SGC_LC4)                \
         (__VA_ARGS__)
 
-
-#define GC_SPLIT(OUT_C, OUT, STR, S, DEL)                                      \
+#define SGC_SPLIT(OUT_C, OUT, STR, S, DEL)                                     \
         OUT_C OUT;                                                             \
         do                                                                     \
         {                                                                      \
-		OUT_C##_init(&OUT);                                            \
-                STR __gc_str_tmp = strtok(S, DEL);                         \
-                while(__gc_str_tmp)                                        \
+                OUT_C##_init(&OUT);                                            \
+                STR __gc_str_tmp = strtok(S, DEL);                             \
+                while(__gc_str_tmp)                                            \
                 {                                                              \
-                        OUT_C##_default_insert(&OUT, __gc_str_tmp);        \
-                        __gc_str_tmp = strtok(NULL, DEL);                  \
+                        OUT_C##_default_insert(&OUT, __gc_str_tmp);            \
+                        __gc_str_tmp = strtok(NULL, DEL);                      \
                 }                                                              \
         } while(0);

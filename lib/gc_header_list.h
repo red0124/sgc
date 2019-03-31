@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_HEADER_LIST(T, N)                                                 \
+#define SGC_INIT_HEADER_LIST(T, N)                                                 \
         struct N##_node                                                        \
         {                                                                      \
                 T _data;                                                       \

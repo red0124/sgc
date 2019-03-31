@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_HEADER_STATIC_UNORDERED_SET(V, S, N)                              \
+#define SGC_INIT_HEADER_STATIC_UNORDERED_SET(V, S, N)                              \
         struct N##_node                                                        \
         {                                                                      \
                 V _value;                                                      \

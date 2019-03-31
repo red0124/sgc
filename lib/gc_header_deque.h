@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_HEADER_DEQUE(T, N)                                                \
+#define SGC_INIT_HEADER_DEQUE(T, N)                                                \
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \

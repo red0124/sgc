@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_STATIC_QUEUE(T, S, N)                                             \
+#define SGC_INIT_STATIC_QUEUE(T, S, N)                                             \
                                                                                \
         struct N                                                               \
         {                                                                      \

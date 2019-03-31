@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GC_NEXT_PRIME
-#define GC_NEXT_PRIME
+#ifndef SGC_NEXT_PRIME
+#define SGC_NEXT_PRIME
 
 static size_t gc_sqrt(size_t n)
 {
@@ -38,7 +38,7 @@ static size_t gc_next_prime(size_t n)
 
 #endif
 
-#define INIT_UNORDERED_SET(V, N)                                               \
+#define SGC_INIT_UNORDERED_SET(V, N)                                               \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \

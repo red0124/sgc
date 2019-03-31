@@ -1,12 +1,12 @@
 #pragma once
 
-#ifndef GC_MAP
-#define GC_MAP
+#ifndef SGC_MAP
+#define SGC_MAP
 #define MAP_LEAF NULL
 #endif
 
-#ifndef GC_MAP_COLOR
-#define GC_MAP_COLOR
+#ifndef SGC_MAP_COLOR
+#define SGC_MAP_COLOR
 enum map_color
 {
         MAP_RED,
@@ -14,8 +14,8 @@ enum map_color
 };
 #endif
 
-#ifndef GC_MAP_LOG
-#define GC_MAP_LOG
+#ifndef SGC_MAP_LOG
+#define SGC_MAP_LOG
 static size_t gc_exp_two(size_t curr)
 {
         size_t power = 1;
@@ -37,7 +37,7 @@ static size_t gc_log_two(size_t size)
 }
 #endif
 
-#define INIT_SET(V, N)                                                         \
+#define SGC_INIT_SET(V, N)                                                         \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \

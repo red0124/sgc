@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_STRING(N)                                                         \
+#define SGC_INIT_STRING(N)                                                         \
                                                                                \
         typedef char *N;                                                       \
         typedef char N##_value;                                                \

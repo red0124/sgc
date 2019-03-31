@@ -1,12 +1,12 @@
 #pragma once
 
-#ifndef GC_ST
-#define GC_ST
+#ifndef SGC_ST
+#define SGC_ST
 #warning                                                                       \
-    "header contains function definitions whitch may cause multiple definition errors, define GC_STATIC_TYPES to kill warning"
+    "header contains function definitions whitch may cause multiple definition errors, define SGC_STATIC_TYPES to kill warning"
 #endif
 
-#define INIT_STATIC(T, N)                                                      \
+#define SGC_INIT_STATIC(T, N)                                                      \
                                                                                \
         void N##_init(T *el)                                                   \
         {                                                                      \
@@ -39,35 +39,35 @@
                 return (int)(*(T *)first - *(T *)second);                      \
         }
 
-INIT_STATIC(char, char);
-INIT_STATIC(unsigned char, unsigned_char);
-INIT_STATIC(short, short);
-INIT_STATIC(unsigned short, unsigned_short);
-INIT_STATIC(int, int);
-INIT_STATIC(unsigned int, unsigned_int);
-INIT_STATIC(long, long);
-INIT_STATIC(unsigned long, unsigned_long);
-INIT_STATIC(float, float);
-INIT_STATIC(double, double);
-INIT_STATIC(long double, long_double);
+SSGC_INIT_STATIC(char, char);
+SSGC_INIT_STATIC(unsigned char, unsigned_char);
+SSGC_INIT_STATIC(short, short);
+SSGC_INIT_STATIC(unsigned short, unsigned_short);
+SSGC_INIT_STATIC(int, int);
+SSGC_INIT_STATIC(unsigned int, unsigned_int);
+SSGC_INIT_STATIC(long, long);
+SSGC_INIT_STATIC(unsigned long, unsigned_long);
+SSGC_INIT_STATIC(float, float);
+SSGC_INIT_STATIC(double, double);
+SSGC_INIT_STATIC(long double, long_double);
 
-#define INIT_HASH(T, N)                                                        \
+#define SGC_INIT_HASH(T, N)                                                        \
                                                                                \
         size_t N##_hash(const T *const el)                                     \
         {                                                                      \
                 return (size_t)*el;                                            \
         }
 
-INIT_HASH(char, char);
-INIT_HASH(unsigned char, unsigned_char);
-INIT_HASH(short, short);
-INIT_HASH(unsigned short, unsigned_short);
-INIT_HASH(int, int);
-INIT_HASH(unsigned int, unsigned_int);
-INIT_HASH(long, long);
-INIT_HASH(unsigned long, unsigned_long);
+SSGC_INIT_HASH(char, char);
+SSGC_INIT_HASH(unsigned char, unsigned_char);
+SSGC_INIT_HASH(short, short);
+SSGC_INIT_HASH(unsigned short, unsigned_short);
+SSGC_INIT_HASH(int, int);
+SSGC_INIT_HASH(unsigned int, unsigned_int);
+SSGC_INIT_HASH(long, long);
+SSGC_INIT_HASH(unsigned long, unsigned_long);
 
-#define INIT_STATIC_STRUCT(T, N)                                               \
+#define SGC_INIT_STATIC_STRUCT(T, N)                                               \
                                                                                \
         void N##_init(T *el)                                                   \
         {                                                                      \

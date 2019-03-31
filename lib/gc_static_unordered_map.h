@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GC_NODE_STATE
-#define GC_NODE_STATE
+#ifndef SGC_NODE_STATE
+#define SGC_NODE_STATE
 
 enum node_state
 {
@@ -12,7 +12,7 @@ enum node_state
 
 #endif
 
-#define INIT_STATIC_UNORDERED_MAP(K, V, S, N)                                  \
+#define SGC_INIT_STATIC_UNORDERED_MAP(K, V, S, N)                                  \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \

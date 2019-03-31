@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_STACK(T, N)                                                       \
+#define SGC_INIT_STACK(T, N)                                                       \
                                                                                \
         struct N                                                               \
         {                                                                      \

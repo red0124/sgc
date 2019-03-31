@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_HEADER_STRING(N)                                                  \
+#define SGC_INIT_HEADER_STRING(N)                                                  \
         typedef char *N;                                                       \
                                                                                \
         void N##_copy(N *first, const N *const second);                        \

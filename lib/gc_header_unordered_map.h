@@ -1,6 +1,6 @@
 #pragma once
 
-#define INIT_HEADER_UNORDERED_MAP(K, V, N)                                     \
+#define SGC_INIT_HEADER_UNORDERED_MAP(K, V, N)                                     \
         struct N##_node                                                        \
         {                                                                      \
                 K _key;                                                        \

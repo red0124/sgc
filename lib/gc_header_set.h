@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GC_MAP_COLOR
-#define GC_MAP_COLOR
+#ifndef SGC_MAP_COLOR
+#define SGC_MAP_COLOR
 enum map_color
 {
         MAP_RED,
@@ -9,7 +9,7 @@ enum map_color
 };
 #endif
 
-#define INIT_HEADER_SET(V, N)                                                  \
+#define SGC_INIT_HEADER_SET(V, N)                                                  \
         struct N##_node                                                        \
         {                                                                      \
                 struct N##_node *_parent;                                      \
