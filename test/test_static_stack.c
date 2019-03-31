@@ -110,7 +110,7 @@ void test_astack(void)
 
         astack_set_share(1);
         ++allocation_count;
-        astack_push(&v, (al){malloc(sizeof(int))});
+        astack_push(&v, (al){(int*)malloc(sizeof(int))});
         astack_set_share(0);
 
         astack_free(&v);

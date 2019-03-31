@@ -115,7 +115,7 @@ void test_apqueue(void)
 
         apqueue_set_share(1);
         ++allocation_count;
-	al new_el = (al){malloc(sizeof(int))};
+	al new_el = (al){(int*)malloc(sizeof(int))};
 	*(new_el.el) = 3;
         apqueue_push(&v, new_el);
         apqueue_set_share(0);

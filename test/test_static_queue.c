@@ -112,7 +112,7 @@ void test_aqueue(void)
 
         aqueue_set_share(1);
         ++allocation_count;
-        aqueue_push(&v, (al){malloc(sizeof(int))});
+        aqueue_push(&v, (al){(int*)malloc(sizeof(int))});
         aqueue_set_share(0);
 
         aqueue_free(&v);

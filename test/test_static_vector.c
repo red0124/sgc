@@ -186,7 +186,7 @@ void test_avector(void)
 
         avector_set_share(1);
         ++allocation_count;
-        avector_push_back(&v, (al){malloc(sizeof(int))});
+        avector_push_back(&v, (al){(int*)malloc(sizeof(int))});
         avector_set_share(0);
 
         avector_free(&v);

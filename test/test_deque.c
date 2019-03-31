@@ -183,7 +183,7 @@ void test_adeque(void)
 
         adeque_set_share(1);
         ++allocation_count;
-        adeque_push_back(&v, (al){malloc(sizeof(int))});
+        adeque_push_back(&v, (al){(int*)malloc(sizeof(int))});
         adeque_set_share(0);
 
         adeque_free(&v);

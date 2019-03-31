@@ -275,7 +275,7 @@ void test_alist(void)
 
         alist_set_share(1);
         ++allocation_count;
-        alist_push_back(&l, (al){malloc(sizeof(int))});
+        alist_push_back(&l, (al){(int*)malloc(sizeof(int))});
         alist_set_share(0);
 
         alist_free(&l);

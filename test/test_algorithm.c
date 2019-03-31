@@ -9,12 +9,17 @@
 #define GC_ST
 #include "../lib/gc_deque.h"
 #include "../lib/gc_map.h"
+#include "../lib/gc_list.h"
 #include "../lib/gc_set.h"
 #include "../lib/gc_static_types.h"
 #include "../lib/gc_static_unordered_map.h"
 #include "../lib/gc_unordered_map.h"
 #include "../lib/gc_unordered_set.h"
 #include "../lib/gc_vector.h"
+#include "../lib/gc_string.h"
+
+INIT_UNORDERED_SET(int, __unused_set);
+INIT_UNORDERED_MAP(int, int, __unused_mat);
 
 #include "../lib/gc_algorithm.h"
 #include "../lib/gc_static_types.h"
@@ -380,67 +385,43 @@ void test_execute_map_pair(void)
         map_free(&m);
 }
 
-INIT_CONDITIONS(v < 5, vector, c1);
-INIT_CONDITIONS(v > 5, vector, c2);
-INIT_CONDITIONS(v < 3, vector, c3);
-INIT_CONDITIONS(v > 3, vector, c4);
-
-INIT_CONDITIONS_PAIR(k == v, map, c5);
-INIT_CONDITIONS_PAIR(k > v, map, c6);
-INIT_CONDITIONS_PAIR(k < v, map, c7);
-
-void test_conditions(void)
+void test_for_each(void)
 {
         vector v;
         vector_init(&v);
 
-        for(size_t i = 0; i < 5; ++i)
+        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
         {
                 vector_push_back(&v, i);
         }
 
-        TEST_ASSERT_EQUAL_INT(1, c1_any(&v));
-        TEST_ASSERT_EQUAL_INT(1, c1_all(&v));
-        TEST_ASSERT_EQUAL_INT(0, c2_any(&v));
-        TEST_ASSERT_EQUAL_INT(0, c2_all(&v));
-        TEST_ASSERT_EQUAL_INT(1, c3_any(&v));
-        TEST_ASSERT_EQUAL_INT(0, c3_all(&v));
-        TEST_ASSERT_EQUAL_INT(1, c4_any(&v));
-        TEST_ASSERT_EQUAL_INT(0, c4_all(&v));
+	GC_FOR_EACH(vector, v, i, *i += 1);
 
-        vector_free(&v);
+	size_t j = 1;
+	GC_FOR_EACH(vector, v, i, TEST_ASSERT_EQUAL_INT(*i, j); ++j);
 
+	vector_free(&v);
+}
+
+void test_for_each_pair(void)
+{
         map m;
         map_init(&m);
 
-        for(size_t i = 0; i < 5; ++i)
+        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
         {
                 map_set_at(&m, i, i);
         }
 
-        TEST_ASSERT_EQUAL_INT(1, c5_any(&m));
-        TEST_ASSERT_EQUAL_INT(1, c5_all(&m));
-        TEST_ASSERT_EQUAL_INT(0, c6_any(&m));
-        TEST_ASSERT_EQUAL_INT(0, c6_all(&m));
-        TEST_ASSERT_EQUAL_INT(0, c7_any(&m));
-        TEST_ASSERT_EQUAL_INT(0, c7_all(&m));
-
-        map_set_at(&m, 0, 1);
-
-        TEST_ASSERT_EQUAL_INT(1, c7_any(&m));
-        TEST_ASSERT_EQUAL_INT(0, c7_all(&m));
-
-        map_set_at(&m, 2, 1);
-
-        TEST_ASSERT_EQUAL_INT(1, c6_any(&m));
-        TEST_ASSERT_EQUAL_INT(0, c6_all(&m));
+	GC_FOR_EACH_PAIR(map, m, k, v, (void)k; *v += 1);
+	GC_FOR_EACH_PAIR(map, m, k, v, TEST_ASSERT_EQUAL_INT(*v, *k + 1));
 
         map_free(&m);
 }
 
 INIT_SET(int, set);
 
-void test_lc(void)
+void test_lc1(void)
 {
         vector v;
         vector_init(&v);
@@ -460,13 +441,48 @@ void test_lc(void)
         }
 
         vector_free(&v);
+        vector_free(&v2);
+        set_free(&s);
+	deque_free(&d);
 }
 
-#define FIRST(...) FIRST_HELPER(__VA_ARGS__, throw)
-#define FIRST_HELPER(first, ...) first
-
-void test_x(void)
+void test_lc2(void)
 {
+        vector v;
+        vector_init(&v);
+
+        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
+        {
+                vector_push_back(&v, i);
+        }
+
+	vector_push_back(&v, 1);
+	GC_LC(set, s, vector, v, i, i, vector_count(&v, i) == 1);
+
+	TEST_ASSERT_EQUAL_INT(set_size(&s), vector_size(&v) - 2);
+
+        vector_free(&v);
+	set_free(&s);
+}
+
+INIT_STRING(string);
+INIT_LIST(string, sset);
+INIT_ALGORITHM(sset);
+
+void test_split(void)
+{
+	string str = string_create("just some random strings :D :D :D");
+	GC_SPLIT(sset, s, string, str, " ");
+
+	TEST_ASSERT_EQUAL_INT(sset_size(&s), 7);
+	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)"just"), 1);
+	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)"some"), 1);
+	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)"random"), 1);
+	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)"strings"), 1);
+	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)":D"), 3);
+
+	sset_free(&s);
+	string_free(&str);
 }
 
 int main(void)
@@ -481,8 +497,11 @@ int main(void)
         RUN_TEST(test_fold_map_pair);
         RUN_TEST(test_execute_map);
         RUN_TEST(test_execute_map_pair);
-        RUN_TEST(test_conditions);
-        RUN_TEST(test_lc);
+	RUN_TEST(test_for_each);
+	RUN_TEST(test_for_each_pair);
+        RUN_TEST(test_lc1);
+        RUN_TEST(test_lc2);
+	RUN_TEST(test_split);
 
         return UNITY_END();
 }
