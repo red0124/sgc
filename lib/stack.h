@@ -1,11 +1,12 @@
 #pragma once
 
-#define SGC_INIT_STATIC_STACK(T, S, N)                                             \
+#define SGC_INIT_STACK(T, N)                                                   \
                                                                                \
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
-                T _data[S];                                                    \
+                size_t _max;                                                   \
+                T *_data;                                                      \
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
@@ -13,9 +14,19 @@
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
                                                                                \
-        size_t N##_max()                                                       \
+        static size_t N##_init_size = 1;                                       \
+        static double N##_growth_scale = 2;                                    \
+                                                                               \
+        void N##_set_init_size(size_t init_size)                               \
         {                                                                      \
-                return S;                                                      \
+                init_size = (init_size == 0) ? 1 : init_size;                  \
+                N##_init_size = init_size;                                     \
+        }                                                                      \
+                                                                               \
+        void N##_set_growth_scale(double growth_scale)                         \
+        {                                                                      \
+                growth_scale = (growth_scale == 0) ? 1 : growth_scale;         \
+                N##_growth_scale = growth_scale;                               \
         }                                                                      \
                                                                                \
         /* =================== */                                              \
@@ -75,23 +86,24 @@
                 N##_default_insert_function(d, el);                            \
         }                                                                      \
                                                                                \
-        /* ======================== */                                         \
-        /*  STATIC STACK FUNCTIONS  */                                         \
-        /* ======================== */                                         \
+        /* ================= */                                                \
+        /*  STACK FUNCTIONS  */                                                \
+        /* ================= */                                                \
                                                                                \
-        void N##_init(struct N *s)                                             \
-        {                                                                      \
-                s->_size = 0;                                                  \
-        }                                                                      \
-                                                                               \
-        size_t N##_size(const struct N *s)                                     \
+        size_t N##_size(const struct N *const s)                               \
         {                                                                      \
                 return s->_size;                                               \
         }                                                                      \
                                                                                \
+        void N##_init(struct N *const s)                                       \
+        {                                                                      \
+                s->_size = s->_max = 0;                                        \
+                s->_data = NULL;                                               \
+        }                                                                      \
+                                                                               \
         void N##_free(struct N *s)                                             \
         {                                                                      \
-                if(s->_size)                                                   \
+                if(s->_data)                                                   \
                 {                                                              \
                         if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
@@ -100,10 +112,12 @@
                                         N##_element_free(&s->_data[i]);        \
                                 }                                              \
                         }                                                      \
+                        free(s->_data);                                        \
                 }                                                              \
         }                                                                      \
                                                                                \
-        int N##_equal(const struct N *first, const struct N *second)           \
+        int N##_equal(const struct N *const first,                             \
+                      const struct N *const second)                            \
         {                                                                      \
                 int equal = (first == second);                                 \
                 if(equal == 0 && first->_size == second->_size)                \
@@ -128,6 +142,8 @@
                 if(src->_size != 0)                                            \
                 {                                                              \
                         dst->_size = src->_size;                               \
+                        dst->_max = src->_size;                                \
+                        dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
                         if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \
@@ -144,13 +160,23 @@
                 }                                                              \
         }                                                                      \
                                                                                \
+        static void N##_resize(struct N *s)                                    \
+        {                                                                      \
+                if(s->_size == s->_max)                                        \
+                {                                                              \
+                        s->_max = (s->_max == 0) ? N##_init_size               \
+                                                 : s->_max * N##_growth_scale; \
+                                                                               \
+                        s->_data =                                             \
+                            (T *)realloc(s->_data, sizeof(T) * s->_max);       \
+                }                                                              \
+        }                                                                      \
+                                                                               \
         void N##_push(struct N *s, T el)                                       \
         {                                                                      \
-                if(s->_size < S)                                               \
-                {                                                              \
-                        N##_element_copy(&s->_data[s->_size], &el);            \
-                        ++s->_size;                                            \
-                }                                                              \
+                N##_resize(s);                                                 \
+                N##_element_copy(&s->_data[s->_size], &el);                    \
+                ++s->_size;                                                    \
         }                                                                      \
                                                                                \
         void N##_pop(struct N *s)                                              \

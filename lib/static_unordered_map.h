@@ -12,7 +12,7 @@ enum node_state
 
 #endif
 
-#define SGC_INIT_STATIC_UNORDERED_MAP(K, V, S, N)                                  \
+#define SGC_INIT_STATIC_UNORDERED_MAP(K, V, S, N)                              \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
@@ -28,7 +28,7 @@ enum node_state
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-	typedef V N##_type;                                                    \
+        typedef V N##_type;                                                    \
         typedef V N##_value;                                                   \
         typedef K N##_key;                                                     \
                                                                                \
@@ -133,7 +133,7 @@ enum node_state
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
-	V *N##_at(struct N *, K);                                              \
+        V *N##_at(struct N *, K);                                              \
                                                                                \
         static void N##_at_wrap(struct N *m, K k)                              \
         {                                                                      \

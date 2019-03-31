@@ -1,6 +1,6 @@
 #pragma once
 
-#define SGC_INIT_STATIC_DEQUE(T, S, N)                                             \
+#define SGC_INIT_STATIC_DEQUE(T, S, N)                                         \
                                                                                \
         struct N                                                               \
         {                                                                      \
@@ -184,7 +184,7 @@
                         }                                                      \
                         else                                                   \
                         {                                                      \
-				size_t i = src->_front;                        \
+                                size_t i = src->_front;                        \
                                 for(size_t j = 0; j < src->_size; ++j)         \
                                 {                                              \
                                         N##_element_copy(&dst->_data[j],       \

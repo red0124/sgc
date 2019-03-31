@@ -1,13 +1,11 @@
 #pragma once
 
-#define SGC_INIT_QUEUE(T, N)                                                       \
+#define SGC_INIT_PRIORITY_QUEUE(T, N)                                          \
                                                                                \
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
                 size_t _max;                                                   \
-                size_t _back;                                                  \
-                size_t _front;                                                 \
                 T *_data;                                                      \
         };                                                                     \
                                                                                \
@@ -74,10 +72,17 @@
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
+        int (*N##_element_compare)(const T *const, const T *const) =           \
+            T##_compare;                                                       \
+                                                                               \
+        void N##_set_compare(int (*compare)(const T *const, const T *const))   \
+        {                                                                      \
+                N##_element_compare = compare;                                 \
+        }                                                                      \
+                                                                               \
         void N##_push(struct N *, T);                                          \
                                                                                \
-        static void (*N##_default_insert_function)(struct N *, T) =            \
-            N##_push;                                                          \
+        static void (*N##_default_insert_function)(struct N *, T) = N##_push;  \
                                                                                \
         void N##_set_default_insert(void (*insert)(N *, T))                    \
         {                                                                      \
@@ -89,48 +94,33 @@
                 N##_default_insert_function(d, el);                            \
         }                                                                      \
                                                                                \
-        /* ================= */                                                \
-        /*  QUEUE FUNCTIONS  */                                                \
-        /* ================= */                                                \
+        /* ==========================*/                                        \
+        /*  PRIOITY QUEUE FUNCTIONS  */                                        \
+        /* ==========================*/                                        \
                                                                                \
-        size_t N##_size(const struct N *const q)                               \
+        void N##_init(struct N *p)                                             \
         {                                                                      \
-                return q->_size;                                               \
+                p->_size = p->_max = 0;                                        \
+                p->_data = NULL;                                               \
         }                                                                      \
                                                                                \
-        void N##_init(struct N *q)                                             \
+        size_t N##_size(const struct N *p)                                     \
         {                                                                      \
-                q->_size = q->_max = q->_front = q->_back = 0;                 \
-                q->_data = NULL;                                               \
+                return p->_size;                                               \
         }                                                                      \
                                                                                \
-        static void N##_move(size_t *flag, size_t max)                         \
+        void N##_free(struct N *p)                                             \
         {                                                                      \
-                if(*flag + 1 == max)                                           \
-                {                                                              \
-                        *flag = 0;                                             \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        ++*flag;                                               \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        void N##_free(struct N *q)                                             \
-        {                                                                      \
-                if(q->_data)                                                   \
+                if(p->_data)                                                   \
                 {                                                              \
                         if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
-				size_t i;                                      \
-                                for(i = q->_front; i != q->_back;)             \
+                                for(size_t i = 0; i < p->_size; ++i)           \
                                 {                                              \
-                                        N##_element_free(&q->_data[i]);        \
-                                        N##_move(&i, q->_max);                 \
+                                        N##_element_free(&p->_data[i]);        \
                                 }                                              \
-				N##_element_free(&q->_data[i]);                \
                         }                                                      \
-                        free(q->_data);                                        \
+                        free(p->_data);                                        \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -141,18 +131,14 @@
                 if(equal == 0 && first->_size == second->_size)                \
                 {                                                              \
                         equal = 1;                                             \
-                        size_t i = first->_front;                              \
-                        size_t j = second->_front;                             \
-                        for(size_t k = 0; k < first->_size; ++k)               \
+                        for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
                                 if(!N##_element_equal(&first->_data[i],        \
-                                                     &second->_data[j]))       \
+                                                      &second->_data[i]))      \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
                                 }                                              \
-                                N##_move(&i, first->_max);                     \
-                                N##_move(&j, second->_max);                    \
                         }                                                      \
                 }                                                              \
                 return equal;                                                  \
@@ -163,155 +149,166 @@
         {                                                                      \
                 if(src->_size != 0)                                            \
                 {                                                              \
-                        dst->_data = (T *)malloc(src->_size * sizeof(T));      \
+                        dst->_size = src->_size;                               \
+                        dst->_max = src->_size;                                \
+                        dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
                         if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
-                                if(src->_front < src->_back)                   \
-                                {                                              \
-                                        memcpy(dst->_data,                     \
-                                               src->_data + src->_front,       \
-                                               src->_size * sizeof(T));        \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        size_t first_part = src->_back;        \
-                                        size_t second_part =                   \
-                                            src->_max - src->_front;           \
-                                        memcpy(dst->_data,                     \
-                                               src->_data + src->_front,       \
-                                               second_part * sizeof(T));       \
-                                        memcpy(dst->_data + second_part,       \
-                                               src->_data,                     \
-                                               (1 + first_part) * sizeof(T));  \
-                                }                                              \
+                                memcpy(dst->_data, src->_data,                 \
+                                       src->_size * sizeof(T));                \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-				size_t i = src->_front;                        \
-                                for(size_t j = 0; j < src->_size; ++j)         \
+                                for(size_t i = 0; i < dst->_size; ++i)         \
                                 {                                              \
-                                        N##_element_copy(&dst->_data[j],       \
+                                        N##_element_copy(&dst->_data[i],       \
                                                          &src->_data[i]);      \
-                                        N##_move(&i, src->_max);               \
                                 }                                              \
                         }                                                      \
                 }                                                              \
-                                                                               \
-                dst->_size = dst->_max = src->_size;                           \
-                dst->_back = src->_size - 1;                                   \
-                dst->_front = 0;                                               \
         }                                                                      \
                                                                                \
-        static void N##_resize(struct N *q)                                    \
+        void N##_shrink(struct N *p)                                           \
         {                                                                      \
-                if(q->_size == q->_max)                                        \
+                if(N##_element_copy != N##_flat_copy)                          \
                 {                                                              \
-                        size_t max = q->_max;                                  \
-                        q->_max = (q->_max == 0) ? N##_init_size               \
-                                                 : q->_max * N##_growth_scale; \
-                                                                               \
-                        q->_data =                                             \
-                            (T *)realloc(q->_data, sizeof(T) * q->_max);       \
-                                                                               \
-                        if(q->_front > q->_back)                               \
+                        for(size_t i = p->_size; i < p->_max; ++i)             \
                         {                                                      \
-                                size_t first_part = q->_back;                  \
-                                size_t second_part = max - q->_front;          \
-                                if(first_part > second_part)                   \
-                                {                                              \
-                                        memcpy(q->_data +                      \
-                                                   (q->_max - second_part),    \
-                                               q->_data + q->_front,           \
-                                               second_part * sizeof(T));       \
-                                        q->_front = q->_front + max;           \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        memcpy(q->_data + max, q->_data,       \
-                                               (1 + first_part) * sizeof(T));  \
-                                        q->_back = q->_back + max;             \
-                                }                                              \
+                                N##_element_free(&p->_data[i]);                \
+                        }                                                      \
+                }                                                              \
+                p->_data = (T *)realloc(p->_data, sizeof(T) * p->_size);       \
+        }                                                                      \
+                                                                               \
+        static void N##_resize(struct N *p)                                    \
+        {                                                                      \
+                if(p->_size == p->_max)                                        \
+                {                                                              \
+                        p->_max = (p->_max == 0) ? N##_init_size               \
+                                                 : p->_max * N##_growth_scale; \
+                        p->_data =                                             \
+                            (T *)realloc(p->_data, sizeof(T) * p->_max);       \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        static void N##_memswp(T *i, T *j)                                     \
+        {                                                                      \
+                char *tmp[sizeof(T)];                                          \
+                                                                               \
+                memcpy(tmp, i, sizeof(T));                                     \
+                memcpy(i, j, sizeof(T));                                       \
+                memcpy(j, tmp, sizeof(T));                                     \
+        }                                                                      \
+                                                                               \
+        static void N##_fix_insert(struct N *p)                                \
+        {                                                                      \
+                size_t curr = p->_size;                                        \
+                while(curr)                                                    \
+                {                                                              \
+                        size_t parent = (curr - 1) / 2;                        \
+                        if(N##_element_compare(&p->_data[parent],              \
+                                               &p->_data[curr]) < 0)           \
+                        {                                                      \
+                                N##_memswp(&p->_data[parent],                  \
+                                           &p->_data[curr]);                   \
+                                curr = parent;                                 \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                break;                                         \
                         }                                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_push(struct N *q, T el)                                       \
+        void N##_push(struct N *p, T el)                                       \
         {                                                                      \
-                N##_resize(q);                                                 \
-                N##_move(&q->_back, q->_max);                                  \
-                N##_element_copy(&q->_data[q->_back], &el);                    \
-                ++q->_size;                                                    \
+                N##_resize(p);                                                 \
+                N##_element_copy(&p->_data[p->_size], &el);                    \
+                N##_fix_insert(p);                                             \
+                ++p->_size;                                                    \
         }                                                                      \
                                                                                \
-        T *N##_front(struct N *q)                                              \
+        static void N##_fix_erase(struct N *p)                                 \
+        {                                                                      \
+                size_t curr = 0;                                               \
+                while((curr + 1) * 2 <= p->_size)                              \
+                {                                                              \
+                        size_t right = (curr + 1) * 2;                         \
+                        size_t left = right - 1;                               \
+                        size_t tmp = right;                                    \
+                        if(right == p->_size ||                                \
+                           N##_element_compare(&p->_data[left],                \
+                                               &p->_data[right]) > 0)          \
+                        {                                                      \
+                                tmp = left;                                    \
+                        }                                                      \
+                        if(N##_element_compare(&p->_data[tmp],                 \
+                                               &p->_data[curr]) > 0)           \
+                        {                                                      \
+                                N##_memswp(&p->_data[curr], &p->_data[tmp]);   \
+                                curr = tmp;                                    \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                break;                                         \
+                        }                                                      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_pop(struct N *p)                                              \
+        {                                                                      \
+                if(p->_size)                                                   \
+                {                                                              \
+                        N##_memswp(&p->_data[0], &p->_data[--p->_size]);       \
+                        if(N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(&p->_data[p->_size]);         \
+                        }                                                      \
+                        N##_fix_erase(p);                                      \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        T *N##_top(struct N *p)                                                \
         {                                                                      \
                 T *ret = NULL;                                                 \
-                if(q->_size)                                                   \
+                if(p->_size)                                                   \
                 {                                                              \
-                        ret = &q->_data[q->_front];                            \
+                        ret = &p->_data[0];                                    \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        void N##_set_front(struct N *q, T new_el)                              \
+        int N##_empty(const struct N *const d)                                 \
         {                                                                      \
-                if(q->_size)                                                   \
-                {                                                              \
-                        T *el = &q->_data[q->_front];                          \
-                        if(N##_element_copy != N##_flat_copy)                  \
-                        {                                                      \
-                                N##_element_free(el);                          \
-                                N##_element_copy(el, &new_el);                 \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
-                }                                                              \
+                return d->_size == 0;                                          \
         }                                                                      \
                                                                                \
-        T *N##_back(struct N *q)                                               \
+        T *N##_array(struct N *d)                                              \
         {                                                                      \
                 T *ret = NULL;                                                 \
-                if(q->_size)                                                   \
+                if(d->_size)                                                   \
                 {                                                              \
-                        ret = &q->_data[q->_back];                             \
+                        ret = d->_data;                                        \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        void N##_set_back(struct N *q, T new_el)                               \
+        void N##_from_array(struct N *p, const T *const arr,                   \
+                            const size_t size)                                 \
         {                                                                      \
-                if(q->_size)                                                   \
+                if(size)                                                       \
                 {                                                              \
-                        T *el = &q->_data[q->_back];                           \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        p->_max = size;                                        \
+                        p->_data = (T *)malloc(sizeof(T) * p->_max);           \
+                        p->_size = 0;                                          \
+                        for(size_t i = 0; i < size; ++i)                       \
                         {                                                      \
-                                N##_element_free(el);                          \
-                                N##_element_copy(el, &new_el);                 \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
+                                N##_push(p, arr[i]);                           \
                         }                                                      \
                 }                                                              \
-        }                                                                      \
-                                                                               \
-        void N##_pop(struct N *q)                                              \
-        {                                                                      \
-                if(q->_size)                                                   \
+                else                                                           \
                 {                                                              \
-                        T *el = &q->_data[q->_front];                          \
-                        if(N##_element_copy != N##_flat_copy)                  \
-                        {                                                      \
-                                N##_element_free(el);                          \
-                        }                                                      \
-                        N##_move(&q->_front, q->_max);                         \
-                        --q->_size;                                            \
+                        p->_max = p->_size = 0;                                \
+                        p->_data = NULL;                                       \
                 }                                                              \
-        }                                                                      \
-                                                                               \
-        int N##_empty(const struct N *const q)                                 \
-        {                                                                      \
-                return q->_size == 0;                                          \
         }

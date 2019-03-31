@@ -3,7 +3,7 @@
 #ifndef SGC_NEXT_PRIME
 #define SGC_NEXT_PRIME
 
-static size_t gc_sqrt(size_t n)
+static size_t sgc_sqrt(size_t n)
 {
         size_t i = 1;
         while(i * i <= n)
@@ -13,10 +13,10 @@ static size_t gc_sqrt(size_t n)
         return i;
 }
 
-static int gc_is_prime(size_t n)
+static int sgc_is_prime(size_t n)
 {
         int is_prime = 1;
-        for(size_t i = 2; i <= gc_sqrt(n); ++i)
+        for(size_t i = 2; i <= sgc_sqrt(n); ++i)
         {
                 if(n % i == 0)
                 {
@@ -27,9 +27,9 @@ static int gc_is_prime(size_t n)
         return is_prime;
 }
 
-static size_t gc_next_prime(size_t n)
+static size_t sgc_next_prime(size_t n)
 {
-        while(!gc_is_prime(n))
+        while(!sgc_is_prime(n))
         {
                 ++n;
         }
@@ -38,10 +38,11 @@ static size_t gc_next_prime(size_t n)
 
 #endif
 
-#define SGC_INIT_UNORDERED_SET(V, N)                                               \
+#define SGC_INIT_UNORDERED_MAP(K, V, N)                                        \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
+                K _key;                                                        \
                 V _value;                                                      \
                 struct N##_node *_next;                                        \
         };                                                                     \
@@ -56,11 +57,18 @@ static size_t gc_next_prime(size_t n)
         typedef struct N N;                                                    \
         typedef V N##_type;                                                    \
         typedef V N##_value;                                                   \
-        typedef V N##_key;                                                     \
+        typedef K N##_key;                                                     \
                                                                                \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
+                                                                               \
+        static void (*N##_element_init)(V *) = V##_init;                       \
+                                                                               \
+        void N##_set_init(void (*init)(V *))                                   \
+        {                                                                      \
+                N##_element_init = init;                                       \
+        }                                                                      \
                                                                                \
         static void (*N##_element_copy)(V *, const V *const) = V##_copy;       \
                                                                                \
@@ -86,6 +94,30 @@ static size_t gc_next_prime(size_t n)
                 }                                                              \
         }                                                                      \
                                                                                \
+        static void (*N##_element_copy_key)(K *, const K *const) = K##_copy;   \
+                                                                               \
+        void N##_set_copy_key(void (*copy)(K *, const K *const))               \
+        {                                                                      \
+                N##_element_copy_key = copy;                                   \
+        }                                                                      \
+                                                                               \
+        static void N##_flat_copy_key(K *dst, const K *const src)              \
+        {                                                                      \
+                *dst = *src;                                                   \
+        }                                                                      \
+                                                                               \
+        void N##_set_share_key(int is_shared)                                  \
+        {                                                                      \
+                if(is_shared)                                                  \
+                {                                                              \
+                        N##_set_copy_key(N##_flat_copy_key);                   \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        N##_set_copy_key(K##_copy);                            \
+                }                                                              \
+        }                                                                      \
+                                                                               \
         static int (*N##_element_equal)(const V *const, const V *const) =      \
             V##_equal;                                                         \
                                                                                \
@@ -94,11 +126,26 @@ static size_t gc_next_prime(size_t n)
                 N##_element_equal = equal;                                     \
         }                                                                      \
                                                                                \
-        static size_t (*N##_element_hash)(const V *const) = V##_hash;          \
+        static int (*N##_element_equal_key)(const K *const, const K *const) =  \
+            K##_equal;                                                         \
                                                                                \
-        void N##_set_hash(size_t (*hash)(const V *const))                      \
+        void N##_set_equal_key(int (*equal)(const K *const, const K *const))   \
+        {                                                                      \
+                N##_element_equal_key = equal;                                 \
+        }                                                                      \
+                                                                               \
+        static size_t (*N##_element_hash)(const K *const) = K##_hash;          \
+                                                                               \
+        void N##_set_hash(size_t (*hash)(const K *const))                      \
         {                                                                      \
                 N##_element_hash = hash;                                       \
+        }                                                                      \
+                                                                               \
+        static void (*N##_element_free_key)(K *) = K##_free;                   \
+                                                                               \
+        void N##_set_free_key(void (*free)(K *))                               \
+        {                                                                      \
+                N##_element_free_key = free;                                   \
         }                                                                      \
                                                                                \
         static void (*N##_element_free)(V *) = V##_free;                       \
@@ -108,29 +155,50 @@ static size_t gc_next_prime(size_t n)
                 N##_element_free = free;                                       \
         }                                                                      \
                                                                                \
-        void N##_insert(struct N *, V);                                        \
+        V *N##_at(struct N *, K);                                              \
                                                                                \
-        static void (*N##_default_insert_function)(struct N *, V) =            \
-            N##_insert;                                                        \
+        static void N##_at_wrap(struct N *m, K k)                              \
+        {                                                                      \
+                N##_at(m, k);                                                  \
+        }                                                                      \
                                                                                \
-        void N##_set_default_insert(void (*insert)(N *, V))                    \
+        static void (*N##_default_insert_function)(struct N *, K) =            \
+            N##_at_wrap;                                                       \
+                                                                               \
+        void N##_set_default_insert(void (*insert)(N *, K))                    \
         {                                                                      \
                 N##_default_insert_function = insert;                          \
         }                                                                      \
                                                                                \
-        void N##_default_insert(struct N *d, V el)                             \
+        void N##_default_insert(struct N *d, K k)                              \
         {                                                                      \
-                N##_default_insert_function(d, el);                            \
+                N##_default_insert_function(d, k);                             \
+        }                                                                      \
+                                                                               \
+        void N##_set_at(struct N *, K, V);                                     \
+                                                                               \
+        static void (*N##_default_insert_pair_function)(struct N *, K, V) =    \
+            N##_set_at;                                                        \
+                                                                               \
+        void N##_set_default_insert_pair(void (*insert)(N *, K, V))            \
+        {                                                                      \
+                N##_default_insert_pair_function = insert;                     \
+        }                                                                      \
+                                                                               \
+        void N##_default_insert_pair(struct N *d, K k, V v)                    \
+        {                                                                      \
+                N##_default_insert_pair_function(d, k, v);                     \
         }                                                                      \
                                                                                \
         /* ================== */                                               \
         /*  BUCKET FUNCTIONS  */                                               \
         /* ================== */                                               \
                                                                                \
-        struct N##_node *N##_node_new(const V *const value)                    \
+        struct N##_node *N##_node_new(const K *key, const V *const value)      \
         {                                                                      \
                 struct N##_node *new_node =                                    \
                     (struct N##_node *)malloc(sizeof(struct N##_node));        \
+                N##_element_copy_key(&new_node->_key, key);                    \
                 N##_element_copy(&new_node->_value, value);                    \
                 new_node->_next = NULL;                                        \
                 return new_node;                                               \
@@ -146,6 +214,10 @@ static size_t gc_next_prime(size_t n)
                         {                                                      \
                                 curr = next;                                   \
                                 next = curr->_next;                            \
+                                if(N##_element_copy_key != N##_flat_copy_key)  \
+                                {                                              \
+                                        N##_element_free_key(&curr->_key);     \
+                                }                                              \
                                 if(N##_element_copy != N##_flat_copy)          \
                                 {                                              \
                                         N##_element_free(&curr->_value);       \
@@ -185,20 +257,24 @@ static size_t gc_next_prime(size_t n)
         }                                                                      \
                                                                                \
         static struct N##_node *N##_bucket_remove(                             \
-            struct N##_node *bucket, const V *const value, size_t *size)       \
+            struct N##_node *bucket, const K *const key, size_t *size)         \
         {                                                                      \
                 struct N##_node *ret = bucket;                                 \
                 struct N##_node *tmp = bucket;                                 \
                 struct N##_node *prev = bucket;                                \
                 while(tmp)                                                     \
                 {                                                              \
-                        if(N##_element_equal(&tmp->_value, value))             \
+                        if(N##_element_equal_key(&tmp->_key, key))             \
                         {                                                      \
                                 if(tmp == bucket)                              \
                                 {                                              \
                                         ret = tmp->_next;                      \
                                 }                                              \
                                 prev->_next = tmp->_next;                      \
+                                if(N##_element_copy_key != N##_flat_copy_key)  \
+                                {                                              \
+                                        N##_element_free_key(&tmp->_key);      \
+                                }                                              \
                                 if(N##_element_copy != N##_flat_copy)          \
                                 {                                              \
                                         N##_element_free(&tmp->_value);        \
@@ -263,12 +339,22 @@ static size_t gc_next_prime(size_t n)
                 int _is_valid;                                                 \
         };                                                                     \
                                                                                \
-        const V *N##_iterator_cvalue(struct N##_iterator i)                    \
+        K *N##_iterator_key(struct N##_iterator i)                             \
+        {                                                                      \
+                return &i._curr->_key;                                         \
+        }                                                                      \
+                                                                               \
+        const K *N##_iterator_ckey(struct N##_iterator i)                      \
+        {                                                                      \
+                return &i._curr->_key;                                         \
+        }                                                                      \
+                                                                               \
+        V *N##_iterator_value(struct N##_iterator i)                           \
         {                                                                      \
                 return &i._curr->_value;                                       \
         }                                                                      \
                                                                                \
-        V *N##_iterator_value(struct N##_iterator i)                           \
+        const V *N##_iterator_cvalue(struct N##_iterator i)                    \
         {                                                                      \
                 return &i._curr->_value;                                       \
         }                                                                      \
@@ -358,7 +444,7 @@ static size_t gc_next_prime(size_t n)
                 else                                                           \
                 {                                                              \
                         struct N##_node *tmp = i->_curr;                       \
-			--i->_curr_bucket;                                     \
+                        --i->_curr_bucket;                                     \
                         while(1)                                               \
                         {                                                      \
                                 i->_curr = i->_data[i->_curr_bucket];          \
@@ -465,7 +551,7 @@ static size_t gc_next_prime(size_t n)
         }                                                                      \
                                                                                \
         /* =============== */                                                  \
-        /*  SET FUNCTIONS  */                                                  \
+        /*  MAP FUNCTIONS  */                                                  \
         /* =============== */                                                  \
                                                                                \
         size_t N##_size(const struct N *const u)                               \
@@ -488,7 +574,10 @@ static size_t gc_next_prime(size_t n)
                         struct N##_iterator it_second = N##_cbegin(second);    \
                         while(N##_iterator_valid(it_first))                    \
                         {                                                      \
-                                if(!N##_element_equal(                         \
+                                if(!N##_element_equal_key(                     \
+                                       &it_first._curr->_key,                  \
+                                       &it_second._curr->_key) ||              \
+                                   !N##_element_equal(                         \
                                        &it_first._curr->_value,                \
                                        &it_second._curr->_value))              \
                                 {                                              \
@@ -521,6 +610,8 @@ static size_t gc_next_prime(size_t n)
                         {                                                      \
                                 dst->_data[i] = (struct N##_node *)malloc(     \
                                     sizeof(struct N##_node));                  \
+                                N##_element_copy_key(&dst->_data[i]->_key,     \
+                                                     &src->_data[i]->_key);    \
                                 N##_element_copy(&dst->_data[i]->_value,       \
                                                  &src->_data[i]->_value);      \
                                 struct N##_node *curr_src = src->_data[i];     \
@@ -536,6 +627,8 @@ static size_t gc_next_prime(size_t n)
                                         }                                      \
                                         tmp_dst = (struct N##_node *)malloc(   \
                                             sizeof(struct N##_node));          \
+                                        N##_element_copy_key(&tmp_dst->_key,   \
+                                                             &tmp_src->_key);  \
                                         N##_element_copy(&tmp_dst->_value,     \
                                                          &tmp_src->_value);    \
                                         curr_dst->_next = tmp_dst;             \
@@ -567,31 +660,35 @@ static size_t gc_next_prime(size_t n)
         }                                                                      \
                                                                                \
         static struct N##_iterator N##_find_by_hash(                           \
-            struct N *u, const V *const v, size_t hash)                        \
+            struct N *u, const K *const k, size_t hash)                        \
         {                                                                      \
                 struct N##_iterator ret = {NULL, NULL, 0, 0, 0};               \
                 if(u->_max)                                                    \
                 {                                                              \
                         size_t position = hash % u->_max;                      \
                         struct N##_node *tmp = u->_data[position];             \
-                        while(tmp)                                             \
+                        if(tmp)                                                \
                         {                                                      \
-                                if(N##_element_equal(&tmp->_value, v))         \
+                                while(tmp)                                     \
                                 {                                              \
-                                        ret = (struct N##_iterator){           \
-                                            u->_data, tmp, position, u->_max,  \
-                                            1};                                \
+                                        if(N##_element_equal_key(&tmp->_key,   \
+                                                                 k))           \
+                                        {                                      \
+                                                ret = (struct N##_iterator){   \
+                                                    u->_data, tmp, position,   \
+                                                    u->_max, 1};               \
+                                        }                                      \
+                                        tmp = tmp->_next;                      \
                                 }                                              \
-                                tmp = tmp->_next;                              \
                         }                                                      \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_find(struct N *u, const V v)                   \
+        struct N##_iterator N##_find(struct N *u, const K k)                   \
         {                                                                      \
-                size_t hash = N##_element_hash(&v);                            \
-                return N##_find_by_hash(u, &v, hash);                          \
+                size_t hash = N##_element_hash(&k);                            \
+                return N##_find_by_hash(u, &k, hash);                          \
         }                                                                      \
                                                                                \
         static void N##_rehash_size(const struct N *const u, size_t *max,      \
@@ -600,7 +697,7 @@ static size_t gc_next_prime(size_t n)
                 *max = u->_max;                                                \
                 if(u->_size == *max)                                           \
                 {                                                              \
-                        *new_max = gc_next_prime(2 * u->_max + 1);             \
+                        *new_max = sgc_next_prime(2 * u->_max + 1);            \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -613,14 +710,14 @@ static size_t gc_next_prime(size_t n)
                         new_data[i] = NULL;                                    \
                 }                                                              \
                                                                                \
-                V *value;                                                      \
+                K *key;                                                        \
                 size_t position;                                               \
                 struct N##_iterator tmp = N##_begin(u);                        \
                 struct N##_node *next;                                         \
                 for(size_t i = 0; i < u->_size; ++i)                           \
                 {                                                              \
-                        value = &tmp._curr->_value;                            \
-                        position = N##_element_hash(value) % new_max;          \
+                        key = &tmp._curr->_key;                                \
+                        position = N##_element_hash(key) % new_max;            \
                         next = tmp._curr->_next;                               \
                         tmp._curr->_next = NULL;                               \
                         if(new_data[position])                                 \
@@ -660,14 +757,14 @@ static size_t gc_next_prime(size_t n)
                                 new_data[i] = NULL;                            \
                         }                                                      \
                                                                                \
-                        V *value;                                              \
+                        K *key;                                                \
                         size_t position;                                       \
                         struct N##_iterator tmp = N##_begin(u);                \
                         struct N##_node *next;                                 \
                         for(size_t i = 0; i < u->_size; ++i)                   \
                         {                                                      \
-                                value = &tmp._curr->_value;                    \
-                                position = N##_element_hash(value) % new_max;  \
+                                key = &tmp._curr->_key;                        \
+                                position = N##_element_hash(key) % new_max;    \
                                 next = tmp._curr->_next;                       \
                                 tmp._curr->_next = NULL;                       \
                                 if(new_data[position])                         \
@@ -694,14 +791,22 @@ static size_t gc_next_prime(size_t n)
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_insert(struct N *u, const V v)                                \
+        void N##_set_at(struct N *u, const K k, const V v)                     \
         {                                                                      \
-                size_t hash = N##_element_hash(&v);                            \
-                struct N##_iterator i = N##_find_by_hash(u, &v, hash);         \
-                if(!i._curr)                                                   \
+                size_t hash = N##_element_hash(&k);                            \
+                struct N##_iterator i = N##_find_by_hash(u, &k, hash);         \
+                if(i._curr)                                                    \
+                {                                                              \
+                        if(N##_element_copy != N##_flat_copy)                  \
+                        {                                                      \
+                                N##_element_free(&i._curr->_value);            \
+                        }                                                      \
+                        N##_element_copy(&i._curr->_value, &v);                \
+                }                                                              \
+                else                                                           \
                 {                                                              \
                         N##_resize(u);                                         \
-                        struct N##_node *new_node = N##_node_new(&v);          \
+                        struct N##_node *new_node = N##_node_new(&k, &v);      \
                         size_t position = hash % u->_max;                      \
                         if(u->_data[position])                                 \
                         {                                                      \
@@ -716,31 +821,45 @@ static size_t gc_next_prime(size_t n)
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_insert_multiple(struct N *u, const V v)                       \
+        V *N##_at(struct N *u, const K k)                                      \
         {                                                                      \
-                N##_resize(u);                                                 \
-                struct N##_node *new_node = N##_node_new(&v);                  \
-                size_t hash = N##_element_hash(&v);                            \
-                size_t position = hash % u->_max;                              \
-                if(u->_data[position])                                         \
+                size_t hash = N##_element_hash(&k);                            \
+                struct N##_iterator i = N##_find_by_hash(u, &k, hash);         \
+                V *ret;                                                        \
+                if(i._curr)                                                    \
                 {                                                              \
-                        N##_bucket_insert(u->_data[position], new_node);       \
+                        ret = &i._curr->_value;                                \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        u->_data[position] = new_node;                         \
+                        N##_resize(u);                                         \
+                        V v;                                                   \
+                        N##_element_init(&v);                                  \
+                        struct N##_node *new_node = N##_node_new(&k, &v);      \
+                        size_t position = hash % u->_max;                      \
+                        if(u->_data[position])                                 \
+                        {                                                      \
+                                N##_bucket_insert(u->_data[position],          \
+                                                  new_node);                   \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                u->_data[position] = new_node;                 \
+                        }                                                      \
+                        ++u->_size;                                            \
+                        ret = &new_node->_value;                               \
                 }                                                              \
-                ++u->_size;                                                    \
+                return ret;                                                    \
         }                                                                      \
                                                                                \
-        void N##_erase(struct N *u, const V v)                                 \
+        void N##_erase(struct N *u, const K k)                                 \
         {                                                                      \
                 if(u->_data)                                                   \
                 {                                                              \
-                        size_t hash = N##_element_hash(&v);                    \
+                        size_t hash = N##_element_hash(&k);                    \
                         size_t position = hash % u->_max;                      \
                         u->_data[position] = N##_bucket_remove(                \
-                            u->_data[position], &v, &u->_size);                \
+                            u->_data[position], &k, &u->_size);                \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -748,9 +867,9 @@ static size_t gc_next_prime(size_t n)
         {                                                                      \
                 if(N##_iterator_valid(*i))                                     \
                 {                                                              \
-                        V value = i->_curr->_value;                            \
+                        K key = i->_curr->_key;                                \
                         N##_iterator_next(i);                                  \
-                        N##_erase(u, value);                                   \
+                        N##_erase(u, key);                                     \
                 }                                                              \
         }                                                                      \
                                                                                \

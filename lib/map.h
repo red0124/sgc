@@ -16,7 +16,7 @@ enum map_color
 
 #ifndef SGC_MAP_LOG
 #define SGC_MAP_LOG
-static size_t gc_exp_two(size_t curr)
+static size_t sgc_exp_two(size_t curr)
 {
         size_t power = 1;
         for(size_t i = 0; i < curr; ++i)
@@ -26,10 +26,10 @@ static size_t gc_exp_two(size_t curr)
         return power;
 }
 
-static size_t gc_log_two(size_t size)
+static size_t sgc_log_two(size_t size)
 {
         size_t curr = 1;
-        while(size >= gc_exp_two(curr))
+        while(size >= sgc_exp_two(curr))
         {
                 ++curr;
         }
@@ -37,7 +37,7 @@ static size_t gc_log_two(size_t size)
 }
 #endif
 
-#define SGC_INIT_MAP(K, V, N)                                                      \
+#define SGC_INIT_MAP(K, V, N)                                                  \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
@@ -388,7 +388,7 @@ static size_t gc_log_two(size_t size)
                                                                                \
         static size_t N##_stack_size(size_t size)                              \
         {                                                                      \
-                size = gc_log_two(size) + 1;                                   \
+                size = sgc_log_two(size) + 1;                                  \
                 return sizeof(struct N##_node *) * (size * 2);                 \
         }                                                                      \
                                                                                \

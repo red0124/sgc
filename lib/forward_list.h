@@ -4,16 +4,16 @@
 #define SGC_STACK
 #define SGC_STACK_SIZE 64
 
-#define SGC_PREPARE_STACK                                                       \
-        char *stack[SGC_STACK_SIZE];                                            \
+#define SGC_PREPARE_STACK                                                      \
+        char *stack[SGC_STACK_SIZE];                                           \
         char **stackptr = stack
 
-#define SGC_STACK_PUSH(array, limit)                                            \
+#define SGC_STACK_PUSH(array, limit)                                           \
         stackptr[0] = array;                                                   \
         stackptr[1] = limit;                                                   \
         stackptr += 2
 
-#define SGC_STACK_POP(array, limit)                                             \
+#define SGC_STACK_POP(array, limit)                                            \
         stackptr -= 2;                                                         \
         array = stackptr[0];                                                   \
         limit = stackptr[1]
@@ -21,7 +21,7 @@
 #define SGC_STACK_THRESH 7
 #endif
 
-#define SGC_INIT_FORWARD_LIST(T, N)                                                \
+#define SGC_INIT_FORWARD_LIST(T, N)                                            \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
@@ -542,10 +542,10 @@
                               int (*comp)(const void *, const void *))         \
         {                                                                      \
                 char *i, *j;                                                   \
-                size_t thresh = SGC_STACK_THRESH * sizeof(struct N##_node *);   \
+                size_t thresh = SGC_STACK_THRESH * sizeof(struct N##_node *);  \
                 char *array_ = (char *)array;                                  \
                 char *limit = array_ + array_size * sizeof(struct N##_node *); \
-                SGC_PREPARE_STACK;                                              \
+                SGC_PREPARE_STACK;                                             \
                                                                                \
                 while(1)                                                       \
                 {                                                              \
@@ -593,12 +593,12 @@
                                 N##_memswp(array_, j);                         \
                                 if(j - array_ > limit - i)                     \
                                 {                                              \
-                                        SGC_STACK_PUSH(array_, j);              \
+                                        SGC_STACK_PUSH(array_, j);             \
                                         array_ = i;                            \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        SGC_STACK_PUSH(i, limit);               \
+                                        SGC_STACK_PUSH(i, limit);              \
                                         limit = j;                             \
                                 }                                              \
                         }                                                      \
@@ -628,7 +628,7 @@
                                 }                                              \
                                 if(stackptr != stack)                          \
                                 {                                              \
-                                        SGC_STACK_POP(array_, limit);           \
+                                        SGC_STACK_POP(array_, limit);          \
                                 }                                              \
                                 else                                           \
                                 {                                              \

@@ -607,25 +607,25 @@
         do                                                                     \
         {                                                                      \
                 N##_type *EL;                                                  \
-                struct N##_iterator __gc_it_begin = N##_cbegin(&C);            \
-                struct N##_iterator __gc_it_end = N##_cend(&C);                \
-                if(!N##_iterator_valid(__gc_it_begin) ||                       \
-                   !N##_iterator_valid(__gc_it_end))                           \
+                struct N##_iterator __sgc_it_begin = N##_cbegin(&C);           \
+                struct N##_iterator __sgc_it_end = N##_cend(&C);               \
+                if(!N##_iterator_valid(__sgc_it_begin) ||                      \
+                   !N##_iterator_valid(__sgc_it_end))                          \
                 {                                                              \
                         break;                                                 \
                 }                                                              \
-                if(!N##_iterator_equal(__gc_it_begin, __gc_it_end))            \
+                if(!N##_iterator_equal(__sgc_it_begin, __sgc_it_end))          \
                 {                                                              \
-                        EL = N##_iterator_value(__gc_it_begin);                \
+                        EL = N##_iterator_value(__sgc_it_begin);               \
                         do                                                     \
                         {                                                      \
                                 ACT;                                           \
                         } while(0);                                            \
                 }                                                              \
-                while(!N##_iterator_equal(__gc_it_begin, __gc_it_end))         \
+                while(!N##_iterator_equal(__sgc_it_begin, __sgc_it_end))       \
                 {                                                              \
-                        N##_iterator_next(&__gc_it_begin);                     \
-                        EL = N##_iterator_value(__gc_it_begin);                \
+                        N##_iterator_next(&__sgc_it_begin);                    \
+                        EL = N##_iterator_value(__sgc_it_begin);               \
                         do                                                     \
                         {                                                      \
                                 ACT;                                           \
@@ -638,27 +638,27 @@
         {                                                                      \
                 const N##_key *K;                                              \
                 N##_value *V;                                                  \
-                struct N##_iterator __gc_it_begin = N##_cbegin(&C);            \
-                struct N##_iterator __gc_it_end = N##_cend(&C);                \
-                if(!N##_iterator_valid(__gc_it_begin) ||                       \
-                   !N##_iterator_valid(__gc_it_end))                           \
+                struct N##_iterator __sgc_it_begin = N##_cbegin(&C);           \
+                struct N##_iterator __sgc_it_end = N##_cend(&C);               \
+                if(!N##_iterator_valid(__sgc_it_begin) ||                      \
+                   !N##_iterator_valid(__sgc_it_end))                          \
                 {                                                              \
                         break;                                                 \
                 }                                                              \
-                if(!N##_iterator_equal(__gc_it_begin, __gc_it_end))            \
+                if(!N##_iterator_equal(__sgc_it_begin, __sgc_it_end))          \
                 {                                                              \
-                        V = N##_iterator_value(__gc_it_begin);                 \
-                        K = N##_iterator_key(__gc_it_begin);                   \
+                        V = N##_iterator_value(__sgc_it_begin);                \
+                        K = N##_iterator_key(__sgc_it_begin);                  \
                         do                                                     \
                         {                                                      \
                                 ACT;                                           \
                         } while(0);                                            \
                 }                                                              \
-                while(!N##_iterator_equal(__gc_it_begin, __gc_it_end))         \
+                while(!N##_iterator_equal(__sgc_it_begin, __sgc_it_end))       \
                 {                                                              \
-                        N##_iterator_next(&__gc_it_begin);                     \
-                        V = N##_iterator_value(__gc_it_begin);                 \
-                        K = N##_iterator_key(__gc_it_begin);                   \
+                        N##_iterator_next(&__sgc_it_begin);                    \
+                        V = N##_iterator_value(__sgc_it_begin);                \
+                        K = N##_iterator_key(__sgc_it_begin);                  \
                         do                                                     \
                         {                                                      \
                                 ACT;                                           \
@@ -744,10 +744,10 @@
         do                                                                     \
         {                                                                      \
                 OUT_C##_init(&OUT);                                            \
-                STR __gc_str_tmp = strtok(S, DEL);                             \
-                while(__gc_str_tmp)                                            \
+                STR __sgc_str_tmp = strtok(S, DEL);                            \
+                while(__sgc_str_tmp)                                           \
                 {                                                              \
-                        OUT_C##_default_insert(&OUT, __gc_str_tmp);            \
-                        __gc_str_tmp = strtok(NULL, DEL);                      \
+                        OUT_C##_default_insert(&OUT, __sgc_str_tmp);           \
+                        __sgc_str_tmp = strtok(NULL, DEL);                     \
                 }                                                              \
         } while(0);

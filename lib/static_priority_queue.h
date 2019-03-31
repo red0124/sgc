@@ -1,6 +1,6 @@
 #pragma once
 
-#define SGC_INIT_STATIC_PRIORITY_QUEUE(T, S, N)                                    \
+#define SGC_INIT_STATIC_PRIORITY_QUEUE(T, S, N)                                \
                                                                                \
         struct N                                                               \
         {                                                                      \
@@ -68,7 +68,7 @@
         {                                                                      \
                 N##_element_compare = compare;                                 \
         }                                                                      \
-									       \
+                                                                               \
         void N##_push(struct N *, T);                                          \
                                                                                \
         static void (*N##_default_insert_function)(struct N *, T) = N##_push;  \
@@ -101,8 +101,7 @@
         {                                                                      \
                 if(p->_data)                                                   \
                 {                                                              \
-                        if(                            \
-                           N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 for(size_t i = 0; i < p->_size; ++i)           \
                                 {                                              \
@@ -138,8 +137,7 @@
                 if(src->_size != 0)                                            \
                 {                                                              \
                         dst->_size = src->_size;                               \
-                        if(                           \
-                           N##_element_copy == N##_flat_copy)                  \
+                        if(N##_element_copy == N##_flat_copy)                  \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \
                                        src->_size * sizeof(T));                \

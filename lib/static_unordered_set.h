@@ -12,7 +12,7 @@ enum node_state
 
 #endif
 
-#define SGC_INIT_STATIC_UNORDERED_SET(V, S, N)                                     \
+#define SGC_INIT_STATIC_UNORDERED_SET(V, S, N)                                 \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
@@ -393,7 +393,7 @@ enum node_state
                         {                                                      \
                                 N##_element_free(value);                       \
                         }                                                      \
-			--u->_size;                                            \
+                        --u->_size;                                            \
                 }                                                              \
         }                                                                      \
                                                                                \

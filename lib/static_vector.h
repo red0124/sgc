@@ -1,6 +1,6 @@
 #pragma once
 
-#define SGC_INIT_STATIC_VECTOR(T, S, N)                                            \
+#define SGC_INIT_STATIC_VECTOR(T, S, N)                                        \
                                                                                \
         struct N                                                               \
         {                                                                      \
@@ -60,8 +60,8 @@
         {                                                                      \
                 N##_element_free = free;                                       \
         }                                                                      \
-	                                                                       \
-	void N##_push_back(struct N*, T);                                      \
+                                                                               \
+        void N##_push_back(struct N *, T);                                     \
                                                                                \
         static void (*N##_default_insert_function)(struct N *, T) =            \
             N##_push_back;                                                     \
@@ -71,7 +71,7 @@
                 N##_default_insert_function = insert;                          \
         }                                                                      \
                                                                                \
-	void N##_default_insert(struct N *d, T el)                             \
+        void N##_default_insert(struct N *d, T el)                             \
         {                                                                      \
                 N##_default_insert_function(d, el);                            \
         }                                                                      \
@@ -243,7 +243,7 @@
         {                                                                      \
                 if(at < v->_size)                                              \
                 {                                                              \
-			if(N##_element_copy != N##_flat_copy)                  \
+                        if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \
                                 N##_element_free(&v->_data[at]);               \
                         }                                                      \
