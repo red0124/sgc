@@ -6,9 +6,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#define GC_ST
-#include "../lib/gc_static_unordered_map.h"
-#include "../lib/gc_static_types.h"
+#define SGC_ST
+#include "../lib/static_types.h"
+#include "../lib/static_unordered_map.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -23,7 +23,7 @@
 #define TEST_ELEMENTS_NUM 50
 #define MAP_MAX 128
 
-INIT_STATIC_UNORDERED_MAP(int, int, MAP_MAX, map);
+SGC_INIT_STATIC_UNORDERED_MAP(int, int, MAP_MAX, map);
 
 void test_map_insert_erase(void)
 {
@@ -81,22 +81,22 @@ size_t allocation_count = 0;
 
 void al_copy(al *dst, const al *const src)
 {
-	if(src->el)
-	{
-		dst->el = (int *)malloc(sizeof(int));
-		*dst->el = *src->el;
-	}
-	else
-	{
-		dst->el = NULL;
-	}
-	++allocation_count;
+        if(src->el)
+        {
+                dst->el = (int *)malloc(sizeof(int));
+                *dst->el = *src->el;
+        }
+        else
+        {
+                dst->el = NULL;
+        }
+        ++allocation_count;
 }
 
 void al_free(al *a)
 {
-	--allocation_count;
-	free(a->el);
+        --allocation_count;
+        free(a->el);
 }
 
 int al_equal(const al *const first, const al *const second)
@@ -109,17 +109,17 @@ int al_compare(const al *const first, const al *const second)
         return *first->el - *second->el;
 }
 
-void al_init(al* a)
+void al_init(al *a)
 {
-	a->el = NULL;
+        a->el = NULL;
 }
 
-size_t al_hash(const al* const a)
+size_t al_hash(const al *const a)
 {
-	return *a->el;
+        return *a->el;
 }
 
-INIT_STATIC_UNORDERED_MAP(al, al, MAP_MAX, amap);
+SGC_INIT_STATIC_UNORDERED_MAP(al, al, MAP_MAX, amap);
 
 void test_amap(void)
 {
@@ -131,7 +131,7 @@ void test_amap(void)
 
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
         {
-		x = i;
+                x = i;
                 amap_at(&v, tmp);
         }
 
@@ -140,9 +140,9 @@ void test_amap(void)
 
         amap_set_share_key(1);
         ++allocation_count;
-	int* new_el = (int*)malloc(sizeof(int));
-	*new_el = TEST_ELEMENTS_NUM + 2;
-	tmp.el = new_el;
+        int *new_el = (int *)malloc(sizeof(int));
+        *new_el = TEST_ELEMENTS_NUM + 2;
+        tmp.el = new_el;
         amap_at(&v, tmp);
         amap_set_share_key(0);
 
@@ -157,7 +157,7 @@ size_t map_hash(const map *const first)
         return map_size(first);
 }
 
-INIT_STATIC_UNORDERED_MAP(map, map, MAP_MAX, vmap);
+SGC_INIT_STATIC_UNORDERED_MAP(map, map, MAP_MAX, vmap);
 
 void test_map_map(void)
 {
@@ -188,9 +188,9 @@ void test_map_map(void)
 
         // {{(0, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 1), (2, 2)}}
 
-	TEST_ASSERT_EQUAL_INT(0, *map_at(vmap_at(&v, tmp), 0));
-	TEST_ASSERT_EQUAL_INT(1, *map_at(vmap_at(&v, tmp), 1));
-	TEST_ASSERT_EQUAL_INT(2, *map_at(vmap_at(&v, tmp), 2));
+        TEST_ASSERT_EQUAL_INT(0, *map_at(vmap_at(&v, tmp), 0));
+        TEST_ASSERT_EQUAL_INT(1, *map_at(vmap_at(&v, tmp), 1));
+        TEST_ASSERT_EQUAL_INT(2, *map_at(vmap_at(&v, tmp), 2));
 
         vmap_free(&v);
         // no memory should be left dealocated

@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_static_types.h"
-#include "../lib/gc_static_queue.h"
+#define SGC_ST
+#include "../lib/static_queue.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -22,7 +22,7 @@
 #define TEST_ELEMENTS_NUM 50
 #define QUEUE_MAX 512
 
-INIT_STATIC_QUEUE(int, QUEUE_MAX, queue);
+SGC_INIT_STATIC_QUEUE(int, QUEUE_MAX, queue);
 
 void test_queue_copy(void)
 {
@@ -93,7 +93,7 @@ int al_equal(const al *const first, const al *const second)
         return *first->el == *second->el;
 }
 
-INIT_STATIC_QUEUE(al, 512, aqueue);
+SGC_INIT_STATIC_QUEUE(al, 512, aqueue);
 
 void test_aqueue(void)
 {
@@ -112,7 +112,7 @@ void test_aqueue(void)
 
         aqueue_set_share(1);
         ++allocation_count;
-        aqueue_push(&v, (al){(int*)malloc(sizeof(int))});
+        aqueue_push(&v, (al){(int *)malloc(sizeof(int))});
         aqueue_set_share(0);
 
         aqueue_free(&v);
@@ -121,7 +121,7 @@ void test_aqueue(void)
         // no memory should be left dealocated
 }
 
-INIT_STATIC_QUEUE(queue, QUEUE_MAX, vqueue);
+SGC_INIT_STATIC_QUEUE(queue, QUEUE_MAX, vqueue);
 
 int *vqueue_front_pair(vqueue *l)
 {

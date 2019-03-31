@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_static_unordered_set.h"
-#include "../lib/gc_static_types.h"
+#define SGC_ST
+#include "../lib/static_types.h"
+#include "../lib/static_unordered_set.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -22,7 +22,7 @@
 #define TEST_ELEMENTS_NUM 50
 #define SET_MAX 127
 
-INIT_STATIC_UNORDERED_SET(int, SET_MAX, set);
+SGC_INIT_STATIC_UNORDERED_SET(int, SET_MAX, set);
 
 void test_set_insert_erase(void)
 {
@@ -69,7 +69,7 @@ void test_set_insert_multiple(void)
                 set_erase(&v, 0);
         }
 
-	TEST_ASSERT_EQUAL_INT(0, set_iterator_valid(set_find(&v, 0)));
+        TEST_ASSERT_EQUAL_INT(0, set_iterator_valid(set_find(&v, 0)));
         TEST_ASSERT_EQUAL_INT(0, set_size(&v));
 
         set_free(&v);
@@ -126,12 +126,12 @@ int al_compare(const al *const first, const al *const second)
         return *first->el - *second->el;
 }
 
-size_t al_hash(const al* const a)
+size_t al_hash(const al *const a)
 {
-	return *a->el;
+        return *a->el;
 }
 
-INIT_STATIC_UNORDERED_SET(al, SET_MAX, aset);
+SGC_INIT_STATIC_UNORDERED_SET(al, SET_MAX, aset);
 
 void test_aset(void)
 {
@@ -143,7 +143,7 @@ void test_aset(void)
 
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
         {
-		*tmp.el = i;
+                *tmp.el = i;
                 aset_insert(&v, tmp);
         }
 
@@ -155,9 +155,9 @@ void test_aset(void)
 
         aset_set_share(1);
         ++allocation_count;
-	int* new_el = (int*)malloc(sizeof(int));
-	*new_el = TEST_ELEMENTS_NUM + 2;
-	tmp.el = new_el;
+        int *new_el = (int *)malloc(sizeof(int));
+        *new_el = TEST_ELEMENTS_NUM + 2;
+        tmp.el = new_el;
         aset_insert(&v, tmp);
         aset_set_share(0);
 
@@ -167,12 +167,12 @@ void test_aset(void)
         // no memory should be left dealocated
 }
 
-size_t set_hash(const set* const s)
+size_t set_hash(const set *const s)
 {
-	return set_size(s);
+        return set_size(s);
 }
 
-INIT_STATIC_UNORDERED_SET(set, SET_MAX, vset);
+SGC_INIT_STATIC_UNORDERED_SET(set, SET_MAX, vset);
 
 void test_set_set(void)
 {

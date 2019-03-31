@@ -3,11 +3,11 @@
 #ifndef SGC_NODE_STATE
 #define SGC_NODE_STATE
 
-enum node_state
+enum sgc_node_state
 {
-        STATE_OPEN,
-        STATE_USED,
-        STATE_ERASED,
+        SGC_NODE_STATE_OPEN,
+        SGC_NODE_STATE_USED,
+        SGC_NODE_STATE_ERASED,
 };
 
 #endif
@@ -108,7 +108,7 @@ enum node_state
         {                                                                      \
                 size_t curr = i->_curr;                                        \
                 while(i->_curr < S - 1 &&                                      \
-                      i->_data[i->_curr + 1]._state != STATE_USED)             \
+                      i->_data[i->_curr + 1]._state != SGC_NODE_STATE_USED)    \
                 {                                                              \
                         ++i->_curr;                                            \
                 }                                                              \
@@ -124,12 +124,13 @@ enum node_state
         {                                                                      \
                 i->_curr = 0;                                                  \
                 i->_data = (struct N##_node *)(m->_data);                      \
-                if(i->_data[i->_curr]._state != STATE_USED)                    \
+                if(i->_data[i->_curr]._state != SGC_NODE_STATE_USED)           \
                 {                                                              \
                         N##_iterator_next(i);                                  \
                 }                                                              \
                 i->_is_valid =                                                 \
-                    (i->_data[i->_curr]._state != STATE_USED) ? 0 : 1;         \
+                    (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) ? 0     \
+                                                                       : 1;    \
         }                                                                      \
                                                                                \
         void N##_iterator_cbegin(const struct N *const m,                      \
@@ -137,24 +138,26 @@ enum node_state
         {                                                                      \
                 i->_curr = 0;                                                  \
                 i->_data = (struct N##_node *)(m->_data);                      \
-                if(i->_data[i->_curr]._state != STATE_USED)                    \
+                if(i->_data[i->_curr]._state != SGC_NODE_STATE_USED)           \
                 {                                                              \
                         N##_iterator_next(i);                                  \
                 }                                                              \
                 i->_is_valid =                                                 \
-                    (i->_data[i->_curr]._state != STATE_USED) ? 0 : 1;         \
+                    (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) ? 0     \
+                                                                       : 1;    \
         }                                                                      \
                                                                                \
         void N##_iterator_prev(struct N##_iterator *i)                         \
         {                                                                      \
                 size_t curr = i->_curr;                                        \
                 while(i->_curr > 1 &&                                          \
-                      i->_data[i->_curr - 1]._state != STATE_USED)             \
+                      i->_data[i->_curr - 1]._state != SGC_NODE_STATE_USED)    \
                 {                                                              \
                         --i->_curr;                                            \
                 }                                                              \
                 --i->_curr;                                                    \
-                if(i->_curr == 0 && i->_data[i->_curr]._state != STATE_USED)   \
+                if(i->_curr == 0 &&                                            \
+                   i->_data[i->_curr]._state != SGC_NODE_STATE_USED)           \
                 {                                                              \
                         i->_curr = curr;                                       \
                         i->_is_valid = 0;                                      \
@@ -165,12 +168,13 @@ enum node_state
         {                                                                      \
                 i->_curr = S - 1;                                              \
                 i->_data = (struct N##_node *)(m->_data);                      \
-                if(i->_data[i->_curr]._state != STATE_USED)                    \
+                if(i->_data[i->_curr]._state != SGC_NODE_STATE_USED)           \
                 {                                                              \
                         N##_iterator_prev(i);                                  \
                 }                                                              \
                 i->_is_valid =                                                 \
-                    (i->_data[i->_curr]._state != STATE_USED) ? 0 : 1;         \
+                    (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) ? 0     \
+                                                                       : 1;    \
         }                                                                      \
                                                                                \
         void N##_iterator_cend(const struct N *const m,                        \
@@ -178,12 +182,13 @@ enum node_state
         {                                                                      \
                 i->_curr = S - 1;                                              \
                 i->_data = (struct N##_node *)(m->_data);                      \
-                if(i->_data[i->_curr]._state != STATE_USED)                    \
+                if(i->_data[i->_curr]._state != SGC_NODE_STATE_USED)           \
                 {                                                              \
                         N##_iterator_prev(i);                                  \
                 }                                                              \
                 i->_is_valid =                                                 \
-                    (i->_data[i->_curr]._state != STATE_USED) ? 0 : 1;         \
+                    (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) ? 0     \
+                                                                       : 1;    \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_begin(struct N *m)                             \
@@ -239,7 +244,7 @@ enum node_state
                 u->_size = 0;                                                  \
                 for(size_t i = 0; i < S; ++i)                                  \
                 {                                                              \
-                        u->_data[i]._state = STATE_OPEN;                       \
+                        u->_data[i]._state = SGC_NODE_STATE_OPEN;              \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -272,7 +277,7 @@ enum node_state
                 dst->_size = src->_size;                                       \
                 for(size_t i = 0; i < S; ++i)                                  \
                 {                                                              \
-                        if(src->_data[i]._state == STATE_USED)                 \
+                        if(src->_data[i]._state == SGC_NODE_STATE_USED)        \
                         {                                                      \
                                 N##_element_copy(&dst->_data[i]._value,        \
                                                  &src->_data[i]._value);       \
@@ -287,7 +292,7 @@ enum node_state
                 {                                                              \
                         for(size_t i = 0; i < S; ++i)                          \
                         {                                                      \
-                                if(u->_data[i]._state == STATE_USED)           \
+                                if(u->_data[i]._state == SGC_NODE_STATE_USED)  \
                                 {                                              \
                                         if(N##_element_copy != N##_flat_copy)  \
                                         {                                      \
@@ -306,9 +311,11 @@ enum node_state
                 if(u->_size)                                                   \
                 {                                                              \
                         size_t position = hash % S;                            \
-                        while(u->_data[position]._state != STATE_OPEN)         \
+                        while(u->_data[position]._state !=                     \
+                              SGC_NODE_STATE_OPEN)                             \
                         {                                                      \
-                                if(u->_data[position]._state == STATE_USED &&  \
+                                if(u->_data[position]._state ==                \
+                                       SGC_NODE_STATE_USED &&                  \
                                    N##_element_equal(                          \
                                        &u->_data[position]._value, v))         \
                                 {                                              \
@@ -342,7 +349,8 @@ enum node_state
                 if(!i._is_valid && u->_size < S - 1)                           \
                 {                                                              \
                         size_t position = hash % S;                            \
-                        while(u->_data[position]._state == STATE_USED)         \
+                        while(u->_data[position]._state ==                     \
+                              SGC_NODE_STATE_USED)                             \
                         {                                                      \
                                 if(position == S - 1)                          \
                                 {                                              \
@@ -354,7 +362,7 @@ enum node_state
                                 }                                              \
                         }                                                      \
                         N##_element_copy(&u->_data[position]._value, &v);      \
-                        u->_data[position]._state = STATE_USED;                \
+                        u->_data[position]._state = SGC_NODE_STATE_USED;       \
                         ++u->_size;                                            \
                 }                                                              \
         }                                                                      \
@@ -364,7 +372,8 @@ enum node_state
                 if(u->_size < S - 1)                                           \
                 {                                                              \
                         size_t position = N##_element_hash(&v) % S;            \
-                        while(u->_data[position]._state == STATE_USED)         \
+                        while(u->_data[position]._state ==                     \
+                              SGC_NODE_STATE_USED)                             \
                         {                                                      \
                                 if(position == S - 1)                          \
                                 {                                              \
@@ -376,7 +385,7 @@ enum node_state
                                 }                                              \
                         }                                                      \
                         N##_element_copy(&u->_data[position]._value, &v);      \
-                        u->_data[position]._state = STATE_USED;                \
+                        u->_data[position]._state = SGC_NODE_STATE_USED;       \
                         ++u->_size;                                            \
                 }                                                              \
         }                                                                      \
@@ -387,7 +396,7 @@ enum node_state
                 if(N##_iterator_valid(*i))                                     \
                 {                                                              \
                         V *value = N##_iterator_value(*i);                     \
-                        i->_data[i->_curr]._state = STATE_ERASED;              \
+                        i->_data[i->_curr]._state = SGC_NODE_STATE_ERASED;     \
                         N##_iterator_next(i);                                  \
                         if(N##_element_copy != N##_flat_copy)                  \
                         {                                                      \

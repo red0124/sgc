@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_map.h"
-#include "../lib/gc_static_types.h"
+#define SGC_ST
+#include "../lib/map.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -21,7 +21,7 @@
 
 #define TEST_ELEMENTS_NUM 50
 
-INIT_MAP(int, int, map);
+SGC_INIT_MAP(int, int, map);
 
 void test_map_insert_erase(void)
 {
@@ -79,22 +79,22 @@ size_t allocation_count = 0;
 
 void al_copy(al *dst, const al *const src)
 {
-	if(src->el)
-	{
-		dst->el = (int *)malloc(sizeof(int));
-		*dst->el = *src->el;
-	}
-	else
-	{
-		dst->el = NULL;
-	}
-	++allocation_count;
+        if(src->el)
+        {
+                dst->el = (int *)malloc(sizeof(int));
+                *dst->el = *src->el;
+        }
+        else
+        {
+                dst->el = NULL;
+        }
+        ++allocation_count;
 }
 
 void al_free(al *a)
 {
-	--allocation_count;
-	free(a->el);
+        --allocation_count;
+        free(a->el);
 }
 
 int al_equal(const al *const first, const al *const second)
@@ -107,12 +107,12 @@ int al_compare(const al *const first, const al *const second)
         return *first->el - *second->el;
 }
 
-void al_init(al* a)
+void al_init(al *a)
 {
-	a->el = NULL;
+        a->el = NULL;
 }
 
-INIT_MAP(al, al, amap);
+SGC_INIT_MAP(al, al, amap);
 
 void test_amap(void)
 {
@@ -124,7 +124,7 @@ void test_amap(void)
 
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
         {
-		x = i;
+                x = i;
                 amap_at(&v, tmp);
         }
 
@@ -133,9 +133,9 @@ void test_amap(void)
 
         amap_set_share_key(1);
         ++allocation_count;
-	int* new_el = (int*)malloc(sizeof(int));
-	*new_el = TEST_ELEMENTS_NUM + 2;
-	tmp.el = new_el;
+        int *new_el = (int *)malloc(sizeof(int));
+        *new_el = TEST_ELEMENTS_NUM + 2;
+        tmp.el = new_el;
         amap_at(&v, tmp);
         amap_set_share_key(0);
 
@@ -150,7 +150,7 @@ int map_compare(const map *const first, const map *const second)
         return map_size(first) - map_size(second);
 }
 
-INIT_MAP(map, map, vmap);
+SGC_INIT_MAP(map, map, vmap);
 
 void test_map_map(void)
 {
@@ -181,9 +181,9 @@ void test_map_map(void)
 
         // {{(0, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 1), (2, 2)}}
 
-	TEST_ASSERT_EQUAL_INT(0, *map_at(vmap_at(&v, tmp), 0));
-	TEST_ASSERT_EQUAL_INT(1, *map_at(vmap_at(&v, tmp), 1));
-	TEST_ASSERT_EQUAL_INT(2, *map_at(vmap_at(&v, tmp), 2));
+        TEST_ASSERT_EQUAL_INT(0, *map_at(vmap_at(&v, tmp), 0));
+        TEST_ASSERT_EQUAL_INT(1, *map_at(vmap_at(&v, tmp), 1));
+        TEST_ASSERT_EQUAL_INT(2, *map_at(vmap_at(&v, tmp), 2));
 
         vmap_free(&v);
         // no memory should be left dealocated

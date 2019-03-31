@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_static_types.h"
-#include "../lib/gc_queue.h"
+#define SGC_ST
+#include "../lib/queue.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -21,7 +21,7 @@
 
 #define TEST_ELEMENTS_NUM 50
 
-INIT_QUEUE(int, queue);
+SGC_INIT_QUEUE(int, queue);
 
 void test_queue_copy(void)
 {
@@ -92,7 +92,7 @@ int al_equal(const al *const first, const al *const second)
         return *first->el == *second->el;
 }
 
-INIT_QUEUE(al, aqueue);
+SGC_INIT_QUEUE(al, aqueue);
 
 void test_aqueue(void)
 {
@@ -111,7 +111,7 @@ void test_aqueue(void)
 
         aqueue_set_share(1);
         ++allocation_count;
-        aqueue_push(&v, (al){(int*)malloc(sizeof(int))});
+        aqueue_push(&v, (al){(int *)malloc(sizeof(int))});
         aqueue_set_share(0);
 
         aqueue_free(&v);
@@ -120,7 +120,7 @@ void test_aqueue(void)
         // no memory should be left dealocated
 }
 
-INIT_QUEUE(queue, vqueue);
+SGC_INIT_QUEUE(queue, vqueue);
 
 int *vqueue_front_pair(vqueue *l)
 {

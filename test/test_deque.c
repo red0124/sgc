@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_static_types.h"
-#include "../lib/gc_deque.h"
+#define SGC_ST
+#include "../lib/deque.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -21,7 +21,7 @@
 
 #define TEST_ELEMENTS_NUM 50
 
-INIT_DEQUE(int, deque);
+SGC_INIT_DEQUE(int, deque);
 
 void test_deque_push_pop(void)
 {
@@ -163,7 +163,7 @@ int al_equal(const al *const first, const al *const second)
         return *first->el == *second->el;
 }
 
-INIT_DEQUE(al, adeque);
+SGC_INIT_DEQUE(al, adeque);
 
 void test_adeque(void)
 {
@@ -183,7 +183,7 @@ void test_adeque(void)
 
         adeque_set_share(1);
         ++allocation_count;
-        adeque_push_back(&v, (al){(int*)malloc(sizeof(int))});
+        adeque_push_back(&v, (al){(int *)malloc(sizeof(int))});
         adeque_set_share(0);
 
         adeque_free(&v);
@@ -192,7 +192,7 @@ void test_adeque(void)
         // no memory should be left dealocated
 }
 
-INIT_DEQUE(deque, vdeque);
+SGC_INIT_DEQUE(deque, vdeque);
 int *vdeque_at_pair(vdeque *l, size_t m, size_t n)
 {
         return deque_at(vdeque_at(l, m), n);
@@ -253,8 +253,7 @@ void test_deque_iterator(void)
         size_t i = 0;
 
         for(struct deque_iterator it = deque_begin(&v);
-            !deque_iterator_equal(it, deque_end(&v));
-            deque_iterator_next(&it))
+            !deque_iterator_equal(it, deque_end(&v)); deque_iterator_next(&it))
         {
                 TEST_ASSERT_EQUAL_INT(*deque_iterator_value(it),
                                       *deque_at(&v, i));
@@ -276,12 +275,10 @@ void test_deque_iterator(void)
         TEST_ASSERT_EQUAL_INT(*deque_iterator_value(deque_begin(&v)),
                               *deque_at(&v, i));
 
-	i = TEST_ELEMENTS_NUM / 2;
-	struct deque_iterator it = deque_from(&v, i);
+        i = TEST_ELEMENTS_NUM / 2;
+        struct deque_iterator it = deque_from(&v, i);
 
-        TEST_ASSERT_EQUAL_INT(*deque_iterator_value(it),
-                              *deque_at(&v, i));
-
+        TEST_ASSERT_EQUAL_INT(*deque_iterator_value(it), *deque_at(&v, i));
 
         deque_free(&v);
 }

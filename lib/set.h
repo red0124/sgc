@@ -7,10 +7,10 @@
 
 #ifndef SGC_MAP_COLOR
 #define SGC_MAP_COLOR
-enum map_color
+enum sgc_map_color
 {
-        MAP_RED,
-        MAP_BLACK,
+        SGC_MAP_RED,
+        SGC_MAP_BLACK,
 };
 #endif
 
@@ -45,7 +45,7 @@ static size_t sgc_log_two(size_t size)
                 struct N##_node *_left;                                        \
                 struct N##_node *_right;                                       \
                 V _value;                                                      \
-                enum map_color _color;                                         \
+                enum sgc_map_color _color;                                     \
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
@@ -153,7 +153,7 @@ static size_t sgc_log_two(size_t size)
                     (struct N##_node *)malloc(sizeof(struct N##_node));        \
                 N##_element_copy(&n->_value, v);                               \
                 n->_left = n->_right = MAP_LEAF;                               \
-                n->_color = MAP_RED;                                           \
+                n->_color = SGC_MAP_RED;                                       \
                 return n;                                                      \
         }                                                                      \
                                                                                \
@@ -535,8 +535,8 @@ static size_t sgc_log_two(size_t size)
                 }                                                              \
                 parent->_left = gparent;                                       \
                 gparent->_parent = parent;                                     \
-                parent->_color = MAP_BLACK;                                    \
-                gparent->_color = MAP_RED;                                     \
+                parent->_color = SGC_MAP_BLACK;                                \
+                gparent->_color = SGC_MAP_RED;                                 \
         }                                                                      \
                                                                                \
         static void N##_rotate_right(struct N *m, struct N##_node *parent,     \
@@ -568,8 +568,8 @@ static size_t sgc_log_two(size_t size)
                 }                                                              \
                 parent->_right = gparent;                                      \
                 gparent->_parent = parent;                                     \
-                parent->_color = MAP_BLACK;                                    \
-                gparent->_color = MAP_RED;                                     \
+                parent->_color = SGC_MAP_BLACK;                                \
+                gparent->_color = SGC_MAP_RED;                                 \
         }                                                                      \
                                                                                \
         static void N##_rotate_left_right(struct N *m, struct N##_node *n,     \
@@ -597,20 +597,20 @@ static size_t sgc_log_two(size_t size)
                         if(N##_is_left_child(parent, gparent))                 \
                         {                                                      \
                                 N##_rotate_right(m, parent, gparent);          \
-                                n->_color = MAP_RED;                           \
-                                parent->_color = MAP_BLACK;                    \
+                                n->_color = SGC_MAP_RED;                       \
+                                parent->_color = SGC_MAP_BLACK;                \
                                 struct N##_node *sibling = parent->_right;     \
                                 if(sibling != MAP_LEAF)                        \
                                 {                                              \
-                                        sibling->_color = MAP_RED;             \
+                                        sibling->_color = SGC_MAP_RED;         \
                                 }                                              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
                                 N##_rotate_right_left(m, n, parent, gparent);  \
-                                n->_color = MAP_BLACK;                         \
-                                n->_right->_color = MAP_RED;                   \
-                                n->_left->_color = MAP_RED;                    \
+                                n->_color = SGC_MAP_BLACK;                     \
+                                n->_right->_color = SGC_MAP_RED;               \
+                                n->_left->_color = SGC_MAP_RED;                \
                         }                                                      \
                 }                                                              \
                 else                                                           \
@@ -618,20 +618,20 @@ static size_t sgc_log_two(size_t size)
                         if(!N##_is_left_child(parent, gparent))                \
                         {                                                      \
                                 N##_rotate_left(m, parent, gparent);           \
-                                n->_color = MAP_RED;                           \
-                                parent->_color = MAP_BLACK;                    \
+                                n->_color = SGC_MAP_RED;                       \
+                                parent->_color = SGC_MAP_BLACK;                \
                                 struct N##_node *sibling = parent->_right;     \
                                 if(sibling != MAP_LEAF)                        \
                                 {                                              \
-                                        sibling->_color = MAP_RED;             \
+                                        sibling->_color = SGC_MAP_RED;         \
                                 }                                              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
                                 N##_rotate_left_right(m, n, parent, gparent);  \
-                                n->_color = MAP_BLACK;                         \
-                                n->_right->_color = MAP_RED;                   \
-                                n->_left->_color = MAP_RED;                    \
+                                n->_color = SGC_MAP_BLACK;                     \
+                                n->_right->_color = SGC_MAP_RED;               \
+                                n->_left->_color = SGC_MAP_RED;                \
                         }                                                      \
                 }                                                              \
         }                                                                      \
@@ -640,15 +640,15 @@ static size_t sgc_log_two(size_t size)
                                     struct N##_node *p, struct N##_node *gp)   \
         {                                                                      \
                 struct N##_node *u = N##_sibling(p, gp);                       \
-                if(u == MAP_LEAF || u->_color == MAP_BLACK)                    \
+                if(u == MAP_LEAF || u->_color == SGC_MAP_BLACK)                \
                 {                                                              \
                         N##_rotate(m, n, p, gp);                               \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        u->_color = MAP_BLACK;                                 \
-                        p->_color = MAP_BLACK;                                 \
-                        gp->_color = MAP_RED;                                  \
+                        u->_color = SGC_MAP_BLACK;                             \
+                        p->_color = SGC_MAP_BLACK;                             \
+                        gp->_color = SGC_MAP_RED;                              \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -656,12 +656,12 @@ static size_t sgc_log_two(size_t size)
         {                                                                      \
                 if(n == m->_root)                                              \
                 {                                                              \
-                        m->_root->_color = MAP_BLACK;                          \
+                        m->_root->_color = SGC_MAP_BLACK;                      \
                         return;                                                \
                 }                                                              \
                 struct N##_node *p = n->_parent;                               \
                 struct N##_node *gp = p->_parent;                              \
-                if(p->_color == MAP_RED && n->_color == MAP_RED)               \
+                if(p->_color == SGC_MAP_RED && n->_color == SGC_MAP_RED)       \
                 {                                                              \
                         N##_corect_tree(m, n, p, gp);                          \
                 }                                                              \
@@ -729,7 +729,7 @@ static size_t sgc_log_two(size_t size)
                 if(m->_root == MAP_LEAF)                                       \
                 {                                                              \
                         struct N##_node *new_node = N##_node_new(&v);          \
-                        new_node->_color = MAP_BLACK;                          \
+                        new_node->_color = SGC_MAP_BLACK;                      \
                         new_node->_parent = MAP_LEAF;                          \
                         m->_root = new_node;                                   \
                         m->_size = 1;                                          \
@@ -781,7 +781,7 @@ static size_t sgc_log_two(size_t size)
                 if(m->_root == MAP_LEAF)                                       \
                 {                                                              \
                         struct N##_node *new_node = N##_node_new(&v);          \
-                        new_node->_color = MAP_BLACK;                          \
+                        new_node->_color = SGC_MAP_BLACK;                      \
                         new_node->_parent = MAP_LEAF;                          \
                         m->_root = new_node;                                   \
                         m->_size = 1;                                          \
@@ -842,25 +842,26 @@ static size_t sgc_log_two(size_t size)
                         if(p->_left == n && p->_right)                         \
                         {                                                      \
                                 s = p->_right;                                 \
-                                if(s->_color == MAP_RED)                       \
+                                if(s->_color == SGC_MAP_RED)                   \
                                 {                                              \
                                         N##_rotate_left(m, s, p);              \
-                                        s->_color = MAP_BLACK;                 \
-                                        p->_color = MAP_BLACK;                 \
+                                        s->_color = SGC_MAP_BLACK;             \
+                                        p->_color = SGC_MAP_BLACK;             \
                                         if(p->_right)                          \
                                         {                                      \
-                                                p->_right->_color = MAP_RED;   \
+                                                p->_right->_color =            \
+                                                    SGC_MAP_RED;               \
                                         }                                      \
                                 }                                              \
-                                else if((!s->_right ||                         \
-                                         s->_right->_color == MAP_BLACK) &&    \
+                                else if((!s->_right || s->_right->_color ==    \
+                                                           SGC_MAP_BLACK) &&   \
                                         (!s->_left ||                          \
-                                         s->_left->_color == MAP_BLACK))       \
+                                         s->_left->_color == SGC_MAP_BLACK))   \
                                 {                                              \
-                                        s->_color = MAP_RED;                   \
-                                        if(p->_color == MAP_RED)               \
+                                        s->_color = SGC_MAP_RED;               \
+                                        if(p->_color == SGC_MAP_RED)           \
                                         {                                      \
-                                                p->_color = MAP_BLACK;         \
+                                                p->_color = SGC_MAP_BLACK;     \
                                         }                                      \
                                         else                                   \
                                         {                                      \
@@ -869,14 +870,14 @@ static size_t sgc_log_two(size_t size)
                                         }                                      \
                                 }                                              \
                                 else if(s->_right &&                           \
-                                        s->_right->_color == MAP_RED)          \
+                                        s->_right->_color == SGC_MAP_RED)      \
                                 {                                              \
                                         r = s->_right;                         \
-                                        r->_color = MAP_BLACK;                 \
+                                        r->_color = SGC_MAP_BLACK;             \
                                         N##_rotate_left(m, s, p);              \
                                 }                                              \
                                 else if(s->_left &&                            \
-                                        s->_left->_color == MAP_RED)           \
+                                        s->_left->_color == SGC_MAP_RED)       \
                                 {                                              \
                                         r = s->_left;                          \
                                         N##_rotate_right_left(m, r, s, p);     \
@@ -889,25 +890,26 @@ static size_t sgc_log_two(size_t size)
                                 {                                              \
                                         return;                                \
                                 }                                              \
-                                if(s->_color == MAP_RED)                       \
+                                if(s->_color == SGC_MAP_RED)                   \
                                 {                                              \
                                         N##_rotate_right(m, s, p);             \
-                                        s->_color = MAP_BLACK;                 \
-                                        p->_color = MAP_BLACK;                 \
+                                        s->_color = SGC_MAP_BLACK;             \
+                                        p->_color = SGC_MAP_BLACK;             \
                                         if(p->_left)                           \
                                         {                                      \
-                                                p->_left->_color = MAP_RED;    \
+                                                p->_left->_color =             \
+                                                    SGC_MAP_RED;               \
                                         }                                      \
                                 }                                              \
-                                else if((!s->_right ||                         \
-                                         s->_right->_color == MAP_BLACK) &&    \
+                                else if((!s->_right || s->_right->_color ==    \
+                                                           SGC_MAP_BLACK) &&   \
                                         (!s->_left ||                          \
-                                         s->_left->_color == MAP_BLACK))       \
+                                         s->_left->_color == SGC_MAP_BLACK))   \
                                 {                                              \
-                                        s->_color = MAP_RED;                   \
-                                        if(p->_color == MAP_RED)               \
+                                        s->_color = SGC_MAP_RED;               \
+                                        if(p->_color == SGC_MAP_RED)           \
                                         {                                      \
-                                                p->_color = MAP_BLACK;         \
+                                                p->_color = SGC_MAP_BLACK;     \
                                         }                                      \
                                         else                                   \
                                         {                                      \
@@ -916,17 +918,17 @@ static size_t sgc_log_two(size_t size)
                                         }                                      \
                                 }                                              \
                                 else if(s->_left &&                            \
-                                        s->_left->_color == MAP_RED)           \
+                                        s->_left->_color == SGC_MAP_RED)       \
                                 {                                              \
                                         r = s->_left;                          \
                                         if(r)                                  \
                                         {                                      \
-                                                r->_color = MAP_BLACK;         \
+                                                r->_color = SGC_MAP_BLACK;     \
                                         }                                      \
                                         N##_rotate_right(m, s, p);             \
                                 }                                              \
                                 else if(s->_right &&                           \
-                                        s->_right->_color == MAP_RED)          \
+                                        s->_right->_color == SGC_MAP_RED)      \
                                 {                                              \
                                         r = s->_right;                         \
                                         N##_rotate_left_right(m, r, s, p);     \
@@ -998,12 +1000,12 @@ static size_t sgc_log_two(size_t size)
                                                      : m->_root->_right;       \
                 }                                                              \
                                                                                \
-                if((succ_c && succ_c->_color == MAP_RED) ||                    \
-                   succ->_color == MAP_RED)                                    \
+                if((succ_c && succ_c->_color == SGC_MAP_RED) ||                \
+                   succ->_color == SGC_MAP_RED)                                \
                 {                                                              \
                         if(succ_c)                                             \
                         {                                                      \
-                                succ_c->_color = MAP_BLACK;                    \
+                                succ_c->_color = SGC_MAP_BLACK;                \
                         }                                                      \
                 }                                                              \
                 else                                                           \
@@ -1012,7 +1014,7 @@ static size_t sgc_log_two(size_t size)
                 }                                                              \
                 if(m->_root)                                                   \
                 {                                                              \
-                        m->_root->_color = MAP_BLACK;                          \
+                        m->_root->_color = SGC_MAP_BLACK;                      \
                 }                                                              \
                 --m->_size;                                                    \
                 return succ;                                                   \

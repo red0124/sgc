@@ -1,6 +1,7 @@
 CC = g++ -std=c++11
 CFLAGS = -Wall -Wextra
 NAME = program
+VAL = 
 
 UNITY = ./Unity/src/unity.c
 
@@ -66,61 +67,61 @@ static_unordered_set:
 
 all:
 	$(CC) $(UNITY) test_algorithm.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_list.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_forward_list.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_vector.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_stack.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_deque.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_queue.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_set.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_unordered_set.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_map.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_unordered_map.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_priority_queue.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_static_stack.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_static_vector.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_static_deque.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_static_priority_queue.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_static_queue.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_static_unordered_map.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_static_unordered_set.c -g -o $(NAME) $(CFLAGS)
-	./$(NAME)
+	$(VAL) ./$(NAME)
 
 	rm $(NAME)
 

@@ -5,11 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_static_types.h"
-#include "../lib/gc_vector.h"
+#define SGC_ST
+#include "../lib/static_types.h"
+#include "../lib/vector.h"
 
-#include "../lib/gc_static_types.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -23,7 +23,7 @@
 
 #define TEST_ELEMENTS_NUM 50
 
-INIT_VECTOR(int, vector);
+SGC_INIT_VECTOR(int, vector);
 
 void test_vector_push_pop(void)
 {
@@ -165,7 +165,7 @@ int al_equal(const al *const first, const al *const second)
         return *first->el == *second->el;
 }
 
-INIT_VECTOR(al, avector);
+SGC_INIT_VECTOR(al, avector);
 
 void test_avector(void)
 {
@@ -185,7 +185,7 @@ void test_avector(void)
 
         avector_set_share(1);
         ++allocation_count;
-        avector_push_back(&v, (al){(int*)malloc(sizeof(int))});
+        avector_push_back(&v, (al){(int *)malloc(sizeof(int))});
         avector_set_share(0);
 
         avector_free(&v);
@@ -194,7 +194,7 @@ void test_avector(void)
         // no memory should be left dealocated
 }
 
-INIT_VECTOR(vector, vvector);
+SGC_INIT_VECTOR(vector, vvector);
 int *vvector_at_pair(vvector *l, size_t m, size_t n)
 {
         return vector_at(vvector_at(l, m), n);
@@ -278,12 +278,10 @@ void test_vector_iterator(void)
         TEST_ASSERT_EQUAL_INT(*vector_iterator_value(vector_begin(&v)),
                               *vector_at(&v, i));
 
-	i = TEST_ELEMENTS_NUM / 2;
-	struct vector_iterator it = vector_from(&v, i);
+        i = TEST_ELEMENTS_NUM / 2;
+        struct vector_iterator it = vector_from(&v, i);
 
-        TEST_ASSERT_EQUAL_INT(*vector_iterator_value(it),
-                              *vector_at(&v, i));
-
+        TEST_ASSERT_EQUAL_INT(*vector_iterator_value(it), *vector_at(&v, i));
 
         vector_free(&v);
 }

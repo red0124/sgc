@@ -3,7 +3,7 @@
 #ifndef SGC_ST
 #define SGC_ST
 #warning                                                                       \
-    "header contains function definitions whitch may cause multiple definition errors, define SGC_STATIC_TYPES to kill warning"
+    "contains function definitions, define SGC_STATIC_TYPES to kill warning"
 #endif
 
 #define SGC_INIT_STATIC(T, N)                                                  \

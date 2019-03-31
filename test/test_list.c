@@ -5,11 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_list.h"
-#include "../lib/gc_static_types.h"
+#define SGC_ST
+#include "../lib/list.h"
+#include "../lib/static_types.h"
 
-#include "../lib/gc_static_types.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -23,7 +23,7 @@
 
 #define TEST_ELEMENTS_NUM 50
 
-INIT_LIST(int, list);
+SGC_INIT_LIST(int, list);
 
 void test_list_push_pop(void)
 {
@@ -257,7 +257,7 @@ int al_equal(const al *const first, const al *const second)
         return *first->el == *second->el;
 }
 
-INIT_LIST(al, alist);
+SGC_INIT_LIST(al, alist);
 
 void test_alist(void)
 {
@@ -277,7 +277,7 @@ void test_alist(void)
 
         alist_set_share(1);
         ++allocation_count;
-        alist_push_back(&l, (al){(int*)malloc(sizeof(int))});
+        alist_push_back(&l, (al){(int *)malloc(sizeof(int))});
         alist_set_share(0);
 
         alist_free(&l);
@@ -286,7 +286,7 @@ void test_alist(void)
         // no memory should be left dealocated
 }
 
-INIT_LIST(list, llist);
+SGC_INIT_LIST(list, llist);
 int *llist_at_pair(llist *l, size_t m, size_t n)
 {
         return list_at(llist_at(l, m), n);

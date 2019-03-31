@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_static_types.h"
-#include "../lib/gc_static_stack.h"
+#define SGC_ST
+#include "../lib/static_stack.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -22,7 +22,7 @@
 #define TEST_ELEMENTS_NUM 50
 #define STACK_MAX 512
 
-INIT_STATIC_STACK(int, STACK_MAX, stack);
+SGC_INIT_STATIC_STACK(int, STACK_MAX, stack);
 
 void test_stack_copy(void)
 {
@@ -57,7 +57,8 @@ void test_stack_front_back(void)
 
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
         {
-                TEST_ASSERT_EQUAL_INT(TEST_ELEMENTS_NUM - 1 - i, *stack_top(&v));
+                TEST_ASSERT_EQUAL_INT(TEST_ELEMENTS_NUM - 1 - i,
+                                      *stack_top(&v));
                 stack_pop(&v);
         }
 
@@ -91,7 +92,7 @@ int al_equal(const al *const first, const al *const second)
         return *first->el == *second->el;
 }
 
-INIT_STATIC_STACK(al, STACK_MAX, astack);
+SGC_INIT_STATIC_STACK(al, STACK_MAX, astack);
 
 void test_astack(void)
 {
@@ -110,7 +111,7 @@ void test_astack(void)
 
         astack_set_share(1);
         ++allocation_count;
-        astack_push(&v, (al){(int*)malloc(sizeof(int))});
+        astack_push(&v, (al){(int *)malloc(sizeof(int))});
         astack_set_share(0);
 
         astack_free(&v);
@@ -119,7 +120,7 @@ void test_astack(void)
         // no memory should be left dealocated
 }
 
-INIT_STATIC_STACK(stack, STACK_MAX, vstack);
+SGC_INIT_STATIC_STACK(stack, STACK_MAX, vstack);
 
 int *vstack_top_pair(vstack *l)
 {

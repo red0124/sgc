@@ -5,11 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_static_types.h"
-#include "../lib/gc_string.h"
+#define SGC_ST
+#include "../lib/static_types.h"
+#include "../lib/string.h"
 
-#include "../lib/gc_static_types.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -23,7 +23,7 @@
 
 #define TEST_ELEMENTS_NUM 20
 
-INIT_STRING(string);
+SGC_INIT_STRING(string);
 
 void test_string_push_pop(void)
 {
@@ -35,7 +35,7 @@ void test_string_push_pop(void)
                 string_push_back(&v, i);
         }
 
-	printf("aham\n");
+        printf("aham\n");
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
         {
                 TEST_ASSERT_EQUAL_INT(i + 'a', v[i]);
@@ -86,32 +86,26 @@ void test_string_iterator(void)
             !string_iterator_equal(it, string_end(&v));
             string_iterator_next(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*string_iterator_value(it),
-                                      v[i]);
+                TEST_ASSERT_EQUAL_INT(*string_iterator_value(it), v[i]);
                 ++i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*string_iterator_value(string_end(&v)),
-                              v[i]);
+        TEST_ASSERT_EQUAL_INT(*string_iterator_value(string_end(&v)), v[i]);
 
         for(struct string_iterator it = string_end(&v);
             !string_iterator_equal(it, string_begin(&v));
             string_iterator_prev(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*string_iterator_value(it),
-                                      v[i]);
+                TEST_ASSERT_EQUAL_INT(*string_iterator_value(it), v[i]);
                 --i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*string_iterator_value(string_begin(&v)),
-                              v[i]);
+        TEST_ASSERT_EQUAL_INT(*string_iterator_value(string_begin(&v)), v[i]);
 
-	i = TEST_ELEMENTS_NUM / 2;
-	struct string_iterator it = string_from(&v, i);
+        i = TEST_ELEMENTS_NUM / 2;
+        struct string_iterator it = string_from(&v, i);
 
-        TEST_ASSERT_EQUAL_INT(*string_iterator_value(it),
-                              v[i]);
-
+        TEST_ASSERT_EQUAL_INT(*string_iterator_value(it), v[i]);
 
         string_free(&v);
 }

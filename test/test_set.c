@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_set.h"
-#include "../lib/gc_static_types.h"
+#define SGC_ST
+#include "../lib/set.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -21,7 +21,7 @@
 
 #define TEST_ELEMENTS_NUM 50
 
-INIT_SET(int, set);
+SGC_INIT_SET(int, set);
 
 void test_set_insert_erase(void)
 {
@@ -68,7 +68,7 @@ void test_set_insert_multiple(void)
                 set_erase(&v, 0);
         }
 
-	TEST_ASSERT_EQUAL_INT(0, set_iterator_valid(set_find(&v, 0)));
+        TEST_ASSERT_EQUAL_INT(0, set_iterator_valid(set_find(&v, 0)));
         TEST_ASSERT_EQUAL_INT(0, set_size(&v));
 
         set_free(&v);
@@ -125,7 +125,7 @@ int al_compare(const al *const first, const al *const second)
         return *first->el - *second->el;
 }
 
-INIT_SET(al, aset);
+SGC_INIT_SET(al, aset);
 
 void test_aset(void)
 {
@@ -148,9 +148,9 @@ void test_aset(void)
 
         aset_set_share(1);
         ++allocation_count;
-	int* new_el = (int*)malloc(sizeof(int));
-	*new_el = TEST_ELEMENTS_NUM + 2;
-	tmp.el = new_el;
+        int *new_el = (int *)malloc(sizeof(int));
+        *new_el = TEST_ELEMENTS_NUM + 2;
+        tmp.el = new_el;
         aset_insert(&v, tmp);
         aset_set_share(0);
 
@@ -165,7 +165,7 @@ int set_compare(const set *const first, const set *const second)
         return set_size(first) - set_size(second);
 }
 
-INIT_SET(set, vset);
+SGC_INIT_SET(set, vset);
 
 void test_set_set(void)
 {

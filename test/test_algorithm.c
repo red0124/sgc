@@ -6,23 +6,23 @@
 #include <string.h>
 #include <unistd.h>
 
-#define GC_ST
-#include "../lib/gc_deque.h"
-#include "../lib/gc_map.h"
-#include "../lib/gc_list.h"
-#include "../lib/gc_set.h"
-#include "../lib/gc_static_types.h"
-#include "../lib/gc_static_unordered_map.h"
-#include "../lib/gc_unordered_map.h"
-#include "../lib/gc_unordered_set.h"
-#include "../lib/gc_vector.h"
-#include "../lib/gc_string.h"
+#define SGC_ST
+#include "../lib/deque.h"
+#include "../lib/list.h"
+#include "../lib/map.h"
+#include "../lib/set.h"
+#include "../lib/static_types.h"
+#include "../lib/static_unordered_map.h"
+#include "../lib/string.h"
+#include "../lib/unordered_map.h"
+#include "../lib/unordered_set.h"
+#include "../lib/vector.h"
 
-INIT_UNORDERED_SET(int, __unused_set);
-INIT_UNORDERED_MAP(int, int, __unused_mat);
+SGC_INIT_UNORDERED_SET(int, __unused_set);
+SGC_INIT_UNORDERED_MAP(int, int, __unused_mat);
 
-#include "../lib/gc_algorithm.h"
-#include "../lib/gc_static_types.h"
+#include "../lib/algorithm.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -36,10 +36,10 @@ INIT_UNORDERED_MAP(int, int, __unused_mat);
 
 #define TEST_ELEMENTS_NUM 50
 
-INIT_VECTOR(int, vector);
-INIT_DEQUE(int, deque);
-INIT_ALGORITHM(vector);
-INIT_FIND_ITERATOR(vector);
+SGC_INIT_VECTOR(int, vector);
+SGC_INIT_DEQUE(int, deque);
+SGC_INIT_ALGORITHM(vector);
+SGC_INIT_FIND_ITERATOR(vector);
 
 void fold_sum(const int *const el, void *acc)
 {
@@ -187,7 +187,7 @@ void test_find(void)
         vector_free(&v);
 }
 
-INIT_BINARY_FIND(int, vector);
+SGC_INIT_BINARY_FIND(int, vector);
 
 void test_binary_find(void)
 {
@@ -213,7 +213,7 @@ void test_binary_find(void)
         vector_free(&v);
 }
 
-INIT_QSORT(int, vector);
+SGC_INIT_QSORT(int, vector);
 
 int compare_reverse(const void *const first, const void *const second)
 {
@@ -249,8 +249,8 @@ void test_sort(void)
         vector_free(&v);
 }
 
-INIT_MAP(int, int, map);
-INIT_ITERATE(map);
+SGC_INIT_MAP(int, int, map);
+SGC_INIT_ITERATE(map);
 
 void test_fold_map(void)
 {
@@ -282,7 +282,7 @@ void test_fold_map(void)
         map_free(&m);
 }
 
-INIT_ITERATE_PAIR(map);
+SGC_INIT_ITERATE_PAIR(map);
 
 void fold_pair(const int *const k, const int *const v, void *arg)
 {
@@ -395,12 +395,12 @@ void test_for_each(void)
                 vector_push_back(&v, i);
         }
 
-	GC_FOR_EACH(vector, v, i, *i += 1);
+        SGC_FOR_EACH(vector, v, i, *i += 1);
 
-	size_t j = 1;
-	GC_FOR_EACH(vector, v, i, TEST_ASSERT_EQUAL_INT(*i, j); ++j);
+        size_t j = 1;
+        SGC_FOR_EACH(vector, v, i, TEST_ASSERT_EQUAL_INT(*i, j); ++j);
 
-	vector_free(&v);
+        vector_free(&v);
 }
 
 void test_for_each_pair(void)
@@ -413,13 +413,13 @@ void test_for_each_pair(void)
                 map_set_at(&m, i, i);
         }
 
-	GC_FOR_EACH_PAIR(map, m, k, v, (void)k; *v += 1);
-	GC_FOR_EACH_PAIR(map, m, k, v, TEST_ASSERT_EQUAL_INT(*v, *k + 1));
+        SGC_FOR_EACH_PAIR(map, m, k, v, (void)k; *v += 1);
+        SGC_FOR_EACH_PAIR(map, m, k, v, TEST_ASSERT_EQUAL_INT(*v, *k + 1));
 
         map_free(&m);
 }
 
-INIT_SET(int, set);
+SGC_INIT_SET(int, set);
 
 void test_lc1(void)
 {
@@ -431,9 +431,9 @@ void test_lc1(void)
                 vector_push_back(&v, i);
         }
 
-        GC_LC(deque, d, vector, v, x, x + 2, 1);
-        GC_LC(vector, v2, deque, d, x, x * 3);
-        GC_LC(set, s, vector, v2);
+        SGC_LC(deque, d, vector, v, x, x + 2, 1);
+        SGC_LC(vector, v2, deque, d, x, x * 3);
+        SGC_LC(set, s, vector, v2);
 
         for(size_t i = 0; i < deque_size(&d); ++i)
         {
@@ -443,7 +443,7 @@ void test_lc1(void)
         vector_free(&v);
         vector_free(&v2);
         set_free(&s);
-	deque_free(&d);
+        deque_free(&d);
 }
 
 void test_lc2(void)
@@ -456,33 +456,33 @@ void test_lc2(void)
                 vector_push_back(&v, i);
         }
 
-	vector_push_back(&v, 1);
-	GC_LC(set, s, vector, v, i, i, vector_count(&v, i) == 1);
+        vector_push_back(&v, 1);
+        SGC_LC(set, s, vector, v, i, i, vector_count(&v, i) == 1);
 
-	TEST_ASSERT_EQUAL_INT(set_size(&s), vector_size(&v) - 2);
+        TEST_ASSERT_EQUAL_INT(set_size(&s), vector_size(&v) - 2);
 
         vector_free(&v);
-	set_free(&s);
+        set_free(&s);
 }
 
-INIT_STRING(string);
-INIT_LIST(string, sset);
-INIT_ALGORITHM(sset);
+SGC_INIT_STRING(string);
+SGC_INIT_LIST(string, sset);
+SGC_INIT_ALGORITHM(sset);
 
 void test_split(void)
 {
-	string str = string_create("just some random strings :D :D :D");
-	GC_SPLIT(sset, s, string, str, " ");
+        string str = string_create("just some random strings :D :D :D");
+        SGC_SPLIT(sset, s, string, str, " ");
 
-	TEST_ASSERT_EQUAL_INT(sset_size(&s), 7);
-	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)"just"), 1);
-	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)"some"), 1);
-	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)"random"), 1);
-	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)"strings"), 1);
-	TEST_ASSERT_EQUAL_INT(sset_count(&s, (string)":D"), 3);
+        TEST_ASSERT_EQUAL_INT(sset_size(&s), 7);
+        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) "just"), 1);
+        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) "some"), 1);
+        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) "random"), 1);
+        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) "strings"), 1);
+        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) ":D"), 3);
 
-	sset_free(&s);
-	string_free(&str);
+        sset_free(&s);
+        string_free(&str);
 }
 
 int main(void)
@@ -497,11 +497,11 @@ int main(void)
         RUN_TEST(test_fold_map_pair);
         RUN_TEST(test_execute_map);
         RUN_TEST(test_execute_map_pair);
-	RUN_TEST(test_for_each);
-	RUN_TEST(test_for_each_pair);
+        RUN_TEST(test_for_each);
+        RUN_TEST(test_for_each_pair);
         RUN_TEST(test_lc1);
         RUN_TEST(test_lc2);
-	RUN_TEST(test_split);
+        RUN_TEST(test_split);
 
         return UNITY_END();
 }

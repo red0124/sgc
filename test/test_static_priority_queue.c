@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GC_ST
-#include "../lib/gc_static_priority_queue.h"
-#include "../lib/gc_static_types.h"
+#define SGC_ST
+#include "../lib/static_priority_queue.h"
+#include "../lib/static_types.h"
 
 //#define __UNITY
 #ifndef __UNITY
@@ -22,7 +22,7 @@
 #define TEST_ELEMENTS_NUM 50
 #define PQUEUE_MAX 512
 
-INIT_STATIC_PRIORITY_QUEUE(int, PQUEUE_MAX, pqueue);
+SGC_INIT_STATIC_PRIORITY_QUEUE(int, PQUEUE_MAX, pqueue);
 
 void test_pqueue_push_pop(void)
 {
@@ -97,7 +97,7 @@ int al_compare(const al *const first, const al *const second)
         return *first->el - *second->el;
 }
 
-INIT_STATIC_PRIORITY_QUEUE(al, PQUEUE_MAX, apqueue);
+SGC_INIT_STATIC_PRIORITY_QUEUE(al, PQUEUE_MAX, apqueue);
 
 void test_apqueue(void)
 {
@@ -116,8 +116,8 @@ void test_apqueue(void)
 
         apqueue_set_share(1);
         ++allocation_count;
-	al new_el = (al){(int*)malloc(sizeof(int))};
-	*(new_el.el) = 3;
+        al new_el = (al){(int *)malloc(sizeof(int))};
+        *(new_el.el) = 3;
         apqueue_push(&v, new_el);
         apqueue_set_share(0);
 
@@ -128,12 +128,12 @@ void test_apqueue(void)
 }
 
 int pqueue_compare(const struct pqueue *const first,
-                  const struct pqueue *const second)
+                   const struct pqueue *const second)
 {
         return pqueue_size(first) - pqueue_size(second);
 }
 
-INIT_STATIC_PRIORITY_QUEUE(pqueue, PQUEUE_MAX, vpqueue);
+SGC_INIT_STATIC_PRIORITY_QUEUE(pqueue, PQUEUE_MAX, vpqueue);
 int *vpqueue_top_pair(struct vpqueue *const v)
 {
         return pqueue_top(vpqueue_top(v));
