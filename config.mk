@@ -1,3 +1,3 @@
 #paths
 DESTDIR = /usr/include
-PREFIX = GC
+PREFIX = SGC

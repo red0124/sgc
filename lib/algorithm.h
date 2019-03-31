@@ -1,5 +1,74 @@
 #pragma once
 
+#define SGC_INIT_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
+#define SGC_INIT(...)                                                          \
+        SGC_INIT_N(__VA_ARGS__, SGC_INIT_7, SGC_INIT6, SGC_INIT5, SGC_INIT4,   \
+                   SGC_INIT3)                                                  \
+        (__VA_ARGS__)
+
+#define SGC_INIT3(C, T, N) SGC_INIT_##M(C, N);
+
+#define SGC_INIT4(C, T, N, A1)                                                 \
+        SGC_INIT_##C(T, N);                                                    \
+        SGC_INIT_##A1(N);
+
+#define SGC_INIT5(C, T, N, A1, A2)                                             \
+        SGC_INIT_##C(T, N);                                                    \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);
+
+#define SGC_INIT6(C, T, N, A1, A2, A3)                                         \
+        SGC_INIT_##C(T, N);                                                    \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);
+
+#define SGC_INIT7(C, T, N, A1, A2, A3, A4)                                     \
+        SGC_INIT_##M(T, N);                                                    \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);                                                      \
+        SGC_INIT_##A4(N);
+
+#define SGC_INIT_PAIR_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, NAME, ...) NAME
+#define SGC_INIT_PAIR(...)                                                     \
+        SGC_INIT_PAIR_N(__VA_ARGS__, SGC_INIT_PAIR9, SGC_INIT_PAIR8,           \
+                        SGC_INIT_PAIR7, SGC_INIT_PAIR6, SGC_INIT_PAIR5,        \
+                        SGC_INIT_PAIR4)                                        \
+        (__VA_ARGS__)
+
+#define SGC_INIT_PAIR4(C, K, V, N) SGC_INIT_##C(K, V, N);
+
+#define SGC_INIT_PAIR5(C, K, V, N, A1)                                         \
+        SGC_INIT_##C(K, V, N);                                                 \
+        SGC_INIT_##A1(N);
+
+#define SGC_INIT_PAIR6(C, K, V, N, A1, A2)                                     \
+        SGC_INIT_##C(K, V, N);                                                 \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);
+
+#define SGC_INIT_PAIR7(C, K, V, N, A1, A2, A3)                                 \
+        SGC_INIT_##C(K, V, N);                                                 \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);
+
+#define SGC_INIT_PAIR8(C, K, V, N, A1, A2, A3, A4)                             \
+        SGC_INIT_##C(K, V, N);                                                 \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);                                                      \
+        SGC_INIT_##A4(N);
+
+#define SGC_INIT_PAIR9(C, K, V, N, A1, A2, A3, A4, A5)                         \
+        SGC_INIT_##C(K, V, N);                                                 \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);                                                      \
+        SGC_INIT_##A4(N);                                                      \
+        SGC_INIT_##A5(N);
+
 #define SGC_INIT_ITERATE(N)                                                    \
         void N##_fold_range(                                                   \
             struct N##_iterator begin, struct N##_iterator end,                \
@@ -46,9 +115,9 @@
                 N##_execute_range(N##_cbegin(c), N##_cend(c), fun);            \
         }                                                                      \
                                                                                \
-        void N##_write_range(struct N##_iterator begin,                        \
-                             struct N##_iterator end,                          \
-                             const char *const format, FILE *file)             \
+        void N##_printf_range(struct N##_iterator begin,                       \
+                              struct N##_iterator end,                         \
+                              const char *const format, FILE *file)            \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
                 {                                                              \
@@ -62,10 +131,10 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_write(const struct N *const c, const char *const format,      \
-                       FILE *file)                                             \
+        void N##_printf(const struct N *const c, const char *const format,     \
+                        FILE *file)                                            \
         {                                                                      \
-                N##_write_range(N##_cbegin(c), N##_cend(c), format, file);     \
+                N##_printf_range(N##_cbegin(c), N##_cend(c), format, file);    \
         }                                                                      \
                                                                                \
         void N##_fold_range_reverse(                                           \
@@ -114,9 +183,9 @@
                 N##_execute_range_reverse(N##_cbegin(c), N##_cend(c), fun);    \
         }                                                                      \
                                                                                \
-        void N##_write_range_reverse(struct N##_iterator begin,                \
-                                     struct N##_iterator end,                  \
-                                     const char *const format, FILE *file)     \
+        void N##_printf_range_reverse(struct N##_iterator begin,               \
+                                      struct N##_iterator end,                 \
+                                      const char *const format, FILE *file)    \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
                 {                                                              \
@@ -130,11 +199,11 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_write_reverse(const struct N *const c,                        \
-                               const char *const format, FILE *file)           \
+        void N##_printf_reverse(const struct N *const c,                       \
+                                const char *const format, FILE *file)          \
         {                                                                      \
-                N##_write_range_reverse(N##_cbegin(c), N##_cend(c), format,    \
-                                        file);                                 \
+                N##_printf_range_reverse(N##_cbegin(c), N##_cend(c), format,   \
+                                         file);                                \
         }
 
 #define SGC_INIT_FIND(N)                                                       \
@@ -219,10 +288,6 @@
                 }                                                              \
                 return ret;                                                    \
         }
-
-#define SGC_INIT_ALGORITHM(N)                                                  \
-        SGC_INIT_ITERATE(N)                                                    \
-        SGC_INIT_FIND(N)
 
 #define SGC_INIT_FIND_ITERATOR(N)                                              \
         struct N##_iterator N##_find_range(struct N##_iterator begin,          \
@@ -373,9 +438,9 @@
                 N##_execute_range_pair(N##_cbegin(c), N##_cend(c), fun);       \
         }                                                                      \
                                                                                \
-        void N##_write_range_pair(struct N##_iterator begin,                   \
-                                  struct N##_iterator end,                     \
-                                  const char *const format, FILE *file)        \
+        void N##_printf_range_pair(struct N##_iterator begin,                  \
+                                   struct N##_iterator end,                    \
+                                   const char *const format, FILE *file)       \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
                 {                                                              \
@@ -391,11 +456,11 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_write_pair(const struct N *const c, const char *const format, \
-                            FILE *file)                                        \
+        void N##_printf_pair(const struct N *const c,                          \
+                             const char *const format, FILE *file)             \
         {                                                                      \
-                N##_write_range_pair(N##_cbegin(c), N##_cend(c), format,       \
-                                     file);                                    \
+                N##_printf_range_pair(N##_cbegin(c), N##_cend(c), format,      \
+                                      file);                                   \
         }                                                                      \
                                                                                \
         void N##_fold_range_reverse_pair(                                      \
@@ -449,7 +514,7 @@
                                                fun);                           \
         }                                                                      \
                                                                                \
-        void N##_write_range_reverse_pair(                                     \
+        void N##_printf_range_reverse_pair(                                    \
             struct N##_iterator begin, struct N##_iterator end,                \
             const char *const format, FILE *file)                              \
         {                                                                      \
@@ -467,11 +532,11 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_write_reverse_pair(const struct N *const c,                   \
-                                    const char *const format, FILE *file)      \
+        void N##_printf_reverse_pair(const struct N *const c,                  \
+                                     const char *const format, FILE *file)     \
         {                                                                      \
-                N##_write_range_reverse_pair(N##_cbegin(c), N##_cend(c),       \
-                                             format, file);                    \
+                N##_printf_range_reverse_pair(N##_cbegin(c), N##_cend(c),      \
+                                              format, file);                   \
         }
 
 #ifndef SGC_STACK
@@ -496,7 +561,7 @@
 
 #endif
 
-#define SGC_INIT_QSORT(T, N)                                                   \
+#define SGC_INIT_QSORT(N)                                                      \
         static void N##_memswp(char *i, char *j)                               \
         {                                                                      \
                 N##_type tmp;                                                  \
