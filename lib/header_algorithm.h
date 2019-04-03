@@ -125,8 +125,7 @@
                                                                                \
         N##_type *N##_find_el(const struct N *const c, const N##_type el);     \
                                                                                \
-            ssize_t N##_find_index(const struct N *const c,                    \
-                                   const N##_type el);                         \
+        ssize_t N##_find_index(const struct N *const c, const N##_type el);    \
                                                                                \
         size_t N##_count(const N *const c, const N##_type el);
 

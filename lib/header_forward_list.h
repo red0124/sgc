@@ -124,5 +124,4 @@
         int N##_iterator_equal(const struct N##_iterator first,                \
                                const struct N##_iterator second);              \
                                                                                \
-        int N##_iterator_valid(const struct N##_iterator i);\
-
+        int N##_iterator_valid(const struct N##_iterator i);

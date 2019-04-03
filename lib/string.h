@@ -1,6 +1,19 @@
 #pragma once
 
-#define SGC_INIT_STRING(N)                                                     \
+#ifndef SGC_STRING_BUFF_SIZE
+#define SGC_STRING_BUFF_SIZE 128
+#endif
+
+#define SGC_INIT_STRING_N(_1, _2, NAME, ...) NAME
+#define SGC_INIT_STRING(...)                                                   \
+        SGC_INIT_STRING_N(__VA_ARGS__, SGC_INIT_STRING2, SGC_INIT_STRING1)     \
+        (__VA_ARGS__);
+
+#define SGC_INIT_STRING2(S, N) SGC_INIT_STRING_WITH_BUFFER(N, S);
+#define SGC_INIT_STRING1(N)                                                    \
+        SGC_INIT_STRING_WITH_BUFFER(N, SGC_STRING_BUFF_SIZE);
+
+#define SGC_INIT_STRING_WITH_BUFFER(N, S)                                      \
                                                                                \
         typedef char *N;                                                       \
         typedef char N##_value;                                                \
@@ -113,17 +126,17 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        int N##_read_buffer(N *s, FILE *f, char *buff, size_t buff_size)       \
+        N N##_read(FILE *f)                                                    \
         {                                                                      \
-                char *tmp = fgets(buff, buff_size, f);                         \
-                if(tmp)                                                        \
+                N s = NULL;                                                    \
+                char buff[S] = "\0";                                           \
+                if(fgets(buff, S - 1, f))                                      \
                 {                                                              \
                         size_t size = strlen(buff);                            \
-                        buff[size - 1] = '\0';                                 \
-                        *s = (N)malloc(sizeof(char) * (size));                 \
-                        memcpy(*s, buff, sizeof(char) * (size));               \
+                        s = (N)malloc(sizeof(char) * (size + 1));              \
+                        memcpy(s, buff, sizeof(char) * (size + 1));            \
                 }                                                              \
-                return (int)(*tmp);                                            \
+                return s;                                                      \
         }                                                                      \
                                                                                \
         static int N##_char_find(const char *const del, char c)                \
@@ -141,48 +154,38 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        int N##_read_untill(N *s, FILE *f, const char *const del)              \
+        N N##_read_untill(FILE *f, const char *const del)                      \
         {                                                                      \
-                *s = NULL;                                                     \
+                N s = NULL;                                                    \
                 char c;                                                        \
                 size_t size = 0;                                               \
-                size_t max = 0;                                                \
+                char buff[S] = "\0";                                           \
                 while(1)                                                       \
                 {                                                              \
-                        if(fscanf(f, "%c", &c) == EOF)                         \
+                        c = fgetc(f);                                          \
+                        if(c == EOF || N##_char_find(del, c))                  \
                         {                                                      \
                                 break;                                         \
                         }                                                      \
-                        int finish = N##_char_find(del, c);                    \
-                        if(finish == 1)                                        \
-                        {                                                      \
-                                break;                                         \
-                        }                                                      \
-                        if(size == max)                                        \
-                        {                                                      \
-                                max = (max == 0) ? 1 : 2 * max;                \
-                                *s = (N)realloc(*s, sizeof(char) * (max + 1)); \
-                        }                                                      \
-                        (*s)[size++] = c;                                      \
+                        buff[size++] = c;                                      \
                 }                                                              \
                 if(size)                                                       \
                 {                                                              \
-                        (*s)[size] = '\0';                                     \
+                        buff[size] = '\0';                                     \
+                        size_t size = strlen(buff);                            \
+                        s = (N)malloc(sizeof(char) * (size + 1));              \
+                        memcpy(s, buff, sizeof(char) * (size + 1));            \
                 }                                                              \
-                return size;                                                   \
+                return s;                                                      \
         }                                                                      \
                                                                                \
-        int N##_read(N *s, FILE *f)                                            \
+        N N##_read_file(const char *const file_name)                           \
         {                                                                      \
-                return N##_read_untill(s, f, " \n");                           \
-        }                                                                      \
-                                                                               \
-        int N##_read_file(N *s, const char *const file_name)                   \
-        {                                                                      \
+                N s;                                                           \
                 FILE *f = fopen(file_name, "r");                               \
-                int ret = N##_read_untill(s, f, "");                           \
+                s = N##_read_untill(f, "");                                    \
                 fclose(f);                                                     \
-                return ret;                                                    \
+                return s;                                                      \
         }                                                                      \
                                                                                \
         struct N##_iterator                                                    \

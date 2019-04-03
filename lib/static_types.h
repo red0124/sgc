@@ -2,8 +2,7 @@
 
 #ifndef SGC_ST
 #define SGC_ST
-#warning                                                                       \
-    "contains function definitions, define SGC_ST kill warning"
+#warning "contains function definitions, define SGC_ST kill warning"
 #endif
 
 #define SGC_INIT_STATIC(T, N)                                                  \
