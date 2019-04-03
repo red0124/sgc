@@ -270,7 +270,8 @@ SGC_FOR_EACH_PAIR(container_type, container_instance, key, value, ACTION);
 **key ::** the name of the const pointer we access the elements key value
 **value ::** the name of the const pointer we access the elements value
 
-Now comes an example of a complex structure stored in a container:
+Example:
+Count the number of each character in a file:
 
 ```c
 #include <stdio.h>
@@ -278,61 +279,37 @@ Now comes an example of a complex structure stored in a container:
 #include <string.h>
 
 #include <SGC/algorithm.h>
-#include <SGC/vector.h>
+#include <SGC/static_types.h>
+#include <SGC/string.h>
+#include <SGC/unordered_map.h>
 
-struct x
-{
-	int* i;
-};
+#define BUFF_SIZE 256
+#define FILE_NAME "dict.txt"
 
-typedef struct x x;
-
-void x_init(x* el)
-{
-	el->i = NULL;
-}
-
-void x_free(x* el)
-{
-	free(el->i);
-}
-
-void x_copy(x* __restrict__ dst, const x* __restrict__ const src)
-{
-	dst->i = (int*)malloc(sizeof(int));
-	*dst->i = *src->i;
-}
-
-// not going to be used so we can do anything with it
-int x_equal(const x* const first, const x* const second)
-{
-	(void)first;
-	(void)second;
-	return 1;
-}
-
-SGC_INIT(VECTOR, x, vector);
+SGC_INIT(STRING, string);
+SGC_INIT_PAIR(UNORDERED_MAP, char, int, map, ITERATE_PAIR);
 
 int main(void)
 {
-	vector v;
-	vector_init(&v);
+        map m;
+        map_init(&m);
 
-	x el = {(int*)malloc(sizeof(int))};
-	*(el.i) = 5;
+        char buff[BUFF_SIZE];
+        FILE *in = fopen(FILE_NAME, "r");
 
-	vector_push_back(&v, el);
-	vector_push_back(&v, el);
-	vector_push_back(&v, el);
+        while(fgets(buff, BUFF_SIZE - 1, in))
+        {
+                string s = buff;
+                SGC_FOR_EACH(string, s, el,
+		     ++*map_at(&m, *el);
+		);
+        }
 
-	SGC_FOR_EACH(vector, v, i, 
-		printf("%d ", *el.i);
-		// prints "5 5 5"
-	);
-	
-	// no leaks
-	x_free(&el);
-	vector_free(&v);
-	return 0;
+        map_printf_pair(&m, "%c -> %d\n", stdout);
+
+        map_free(&m);
+        return 0;
 }
 ```
+
+
