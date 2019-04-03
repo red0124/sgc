@@ -3,10 +3,12 @@
 #define SGC_INIT_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
 #define SGC_INIT(...)                                                          \
         SGC_INIT_N(__VA_ARGS__, SGC_INIT_7, SGC_INIT6, SGC_INIT5, SGC_INIT4,   \
-                   SGC_INIT3)                                                  \
+                   SGC_INIT3, SGC_INIT2)                                       \
         (__VA_ARGS__)
 
-#define SGC_INIT3(C, T, N) SGC_INIT_##M(C, N);
+#define SGC_INIT2(C, N) SGC_INIT_##C(N);
+
+#define SGC_INIT3(C, T, N) SGC_INIT_##C(T, N);
 
 #define SGC_INIT4(C, T, N, A1)                                                 \
         SGC_INIT_##C(T, N);                                                    \
@@ -668,6 +670,8 @@
                 N##_qsort(N##_array(c), N##_size(c), comp);                    \
         }
 
+#ifndef SGC_HELPERS
+#define SGC_HELPERS
 #define SGC_FOR_EACH(N, C, EL, ACT)                                            \
         do                                                                     \
         {                                                                      \
@@ -816,3 +820,5 @@
                         __sgc_str_tmp = strtok(NULL, DEL);                     \
                 }                                                              \
         } while(0);
+
+#endif
