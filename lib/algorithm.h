@@ -138,6 +138,30 @@
                 N##_fprintf_range(N##_cbegin(c), N##_cend(c), format, file);   \
         }                                                                      \
                                                                                \
+        void N##_sprintf_range(struct N##_iterator begin,                      \
+                               struct N##_iterator end,                        \
+                               const char *const format, char *buff)           \
+        {                                                                      \
+                if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                sprintf(buff, format, *N##_iterator_value(begin));             \
+                buff += strlen(buff);                                          \
+                while(!N##_iterator_equal(begin, end))                         \
+                {                                                              \
+                        N##_iterator_next(&begin);                             \
+                        sprintf(buff, format, *N##_iterator_value(begin));     \
+                        buff += strlen(buff);                                  \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_sprintf(const N *const c, const char *const format,           \
+                         char *buff)                                           \
+        {                                                                      \
+                N##_sprintf_range(N##_cbegin(c), N##_cend(c), format, buff);   \
+        }                                                                      \
+                                                                               \
         void N##_fold_range_reverse(                                           \
             struct N##_iterator begin, struct N##_iterator end,                \
             void (*fun)(const N##_type *const, void *), void *argout)          \
@@ -205,6 +229,31 @@
         {                                                                      \
                 N##_fprintf_range_reverse(N##_cbegin(c), N##_cend(c), format,  \
                                           file);                               \
+        }                                                                      \
+                                                                               \
+        void N##_sprintf_range_reverse(struct N##_iterator begin,              \
+                                       struct N##_iterator end,                \
+                                       const char *const format, char *buff)   \
+        {                                                                      \
+                if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                sprintf(buff, format, *N##_iterator_value(end));               \
+                buff += strlen(buff);                                          \
+                while(!N##_iterator_equal(begin, end))                         \
+                {                                                              \
+                        N##_iterator_prev(&end);                               \
+                        sprintf(buff, format, *N##_iterator_value(end));       \
+                        buff += strlen(buff);                                  \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_sprintf_reverse(const N *const c, const char *const format,   \
+                                 char *buff)                                   \
+        {                                                                      \
+                N##_sprintf_range_reverse(N##_cbegin(c), N##_cend(c), format,  \
+                                          buff);                               \
         }
 
 #define SGC_INIT_FIND(N)                                                       \
@@ -463,6 +512,33 @@
                                        file);                                  \
         }                                                                      \
                                                                                \
+        void N##_sprintf_range_pair(struct N##_iterator begin,                 \
+                                    struct N##_iterator end,                   \
+                                    const char *const format, char *buff)      \
+        {                                                                      \
+                if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                sprintf(buff, format, *N##_iterator_key(begin),                \
+                        *N##_iterator_value(begin));                           \
+                buff += strlen(buff);                                          \
+                while(!N##_iterator_equal(begin, end))                         \
+                {                                                              \
+                        N##_iterator_next(&begin);                             \
+                        sprintf(buff, format, *N##_iterator_key(begin),        \
+                                *N##_iterator_value(begin));                   \
+                        buff += strlen(buff);                                  \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_sprintf_pair(const N *const c, const char *const format,      \
+                              char *buff)                                      \
+        {                                                                      \
+                N##_sprintf_range_pair(N##_cbegin(c), N##_cend(c), format,     \
+                                       buff);                                  \
+        }                                                                      \
+                                                                               \
         void N##_fold_range_reverse_pair(                                      \
             struct N##_iterator begin, struct N##_iterator end,                \
             void (*fun)(const N##_key *const, const N##_value *const, void *), \
@@ -537,6 +613,33 @@
         {                                                                      \
                 N##_fprintf_range_reverse_pair(N##_cbegin(c), N##_cend(c),     \
                                                format, file);                  \
+        }                                                                      \
+                                                                               \
+        void N##_sprintf_range_reverse_pair(                                   \
+            struct N##_iterator begin, struct N##_iterator end,                \
+            const char *const format, char *buff)                              \
+        {                                                                      \
+                if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
+                {                                                              \
+                        return;                                                \
+                }                                                              \
+                sprintf(buff, format, *N##_iterator_key(end),                  \
+                        *N##_iterator_value(end));                             \
+                buff += strlen(buff);                                          \
+                while(!N##_iterator_equal(begin, end))                         \
+                {                                                              \
+                        N##_iterator_prev(&end);                               \
+                        sprintf(buff, format, *N##_iterator_key(end),          \
+                                *N##_iterator_value(end));                     \
+                        buff += strlen(buff);                                  \
+                }                                                              \
+        }                                                                      \
+                                                                               \
+        void N##_sprintf_reverse_pair(const N *const c,                        \
+                                      const char *const format, char *buff)    \
+        {                                                                      \
+                N##_sprintf_range_reverse_pair(N##_cbegin(c), N##_cend(c),     \
+                                               format, buff);                  \
         }
 
 #ifndef SGC_STACK
