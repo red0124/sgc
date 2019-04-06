@@ -677,6 +677,7 @@ static size_t sgc_next_prime(size_t n)
                                                 ret = (struct N##_iterator){   \
                                                     u->_data, tmp, position,   \
                                                     u->_max, 1};               \
+                                                break;                         \
                                         }                                      \
                                         tmp = tmp->_next;                      \
                                 }                                              \
@@ -832,8 +833,8 @@ static size_t sgc_next_prime(size_t n)
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        N##_resize(u);                                         \
                         V v;                                                   \
+                        N##_resize(u);                                         \
                         N##_element_init(&v);                                  \
                         struct N##_node *new_node = N##_node_new(&k, &v);      \
                         size_t position = hash % u->_max;                      \

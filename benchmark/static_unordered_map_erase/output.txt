@@ -1,0 +1,29 @@
+inser <num of elements>, cpp program has to reserve
+every time, but that is irrelevant
+erase every element one by one
+
+c
+
+num of elements = 16384
+  Time (mean ± σ):       3.9 ms ±   0.5 ms    [User: 1.4 ms, System: 2.4 ms]
+num of elements = 32768
+  Time (mean ± σ):       4.4 ms ±   0.7 ms    [User: 2.3 ms, System: 2.0 ms]
+num of elements = 65536
+  Time (mean ± σ):       5.8 ms ±   0.8 ms    [User: 3.3 ms, System: 2.5 ms]
+num of elements = 131072
+  Time (mean ± σ):       7.8 ms ±   0.9 ms    [User: 5.3 ms, System: 2.5 ms]
+num of elements = 262144
+  Time (mean ± σ):      20.1 ms ±   3.3 ms    [User: 18.2 ms, System: 1.7 ms]
+
+cpp
+
+num of elements = 16384
+  Time (mean ± σ):       5.8 ms ±   0.9 ms    [User: 3.8 ms, System: 2.0 ms]
+num of elements = 32768
+  Time (mean ± σ):       9.4 ms ±   0.6 ms    [User: 6.3 ms, System: 3.0 ms]
+num of elements = 65536
+  Time (mean ± σ):      15.9 ms ±   0.6 ms    [User: 12.8 ms, System: 3.0 ms]
+num of elements = 131072
+  Time (mean ± σ):      28.1 ms ±   1.0 ms    [User: 25.0 ms, System: 2.9 ms]
+num of elements = 262144
+  Time (mean ± σ):      59.2 ms ±   4.5 ms    [User: 54.1 ms, System: 4.6 ms]

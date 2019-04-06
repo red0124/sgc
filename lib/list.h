@@ -347,12 +347,24 @@
                 T *ret = NULL;                                                 \
                 if(!(at >= l->_size || l->_size == 0))                         \
                 {                                                              \
-                        struct N##_node *curr = l->_head;                      \
-                        for(size_t i = 0; i < at; ++i)                         \
+                        if(at <= l->_size / 2)                                 \
                         {                                                      \
-                                curr = curr->_next;                            \
+                                struct N##_node *curr = l->_head;              \
+                                for(size_t i = 0; i < at; ++i)                 \
+                                {                                              \
+                                        curr = curr->_next;                    \
+                                }                                              \
+                                ret = &curr->_data;                            \
                         }                                                      \
-                        ret = &curr->_data;                                    \
+                        else                                                   \
+                        {                                                      \
+                                struct N##_node *curr = l->_tail;              \
+                                for(size_t i = 1; i < l->_size - at; ++i)      \
+                                {                                              \
+                                        curr = curr->_prev;                    \
+                                }                                              \
+                                ret = &curr->_data;                            \
+                        }                                                      \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
@@ -441,9 +453,21 @@
                 else if(erase)                                                 \
                 {                                                              \
                         struct N##_node *curr = l->_head;                      \
-                        for(size_t i = 0; i < at - 1; ++i)                     \
+			if(at <= l->_size / 2)                                 \
                         {                                                      \
-                                curr = curr->_next;                            \
+                                curr = l->_head;                               \
+                                for(size_t i = 0; i < at; ++i)                 \
+                                {                                              \
+                                        curr = curr->_next;                    \
+                                }                                              \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                curr = l->_tail;                               \
+                                for(size_t i = 1; i < l->_size - at; ++i)      \
+                                {                                              \
+                                        curr = curr->_prev;                    \
+                                }                                              \
                         }                                                      \
                         if(curr == l->_head)                                   \
                         {                                                      \

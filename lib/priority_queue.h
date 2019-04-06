@@ -203,14 +203,14 @@
         static void N##_fix_insert(struct N *p)                                \
         {                                                                      \
                 size_t curr = p->_size;                                        \
-                while(curr)                                                    \
+                while(curr > 0)                                                \
                 {                                                              \
-                        size_t parent = (curr - 1) / 2;                        \
-                        if(N##_element_compare(&p->_data[parent],              \
-                                               &p->_data[curr]) < 0)           \
+                        size_t parent = (curr - 1) >> 1;                       \
+                        T *parent_data = &p->_data[parent];                    \
+                        T *curr_data = &p->_data[curr];                        \
+                        if(N##_element_compare(parent_data, curr_data) < 0)    \
                         {                                                      \
-                                N##_memswp(&p->_data[parent],                  \
-                                           &p->_data[curr]);                   \
+                                N##_memswp(parent_data, curr_data);            \
                                 curr = parent;                                 \
                         }                                                      \
                         else                                                   \

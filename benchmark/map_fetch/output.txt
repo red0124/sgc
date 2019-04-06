@@ -1,0 +1,32 @@
+insert <num of elements> elements
+fetch every element 9 times
+
+c
+
+num of elements = 8192
+  Time (mean ± σ):       4.3 ms ±   0.5 ms    [User: 3.5 ms, System: 0.8 ms]
+num of elements = 16384
+  Time (mean ± σ):       8.8 ms ±   1.7 ms    [User: 8.1 ms, System: 0.6 ms]
+num of elements = 32768
+  Time (mean ± σ):      17.5 ms ±   1.2 ms    [User: 16.5 ms, System: 0.8 ms]
+num of elements = 65536
+  Time (mean ± σ):      38.1 ms ±   4.3 ms    [User: 36.1 ms, System: 1.8 ms]
+num of elements = 131072
+  Time (mean ± σ):      85.0 ms ±   2.6 ms    [User: 82.3 ms, System: 2.3 ms]
+num of elements = 262144
+  Time (mean ± σ):     198.2 ms ±   4.8 ms    [User: 193.6 ms, System: 4.0 ms]
+
+cpp
+
+num of elements = 8192
+  Time (mean ± σ):       5.1 ms ±   0.5 ms    [User: 4.4 ms, System: 0.6 ms]
+num of elements = 16384
+  Time (mean ± σ):       8.4 ms ±   0.5 ms    [User: 7.4 ms, System: 1.0 ms]
+num of elements = 32768
+  Time (mean ± σ):      19.1 ms ±   0.9 ms    [User: 18.0 ms, System: 1.0 ms]
+num of elements = 65536
+  Time (mean ± σ):      41.8 ms ±   1.1 ms    [User: 40.1 ms, System: 1.5 ms]
+num of elements = 131072
+  Time (mean ± σ):     102.2 ms ±   1.4 ms    [User: 99.7 ms, System: 2.2 ms]
+num of elements = 262144
+  Time (mean ± σ):     219.9 ms ±   3.1 ms    [User: 215.1 ms, System: 4.3 ms]

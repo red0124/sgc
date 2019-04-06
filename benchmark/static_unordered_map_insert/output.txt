@@ -1,0 +1,29 @@
+inser <num of elements>, cpp program has to reserve
+every time, but that is irrelevant
+the time meassured is for 9 cicles
+
+c
+
+num of elements = 16384
+  Time (mean ± σ):       7.8 ms ±   0.6 ms    [User: 6.2 ms, System: 1.5 ms]
+num of elements = 32768
+  Time (mean ± σ):      10.4 ms ±   0.7 ms    [User: 8.8 ms, System: 1.4 ms]
+num of elements = 65536
+  Time (mean ± σ):      15.7 ms ±   2.0 ms    [User: 13.6 ms, System: 1.8 ms]
+num of elements = 131072
+  Time (mean ± σ):      23.5 ms ±   0.6 ms    [User: 21.7 ms, System: 1.5 ms]
+num of elements = 262144
+  Time (mean ± σ):      39.9 ms ±   1.1 ms    [User: 37.9 ms, System: 1.7 ms]
+
+cpp
+
+num of elements = 16384
+  Time (mean ± σ):      15.6 ms ±   1.2 ms    [User: 12.5 ms, System: 2.8 ms]
+num of elements = 32768
+  Time (mean ± σ):      33.5 ms ±   7.3 ms    [User: 27.4 ms, System: 3.9 ms]
+num of elements = 65536
+  Time (mean ± σ):      46.0 ms ±   7.0 ms    [User: 41.4 ms, System: 3.5 ms]
+num of elements = 131072
+  Time (mean ± σ):      84.6 ms ±  11.5 ms    [User: 78.7 ms, System: 4.7 ms]
+num of elements = 262144
+  Time (mean ± σ):     162.6 ms ±  14.6 ms    [User: 153.1 ms, System: 7.0 ms]

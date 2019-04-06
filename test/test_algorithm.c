@@ -38,7 +38,8 @@ SGC_INIT_UNORDERED_MAP(int, int, __unused_mat);
 
 SGC_INIT_VECTOR(int, vector);
 SGC_INIT_DEQUE(int, deque);
-SGC_INIT_ALGORITHM(vector);
+SGC_INIT_ITERATE(vector);
+SGC_INIT_FIND(vector);
 SGC_INIT_FIND_ITERATOR(vector);
 
 void fold_sum(const int *const el, void *acc)
@@ -467,7 +468,8 @@ void test_lc2(void)
 
 SGC_INIT_STRING(string);
 SGC_INIT_LIST(string, sset);
-SGC_INIT_ALGORITHM(sset);
+SGC_INIT_ITERATE(sset);
+SGC_INIT_FIND(sset);
 
 void test_split(void)
 {

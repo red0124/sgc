@@ -1,0 +1,27 @@
+insert <num of elements> elements
+
+c
+
+num of elements = 524288
+  Time (mean ± σ):      20.9 ms ±   0.9 ms    [User: 19.6 ms, System: 1.2 ms]
+num of elements = 1048576
+  Time (mean ± σ):      41.7 ms ±   0.4 ms    [User: 38.5 ms, System: 3.1 ms]
+num of elements = 2097152
+  Time (mean ± σ):      86.2 ms ±   2.6 ms    [User: 83.3 ms, System: 2.6 ms]
+num of elements = 4194304
+  Time (mean ± σ):     178.4 ms ±   2.6 ms    [User: 173.7 ms, System: 4.3 ms]
+num of elements = 8388608
+  Time (mean ± σ):     365.7 ms ±   1.6 ms    [User: 358.2 ms, System: 6.7 ms]
+
+cpp
+
+num of elements = 524288
+  Time (mean ± σ):      16.9 ms ±   0.4 ms    [User: 14.6 ms, System: 2.1 ms]
+num of elements = 1048576
+  Time (mean ± σ):      31.8 ms ±   0.9 ms    [User: 28.5 ms, System: 3.1 ms]
+num of elements = 2097152
+  Time (mean ± σ):      63.4 ms ±   0.9 ms    [User: 58.9 ms, System: 4.2 ms]
+num of elements = 4194304
+  Time (mean ± σ):     130.5 ms ±   7.4 ms    [User: 123.5 ms, System: 6.6 ms]
+num of elements = 8388608
+  Time (mean ± σ):     265.4 ms ±   3.2 ms    [User: 253.6 ms, System: 10.9 ms]

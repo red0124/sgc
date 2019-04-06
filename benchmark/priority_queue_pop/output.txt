@@ -1,0 +1,32 @@
+insert <num of elements> elements
+remove top element until empty
+
+c
+
+num of elements = 65536
+  Time (mean ± σ):       8.6 ms ±   0.8 ms    [User: 7.8 ms, System: 0.7 ms]
+num of elements = 131072
+  Time (mean ± σ):      16.0 ms ±   1.7 ms    [User: 15.5 ms, System: 0.4 ms]
+num of elements = 262144
+  Time (mean ± σ):      30.9 ms ±   2.5 ms    [User: 30.1 ms, System: 0.7 ms]
+num of elements = 524288
+  Time (mean ± σ):      67.0 ms ±   4.8 ms    [User: 64.6 ms, System: 1.6 ms]
+num of elements = 1048576
+  Time (mean ± σ):     142.8 ms ±  12.2 ms    [User: 139.6 ms, System: 2.1 ms]
+num of elements = 2097152
+  Time (mean ± σ):     289.6 ms ±  17.1 ms    [User: 284.4 ms, System: 3.8 ms]
+
+cpp
+
+num of elements = 65536
+  Time (mean ± σ):       7.6 ms ±   0.9 ms    [User: 7.1 ms, System: 0.4 ms]
+num of elements = 131072
+  Time (mean ± σ):      11.7 ms ±   0.4 ms    [User: 10.6 ms, System: 1.0 ms]
+num of elements = 262144
+  Time (mean ± σ):      22.7 ms ±   0.9 ms    [User: 21.5 ms, System: 1.1 ms]
+num of elements = 524288
+  Time (mean ± σ):      43.1 ms ±   1.7 ms    [User: 41.3 ms, System: 1.5 ms]
+num of elements = 1048576
+  Time (mean ± σ):      86.2 ms ±   0.9 ms    [User: 82.6 ms, System: 3.1 ms]
+num of elements = 2097152
+  Time (mean ± σ):     185.6 ms ±   2.6 ms    [User: 180.4 ms, System: 4.2 ms]

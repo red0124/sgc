@@ -5,7 +5,7 @@
 #warning "contains function definitions, define SGC_ST kill warning"
 #endif
 
-#define SGC_INIT_STATIC(T, N)                                                  \
+#define SGC_INIT_STATIC_TYPE(T, N)                                             \
                                                                                \
         void N##_init(T *el)                                                   \
         {                                                                      \
@@ -38,17 +38,17 @@
                 return (int)(*(T *)first - *(T *)second);                      \
         }
 
-SGC_INIT_STATIC(char, char);
-SGC_INIT_STATIC(unsigned char, unsigned_char);
-SGC_INIT_STATIC(short, short);
-SGC_INIT_STATIC(unsigned short, unsigned_short);
-SGC_INIT_STATIC(int, int);
-SGC_INIT_STATIC(unsigned int, unsigned_int);
-SGC_INIT_STATIC(long, long);
-SGC_INIT_STATIC(unsigned long, unsigned_long);
-SGC_INIT_STATIC(float, float);
-SGC_INIT_STATIC(double, double);
-SGC_INIT_STATIC(long double, long_double);
+SGC_INIT_STATIC_TYPE(char, char);
+SGC_INIT_STATIC_TYPE(unsigned char, unsigned_char);
+SGC_INIT_STATIC_TYPE(short, short);
+SGC_INIT_STATIC_TYPE(unsigned short, unsigned_short);
+SGC_INIT_STATIC_TYPE(int, int);
+SGC_INIT_STATIC_TYPE(unsigned int, unsigned_int);
+SGC_INIT_STATIC_TYPE(long, long);
+SGC_INIT_STATIC_TYPE(unsigned long, unsigned_long);
+SGC_INIT_STATIC_TYPE(float, float);
+SGC_INIT_STATIC_TYPE(double, double);
+SGC_INIT_STATIC_TYPE(long double, long_double);
 
 #define SGC_INIT_HASH(T, N)                                                    \
                                                                                \

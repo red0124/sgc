@@ -26,7 +26,38 @@
         SGC_INIT_##A3(N);
 
 #define SGC_INIT7(C, T, N, A1, A2, A3, A4)                                     \
-        SGC_INIT_##M(T, N);                                                    \
+        SGC_INIT_##C(T, N);                                                    \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);                                                      \
+        SGC_INIT_##A4(N);
+
+#define SGC_INIT_STATIC_N(_1, _2, _3, _4, _5, _6, _7, _8, NAME, ...) NAME
+#define SGC_INIT_STATIC(...)                                                   \
+        SGC_INIT_STATIC_N(__VA_ARGS__, SGC_INIT_STATIC8, SGC_INIT_STATIC7,     \
+                          SGC_INIT_STATIC6, SGC_INIT_STATIC5,                  \
+                          SGC_INIT_STATIC4, SGC_INIT_STATIC3)                  \
+        (__VA_ARGS__)
+
+#define SGC_INIT_STATIC4(C, T, S, N) SGC_INIT_STATIC_##C(T, S, N);
+
+#define SGC_INIT_STATIC5(C, T, S, N, A1)                                       \
+        SGC_INIT_STATIC_##C(T, S, N);                                          \
+        SGC_INIT_##A1(N);
+
+#define SGC_INIT_STATIC6(C, T, S, N, A1, A2)                                   \
+        SGC_INIT_STATIC_##C(T, S, N);                                          \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);
+
+#define SGC_INIT_STATIC7(C, T, S, N, A1, A2, A3)                               \
+        SGC_INIT_STATIC_##C(T, S, N);                                          \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);
+
+#define SGC_INIT_STATIC8(C, T, S, N, A1, A2, A3, A4)                           \
+        SGC_INIT_STATIC_##C(T, S, N);                                          \
         SGC_INIT_##A1(N);                                                      \
         SGC_INIT_##A2(N);                                                      \
         SGC_INIT_##A3(N);                                                      \
@@ -65,6 +96,47 @@
 
 #define SGC_INIT_PAIR9(C, K, V, N, A1, A2, A3, A4, A5)                         \
         SGC_INIT_##C(K, V, N);                                                 \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);                                                      \
+        SGC_INIT_##A4(N);                                                      \
+        SGC_INIT_##A5(N);
+
+#define SGC_INIT_STATIC_PAIR_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...)  \
+        NAME
+#define SGC_INIT_STATIC_PAIR(...)                                              \
+        SGC_INIT_STATIC_PAIR_N(__VA_ARGS__, SGC_INIT_STATIC_PAIR10,            \
+                               SGC_INIT_STATIC_PAIR9, SGC_INIT_STATIC_PAIR8,   \
+                               SGC_INIT_STATIC_PAIR7, SGC_INIT_STATIC_PAIR6,   \
+                               SGC_INIT_STATIC_PAIR5)                          \
+        (__VA_ARGS__)
+
+#define SGC_INIT_STATIC_PAIR5(C, K, V, S, N) SGC_INIT_STATIC_##C(K, V, S, N);
+
+#define SGC_INIT_STATIC_PAIR6(C, K, V, S, N, A1)                               \
+        SGC_INIT_STATIC_##C(K, V, S, N);                                       \
+        SGC_INIT_##A1(N);
+
+#define SGC_INIT_STATIC_PAIR7(C, K, V, S, N, A1, A2)                           \
+        SGC_INIT_STATIC_##C(K, V, S, N);                                       \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);
+
+#define SGC_INIT_STATIC_PAIR8(C, K, V, S, N, A1, A2, A3)                       \
+        SGC_INIT_STATIC_##C(K, V, S, N);                                       \
+        SGC_INIT_##A1(N);                                                      \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);
+
+#define SGC_INIT_STATIC_PAIR9(C, K, V, S, N, A1, A2, A3, A4)                   \
+        SGC_INIT_STATIC_##C(K, V, S, N);                                       \
+        \ SGC_INIT_##A1(N);                                                    \
+        SGC_INIT_##A2(N);                                                      \
+        SGC_INIT_##A3(N);                                                      \
+        SGC_INIT_##A4(N);
+
+#define SGC_INIT_STATIC_PAIR10(C, K, V, S, N, A1, A2, A3, A4, A5)              \
+        SGC_INIT_STATIC_##C(K, V, S, N);                                       \
         SGC_INIT_##A1(N);                                                      \
         SGC_INIT_##A2(N);                                                      \
         SGC_INIT_##A3(N);                                                      \

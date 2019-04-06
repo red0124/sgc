@@ -428,6 +428,7 @@ enum sgc_node_state
                                         ret = (struct N##_iterator){           \
                                             position,                          \
                                             (struct N##_node *)u->_data, 1};   \
+                                        break;                                 \
                                 }                                              \
                                 if(position == S - 1)                          \
                                 {                                              \

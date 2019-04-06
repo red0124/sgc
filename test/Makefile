@@ -1,4 +1,4 @@
-CC = g++ -std=c++11
+CC = gcc 
 CFLAGS = -Wall -Wextra
 NAME = program
 VAL = 

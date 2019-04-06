@@ -1,0 +1,35 @@
+sort <num of elements> elements
+
+c
+
+num of elements = 16384
+  Time (mean ± σ):       1.6 ms ±   0.2 ms    [User: 1.1 ms, System: 0.5 ms]
+num of elements = 32768
+  Time (mean ± σ):       2.7 ms ±   0.3 ms    [User: 1.9 ms, System: 0.8 ms]
+num of elements = 65536
+  Time (mean ± σ):       4.7 ms ±   0.5 ms    [User: 3.4 ms, System: 1.2 ms]
+num of elements = 131072
+  Time (mean ± σ):       9.0 ms ±   0.8 ms    [User: 6.7 ms, System: 2.1 ms]
+num of elements = 262144
+  Time (mean ± σ):      15.5 ms ±   0.7 ms    [User: 11.3 ms, System: 4.0 ms]
+num of elements = 524288
+  Time (mean ± σ):      28.8 ms ±   0.7 ms    [User: 22.9 ms, System: 5.7 ms]
+num of elements = 1048576
+  Time (mean ± σ):      55.2 ms ±   0.8 ms    [User: 43.3 ms, System: 11.6 ms]
+
+cpp
+
+num of elements = 16384
+  Time (mean ± σ):       3.0 ms ±   0.2 ms    [User: 2.2 ms, System: 0.8 ms]
+num of elements = 32768
+  Time (mean ± σ):       5.8 ms ±   0.6 ms    [User: 4.7 ms, System: 1.0 ms]
+num of elements = 65536
+  Time (mean ± σ):       9.5 ms ±   0.7 ms    [User: 7.9 ms, System: 1.5 ms]
+num of elements = 131072
+  Time (mean ± σ):      21.0 ms ±   2.0 ms    [User: 18.8 ms, System: 2.0 ms]
+num of elements = 262144
+  Time (mean ± σ):      55.8 ms ±   7.8 ms    [User: 51.7 ms, System: 3.7 ms]
+num of elements = 524288
+  Time (mean ± σ):     124.0 ms ±  12.0 ms    [User: 117.1 ms, System: 6.2 ms]
+num of elements = 1048576
+  Time (mean ± σ):     295.7 ms ±   5.6 ms    [User: 283.8 ms, System: 10.2 ms]
