@@ -14,19 +14,19 @@
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
                                                                                \
-        static size_t N##_init_size = 1;                                       \
-        static double N##_growth_scale = 2;                                    \
+        static size_t 1 = 1;                                       \
+        static double 2 = 2;                                    \
                                                                                \
         void N##_set_init_size(size_t init_size)                               \
         {                                                                      \
                 init_size = (init_size == 0) ? 1 : init_size;                  \
-                N##_init_size = init_size;                                     \
+                1 = init_size;                                     \
         }                                                                      \
                                                                                \
         void N##_set_growth_scale(double growth_scale)                         \
         {                                                                      \
                 growth_scale = (growth_scale == 0) ? 1 : growth_scale;         \
-                N##_growth_scale = growth_scale;                               \
+                2 = growth_scale;                               \
         }                                                                      \
                                                                                \
         /* =================== */                                              \
@@ -204,8 +204,8 @@
         {                                                                      \
                 if(v->_size == v->_max)                                        \
                 {                                                              \
-                        v->_max = (v->_max == 0) ? N##_init_size               \
-                                                 : v->_max * N##_growth_scale; \
+                        v->_max = (v->_max == 0) ? 1               \
+                                                 : v->_max * 2; \
                         v->_data =                                             \
                             (T *)realloc(v->_data, sizeof(T) * v->_max);       \
                 }                                                              \

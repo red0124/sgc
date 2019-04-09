@@ -33,6 +33,7 @@
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
+                size_t _shared;                                                \
                 struct N##_node *_head;                                        \
                 struct N##_node *_tail;                                        \
         };                                                                     \
@@ -42,67 +43,14 @@
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
                                                                                \
-        /* =================== */                                              \
-        /*  ELEMENT FUNCTIONS  */                                              \
-        /* =================== */                                              \
-                                                                               \
-        static void (*N##_element_copy)(T *, const T *const) = T##_copy;       \
-                                                                               \
-        void N##_set_copy(void (*copy)(T *, const T *const))                   \
-        {                                                                      \
-                N##_element_copy = copy;                                       \
-        }                                                                      \
-                                                                               \
-        static void N##_flat_copy(T *dst, const T *const src)                  \
-        {                                                                      \
-                *dst = *src;                                                   \
-        }                                                                      \
-                                                                               \
-        void N##_set_share(int is_shared)                                      \
-        {                                                                      \
-                if(is_shared)                                                  \
-                {                                                              \
-                        N##_set_copy(N##_flat_copy);                           \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        N##_set_copy(T##_copy);                                \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        static int (*N##_element_equal)(const T *const, const T *const) =      \
-            T##_equal;                                                         \
-                                                                               \
-        void N##_set_equal(int (*equal)(const T *const, const T *const))       \
-        {                                                                      \
-                N##_element_equal = equal;                                     \
-        }                                                                      \
-                                                                               \
-        static void (*N##_element_free)(T *) = T##_free;                       \
-                                                                               \
-        void N##_set_free(void (*free)(T *))                                   \
-        {                                                                      \
-                N##_element_free = free;                                       \
-        }                                                                      \
-                                                                               \
-        void N##_push_back(struct N *, T);                                     \
-                                                                               \
-        static void (*N##_default_insert_function)(struct N *, T) =            \
-            N##_push_back;                                                     \
-                                                                               \
-        void N##_set_default_insert(void (*insert)(N *, T))                    \
-        {                                                                      \
-                N##_default_insert_function = insert;                          \
-        }                                                                      \
-                                                                               \
-        void N##_default_insert(struct N *d, T el)                             \
-        {                                                                      \
-                N##_default_insert_function(d, el);                            \
-        }                                                                      \
-                                                                               \
         /* ================ */                                                 \
         /*  LIST FUNCTIONS  */                                                 \
         /* ================ */                                                 \
+                                                                               \
+        void N##_set_share(N *l, int is_shared)                                \
+        {                                                                      \
+                l->_shared = is_shared;                                        \
+        }                                                                      \
                                                                                \
         size_t N##_size(const struct N *const l)                               \
         {                                                                      \
@@ -113,6 +61,7 @@
         {                                                                      \
                 l->_size = 0;                                                  \
                 l->_head = l->_tail = NULL;                                    \
+                l->_shared = 0;                                                \
         }                                                                      \
                                                                                \
         void N##_free(struct N *l)                                             \
@@ -123,9 +72,9 @@
                 {                                                              \
                         tmp = curr;                                            \
                         curr = curr->_next;                                    \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!l->_shared)                                        \
                         {                                                      \
-                                N##_element_free(&tmp->_data);                 \
+                                T##_free(&tmp->_data);                         \
                         }                                                      \
                         free(tmp);                                             \
                 }                                                              \
@@ -144,8 +93,8 @@
                         equal = 1;                                             \
                         while(curr_first)                                      \
                         {                                                      \
-                                if(!N##_element_equal(&curr_first->_data,      \
-                                                      &curr_second->_data))    \
+                                if(!T##_equal(&curr_first->_data,              \
+                                              &curr_second->_data))            \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -160,12 +109,20 @@
         void N##_copy(struct N *__restrict__ dst,                              \
                       const struct N *__restrict__ const src)                  \
         {                                                                      \
+                dst->_shared = src->_shared;                                   \
                 if(src->_size != 0)                                            \
                 {                                                              \
                         dst->_head = (struct N##_node *)malloc(                \
                             sizeof(struct N##_node));                          \
-                        N##_element_copy(&dst->_head->_data,                   \
+                        if(!src->_shared)                                      \
+                        {                                                      \
+                                T##_copy(&dst->_head->_data,                   \
                                          &src->_head->_data);                  \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                dst->_head->_data = src->_head->_data;         \
+                        }                                                      \
                         struct N##_node *curr_src = src->_head;                \
                         struct N##_node *curr_dst = dst->_head;                \
                         struct N##_node *tmp_src = NULL;                       \
@@ -179,8 +136,15 @@
                                 }                                              \
                                 tmp_dst = (struct N##_node *)malloc(           \
                                     sizeof(struct N##_node));                  \
-                                N##_element_copy(&tmp_dst->_data,              \
+                                if(!src->_shared)                              \
+                                {                                              \
+                                        T##_copy(&tmp_dst->_data,              \
                                                  &tmp_src->_data);             \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        tmp_dst->_data = tmp_src->_data;       \
+                                }                                              \
                                 tmp_dst->_prev = curr_dst;                     \
                                 curr_dst->_next = tmp_dst;                     \
                                 curr_dst = tmp_dst;                            \
@@ -200,7 +164,14 @@
         {                                                                      \
                 struct N##_node *new_el =                                      \
                     (struct N##_node *)malloc(sizeof(struct N##_node));        \
-                N##_element_copy(&new_el->_data, &el);                         \
+                if(!l->_shared)                                                \
+                {                                                              \
+                        T##_copy(&new_el->_data, &el);                         \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        new_el->_data = el;                                    \
+                }                                                              \
                 new_el->_next = NULL;                                          \
                 switch(l->_size)                                               \
                 {                                                              \
@@ -237,10 +208,10 @@
                 if(l->_size)                                                   \
                 {                                                              \
                         T *el = &l->_tail->_data;                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!l->_shared)                                        \
                         {                                                      \
-                                N##_element_free(el);                          \
-                                N##_element_copy(el, &new_el);                 \
+                                T##_free(el);                                  \
+                                T##_copy(el, &new_el);                         \
                         }                                                      \
                         else                                                   \
                         {                                                      \
@@ -255,9 +226,9 @@
                 {                                                              \
                         struct N##_node *tmp = l->_tail;                       \
                         l->_tail = l->_tail->_prev;                            \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!l->_shared)                                        \
                         {                                                      \
-                                N##_element_free(&tmp->_data);                 \
+                                T##_free(&tmp->_data);                         \
                         }                                                      \
                         free(tmp);                                             \
                         if(l->_tail)                                           \
@@ -272,7 +243,14 @@
         {                                                                      \
                 struct N##_node *new_el =                                      \
                     (struct N##_node *)malloc(sizeof(struct N##_node));        \
-                N##_element_copy(&new_el->_data, &el);                         \
+                if(!l->_shared)                                                \
+                {                                                              \
+                        T##_copy(&new_el->_data, &el);                         \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        new_el->_data = el;                                    \
+                }                                                              \
                 new_el->_prev = NULL;                                          \
                 switch(l->_size)                                               \
                 {                                                              \
@@ -310,10 +288,10 @@
                 if(l->_size)                                                   \
                 {                                                              \
                         T *el = &l->_head->_data;                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!l->_shared)                                        \
                         {                                                      \
-                                N##_element_free(el);                          \
-                                N##_element_copy(el, &new_el);                 \
+                                T##_free(el);                                  \
+                                T##_copy(el, &new_el);                         \
                         }                                                      \
                         else                                                   \
                         {                                                      \
@@ -329,9 +307,9 @@
                 {                                                              \
                         struct N##_node *tmp = l->_head;                       \
                         l->_head = l->_head->_next;                            \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!l->_shared)                                        \
                         {                                                      \
-                                N##_element_free(&tmp->_data);                 \
+                                T##_free(&tmp->_data);                         \
                         }                                                      \
                         free(tmp);                                             \
                         if(l->_head)                                           \
@@ -374,10 +352,10 @@
                 T *el = N##_at(l, at);                                         \
                 if(el)                                                         \
                 {                                                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!l->_shared)                                        \
                         {                                                      \
-                                N##_element_free(el);                          \
-                                N##_element_copy(el, &new_el);                 \
+                                T##_free(el);                                  \
+                                T##_copy(el, &new_el);                         \
                         }                                                      \
                         else                                                   \
                         {                                                      \
@@ -393,7 +371,7 @@
                 for(struct N##_node *curr = l->_head; curr;                    \
                     curr = curr->_next)                                        \
                 {                                                              \
-                        if(N##_element_equal(&curr->_data, &el))               \
+                        if(T##_equal(&curr->_data, &el))                       \
                         {                                                      \
                                 location = curr;                               \
                                 break;                                         \
@@ -402,7 +380,7 @@
                 return location;                                               \
         }                                                                      \
                                                                                \
-        static void N##_node_erase(struct N##_node *n)                         \
+        static void N##_node_erase(struct N##_node *n, int is_shared)          \
         {                                                                      \
                 if(n->_next)                                                   \
                 {                                                              \
@@ -412,9 +390,9 @@
                 {                                                              \
                         n->_prev->_next = n->_next;                            \
                 }                                                              \
-                if(N##_element_copy != N##_flat_copy)                          \
+                if(is_shared)                                                  \
                 {                                                              \
-                        N##_element_free(&n->_data);                           \
+                        T##_free(&n->_data);                                   \
                 }                                                              \
                 free(n);                                                       \
                 n = NULL;                                                      \
@@ -436,7 +414,7 @@
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                N##_node_erase(n);                             \
+                                N##_node_erase(n, l->_shared);                 \
                                 l->_size--;                                    \
                         }                                                      \
                 }                                                              \
@@ -453,7 +431,7 @@
                 else if(erase)                                                 \
                 {                                                              \
                         struct N##_node *curr = l->_head;                      \
-			if(at <= l->_size / 2)                                 \
+                        if(at <= l->_size / 2)                                 \
                         {                                                      \
                                 curr = l->_head;                               \
                                 for(size_t i = 0; i < at; ++i)                 \
@@ -477,7 +455,7 @@
                         {                                                      \
                                 l->_tail = l->_tail->_prev;                    \
                         }                                                      \
-                        N##_node_erase(curr);                                  \
+                        N##_node_erase(curr, l->_shared);                      \
                         l->_size--;                                            \
                 }                                                              \
                 return erase;                                                  \
@@ -513,7 +491,14 @@
                 {                                                              \
                         struct N##_node *new_node = (struct N##_node *)malloc( \
                             sizeof(struct N##_node));                          \
-                        N##_element_copy(&new_node->_data, &el);               \
+                        if(!l->_shared)                                        \
+                        {                                                      \
+                                T##_copy(&new_node->_data, &el);               \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                new_node->_data = el;                          \
+                        }                                                      \
                         struct N##_node *curr = l->_head;                      \
                         for(size_t i = 0; i < at - 1; ++i)                     \
                         {                                                      \
@@ -549,7 +534,14 @@
                 {                                                              \
                         struct N##_node *new_node = (struct N##_node *)malloc( \
                             sizeof(struct N##_node));                          \
-                        N##_element_copy(&new_node->_data, &el);               \
+                        if(!l->_shared)                                        \
+                        {                                                      \
+                                T##_copy(&new_node->_data, &el);               \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                new_node->_data = el;                          \
+                        }                                                      \
                         struct N##_node *curr = l->_head;                      \
                         while(compare(&curr->_data, &el) <= 0)                 \
                         {                                                      \

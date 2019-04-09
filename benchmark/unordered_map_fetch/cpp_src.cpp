@@ -1,24 +1,14 @@
-#include <unordered_map>
+#include <queue>
 #include <fstream>
 
 #define INPUT_FILE "input.txt"
 
 static void meassure(size_t num_of_elements)
 {
-	std::unordered_map<int, int> m;
-
+	std::priority_queue<int> d;
 	for(size_t i = 0; i < num_of_elements; ++i)
 	{
-		// i * 9999 to get some identical hashes
-		m.insert(std::pair<int, int>(i * 9999, i));
-	}
-
-	for(size_t i = 0; i < num_of_elements; ++i)
-	{
-		for(size_t j = 0; j < 9; ++j)
-		{
-			++m[i * 9999];
-		}
+		d.push(i);
 	}
 }
 

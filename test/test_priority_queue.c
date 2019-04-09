@@ -113,12 +113,12 @@ void test_apqueue(void)
 
         apqueue_pop(&v);
 
-        apqueue_set_share(1);
+        apqueue_set_share(&v, 1);
         ++allocation_count;
         al new_el = (al){(int *)malloc(sizeof(int))};
         *(new_el.el) = 3;
         apqueue_push(&v, new_el);
-        apqueue_set_share(0);
+        apqueue_set_share(&v, 0);
 
         apqueue_free(&v);
 
@@ -160,9 +160,9 @@ void test_pqueue_pqueue(void)
         pqueue_push(&tmp, 2);
         // {0, 1, 2}
 
-        vpqueue_set_share(1);
+        vpqueue_set_share(&v, 1);
         vpqueue_push(&v, tmp);
-        vpqueue_set_share(0);
+        vpqueue_set_share(&v, 0);
         // pushed pqueue into vpqueue, it will use the original
 
         // {{0}, {0, 1}, {0, 1, 2}}

@@ -1,11 +1,11 @@
-#include <unordered_map>
+#include <map>
 #include <fstream>
 
 #define INPUT_FILE "input.txt"
 
 static void meassure(size_t num_of_elements)
 {
-	std::unordered_map<int, int> m;
+	std::map<int, int> m;
 
 	for(size_t i = 0; i < num_of_elements; ++i)
 	{

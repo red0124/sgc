@@ -181,10 +181,10 @@ void test_adeque(void)
         adeque_pop_back(&v);
         adeque_erase_at(&v, adeque_size(&v) - 1);
 
-        adeque_set_share(1);
+        adeque_set_share(&v, 1);
         ++allocation_count;
         adeque_push_back(&v, (al){(int *)malloc(sizeof(int))});
-        adeque_set_share(0);
+        adeque_set_share(&v, 0);
 
         adeque_free(&v);
 
@@ -220,9 +220,9 @@ void test_deque_deque(void)
         deque_push_back(&tmp, 2);
         // {0, 1, 2}
 
-        vdeque_set_share(1);
+        vdeque_set_share(&v, 1);
         vdeque_push_back(&v, tmp);
-        vdeque_set_share(0);
+        vdeque_set_share(&v, 0);
         // pushed deque into vdeque, it will use the original
 
         // {{0}, {0, 1}, {0, 1, 2}}

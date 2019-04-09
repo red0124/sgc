@@ -275,10 +275,10 @@ void test_alist(void)
         alist_pop_back(&l);
         alist_pop_front(&l);
 
-        alist_set_share(1);
+        alist_set_share(&l, 1);
         ++allocation_count;
         alist_push_back(&l, (al){(int *)malloc(sizeof(int))});
-        alist_set_share(0);
+        alist_set_share(&l, 0);
 
         alist_free(&l);
 
@@ -314,9 +314,9 @@ void test_list_list(void)
         list_push_back(&tmp, 2);
         // {0, 1, 2}
 
-        llist_set_share(1);
+        llist_set_share(&l, 1);
         llist_push_back(&l, tmp);
-        llist_set_share(0);
+        llist_set_share(&l, 0);
         // pushed list into llist, it will use the original
 
         // {{0}, {0, 1}, {0, 1, 2}}

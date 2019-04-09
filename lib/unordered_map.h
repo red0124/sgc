@@ -667,11 +667,9 @@ static size_t sgc_next_prime(size_t n)
                 {                                                              \
                         size_t position = hash % u->_max;                      \
                         struct N##_node *tmp = u->_data[position];             \
-                        if(tmp)                                                \
-                        {                                                      \
                                 while(tmp)                                     \
                                 {                                              \
-                                        if(N##_element_equal_key(&tmp->_key,   \
+                                        if(K##_equal(&tmp->_key,   \
                                                                  k))           \
                                         {                                      \
                                                 ret = (struct N##_iterator){   \
@@ -681,7 +679,6 @@ static size_t sgc_next_prime(size_t n)
                                         }                                      \
                                         tmp = tmp->_next;                      \
                                 }                                              \
-                        }                                                      \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \

@@ -93,8 +93,8 @@ void al_copy(al *dst, const al *const src)
 
 void al_free(al *a)
 {
-        --allocation_count;
-        free(a->el);
+	--allocation_count;
+	free(a->el);
 }
 
 int al_equal(const al *const first, const al *const second)
@@ -131,13 +131,13 @@ void test_amap(void)
         x = TEST_ELEMENTS_NUM / 2;
         amap_erase(&v, tmp);
 
-        amap_set_share_key(1);
+        amap_set_share_key(&v, 1);
         ++allocation_count;
         int *new_el = (int *)malloc(sizeof(int));
         *new_el = TEST_ELEMENTS_NUM + 2;
         tmp.el = new_el;
         amap_at(&v, tmp);
-        amap_set_share_key(0);
+        amap_set_share_key(&v, 0);
 
         amap_free(&v);
 
@@ -174,9 +174,9 @@ void test_map_map(void)
         map_set_at(&tmp, 2, 2);
         // {(0, 0), (1, 1), (2, 2)}
 
-        vmap_set_share(1);
+        vmap_set_share(&v, 1);
         vmap_set_at(&v, tmp, tmp);
-        vmap_set_share(0);
+        vmap_set_share(&v, 0);
         // pushed map into vmap, it will use the original
 
         // {{(0, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 1), (2, 2)}}

@@ -1,27 +1,46 @@
-insert <num of elements> elements
 
 c
 
-num of elements = 524288
-  Time (mean ± σ):      20.9 ms ±   0.9 ms    [User: 19.6 ms, System: 1.2 ms]
-num of elements = 1048576
-  Time (mean ± σ):      41.7 ms ±   0.4 ms    [User: 38.5 ms, System: 3.1 ms]
-num of elements = 2097152
-  Time (mean ± σ):      86.2 ms ±   2.6 ms    [User: 83.3 ms, System: 2.6 ms]
-num of elements = 4194304
-  Time (mean ± σ):     178.4 ms ±   2.6 ms    [User: 173.7 ms, System: 4.3 ms]
-num of elements = 8388608
-  Time (mean ± σ):     365.7 ms ±   1.6 ms    [User: 358.2 ms, System: 6.7 ms]
+num of elements = 140210
+  Time (mean ± σ):       4.5 ms ±   0.6 ms    [User: 3.8 ms, System: 0.8 ms]
+num of elements = 168252
+  Time (mean ± σ):       4.9 ms ±   0.9 ms    [User: 4.0 ms, System: 0.9 ms]
+num of elements = 201903
+  Time (mean ± σ):       5.8 ms ±   0.9 ms    [User: 5.6 ms, System: 0.2 ms]
+num of elements = 242283
+  Time (mean ± σ):       6.8 ms ±   0.8 ms    [User: 5.9 ms, System: 0.9 ms]
+num of elements = 290740
+  Time (mean ± σ):       8.1 ms ±   0.6 ms    [User: 7.1 ms, System: 1.0 ms]
+num of elements = 348888
+  Time (mean ± σ):       9.3 ms ±   0.6 ms    [User: 8.1 ms, System: 1.1 ms]
+num of elements = 418666
+  Time (mean ± σ):      11.6 ms ±   0.4 ms    [User: 10.4 ms, System: 1.1 ms]
+num of elements = 502400
+  Time (mean ± σ):      13.0 ms ±   0.7 ms    [User: 11.8 ms, System: 1.1 ms]
+num of elements = 602880
+  Time (mean ± σ):      16.2 ms ±   1.0 ms    [User: 15.4 ms, System: 0.7 ms]
+num of elements = 723456
+  Time (mean ± σ):      19.4 ms ±   0.8 ms    [User: 18.8 ms, System: 0.6 ms]
 
 cpp
 
-num of elements = 524288
-  Time (mean ± σ):      16.9 ms ±   0.4 ms    [User: 14.6 ms, System: 2.1 ms]
-num of elements = 1048576
-  Time (mean ± σ):      31.8 ms ±   0.9 ms    [User: 28.5 ms, System: 3.1 ms]
-num of elements = 2097152
-  Time (mean ± σ):      63.4 ms ±   0.9 ms    [User: 58.9 ms, System: 4.2 ms]
-num of elements = 4194304
-  Time (mean ± σ):     130.5 ms ±   7.4 ms    [User: 123.5 ms, System: 6.6 ms]
-num of elements = 8388608
-  Time (mean ± σ):     265.4 ms ±   3.2 ms    [User: 253.6 ms, System: 10.9 ms]
+num of elements = 140210
+  Time (mean ± σ):       5.6 ms ±   0.7 ms    [User: 4.1 ms, System: 1.4 ms]
+num of elements = 168252
+  Time (mean ± σ):       6.2 ms ±   0.4 ms    [User: 5.1 ms, System: 1.1 ms]
+num of elements = 201903
+  Time (mean ± σ):       7.6 ms ±   0.9 ms    [User: 6.1 ms, System: 1.5 ms]
+num of elements = 242283
+  Time (mean ± σ):       8.3 ms ±   0.5 ms    [User: 7.4 ms, System: 0.9 ms]
+num of elements = 290740
+  Time (mean ± σ):      10.1 ms ±   0.7 ms    [User: 7.6 ms, System: 2.4 ms]
+num of elements = 348888
+  Time (mean ± σ):      11.8 ms ±   1.0 ms    [User: 10.3 ms, System: 1.4 ms]
+num of elements = 418666
+  Time (mean ± σ):      14.2 ms ±   1.1 ms    [User: 11.5 ms, System: 2.6 ms]
+num of elements = 502400
+  Time (mean ± σ):      15.7 ms ±   0.8 ms    [User: 13.2 ms, System: 2.4 ms]
+num of elements = 602880
+  Time (mean ± σ):      19.7 ms ±   0.6 ms    [User: 15.9 ms, System: 3.6 ms]
+num of elements = 723456
+  Time (mean ± σ):      23.0 ms ±   0.9 ms    [User: 19.8 ms, System: 3.0 ms]

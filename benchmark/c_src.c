@@ -5,9 +5,9 @@
 #define SGC_ST
 #include "../lib/algorithm.h"
 #include "../lib/static_types.h"
-#include "../lib/unordered_map.h"
+#include "../lib/map.h"
 
-SGC_INIT_PAIR(UNORDERED_MAP, int, int, map);
+SGC_INIT_PAIR(MAP, int, int, map);
 
 #define INPUT_FILE "input.txt"
 #define BUFF_SIZE 64

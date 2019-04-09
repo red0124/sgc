@@ -15,7 +15,7 @@ POW_BASE=1.2
 POW_MIN=55
 POW_MAX=65
 
-OUTPUT_DOCUMENT='unordered_map_fetch'
+OUTPUT_DOCUMENT='map_fetch'
 
 ###################
 ###################

@@ -3,9 +3,9 @@
 #include <string.h>
 
 #define SGC_ST
-#include "../../lib/algorithm.h"
-#include "../../lib/static_types.h"
-#include "../../lib/priority_queue.h"
+#include "../lib/algorithm.h"
+#include "../lib/static_types.h"
+#include "../lib/priority_queue.h"
 
 SGC_INIT(PRIORITY_QUEUE, int, pqueue);
 

@@ -2,7 +2,7 @@
 
 #ifndef SGC_MAP
 #define SGC_MAP
-#define MAP_LEAF NULL
+#define SGC_MAP_LEAF NULL
 #endif
 
 #ifndef SGC_MAP_COLOR
@@ -56,78 +56,18 @@ static size_t sgc_log_two(size_t size)
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
+                size_t _shared;                                                \
                 struct N##_node *_root;                                        \
         };                                                                     \
-                                                                               \
-        /* =================== */                                              \
-        /*  ELEMENT FUNCTIONS  */                                              \
-        /* =================== */                                              \
-                                                                               \
-        static void (*N##_element_copy)(V *, const V *const) = V##_copy;       \
-                                                                               \
-        void N##_set_copy(void (*copy)(V *, const V *const))                   \
-        {                                                                      \
-                N##_element_copy = copy;                                       \
-        }                                                                      \
-                                                                               \
-        static void N##_flat_copy(V *dst, const V *const src)                  \
-        {                                                                      \
-                *dst = *src;                                                   \
-        }                                                                      \
-                                                                               \
-        void N##_set_share(int is_shared)                                      \
-        {                                                                      \
-                if(is_shared)                                                  \
-                {                                                              \
-                        N##_set_copy(N##_flat_copy);                           \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        N##_set_copy(V##_copy);                                \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        static int (*N##_element_equal)(const V *const, const V *const) =      \
-            V##_equal;                                                         \
-                                                                               \
-        void N##_set_equal(int (*equal)(const V *const, const V *const))       \
-        {                                                                      \
-                N##_element_equal = equal;                                     \
-        }                                                                      \
-                                                                               \
-        static int (*N##_element_compare)(const V *const, const V *const) =    \
-            V##_compare;                                                       \
-                                                                               \
-        void N##_set_compare(int (*compare)(const V *const, const V *const))   \
-        {                                                                      \
-                N##_element_compare = compare;                                 \
-        }                                                                      \
-                                                                               \
-        static void (*N##_element_free)(V *) = V##_free;                       \
-                                                                               \
-        void N##_set_free(void (*free)(V *))                                   \
-        {                                                                      \
-                N##_element_free = free;                                       \
-        }                                                                      \
-                                                                               \
-        void N##_insert(struct N *, V);                                        \
-                                                                               \
-        static void (*N##_default_insert_function)(struct N *, V) =            \
-            N##_insert;                                                        \
-                                                                               \
-        void N##_set_default_insert(void (*insert)(N *, V))                    \
-        {                                                                      \
-                N##_default_insert_function = insert;                          \
-        }                                                                      \
-                                                                               \
-        void N##_default_insert(struct N *d, V el)                             \
-        {                                                                      \
-                N##_default_insert_function(d, el);                            \
-        }                                                                      \
                                                                                \
         /* ================ */                                                 \
         /*  NODE FUNCTIONS  */                                                 \
         /* ================ */                                                 \
+                                                                               \
+        void N##_set_share(N *s, int is_shared)                                \
+        {                                                                      \
+                s->_shared = is_shared;                                        \
+        }                                                                      \
                                                                                \
         static struct N##_node *N##_node_begin(struct N##_node *n)             \
         {                                                                      \
@@ -147,12 +87,20 @@ static size_t sgc_log_two(size_t size)
                 return n;                                                      \
         }                                                                      \
                                                                                \
-        static struct N##_node *N##_node_new(const V *const v)                 \
+        static struct N##_node *N##_node_new(const V *const v,                 \
+                                             size_t is_shared)                 \
         {                                                                      \
                 struct N##_node *n =                                           \
                     (struct N##_node *)malloc(sizeof(struct N##_node));        \
-                N##_element_copy(&n->_value, v);                               \
-                n->_left = n->_right = MAP_LEAF;                               \
+                if(!is_shared)                                                 \
+                {                                                              \
+                        V##_copy(&n->_value, v);                               \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        n->_value = *v;                                        \
+                }                                                              \
+                n->_left = n->_right = SGC_MAP_LEAF;                           \
                 n->_color = SGC_MAP_RED;                                       \
                 return n;                                                      \
         }                                                                      \
@@ -205,19 +153,21 @@ static size_t sgc_log_two(size_t size)
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_iterator_begin(struct N *m, struct N##_iterator *i)           \
+        void N##_iterator_begin(struct N *s, struct N##_iterator *i)           \
         {                                                                      \
-                i->_curr = MAP_LEAF;                                           \
-                i->_next = (m->_root) ? N##_node_begin(m->_root) : MAP_LEAF;   \
+                i->_curr = SGC_MAP_LEAF;                                       \
+                i->_next =                                                     \
+                    (s->_root) ? N##_node_begin(s->_root) : SGC_MAP_LEAF;      \
                 i->_is_valid = 1;                                              \
                 N##_iterator_next(i);                                          \
         }                                                                      \
                                                                                \
-        void N##_iterator_cbegin(const struct N *const m,                      \
+        void N##_iterator_cbegin(const struct N *const s,                      \
                                  struct N##_iterator *i)                       \
         {                                                                      \
-                i->_curr = MAP_LEAF;                                           \
-                i->_next = (m->_root) ? N##_node_begin(m->_root) : MAP_LEAF;   \
+                i->_curr = SGC_MAP_LEAF;                                       \
+                i->_next =                                                     \
+                    (s->_root) ? N##_node_begin(s->_root) : SGC_MAP_LEAF;      \
                 i->_is_valid = 1;                                              \
                 N##_iterator_next(i);                                          \
         }                                                                      \
@@ -249,18 +199,18 @@ static size_t sgc_log_two(size_t size)
                 }                                                              \
         }                                                                      \
                                                                                \
-        void N##_iterator_end(struct N *m, struct N##_iterator *i)             \
+        void N##_iterator_end(struct N *s, struct N##_iterator *i)             \
         {                                                                      \
-                i->_curr = (m->_root) ? N##_node_end(m->_root) : MAP_LEAF;     \
-                i->_next = MAP_LEAF;                                           \
+                i->_curr = (s->_root) ? N##_node_end(s->_root) : SGC_MAP_LEAF; \
+                i->_next = SGC_MAP_LEAF;                                       \
                 i->_is_valid = (i->_curr) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
-        void N##_iterator_cend(const struct N *const m,                        \
+        void N##_iterator_cend(const struct N *const s,                        \
                                struct N##_iterator *i)                         \
         {                                                                      \
-                i->_curr = (m->_root) ? N##_node_end(m->_root) : MAP_LEAF;     \
-                i->_next = MAP_LEAF;                                           \
+                i->_curr = (s->_root) ? N##_node_end(s->_root) : SGC_MAP_LEAF; \
+                i->_next = SGC_MAP_LEAF;                                       \
                 i->_is_valid = (i->_curr) ? 1 : 0;                             \
         }                                                                      \
                                                                                \
@@ -304,7 +254,7 @@ static size_t sgc_log_two(size_t size)
         }                                                                      \
                                                                                \
         /* =============== */                                                  \
-        /*  MAP FUNCTIONS  */                                                  \
+        /*  SET FUNCTIONS  */                                                  \
         /* =============== */                                                  \
                                                                                \
         static size_t N##_stack_size(size_t size)                              \
@@ -313,33 +263,34 @@ static size_t sgc_log_two(size_t size)
                 return sizeof(struct N##_node *) * (size * 2);                 \
         }                                                                      \
                                                                                \
-        size_t N##_size(const struct N *const m)                               \
+        size_t N##_size(const struct N *const s)                               \
         {                                                                      \
-                return m->_size;                                               \
+                return s->_size;                                               \
         }                                                                      \
                                                                                \
-        void N##_init(struct N *m)                                             \
+        void N##_init(struct N *s)                                             \
         {                                                                      \
-                m->_size = 0;                                                  \
-                m->_root = MAP_LEAF;                                           \
+                s->_size = 0;                                                  \
+                s->_root = SGC_MAP_LEAF;                                       \
+                s->_shared = 0;                                                \
         }                                                                      \
                                                                                \
-        void N##_free(struct N *m)                                             \
+        void N##_free(struct N *s)                                             \
         {                                                                      \
-                if(!m->_size)                                                  \
+                if(!s->_size)                                                  \
                 {                                                              \
                         return;                                                \
                 }                                                              \
                 struct N##_node **stack =                                      \
-                    (struct N##_node **)malloc(N##_stack_size(m->_size));      \
+                    (struct N##_node **)malloc(N##_stack_size(s->_size));      \
                                                                                \
-                struct N##_node *curr = m->_root;                              \
+                struct N##_node *curr = s->_root;                              \
                 struct N##_node *tmp = NULL;                                   \
                                                                                \
                 size_t stack_size = 0;                                         \
                 while(1)                                                       \
                 {                                                              \
-                        if(curr != MAP_LEAF)                                   \
+                        if(curr != SGC_MAP_LEAF)                               \
                         {                                                      \
                                 stack[stack_size++] = curr;                    \
                                 curr = curr->_left;                            \
@@ -353,16 +304,16 @@ static size_t sgc_log_two(size_t size)
                                 curr = stack[--stack_size];                    \
                                 tmp = curr;                                    \
                                 curr = curr->_right;                           \
-                                if(N##_element_copy != N##_flat_copy)          \
+                                if(!s->_shared)                                \
                                 {                                              \
-                                        N##_element_free(&tmp->_value);        \
+                                        V##_free(&tmp->_value);                \
                                 }                                              \
                                 free(tmp);                                     \
                         }                                                      \
                 }                                                              \
                 free(stack);                                                   \
-                m->_root = MAP_LEAF;                                           \
-                m->_size = 0;                                                  \
+                s->_root = SGC_MAP_LEAF;                                       \
+                s->_size = 0;                                                  \
         }                                                                      \
                                                                                \
         int N##_equal(const struct N *const first,                             \
@@ -380,9 +331,8 @@ static size_t sgc_log_two(size_t size)
                                                                                \
                         for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
-                                if(!N##_element_equal(                         \
-                                       &it_first._curr->_value,                \
-                                       &it_second._curr->_value))              \
+                                if(!V##_equal(&it_first._curr->_value,         \
+                                              &it_second._curr->_value))       \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -398,18 +348,26 @@ static size_t sgc_log_two(size_t size)
                       const struct N *__restrict__ const src)                  \
         {                                                                      \
                 dst->_size = src->_size;                                       \
-                dst->_root = MAP_LEAF;                                         \
+                dst->_root = SGC_MAP_LEAF;                                     \
+                dst->_shared = src->_shared;                                   \
                                                                                \
                 if(src->_size != 0)                                            \
                 {                                                              \
                         dst->_root = (struct N##_node *)malloc(                \
                             sizeof(struct N##_node));                          \
                                                                                \
-                        N##_element_copy(&dst->_root->_value,                  \
+                        if(!dst->_shared)                                      \
+                        {                                                      \
+                                V##_copy(&dst->_root->_value,                  \
                                          &src->_root->_value);                 \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                dst->_root->_value = src->_root->_value;       \
+                        }                                                      \
                         dst->_root->_color = src->_root->_color;               \
                         dst->_root->_left = dst->_root->_right =               \
-                            dst->_root->_parent = MAP_LEAF;                    \
+                            dst->_root->_parent = SGC_MAP_LEAF;                \
                                                                                \
                         struct N##_node **stack_src =                          \
                             (struct N##_node **)malloc(                        \
@@ -422,11 +380,10 @@ static size_t sgc_log_two(size_t size)
                                 N##_stack_size(dst->_size));                   \
                                                                                \
                         struct N##_node *curr_dst = dst->_root;                \
+                        struct N##_node *tmp = SGC_MAP_LEAF;                   \
                                                                                \
-                        struct N##_node *tmp = MAP_LEAF;                       \
-                                                                               \
-                        stack_src[0] = MAP_LEAF;                               \
-                        stack_dst[0] = MAP_LEAF;                               \
+                        stack_src[0] = SGC_MAP_LEAF;                           \
+                        stack_dst[0] = SGC_MAP_LEAF;                           \
                                                                                \
                         stack_src[1] = src->_root;                             \
                         stack_dst[1] = dst->_root;                             \
@@ -434,10 +391,10 @@ static size_t sgc_log_two(size_t size)
                                                                                \
                         while(stack_size > 0)                                  \
                         {                                                      \
-                                if(!((curr_src->_left != MAP_LEAF &&           \
-                                      curr_dst->_left == MAP_LEAF) ||          \
-                                     (curr_src->_right != MAP_LEAF &&          \
-                                      curr_dst->_right == MAP_LEAF)))          \
+                                if(!((curr_src->_left != SGC_MAP_LEAF &&       \
+                                      curr_dst->_left == SGC_MAP_LEAF) ||      \
+                                     (curr_src->_right != SGC_MAP_LEAF &&      \
+                                      curr_dst->_right == SGC_MAP_LEAF)))      \
                                 {                                              \
                                         --stack_size;                          \
                                         curr_src = stack_src[stack_size];      \
@@ -445,8 +402,8 @@ static size_t sgc_log_two(size_t size)
                                         continue;                              \
                                 }                                              \
                                                                                \
-                                if(curr_src->_left != MAP_LEAF &&              \
-                                   curr_dst->_left == MAP_LEAF)                \
+                                if(curr_src->_left != SGC_MAP_LEAF &&          \
+                                   curr_dst->_left == SGC_MAP_LEAF)            \
                                 {                                              \
                                         curr_dst->_left =                      \
                                             (struct N##_node *)malloc(         \
@@ -464,10 +421,17 @@ static size_t sgc_log_two(size_t size)
                                         tmp->_parent = curr_dst;               \
                                         curr_src = curr_src->_right;           \
                                 }                                              \
-                                tmp->_left = tmp->_right = MAP_LEAF;           \
+                                tmp->_left = tmp->_right = SGC_MAP_LEAF;       \
                                 curr_dst = tmp;                                \
-                                N##_element_copy(&curr_dst->_value,            \
+                                if(!dst->_shared)                              \
+                                {                                              \
+                                        V##_copy(&curr_dst->_value,            \
                                                  &curr_src->_value);           \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        curr_dst->_value = curr_src->_value;   \
+                                }                                              \
                                 curr_dst->_color = curr_src->_color;           \
                                 stack_src[stack_size] = curr_src;              \
                                 stack_dst[stack_size] = curr_dst;              \
@@ -495,7 +459,7 @@ static size_t sgc_log_two(size_t size)
             const struct N##_node *const parent)                               \
         {                                                                      \
                 struct N##_node *sibling = NULL;                               \
-                if(parent != MAP_LEAF)                                         \
+                if(parent != SGC_MAP_LEAF)                                     \
                 {                                                              \
                         sibling = (n == parent->_left) ? parent->_right        \
                                                        : parent->_left;        \
@@ -503,7 +467,7 @@ static size_t sgc_log_two(size_t size)
                 return sibling;                                                \
         }                                                                      \
                                                                                \
-        static void N##_rotate_left(struct N *m, struct N##_node *parent,      \
+        static void N##_rotate_left(struct N *s, struct N##_node *parent,      \
                                     struct N##_node *gparent)                  \
         {                                                                      \
                 struct N##_node *_left = parent->_left;                        \
@@ -511,14 +475,14 @@ static size_t sgc_log_two(size_t size)
                 {                                                              \
                         gparent->_right = _left;                               \
                 }                                                              \
-                if(_left != MAP_LEAF)                                          \
+                if(_left != SGC_MAP_LEAF)                                      \
                 {                                                              \
                         _left->_parent = gparent;                              \
                 }                                                              \
-                if(gparent == m->_root)                                        \
+                if(gparent == s->_root)                                        \
                 {                                                              \
-                        m->_root = parent;                                     \
-                        parent->_parent = MAP_LEAF;                            \
+                        s->_root = parent;                                     \
+                        parent->_parent = SGC_MAP_LEAF;                        \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -539,19 +503,19 @@ static size_t sgc_log_two(size_t size)
                 gparent->_color = SGC_MAP_RED;                                 \
         }                                                                      \
                                                                                \
-        static void N##_rotate_right(struct N *m, struct N##_node *parent,     \
+        static void N##_rotate_right(struct N *s, struct N##_node *parent,     \
                                      struct N##_node *gparent)                 \
         {                                                                      \
                 struct N##_node *right = parent->_right;                       \
                 gparent->_left = right;                                        \
-                if(right != MAP_LEAF)                                          \
+                if(right != SGC_MAP_LEAF)                                      \
                 {                                                              \
                         right->_parent = gparent;                              \
                 }                                                              \
-                if(gparent == m->_root)                                        \
+                if(gparent == s->_root)                                        \
                 {                                                              \
-                        m->_root = parent;                                     \
-                        parent->_parent = MAP_LEAF;                            \
+                        s->_root = parent;                                     \
+                        parent->_parent = SGC_MAP_LEAF;                        \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -572,23 +536,23 @@ static size_t sgc_log_two(size_t size)
                 gparent->_color = SGC_MAP_RED;                                 \
         }                                                                      \
                                                                                \
-        static void N##_rotate_left_right(struct N *m, struct N##_node *n,     \
+        static void N##_rotate_left_right(struct N *s, struct N##_node *n,     \
                                           struct N##_node *parent,             \
                                           struct N##_node *gparent)            \
         {                                                                      \
-                N##_rotate_left(m, n, parent);                                 \
-                N##_rotate_right(m, n, gparent);                               \
+                N##_rotate_left(s, n, parent);                                 \
+                N##_rotate_right(s, n, gparent);                               \
         }                                                                      \
                                                                                \
-        static void N##_rotate_right_left(struct N *m, struct N##_node *n,     \
+        static void N##_rotate_right_left(struct N *s, struct N##_node *n,     \
                                           struct N##_node *parent,             \
                                           struct N##_node *gparent)            \
         {                                                                      \
-                N##_rotate_right(m, n, parent);                                \
-                N##_rotate_left(m, n, gparent);                                \
+                N##_rotate_right(s, n, parent);                                \
+                N##_rotate_left(s, n, gparent);                                \
         }                                                                      \
                                                                                \
-        static void N##_rotate(struct N *m, struct N##_node *n,                \
+        static void N##_rotate(struct N *s, struct N##_node *n,                \
                                struct N##_node *parent,                        \
                                struct N##_node *gparent)                       \
         {                                                                      \
@@ -596,18 +560,18 @@ static size_t sgc_log_two(size_t size)
                 {                                                              \
                         if(N##_is_left_child(parent, gparent))                 \
                         {                                                      \
-                                N##_rotate_right(m, parent, gparent);          \
+                                N##_rotate_right(s, parent, gparent);          \
                                 n->_color = SGC_MAP_RED;                       \
                                 parent->_color = SGC_MAP_BLACK;                \
                                 struct N##_node *sibling = parent->_right;     \
-                                if(sibling != MAP_LEAF)                        \
+                                if(sibling != SGC_MAP_LEAF)                    \
                                 {                                              \
                                         sibling->_color = SGC_MAP_RED;         \
                                 }                                              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                N##_rotate_right_left(m, n, parent, gparent);  \
+                                N##_rotate_right_left(s, n, parent, gparent);  \
                                 n->_color = SGC_MAP_BLACK;                     \
                                 n->_right->_color = SGC_MAP_RED;               \
                                 n->_left->_color = SGC_MAP_RED;                \
@@ -617,18 +581,18 @@ static size_t sgc_log_two(size_t size)
                 {                                                              \
                         if(!N##_is_left_child(parent, gparent))                \
                         {                                                      \
-                                N##_rotate_left(m, parent, gparent);           \
+                                N##_rotate_left(s, parent, gparent);           \
                                 n->_color = SGC_MAP_RED;                       \
                                 parent->_color = SGC_MAP_BLACK;                \
                                 struct N##_node *sibling = parent->_right;     \
-                                if(sibling != MAP_LEAF)                        \
+                                if(sibling != SGC_MAP_LEAF)                    \
                                 {                                              \
                                         sibling->_color = SGC_MAP_RED;         \
                                 }                                              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                N##_rotate_left_right(m, n, parent, gparent);  \
+                                N##_rotate_left_right(s, n, parent, gparent);  \
                                 n->_color = SGC_MAP_BLACK;                     \
                                 n->_right->_color = SGC_MAP_RED;               \
                                 n->_left->_color = SGC_MAP_RED;                \
@@ -636,13 +600,13 @@ static size_t sgc_log_two(size_t size)
                 }                                                              \
         }                                                                      \
                                                                                \
-        static void N##_corect_tree(struct N *m, struct N##_node *n,           \
+        static void N##_corect_tree(struct N *s, struct N##_node *n,           \
                                     struct N##_node *p, struct N##_node *gp)   \
         {                                                                      \
                 struct N##_node *u = N##_sibling(p, gp);                       \
-                if(u == MAP_LEAF || u->_color == SGC_MAP_BLACK)                \
+                if(u == SGC_MAP_LEAF || u->_color == SGC_MAP_BLACK)            \
                 {                                                              \
-                        N##_rotate(m, n, p, gp);                               \
+                        N##_rotate(s, n, p, gp);                               \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -652,62 +616,63 @@ static size_t sgc_log_two(size_t size)
                 }                                                              \
         }                                                                      \
                                                                                \
-        static void N##_check_color(struct N *m, struct N##_node *n)           \
+        static void N##_check_color(struct N *s, struct N##_node *n)           \
         {                                                                      \
-                if(n == m->_root)                                              \
+                if(n == s->_root)                                              \
                 {                                                              \
-                        m->_root->_color = SGC_MAP_BLACK;                      \
+                        s->_root->_color = SGC_MAP_BLACK;                      \
                         return;                                                \
                 }                                                              \
                 struct N##_node *p = n->_parent;                               \
                 struct N##_node *gp = p->_parent;                              \
                 if(p->_color == SGC_MAP_RED && n->_color == SGC_MAP_RED)       \
                 {                                                              \
-                        N##_corect_tree(m, n, p, gp);                          \
+                        N##_corect_tree(s, n, p, gp);                          \
                 }                                                              \
                 if(gp)                                                         \
                 {                                                              \
-                        N##_check_color(m, gp);                                \
+                        N##_check_color(s, gp);                                \
                 }                                                              \
         }                                                                      \
                                                                                \
-        static void N##_insert_node(struct N *m, V *v)                         \
+        static void N##_insert_node(struct N *s, V *v)                         \
         {                                                                      \
-                struct N##_node *parent = m->_root;                            \
+                struct N##_node *parent = s->_root;                            \
                 struct N##_node *new_node = NULL;                              \
                 for(;;)                                                        \
                 {                                                              \
-                        int compare =                                          \
-                            (N##_element_compare(&parent->_value, v));         \
+                        int compare = (V##_compare(&parent->_value, v));       \
                                                                                \
                         if(compare > 0)                                        \
                         {                                                      \
-                                if(parent->_left == MAP_LEAF)                  \
+                                if(parent->_left == SGC_MAP_LEAF)              \
                                 {                                              \
-                                        new_node = N##_node_new(v);            \
+                                        new_node =                             \
+                                            N##_node_new(v, s->_shared);       \
                                         parent->_left = new_node;              \
-                                        m->_size++;                            \
+                                        s->_size++;                            \
                                         break;                                 \
                                 }                                              \
                                 parent = parent->_left;                        \
                         }                                                      \
                         else if(compare < 0)                                   \
                         {                                                      \
-                                if(parent->_right == MAP_LEAF)                 \
+                                if(parent->_right == SGC_MAP_LEAF)             \
                                 {                                              \
-                                        new_node = N##_node_new(v);            \
+                                        new_node =                             \
+                                            N##_node_new(v, s->_shared);       \
                                         parent->_right = new_node;             \
-                                        m->_size++;                            \
+                                        s->_size++;                            \
                                         break;                                 \
                                 }                                              \
                                 parent = parent->_right;                       \
                         }                                                      \
-                        else if(!N##_element_equal(&parent->_value, v))        \
+                        else if(!V##_equal(&parent->_value, v))                \
                         {                                                      \
-                                if(N##_element_copy != N##_flat_copy)          \
+                                if(!s->_shared)                                \
                                 {                                              \
-                                        N##_element_free(&parent->_value);     \
-                                        N##_element_copy(&parent->_value, v);  \
+                                        V##_free(&parent->_value);             \
+                                        V##_copy(&parent->_value, v);          \
                                 }                                              \
                                 else                                           \
                                 {                                              \
@@ -721,89 +686,92 @@ static size_t sgc_log_two(size_t size)
                         }                                                      \
                 }                                                              \
                 new_node->_parent = parent;                                    \
-                N##_check_color(m, new_node);                                  \
+                N##_check_color(s, new_node);                                  \
         }                                                                      \
                                                                                \
-        void N##_insert(struct N *m, V v)                                      \
+        void N##_insert(struct N *s, V v)                                      \
         {                                                                      \
-                if(m->_root == MAP_LEAF)                                       \
+                if(s->_root == SGC_MAP_LEAF)                                   \
                 {                                                              \
-                        struct N##_node *new_node = N##_node_new(&v);          \
+                        struct N##_node *new_node =                            \
+                            N##_node_new(&v, s->_shared);                      \
                         new_node->_color = SGC_MAP_BLACK;                      \
-                        new_node->_parent = MAP_LEAF;                          \
-                        m->_root = new_node;                                   \
-                        m->_size = 1;                                          \
+                        new_node->_parent = SGC_MAP_LEAF;                      \
+                        s->_root = new_node;                                   \
+                        s->_size = 1;                                          \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        N##_insert_node(m, &v);                                \
+                        N##_insert_node(s, &v);                                \
                 }                                                              \
         }                                                                      \
                                                                                \
-        static void N##_insert_multiple_node(struct N *m, V *v)                \
+        static void N##_insert_multiple_node(struct N *s, V *v)                \
         {                                                                      \
-                struct N##_node *parent = m->_root;                            \
+                struct N##_node *parent = s->_root;                            \
                 struct N##_node *new_node = NULL;                              \
                 for(;;)                                                        \
                 {                                                              \
-                        int compare =                                          \
-                            (N##_element_compare(&parent->_value, v));         \
+                        int compare = (V##_compare(&parent->_value, v));       \
                                                                                \
                         if(compare > 0)                                        \
                         {                                                      \
-                                if(parent->_left == MAP_LEAF)                  \
+                                if(parent->_left == SGC_MAP_LEAF)              \
                                 {                                              \
-                                        new_node = N##_node_new(v);            \
+                                        new_node =                             \
+                                            N##_node_new(v, s->_shared);       \
                                         parent->_left = new_node;              \
-                                        m->_size++;                            \
+                                        s->_size++;                            \
                                         break;                                 \
                                 }                                              \
                                 parent = parent->_left;                        \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                if(parent->_right == MAP_LEAF)                 \
+                                if(parent->_right == SGC_MAP_LEAF)             \
                                 {                                              \
-                                        new_node = N##_node_new(v);            \
+                                        new_node =                             \
+                                            N##_node_new(v, s->_shared);       \
                                         parent->_right = new_node;             \
-                                        m->_size++;                            \
+                                        s->_size++;                            \
                                         break;                                 \
                                 }                                              \
                                 parent = parent->_right;                       \
                         }                                                      \
                 }                                                              \
                 new_node->_parent = parent;                                    \
-                N##_check_color(m, new_node);                                  \
+                N##_check_color(s, new_node);                                  \
         }                                                                      \
                                                                                \
-        void N##_insert_multiple(struct N *m, V v)                             \
+        void N##_insert_multiple(struct N *s, V v)                             \
         {                                                                      \
-                if(m->_root == MAP_LEAF)                                       \
+                if(s->_root == SGC_MAP_LEAF)                                   \
                 {                                                              \
-                        struct N##_node *new_node = N##_node_new(&v);          \
+                        struct N##_node *new_node =                            \
+                            N##_node_new(&v, s->_shared);                      \
                         new_node->_color = SGC_MAP_BLACK;                      \
-                        new_node->_parent = MAP_LEAF;                          \
-                        m->_root = new_node;                                   \
-                        m->_size = 1;                                          \
+                        new_node->_parent = SGC_MAP_LEAF;                      \
+                        s->_root = new_node;                                   \
+                        s->_size = 1;                                          \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        N##_insert_multiple_node(m, &v);                       \
+                        N##_insert_multiple_node(s, &v);                       \
                 }                                                              \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_find(struct N *m, V v)                         \
+        struct N##_iterator N##_find(struct N *s, V v)                         \
         {                                                                      \
-                struct N##_iterator ret = {MAP_LEAF, MAP_LEAF, 0};             \
+                struct N##_iterator ret = {SGC_MAP_LEAF, SGC_MAP_LEAF, 0};     \
                 struct N##_node *prev;                                         \
-                if(m->_root)                                                   \
+                if(s->_root)                                                   \
                 {                                                              \
-                        struct N##_node *curr = m->_root;                      \
+                        struct N##_node *curr = s->_root;                      \
                         while(curr)                                            \
                         {                                                      \
                                 prev = curr;                                   \
                                 int compare =                                  \
-                                    (N##_element_compare(&curr->_value, &v));  \
+                                    (V##_compare(&curr->_value, &v));          \
                                                                                \
                                 if(compare > 0)                                \
                                 {                                              \
@@ -826,9 +794,9 @@ static size_t sgc_log_two(size_t size)
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        static struct N##_node *N##_find_node(struct N *m, V v)                \
+        static struct N##_node *N##_find_node(struct N *s, V v)                \
         {                                                                      \
-                struct N##_iterator i = N##_find(m, v);                        \
+                struct N##_iterator i = N##_find(s, v);                        \
                 return i._curr;                                                \
         }                                                                      \
                                                                                \
@@ -942,7 +910,7 @@ static size_t sgc_log_two(size_t size)
         {                                                                      \
                 struct N##_node *succ;                                         \
                 struct N##_node *succ_p;                                       \
-                struct N##_node *succ_c = MAP_LEAF;                            \
+                struct N##_node *succ_c = SGC_MAP_LEAF;                        \
                 if(!n->_left || !n->_right)                                    \
                 {                                                              \
                         succ = n;                                              \
@@ -964,10 +932,10 @@ static size_t sgc_log_two(size_t size)
                 }                                                              \
                 if(succ != n)                                                  \
                 {                                                              \
-                        N##_element_copy(&n->_value, &succ->_value);           \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        V##_copy(&n->_value, &succ->_value);                   \
+                        if(!m->_shared)                                        \
                         {                                                      \
-                                N##_element_free(&succ->_value);               \
+                                V##_free(&succ->_value);                       \
                         }                                                      \
                         /* relinking nodes would be better */                  \
                 }                                                              \
@@ -1026,9 +994,9 @@ static size_t sgc_log_two(size_t size)
                 int ret = (n) ? 1 : 0;                                         \
                 if(ret)                                                        \
                 {                                                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!m->_shared)                                        \
                         {                                                      \
-                                N##_element_free(&n->_value);                  \
+                                V##_free(&n->_value);                          \
                         }                                                      \
                         free(N##_erase_node(m, n));                            \
                 }                                                              \
@@ -1042,9 +1010,9 @@ static size_t sgc_log_two(size_t size)
                 int ret = i->_is_valid;                                        \
                 if(ret)                                                        \
                 {                                                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!m->_shared)                                        \
                         {                                                      \
-                                N##_element_free(&i->_curr->_value);           \
+                                V##_free(&i->_curr->_value);                   \
                         }                                                      \
                         free(N##_erase_node(m, i->_curr));                     \
                 }                                                              \
