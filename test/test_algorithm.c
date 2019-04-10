@@ -36,11 +36,8 @@ SGC_INIT_UNORDERED_MAP(int, int, __unused_mat);
 
 #define TEST_ELEMENTS_NUM 50
 
-SGC_INIT_VECTOR(int, vector);
+SGC_INIT(VECTOR, int, vector, ITERATE, FIND, FIND_ITERATOR);
 SGC_INIT_DEQUE(int, deque);
-SGC_INIT_ITERATE(vector);
-SGC_INIT_FIND(vector);
-SGC_INIT_FIND_ITERATOR(vector);
 
 void fold_sum(const int *const el, void *acc)
 {
@@ -250,8 +247,7 @@ void test_sort(void)
         vector_free(&v);
 }
 
-SGC_INIT_MAP(int, int, map);
-SGC_INIT_ITERATE(map);
+SGC_INIT_PAIR(MAP, int, int, map, ITERATE, ITERATE_PAIR);
 
 void test_fold_map(void)
 {
@@ -282,8 +278,6 @@ void test_fold_map(void)
 
         map_free(&m);
 }
-
-SGC_INIT_ITERATE_PAIR(map);
 
 void fold_pair(const int *const k, const int *const v, void *arg)
 {
@@ -420,73 +414,6 @@ void test_for_each_pair(void)
         map_free(&m);
 }
 
-SGC_INIT_SET(int, set);
-
-void test_lc1(void)
-{
-        vector v;
-        vector_init(&v);
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                vector_push_back(&v, i);
-        }
-
-        SGC_LC(deque, d, vector, v, x, x + 2, 1);
-        SGC_LC(vector, v2, deque, d, x, x * 3);
-        SGC_LC(set, s, vector, v2);
-
-        for(size_t i = 0; i < deque_size(&d); ++i)
-        {
-                TEST_ASSERT_EQUAL_INT(*deque_at(&d, i) - 2, *vector_at(&v, i));
-        }
-
-        vector_free(&v);
-        vector_free(&v2);
-        set_free(&s);
-        deque_free(&d);
-}
-
-void test_lc2(void)
-{
-        vector v;
-        vector_init(&v);
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                vector_push_back(&v, i);
-        }
-
-        vector_push_back(&v, 1);
-        SGC_LC(set, s, vector, v, i, i, vector_count(&v, i) == 1);
-
-        TEST_ASSERT_EQUAL_INT(set_size(&s), vector_size(&v) - 2);
-
-        vector_free(&v);
-        set_free(&s);
-}
-
-SGC_INIT_STRING(string);
-SGC_INIT_LIST(string, sset);
-SGC_INIT_ITERATE(sset);
-SGC_INIT_FIND(sset);
-
-void test_split(void)
-{
-        string str = string_create("just some random strings :D :D :D");
-        SGC_SPLIT(sset, s, string, str, " ");
-
-        TEST_ASSERT_EQUAL_INT(sset_size(&s), 7);
-        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) "just"), 1);
-        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) "some"), 1);
-        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) "random"), 1);
-        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) "strings"), 1);
-        TEST_ASSERT_EQUAL_INT(sset_count(&s, (string) ":D"), 3);
-
-        sset_free(&s);
-        string_free(&str);
-}
-
 int main(void)
 {
         UNITY_BEGIN();
@@ -501,9 +428,6 @@ int main(void)
         RUN_TEST(test_execute_map_pair);
         RUN_TEST(test_for_each);
         RUN_TEST(test_for_each_pair);
-        RUN_TEST(test_lc1);
-        RUN_TEST(test_lc2);
-        RUN_TEST(test_split);
 
         return UNITY_END();
 }

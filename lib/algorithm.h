@@ -16,21 +16,21 @@
 
 #define SGC_INIT5(C, T, N, A1, A2)                                             \
         SGC_INIT_##C(T, N);                                                    \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);
+        SGC_INIT_##A1(T, N);                                                   \
+        SGC_INIT_##A2(T, N);
 
 #define SGC_INIT6(C, T, N, A1, A2, A3)                                         \
         SGC_INIT_##C(T, N);                                                    \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);
+        SGC_INIT_##A1(T, N);                                                   \
+        SGC_INIT_##A2(T, N);                                                   \
+        SGC_INIT_##A3(T, N);
 
 #define SGC_INIT7(C, T, N, A1, A2, A3, A4)                                     \
         SGC_INIT_##C(T, N);                                                    \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);                                                      \
-        SGC_INIT_##A4(N);
+        SGC_INIT_##A1(T, N);                                                   \
+        SGC_INIT_##A2(T, N);                                                   \
+        SGC_INIT_##A3(T, N);                                                   \
+        SGC_INIT_##A4(T, N);
 
 #define SGC_INIT_STATIC_N(_1, _2, _3, _4, _5, _6, _7, _8, NAME, ...) NAME
 #define SGC_INIT_STATIC(...)                                                   \
@@ -43,25 +43,25 @@
 
 #define SGC_INIT_STATIC5(C, T, S, N, A1)                                       \
         SGC_INIT_STATIC_##C(T, S, N);                                          \
-        SGC_INIT_##A1(N);
+        SGC_INIT_##A1(T, N);
 
 #define SGC_INIT_STATIC6(C, T, S, N, A1, A2)                                   \
         SGC_INIT_STATIC_##C(T, S, N);                                          \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);
+        SGC_INIT_##A1(T, N);                                                   \
+        SGC_INIT_##A2(T, N);
 
 #define SGC_INIT_STATIC7(C, T, S, N, A1, A2, A3)                               \
         SGC_INIT_STATIC_##C(T, S, N);                                          \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);
+        SGC_INIT_##A1(T, N);                                                   \
+        SGC_INIT_##A2(T, N);                                                   \
+        SGC_INIT_##A3(T, N);
 
 #define SGC_INIT_STATIC8(C, T, S, N, A1, A2, A3, A4)                           \
         SGC_INIT_STATIC_##C(T, S, N);                                          \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);                                                      \
-        SGC_INIT_##A4(N);
+        SGC_INIT_##A1(T, N);                                                   \
+        SGC_INIT_##A2(T, N);                                                   \
+        SGC_INIT_##A3(T, N);                                                   \
+        SGC_INIT_##A4(T, N);
 
 #define SGC_INIT_PAIR_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, NAME, ...) NAME
 #define SGC_INIT_PAIR(...)                                                     \
@@ -74,35 +74,36 @@
 
 #define SGC_INIT_PAIR5(C, K, V, N, A1)                                         \
         SGC_INIT_##C(K, V, N);                                                 \
-        SGC_INIT_##A1(N);
+        SGC_INIT_##A1(V, N);
 
 #define SGC_INIT_PAIR6(C, K, V, N, A1, A2)                                     \
         SGC_INIT_##C(K, V, N);                                                 \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);
+        SGC_INIT_##A1(V, N);                                                   \
+        SGC_INIT_##A2(V, N);
 
 #define SGC_INIT_PAIR7(C, K, V, N, A1, A2, A3)                                 \
         SGC_INIT_##C(K, V, N);                                                 \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);
+        SGC_INIT_##A1(V, N);                                                   \
+        SGC_INIT_##A2(V, N);                                                   \
+        SGC_INIT_##A3(V, N);
 
 #define SGC_INIT_PAIR8(C, K, V, N, A1, A2, A3, A4)                             \
         SGC_INIT_##C(K, V, N);                                                 \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);                                                      \
-        SGC_INIT_##A4(N);
+        SGC_INIT_##A1(V, N);                                                   \
+        SGC_INIT_##A2(V, N);                                                   \
+        SGC_INIT_##A3(V, N);                                                   \
+        SGC_INIT_##A4(V, N);
 
 #define SGC_INIT_PAIR9(C, K, V, N, A1, A2, A3, A4, A5)                         \
         SGC_INIT_##C(K, V, N);                                                 \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);                                                      \
-        SGC_INIT_##A4(N);                                                      \
-        SGC_INIT_##A5(N);
+        SGC_INIT_##A1(V, N);                                                   \
+        SGC_INIT_##A2(V, N);                                                   \
+        SGC_INIT_##A3(V, N);                                                   \
+        SGC_INIT_##A4(V, N);                                                   \
+        SGC_INIT_##A5(V, N);
 
-#define SGC_INIT_STATIC_PAIR_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...)  \
+#define SGC_INIT_STATIC_PAIR_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME,  \
+                               ...)                                            \
         NAME
 #define SGC_INIT_STATIC_PAIR(...)                                              \
         SGC_INIT_STATIC_PAIR_N(__VA_ARGS__, SGC_INIT_STATIC_PAIR10,            \
@@ -115,35 +116,35 @@
 
 #define SGC_INIT_STATIC_PAIR6(C, K, V, S, N, A1)                               \
         SGC_INIT_STATIC_##C(K, V, S, N);                                       \
-        SGC_INIT_##A1(N);
+        SGC_INIT_##A1(V, N);
 
 #define SGC_INIT_STATIC_PAIR7(C, K, V, S, N, A1, A2)                           \
         SGC_INIT_STATIC_##C(K, V, S, N);                                       \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);
+        SGC_INIT_##A1(V, N);                                                   \
+        SGC_INIT_##A2(V, N);
 
 #define SGC_INIT_STATIC_PAIR8(C, K, V, S, N, A1, A2, A3)                       \
         SGC_INIT_STATIC_##C(K, V, S, N);                                       \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);
+        SGC_INIT_##A1(V, N);                                                   \
+        SGC_INIT_##A2(V, N);                                                   \
+        SGC_INIT_##A3(V, N);
 
 #define SGC_INIT_STATIC_PAIR9(C, K, V, S, N, A1, A2, A3, A4)                   \
         SGC_INIT_STATIC_##C(K, V, S, N);                                       \
-        \ SGC_INIT_##A1(N);                                                    \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);                                                      \
-        SGC_INIT_##A4(N);
+        \ SGC_INIT_##A1(V, N);                                                 \
+        SGC_INIT_##A2(V, N);                                                   \
+        SGC_INIT_##A3(V, N);                                                   \
+        SGC_INIT_##A4(V, N);
 
 #define SGC_INIT_STATIC_PAIR10(C, K, V, S, N, A1, A2, A3, A4, A5)              \
         SGC_INIT_STATIC_##C(K, V, S, N);                                       \
-        SGC_INIT_##A1(N);                                                      \
-        SGC_INIT_##A2(N);                                                      \
-        SGC_INIT_##A3(N);                                                      \
-        SGC_INIT_##A4(N);                                                      \
-        SGC_INIT_##A5(N);
+        SGC_INIT_##A1(V, N);                                                   \
+        SGC_INIT_##A2(V, N);                                                   \
+        SGC_INIT_##A3(V, N);                                                   \
+        SGC_INIT_##A4(V, N);                                                   \
+        SGC_INIT_##A5(V, N);
 
-#define SGC_INIT_ITERATE(N)                                                    \
+#define SGC_INIT_ITERATE(T, N)                                                 \
         void N##_fold_range(                                                   \
             struct N##_iterator begin, struct N##_iterator end,                \
             void (*fun)(const N##_type *const, void *), void *argout)          \
@@ -328,7 +329,7 @@
                                           buff);                               \
         }
 
-#define SGC_INIT_FIND(N)                                                       \
+#define SGC_INIT_FIND(T, N)                                                    \
         N##_type *N##_find_el_range(struct N##_iterator begin,                 \
                                     struct N##_iterator end,                   \
                                     const N##_type el)                         \
@@ -336,14 +337,14 @@
                 N##_type *ret = NULL;                                          \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
-                        if(N##_element_equal(&el, N##_iterator_value(begin)))  \
+                        if(T##_equal(&el, N##_iterator_value(begin)))  \
                         {                                                      \
                                 ret = N##_iterator_value(begin);               \
                         }                                                      \
                         while(!ret && !N##_iterator_equal(begin, end))         \
                         {                                                      \
                                 N##_iterator_next(&begin);                     \
-                                if(N##_element_equal(                          \
+                                if(T##_equal(                          \
                                        &el, N##_iterator_value(begin)))        \
                                 {                                              \
                                         ret = N##_iterator_value(begin);       \
@@ -364,13 +365,13 @@
                 int found = 0;                                                 \
                 struct N##_iterator begin = N##_cbegin(c);                     \
                 struct N##_iterator end = N##_cend(c);                         \
-                if(!N##_element_equal(&el, N##_iterator_value(begin)))         \
+                if(!T##_equal(&el, N##_iterator_value(begin)))         \
                 {                                                              \
                         while(!N##_iterator_equal(begin, end))                 \
                         {                                                      \
                                 ++ret;                                         \
                                 N##_iterator_next(&begin);                     \
-                                if(N##_element_equal(                          \
+                                if(T##_equal(                          \
                                        &el, N##_iterator_value(begin)))        \
                                 {                                              \
                                         found = 1;                             \
@@ -378,7 +379,7 @@
                                 }                                              \
                         }                                                      \
                 }                                                              \
-                if(!N##_element_equal(&el, N##_iterator_value(begin)))         \
+                if(!T##_equal(&el, N##_iterator_value(begin)))         \
                 {                                                              \
                         ++ret;                                                 \
                         found = 1;                                             \
@@ -394,14 +395,14 @@
                 struct N##_iterator end = N##_cend(c);                         \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
-                        if(N##_element_equal(&el, N##_iterator_value(begin)))  \
+                        if(T##_equal(&el, N##_iterator_value(begin)))  \
                         {                                                      \
                                 ++ret;                                         \
                         }                                                      \
                         while(!N##_iterator_equal(begin, end))                 \
                         {                                                      \
                                 N##_iterator_next(&begin);                     \
-                                if(N##_element_equal(                          \
+                                if(T##_equal(                          \
                                        &el, N##_iterator_value(begin)))        \
                                 {                                              \
                                         ++ret;                                 \
@@ -411,7 +412,7 @@
                 return ret;                                                    \
         }
 
-#define SGC_INIT_FIND_ITERATOR(N)                                              \
+#define SGC_INIT_FIND_ITERATOR(T, N)                                           \
         struct N##_iterator N##_find_range(struct N##_iterator begin,          \
                                            struct N##_iterator end,            \
                                            const N##_type el)                  \
@@ -420,7 +421,7 @@
                 int done = 0;                                                  \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
-                        if(N##_element_equal(&el, N##_iterator_value(begin)))  \
+                        if(T##_equal(&el, N##_iterator_value(begin)))  \
                         {                                                      \
                                 ret = begin;                                   \
                                 done = 1;                                      \
@@ -428,7 +429,7 @@
                         while(!done && !N##_iterator_equal(begin, end))        \
                         {                                                      \
                                 N##_iterator_next(&begin);                     \
-                                if(N##_element_equal(                          \
+                                if(T##_equal(                          \
                                        &el, N##_iterator_value(begin)))        \
                                 {                                              \
                                         ret = begin;                           \
@@ -457,7 +458,7 @@
                         {                                                      \
                                 m = l + (r - l) / 2;                           \
                                 N##_type *curr = N##_at(c, m);                 \
-                                if(N##_element_equal(curr, &el))               \
+                                if(T##_equal(curr, &el))               \
                                 {                                              \
                                         ret = N##_at(c, m);                    \
                                         break;                                 \
@@ -488,7 +489,7 @@
                         {                                                      \
                                 m = l + (r - l) / 2;                           \
                                 N##_type *curr = N##_at(c, m);                 \
-                                if(N##_element_equal(curr, &el))               \
+                                if(T##_equal(curr, &el))               \
                                 {                                              \
                                         ret = m;                               \
                                         break;                                 \
@@ -507,7 +508,7 @@
                 return ret;                                                    \
         }
 
-#define SGC_INIT_ITERATE_PAIR(N)                                               \
+#define SGC_INIT_ITERATE_PAIR(T, N)                                            \
         void N##_fold_range_pair(                                              \
             struct N##_iterator begin, struct N##_iterator end,                \
             void (*fun)(const N##_key *const, const N##_value *const, void *), \
@@ -905,92 +906,6 @@
                         {                                                      \
                                 ACT;                                           \
                         } while(0);                                            \
-                }                                                              \
-        } while(0);
-
-#define SGC_LC7(OUT_C, OUT, IN_C, IN, V, ACT, COND)                            \
-        struct OUT_C OUT;                                                      \
-        do                                                                     \
-        {                                                                      \
-                OUT_C##_init(&OUT);                                            \
-                IN_C##_value V;                                                \
-                struct IN_C##_iterator begin = IN_C##_cbegin(&IN);             \
-                struct IN_C##_iterator end = IN_C##_cend(&IN);                 \
-                if(!IN_C##_iterator_equal(begin, end))                         \
-                {                                                              \
-                        V = *IN_C##_iterator_value(begin);                     \
-                        if(COND)                                               \
-                        {                                                      \
-                                OUT_C##_default_insert(&OUT, ACT);             \
-                        }                                                      \
-                }                                                              \
-                while(!IN_C##_iterator_equal(begin, end))                      \
-                {                                                              \
-                        IN_C##_iterator_next(&begin);                          \
-                        V = *IN_C##_iterator_value(begin);                     \
-                        if(COND)                                               \
-                        {                                                      \
-                                OUT_C##_default_insert(&OUT, ACT);             \
-                        }                                                      \
-                }                                                              \
-        } while(0);
-
-#define SGC_LC6(OUT_C, OUT, IN_C, IN, V, ACT)                                  \
-        struct OUT_C OUT;                                                      \
-        do                                                                     \
-        {                                                                      \
-                OUT_C##_init(&OUT);                                            \
-                IN_C##_value V;                                                \
-                struct IN_C##_iterator begin = IN_C##_cbegin(&IN);             \
-                struct IN_C##_iterator end = IN_C##_cend(&IN);                 \
-                if(!IN_C##_iterator_equal(begin, end))                         \
-                {                                                              \
-                        V = *IN_C##_iterator_value(begin);                     \
-                        OUT_C##_default_insert(&OUT, ACT);                     \
-                }                                                              \
-                while(!IN_C##_iterator_equal(begin, end))                      \
-                {                                                              \
-                        IN_C##_iterator_next(&begin);                          \
-                        V = *IN_C##_iterator_value(begin);                     \
-                        OUT_C##_default_insert(&OUT, ACT);                     \
-                }                                                              \
-        } while(0);
-
-#define SGC_LC4(OUT_C, OUT, IN_C, IN)                                          \
-        struct OUT_C OUT;                                                      \
-        do                                                                     \
-        {                                                                      \
-                OUT_C##_init(&OUT);                                            \
-                struct IN_C##_iterator begin = IN_C##_cbegin(&IN);             \
-                struct IN_C##_iterator end = IN_C##_cend(&IN);                 \
-                if(!IN_C##_iterator_equal(begin, end))                         \
-                {                                                              \
-                        OUT_C##_default_insert(&OUT,                           \
-                                               *IN_C##_iterator_value(begin)); \
-                }                                                              \
-                while(!IN_C##_iterator_equal(begin, end))                      \
-                {                                                              \
-                        IN_C##_iterator_next(&begin);                          \
-                        OUT_C##_default_insert(&OUT,                           \
-                                               *IN_C##_iterator_value(begin)); \
-                }                                                              \
-        } while(0);
-
-#define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
-#define SGC_LC(...)                                                            \
-        GET_MACRO(__VA_ARGS__, SGC_LC7, SGC_LC6, NONE, SGC_LC4)                \
-        (__VA_ARGS__)
-
-#define SGC_SPLIT(OUT_C, OUT, STR, S, DEL)                                     \
-        OUT_C OUT;                                                             \
-        do                                                                     \
-        {                                                                      \
-                OUT_C##_init(&OUT);                                            \
-                STR __sgc_str_tmp = strtok(S, DEL);                            \
-                while(__sgc_str_tmp)                                           \
-                {                                                              \
-                        OUT_C##_default_insert(&OUT, __sgc_str_tmp);           \
-                        __sgc_str_tmp = strtok(NULL, DEL);                     \
                 }                                                              \
         } while(0);
 

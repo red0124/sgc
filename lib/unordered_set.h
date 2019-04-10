@@ -50,6 +50,7 @@ static size_t sgc_next_prime(size_t n)
         {                                                                      \
                 size_t _size;                                                  \
                 size_t _max;                                                   \
+                size_t _shared;                                                \
                 struct N##_node **_data;                                       \
         };                                                                     \
                                                                                \
@@ -58,85 +59,27 @@ static size_t sgc_next_prime(size_t n)
         typedef V N##_value;                                                   \
         typedef V N##_key;                                                     \
                                                                                \
-        /* =================== */                                              \
-        /*  ELEMENT FUNCTIONS  */                                              \
-        /* =================== */                                              \
-                                                                               \
-        static void (*N##_element_copy)(V *, const V *const) = V##_copy;       \
-                                                                               \
-        void N##_set_copy(void (*copy)(V *, const V *const))                   \
-        {                                                                      \
-                N##_element_copy = copy;                                       \
-        }                                                                      \
-                                                                               \
-        static void N##_flat_copy(V *dst, const V *const src)                  \
-        {                                                                      \
-                *dst = *src;                                                   \
-        }                                                                      \
-                                                                               \
-        void N##_set_share(int is_shared)                                      \
-        {                                                                      \
-                if(is_shared)                                                  \
-                {                                                              \
-                        N##_set_copy(N##_flat_copy);                           \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        N##_set_copy(V##_copy);                                \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        static int (*N##_element_equal)(const V *const, const V *const) =      \
-            V##_equal;                                                         \
-                                                                               \
-        void N##_set_equal(int (*equal)(const V *const, const V *const))       \
-        {                                                                      \
-                N##_element_equal = equal;                                     \
-        }                                                                      \
-                                                                               \
-        static size_t (*N##_element_hash)(const V *const) = V##_hash;          \
-                                                                               \
-        void N##_set_hash(size_t (*hash)(const V *const))                      \
-        {                                                                      \
-                N##_element_hash = hash;                                       \
-        }                                                                      \
-                                                                               \
-        static void (*N##_element_free)(V *) = V##_free;                       \
-                                                                               \
-        void N##_set_free(void (*free)(V *))                                   \
-        {                                                                      \
-                N##_element_free = free;                                       \
-        }                                                                      \
-                                                                               \
-        void N##_insert(struct N *, V);                                        \
-                                                                               \
-        static void (*N##_default_insert_function)(struct N *, V) =            \
-            N##_insert;                                                        \
-                                                                               \
-        void N##_set_default_insert(void (*insert)(N *, V))                    \
-        {                                                                      \
-                N##_default_insert_function = insert;                          \
-        }                                                                      \
-                                                                               \
-        void N##_default_insert(struct N *d, V el)                             \
-        {                                                                      \
-                N##_default_insert_function(d, el);                            \
-        }                                                                      \
-                                                                               \
         /* ================== */                                               \
         /*  BUCKET FUNCTIONS  */                                               \
         /* ================== */                                               \
                                                                                \
-        struct N##_node *N##_node_new(const V *const value)                    \
+        struct N##_node *N##_node_new(const V *const value, size_t is_shared)  \
         {                                                                      \
                 struct N##_node *new_node =                                    \
                     (struct N##_node *)malloc(sizeof(struct N##_node));        \
-                N##_element_copy(&new_node->_value, value);                    \
+                if(!is_shared)                                                 \
+                {                                                              \
+                        V##_copy(&new_node->_value, value);                    \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        new_node->_value = *value;                             \
+                }                                                              \
                 new_node->_next = NULL;                                        \
                 return new_node;                                               \
         }                                                                      \
                                                                                \
-        static void N##_bucket_free(struct N##_node *bucket)                   \
+        static void N##_bucket_free(struct N##_node *bucket, size_t is_shared) \
         {                                                                      \
                 if(bucket)                                                     \
                 {                                                              \
@@ -146,9 +89,9 @@ static size_t sgc_next_prime(size_t n)
                         {                                                      \
                                 curr = next;                                   \
                                 next = curr->_next;                            \
-                                if(N##_element_copy != N##_flat_copy)          \
+                                if(!is_shared)                                 \
                                 {                                              \
-                                        N##_element_free(&curr->_value);       \
+                                        V##_free(&curr->_value);               \
                                 }                                              \
                                 free(curr);                                    \
                                 curr = NULL;                                   \
@@ -185,23 +128,24 @@ static size_t sgc_next_prime(size_t n)
         }                                                                      \
                                                                                \
         static struct N##_node *N##_bucket_remove(                             \
-            struct N##_node *bucket, const V *const value, size_t *size)       \
+            struct N##_node *bucket, const V *const value, size_t *size,       \
+            size_t is_shared)                                                  \
         {                                                                      \
                 struct N##_node *ret = bucket;                                 \
                 struct N##_node *tmp = bucket;                                 \
                 struct N##_node *prev = bucket;                                \
                 while(tmp)                                                     \
                 {                                                              \
-                        if(N##_element_equal(&tmp->_value, value))             \
+                        if(V##_equal(&tmp->_value, value))                     \
                         {                                                      \
                                 if(tmp == bucket)                              \
                                 {                                              \
                                         ret = tmp->_next;                      \
                                 }                                              \
                                 prev->_next = tmp->_next;                      \
-                                if(N##_element_copy != N##_flat_copy)          \
+                                if(!is_shared)                                 \
                                 {                                              \
-                                        N##_element_free(&tmp->_value);        \
+                                        V##_free(&tmp->_value);                \
                                 }                                              \
                                 free(tmp);                                     \
                                 --*size;                                       \
@@ -468,6 +412,11 @@ static size_t sgc_next_prime(size_t n)
         /*  SET FUNCTIONS  */                                                  \
         /* =============== */                                                  \
                                                                                \
+        void N##_set_share(N *u, int is_shared)                                \
+        {                                                                      \
+                u->_shared = is_shared;                                        \
+        }                                                                      \
+                                                                               \
         size_t N##_size(const struct N *const u)                               \
         {                                                                      \
                 return u->_size;                                               \
@@ -477,6 +426,7 @@ static size_t sgc_next_prime(size_t n)
         {                                                                      \
                 u->_size = u->_max = 0;                                        \
                 u->_data = NULL;                                               \
+                u->_shared = 0;                                                \
         }                                                                      \
                                                                                \
         int N##_equal(const N *const first, const N *const second)             \
@@ -488,9 +438,8 @@ static size_t sgc_next_prime(size_t n)
                         struct N##_iterator it_second = N##_cbegin(second);    \
                         while(N##_iterator_valid(it_first))                    \
                         {                                                      \
-                                if(!N##_element_equal(                         \
-                                       &it_first._curr->_value,                \
-                                       &it_second._curr->_value))              \
+                                if(!V##_equal(&it_first._curr->_value,         \
+                                              &it_second._curr->_value))       \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -515,14 +464,23 @@ static size_t sgc_next_prime(size_t n)
                 dst->_max = src->_max;                                         \
                 dst->_data = (struct N##_node **)malloc(                       \
                     sizeof(struct N##_node *) * dst->_max);                    \
+                dst->_shared = src->_shared;                                   \
                 for(size_t i = 0; i < src->_max; ++i)                          \
                 {                                                              \
                         if(src->_data[i])                                      \
                         {                                                      \
                                 dst->_data[i] = (struct N##_node *)malloc(     \
                                     sizeof(struct N##_node));                  \
-                                N##_element_copy(&dst->_data[i]->_value,       \
+                                if(!src->_shared)                              \
+                                {                                              \
+                                        V##_copy(&dst->_data[i]->_value,       \
                                                  &src->_data[i]->_value);      \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        dst->_data[i]->_value =                \
+                                            src->_data[i]->_value;             \
+                                }                                              \
                                 struct N##_node *curr_src = src->_data[i];     \
                                 struct N##_node *curr_dst = dst->_data[i];     \
                                 struct N##_node *tmp_src = NULL;               \
@@ -536,8 +494,16 @@ static size_t sgc_next_prime(size_t n)
                                         }                                      \
                                         tmp_dst = (struct N##_node *)malloc(   \
                                             sizeof(struct N##_node));          \
-                                        N##_element_copy(&tmp_dst->_value,     \
+                                        if(!src->_shared)                      \
+                                        {                                      \
+                                                V##_copy(&tmp_dst->_value,     \
                                                          &tmp_src->_value);    \
+                                        }                                      \
+                                        else                                   \
+                                        {                                      \
+                                                tmp_dst->_value =              \
+                                                    tmp_src->_value;           \
+                                        }                                      \
                                         curr_dst->_next = tmp_dst;             \
                                         curr_dst = tmp_dst;                    \
                                         curr_src = tmp_src;                    \
@@ -557,7 +523,7 @@ static size_t sgc_next_prime(size_t n)
                 {                                                              \
                         for(size_t i = 0; i < u->_max; ++i)                    \
                         {                                                      \
-                                N##_bucket_free(u->_data[i]);                  \
+                                N##_bucket_free(u->_data[i], u->_shared);      \
                         }                                                      \
                 }                                                              \
                 if(u->_data)                                                   \
@@ -576,7 +542,7 @@ static size_t sgc_next_prime(size_t n)
                         struct N##_node *tmp = u->_data[position];             \
                         while(tmp)                                             \
                         {                                                      \
-                                if(N##_element_equal(&tmp->_value, v))         \
+                                if(V##_equal(&tmp->_value, v))                 \
                                 {                                              \
                                         ret = (struct N##_iterator){           \
                                             u->_data, tmp, position, u->_max,  \
@@ -590,7 +556,7 @@ static size_t sgc_next_prime(size_t n)
                                                                                \
         struct N##_iterator N##_find(struct N *u, const V v)                   \
         {                                                                      \
-                size_t hash = N##_element_hash(&v);                            \
+                size_t hash = V##_hash(&v);                                    \
                 return N##_find_by_hash(u, &v, hash);                          \
         }                                                                      \
                                                                                \
@@ -620,7 +586,7 @@ static size_t sgc_next_prime(size_t n)
                 for(size_t i = 0; i < u->_size; ++i)                           \
                 {                                                              \
                         value = &tmp._curr->_value;                            \
-                        position = N##_element_hash(value) % new_max;          \
+                        position = V##_hash(value) % new_max;                  \
                         next = tmp._curr->_next;                               \
                         tmp._curr->_next = NULL;                               \
                         if(new_data[position])                                 \
@@ -667,7 +633,7 @@ static size_t sgc_next_prime(size_t n)
                         for(size_t i = 0; i < u->_size; ++i)                   \
                         {                                                      \
                                 value = &tmp._curr->_value;                    \
-                                position = N##_element_hash(value) % new_max;  \
+                                position = V##_hash(value) % new_max;          \
                                 next = tmp._curr->_next;                       \
                                 tmp._curr->_next = NULL;                       \
                                 if(new_data[position])                         \
@@ -696,12 +662,13 @@ static size_t sgc_next_prime(size_t n)
                                                                                \
         void N##_insert(struct N *u, const V v)                                \
         {                                                                      \
-                size_t hash = N##_element_hash(&v);                            \
+                size_t hash = V##_hash(&v);                                    \
                 struct N##_iterator i = N##_find_by_hash(u, &v, hash);         \
                 if(!i._curr)                                                   \
                 {                                                              \
                         N##_resize(u);                                         \
-                        struct N##_node *new_node = N##_node_new(&v);          \
+                        struct N##_node *new_node =                            \
+                            N##_node_new(&v, u->_shared);                      \
                         size_t position = hash % u->_max;                      \
                         if(u->_data[position])                                 \
                         {                                                      \
@@ -719,8 +686,8 @@ static size_t sgc_next_prime(size_t n)
         void N##_insert_multiple(struct N *u, const V v)                       \
         {                                                                      \
                 N##_resize(u);                                                 \
-                struct N##_node *new_node = N##_node_new(&v);                  \
-                size_t hash = N##_element_hash(&v);                            \
+                struct N##_node *new_node = N##_node_new(&v, u->_shared);      \
+                size_t hash = V##_hash(&v);                                    \
                 size_t position = hash % u->_max;                              \
                 if(u->_data[position])                                         \
                 {                                                              \
@@ -737,10 +704,10 @@ static size_t sgc_next_prime(size_t n)
         {                                                                      \
                 if(u->_data)                                                   \
                 {                                                              \
-                        size_t hash = N##_element_hash(&v);                    \
+                        size_t hash = V##_hash(&v);                            \
                         size_t position = hash % u->_max;                      \
                         u->_data[position] = N##_bucket_remove(                \
-                            u->_data[position], &v, &u->_size);                \
+                            u->_data[position], &v, &u->_size, u->_shared);    \
                 }                                                              \
         }                                                                      \
                                                                                \

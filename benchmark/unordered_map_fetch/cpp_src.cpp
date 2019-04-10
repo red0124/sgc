@@ -1,14 +1,23 @@
-#include <queue>
+#include <unordered_map>
 #include <fstream>
 
 #define INPUT_FILE "input.txt"
 
 static void meassure(size_t num_of_elements)
 {
-	std::priority_queue<int> d;
+	std::unordered_map<int, int> m;
+
 	for(size_t i = 0; i < num_of_elements; ++i)
 	{
-		d.push(i);
+		m.insert(std::pair<int, int>(i, i));
+	}
+
+	for(size_t i = 0; i < num_of_elements; ++i)
+	{
+		for(size_t j = 0; j < 9; ++j)
+		{
+			++m[i];
+		}
 	}
 }
 

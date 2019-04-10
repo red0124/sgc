@@ -153,13 +153,13 @@ void test_aset(void)
         aset_insert(&v, tmp);
         aset_insert(&v, tmp);
 
-        aset_set_share(1);
+        aset_set_share(&v, 1);
         ++allocation_count;
         int *new_el = (int *)malloc(sizeof(int));
         *new_el = TEST_ELEMENTS_NUM + 2;
         tmp.el = new_el;
         aset_insert(&v, tmp);
-        aset_set_share(0);
+        aset_set_share(&v, 0);
 
         aset_free(&v);
 
@@ -196,9 +196,9 @@ void test_set_set(void)
         set_insert(&tmp, 2);
         // {0, 1, 2}
 
-        vset_set_share(1);
+        vset_set_share(&v, 1);
         vset_insert(&v, tmp);
-        vset_set_share(0);
+        vset_set_share(&v, 0);
         // pushed set into vset, it will use the original
 
         // {{0}, {0, 1}, {0, 1, 2}}

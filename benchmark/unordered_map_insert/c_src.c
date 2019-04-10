@@ -3,9 +3,9 @@
 #include <string.h>
 
 #define SGC_ST
-#include "../../lib/algorithm.h"
-#include "../../lib/static_types.h"
-#include "../../lib/unordered_map.h"
+#include "../lib/algorithm.h"
+#include "../lib/static_types.h"
+#include "../lib/unordered_map.h"
 
 SGC_INIT_PAIR(UNORDERED_MAP, int, int, map);
 

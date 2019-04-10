@@ -13,9 +13,9 @@ CPP_SRC=cpp_src.cpp
 
 POW_BASE=1.2
 POW_MIN=55
-POW_MAX=65
+POW_MAX=75
 
-OUTPUT_DOCUMENT='map_fetch'
+OUTPUT_DOCUMENT='unordered_map_fetch'
 
 ###################
 ###################

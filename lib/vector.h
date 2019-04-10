@@ -6,6 +6,7 @@
         {                                                                      \
                 size_t _size;                                                  \
                 size_t _max;                                                   \
+		size_t _shared;\
                 T *_data;                                                      \
         };                                                                     \
                                                                                \
@@ -14,77 +15,13 @@
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
                                                                                \
-        static size_t 1 = 1;                                       \
-        static double 2 = 2;                                    \
-                                                                               \
-        void N##_set_init_size(size_t init_size)                               \
-        {                                                                      \
-                init_size = (init_size == 0) ? 1 : init_size;                  \
-                1 = init_size;                                     \
-        }                                                                      \
-                                                                               \
-        void N##_set_growth_scale(double growth_scale)                         \
-        {                                                                      \
-                growth_scale = (growth_scale == 0) ? 1 : growth_scale;         \
-                2 = growth_scale;                               \
-        }                                                                      \
-                                                                               \
         /* =================== */                                              \
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
                                                                                \
-        static void (*N##_element_copy)(T *, const T *const) = T##_copy;       \
-                                                                               \
-        void N##_set_copy(void (*copy)(T *, const T *const))                   \
+        void N##_set_share(N* v, int is_shared)                                  \
         {                                                                      \
-                N##_element_copy = copy;                                       \
-        }                                                                      \
-                                                                               \
-        static void N##_flat_copy(T *dst, const T *const src)                  \
-        {                                                                      \
-                *dst = *src;                                                   \
-        }                                                                      \
-                                                                               \
-        void N##_set_share(int is_shared)                                      \
-        {                                                                      \
-                if(is_shared)                                                  \
-                {                                                              \
-                        N##_set_copy(N##_flat_copy);                           \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        N##_set_copy(T##_copy);                                \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        static int (*N##_element_equal)(const T *const, const T *const) =      \
-            T##_equal;                                                         \
-                                                                               \
-        void N##_set_equal(int (*equal)(const T *const, const T *const))       \
-        {                                                                      \
-                N##_element_equal = equal;                                     \
-        }                                                                      \
-                                                                               \
-        static void (*N##_element_free)(T *) = T##_free;                       \
-                                                                               \
-        void N##_set_free(void (*free)(T *))                                   \
-        {                                                                      \
-                N##_element_free = free;                                       \
-        }                                                                      \
-                                                                               \
-        void N##_push_back(struct N *, T);                                     \
-                                                                               \
-        static void (*N##_default_insert_function)(struct N *, T) =            \
-            N##_push_back;                                                     \
-                                                                               \
-        void N##_set_default_insert(void (*insert)(N *, T))                    \
-        {                                                                      \
-                N##_default_insert_function = insert;                          \
-        }                                                                      \
-                                                                               \
-        void N##_default_insert(struct N *d, T el)                             \
-        {                                                                      \
-                N##_default_insert_function(d, el);                            \
+		v->_shared = is_shared;\
         }                                                                      \
                                                                                \
         /* ================== */                                               \
@@ -95,6 +32,7 @@
         {                                                                      \
                 v->_size = v->_max = 0;                                        \
                 v->_data = NULL;                                               \
+		v->_shared = 0;\
         }                                                                      \
                                                                                \
         size_t N##_size(const struct N *v)                                     \
@@ -106,11 +44,11 @@
         {                                                                      \
                 if(v->_data)                                                   \
                 {                                                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!v->_shared)                  \
                         {                                                      \
                                 for(size_t i = 0; i < v->_size; ++i)           \
                                 {                                              \
-                                        N##_element_free(&v->_data[i]);        \
+                                        T##_free(&v->_data[i]);        \
                                 }                                              \
                         }                                                      \
                         free(v->_data);                                        \
@@ -126,7 +64,7 @@
                         equal = 1;                                             \
                         for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
-                                if(!N##_element_equal(&first->_data[i],        \
+                                if(!T##_equal(&first->_data[i],        \
                                                       &second->_data[i]))      \
                                 {                                              \
                                         equal = 0;                             \
@@ -145,7 +83,8 @@
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
                         dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
-                        if(N##_element_copy == N##_flat_copy)                  \
+			dst->_shared = src->_shared;\
+                        if(!dst->_shared)                  \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \
                                        src->_size * sizeof(T));                \
@@ -154,7 +93,7 @@
                         {                                                      \
                                 for(size_t i = 0; i < dst->_size; ++i)         \
                                 {                                              \
-                                        N##_element_copy(&dst->_data[i],       \
+                                        T##_copy(&dst->_data[i],       \
                                                          &src->_data[i]);      \
                                 }                                              \
                         }                                                      \
@@ -168,18 +107,12 @@
                 {                                                              \
                         v->_max = v->_size = size;                             \
                         v->_data = (T *)malloc(sizeof(T) * size);              \
-                        if(N##_element_copy == N##_flat_copy)                  \
-                        {                                                      \
-                                memcpy(v->_data, arr, size * sizeof(T));       \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                for(size_t i = 0; i < v->_size; ++i)           \
-                                {                                              \
-                                        N##_element_copy(&v->_data[i],         \
-                                                         &arr[i]);             \
-                                }                                              \
-                        }                                                      \
+			v->_shared = 0;\
+			for(size_t i = 0; i < v->_size; ++i)           \
+			{                                              \
+				T##_copy(&v->_data[i],         \
+						 &arr[i]);             \
+			}                                              \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -190,11 +123,11 @@
                                                                                \
         void N##_shrink(struct N *v)                                           \
         {                                                                      \
-                if(N##_element_copy != N##_flat_copy)                          \
+                if(!v->_shared)                          \
                 {                                                              \
                         for(size_t i = v->_size; i < v->_max; ++i)             \
                         {                                                      \
-                                N##_element_free(&v->_data[i]);                \
+                                T##_free(&v->_data[i]);                \
                         }                                                      \
                 }                                                              \
                 v->_data = (T *)realloc(v->_data, sizeof(T) * v->_size);       \
@@ -214,7 +147,14 @@
         void N##_push_back(struct N *v, T el)                                  \
         {                                                                      \
                 N##_resize(v);                                                 \
-                N##_element_copy(&v->_data[v->_size], &el);                    \
+		if(!v->_shared)\
+		{\
+                T##_copy(&v->_data[v->_size], &el);                    \
+		}\
+		else\
+		{\
+			v->_data[v->_size] = el;\
+		}\
                 ++v->_size;                                                    \
         }                                                                      \
                                                                                \
@@ -223,9 +163,9 @@
                 if(v->_size)                                                   \
                 {                                                              \
                         T *el = &v->_data[--v->_size];                         \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!v->_shared)                  \
                         {                                                      \
-                                N##_element_free(el);                          \
+                                T##_free(el);                          \
                         }                                                      \
                 }                                                              \
         }                                                                      \
@@ -237,7 +177,14 @@
                         N##_resize(v);                                         \
                         memmove(v->_data + at + 1, v->_data + at,              \
                                 (v->_size - at) * sizeof(T));                  \
-                        N##_element_copy(&v->_data[at], &el);                  \
+			if(!v->_shared)\
+			{\
+                        T##_copy(&v->_data[at], &el);                  \
+			}\
+			else\
+			{\
+				v->_data[at] = el;\
+			}\
                         ++v->_size;                                            \
                 }                                                              \
                 else                                                           \
@@ -261,10 +208,10 @@
                 if(at < v->_size)                                              \
                 {                                                              \
                         T *el = &v->_data[at];                                 \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!v->_shared)                  \
                         {                                                      \
-                                N##_element_free(el);                          \
-                                N##_element_copy(el, &new_el);                 \
+                                T##_free(el);                          \
+                                T##_copy(el, &new_el);                 \
                         }                                                      \
                         else                                                   \
                         {                                                      \
@@ -297,9 +244,9 @@
         {                                                                      \
                 if(at < v->_size)                                              \
                 {                                                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!v->_shared)                  \
                         {                                                      \
-                                N##_element_free(&v->_data[at]);               \
+                                T##_free(&v->_data[at]);               \
                         }                                                      \
                         memmove(v->_data + at, v->_data + at + 1,              \
                                 (v->_size - at) * sizeof(T));                  \

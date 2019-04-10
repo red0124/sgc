@@ -1,23 +1,22 @@
-#include <map>
+#include <unordered_map>
 #include <fstream>
 
 #define INPUT_FILE "input.txt"
 
 static void meassure(size_t num_of_elements)
 {
-	std::map<int, int> m;
+	std::unordered_map<int, int> m;
 
 	for(size_t i = 0; i < num_of_elements; ++i)
 	{
-		// i * 9999 to get some identical hashes
-		m.insert(std::pair<int, int>(i * 9999, i));
+		m.insert(std::pair<int, int>(i, i));
 	}
 
 	for(size_t i = 0; i < num_of_elements; ++i)
 	{
 		for(size_t j = 0; j < 9; ++j)
 		{
-			++m[i * 9999];
+			++m[i];
 		}
 	}
 }

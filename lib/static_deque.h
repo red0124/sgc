@@ -7,6 +7,7 @@
                 size_t _size;                                                  \
                 size_t _back;                                                  \
                 size_t _front;                                                 \
+                size_t _shared;                                                \
                 T _data[S];                                                    \
         };                                                                     \
                                                                                \
@@ -24,63 +25,10 @@
         /*  ELEMENT FUNCTIONS  */                                              \
         /* =================== */                                              \
                                                                                \
-        static void (*N##_element_copy)(T *, const T *const) = T##_copy;       \
-                                                                               \
-        void N##_set_copy(void (*copy)(T *, const T *const))                   \
+        void N##_set_share(N *d, int is_shared)                                \
         {                                                                      \
-                N##_element_copy = copy;                                       \
+                d->_shared = is_shared;                                        \
         }                                                                      \
-                                                                               \
-        static void N##_flat_copy(T *dst, const T *const src)                  \
-        {                                                                      \
-                *dst = *src;                                                   \
-        }                                                                      \
-                                                                               \
-        void N##_set_share(int is_shared)                                      \
-        {                                                                      \
-                if(is_shared)                                                  \
-                {                                                              \
-                        N##_set_copy(N##_flat_copy);                           \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        N##_set_copy(T##_copy);                                \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        static int (*N##_element_equal)(const T *const, const T *const) =      \
-            T##_equal;                                                         \
-                                                                               \
-        void N##_set_equal(int (*equal)(const T *const, const T *const))       \
-        {                                                                      \
-                N##_element_equal = equal;                                     \
-        }                                                                      \
-                                                                               \
-        static void (*N##_element_free)(T *) = T##_free;                       \
-                                                                               \
-        void N##_set_free(void (*free)(T *))                                   \
-        {                                                                      \
-                N##_element_free = free;                                       \
-        }                                                                      \
-                                                                               \
-        void N##_push_back(struct N *, T);                                     \
-                                                                               \
-        static void (*N##_default_insert_function)(struct N *, T) =            \
-            N##_push_back;                                                     \
-                                                                               \
-        void N##_set_default_insert(void (*insert)(N *, T))                    \
-        {                                                                      \
-                N##_default_insert_function = insert;                          \
-        }                                                                      \
-                                                                               \
-        void N##_default_insert(struct N *d, T el)                             \
-        {                                                                      \
-                N##_default_insert_function(d, el);                            \
-        }                                                                      \
-                                                                               \
-        /* ================= */                                                \
-        /*  DEQUE FUNCTIONS  */                                                \
-        /* ================= */                                                \
                                                                                \
         size_t N##_size(const struct N *const d)                               \
         {                                                                      \
@@ -90,6 +38,7 @@
         void N##_init(struct N *d)                                             \
         {                                                                      \
                 d->_size = d->_front = d->_back = 0;                           \
+                d->_shared = 0;                                                \
         }                                                                      \
                                                                                \
         static void N##_move(size_t *flag)                                     \
@@ -120,15 +69,15 @@
         {                                                                      \
                 if(d->_data)                                                   \
                 {                                                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!d->_shared)                                        \
                         {                                                      \
                                 size_t i;                                      \
                                 for(i = d->_front; i != d->_back;)             \
                                 {                                              \
-                                        N##_element_free(&d->_data[i]);        \
+                                        T##_free(&d->_data[i]);                \
                                         N##_move(&i);                          \
                                 }                                              \
-                                N##_element_free(&d->_data[i]);                \
+                                T##_free(&d->_data[i]);                        \
                         }                                                      \
                 }                                                              \
         }                                                                      \
@@ -144,8 +93,8 @@
                         size_t j = second->_front;                             \
                         for(size_t k = 0; k < first->_size; ++k)               \
                         {                                                      \
-                                if(!N##_element_equal(&first->_data[i],        \
-                                                      &second->_data[j]))      \
+                                if(!T##_equal(&first->_data[i],                \
+                                              &second->_data[j]))              \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -162,7 +111,8 @@
         {                                                                      \
                 if(src->_size != 0)                                            \
                 {                                                              \
-                        if(N##_element_copy == N##_flat_copy)                  \
+                        dst->_shared = src->_shared;                           \
+                        if(dst->_shared)                                       \
                         {                                                      \
                                 if(src->_front < src->_back)                   \
                                 {                                              \
@@ -187,8 +137,8 @@
                                 size_t i = src->_front;                        \
                                 for(size_t j = 0; j < src->_size; ++j)         \
                                 {                                              \
-                                        N##_element_copy(&dst->_data[j],       \
-                                                         &src->_data[i]);      \
+                                        T##_copy(&dst->_data[j],               \
+                                                 &src->_data[i]);              \
                                         N##_move(&i);                          \
                                 }                                              \
                         }                                                      \
@@ -208,7 +158,14 @@
                         {                                                      \
                                 --d->_back;                                    \
                         }                                                      \
-                        N##_element_copy(&d->_data[d->_back], &el);            \
+                        if(!d->_shared)                                        \
+                        {                                                      \
+                                T##_copy(&d->_data[d->_back], &el);            \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                d->_data[d->_back] = el;                       \
+                        }                                                      \
                         ++d->_size;                                            \
                 }                                                              \
         }                                                                      \
@@ -220,7 +177,14 @@
                 {                                                              \
                         d->_front = 0;                                         \
                 }                                                              \
-                N##_element_copy(&d->_data[d->_front], &el);                   \
+                if(!d->_shared)                                                \
+                {                                                              \
+                        T##_copy(&d->_data[d->_front], &el);                   \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        d->_data[d->_front] = el;                              \
+                }                                                              \
                 ++d->_size;                                                    \
         }                                                                      \
                                                                                \
@@ -239,10 +203,10 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_front];                          \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!d->_shared)                                        \
                         {                                                      \
-                                N##_element_free(el);                          \
-                                N##_element_copy(el, &new_el);                 \
+                                T##_free(el);                                  \
+                                T##_copy(el, &new_el);                         \
                         }                                                      \
                         else                                                   \
                         {                                                      \
@@ -266,10 +230,10 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_back];                           \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!d->_shared)                                        \
                         {                                                      \
-                                N##_element_free(el);                          \
-                                N##_element_copy(el, &new_el);                 \
+                                T##_free(el);                                  \
+                                T##_copy(el, &new_el);                         \
                         }                                                      \
                         else                                                   \
                         {                                                      \
@@ -283,9 +247,9 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_front];                          \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!d->_shared)                                        \
                         {                                                      \
-                                N##_element_free(el);                          \
+                                T##_free(el);                                  \
                         }                                                      \
                         N##_move(&d->_front);                                  \
                         --d->_size;                                            \
@@ -297,9 +261,9 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_back];                           \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!d->_shared)                                        \
                         {                                                      \
-                                N##_element_free(el);                          \
+                                T##_free(el);                                  \
                         }                                                      \
                         N##_move_back(&d->_back);                              \
                         --d->_size;                                            \
@@ -379,8 +343,15 @@
                                 N##_move_back(&d->_front);                     \
                         }                                                      \
                         ++d->_size;                                            \
-                        N##_element_copy(&d->_data[(at + d->_front) % S],      \
+                        if(!d->_shared)                                        \
+                        {                                                      \
+                                T##_copy(&d->_data[(at + d->_front) % S],      \
                                          &el);                                 \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                d->_data[(at + d->_front) % S] = el;           \
+                        }                                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -388,9 +359,9 @@
         {                                                                      \
                 if(at < d->_size && d->_size > 0)                              \
                 {                                                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!d->_shared)                                        \
                         {                                                      \
-                                N##_element_free(&d->_data[at]);               \
+                                T##_free(&d->_data[at]);                       \
                         }                                                      \
                         size_t _at = (at + d->_front) % S;                     \
                         size_t shift_back = 0;                                 \
@@ -460,10 +431,10 @@
                 if(at < d->_size)                                              \
                 {                                                              \
                         T *el = &d->_data[(d->_front + at) % S];               \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!d->_shared)                                        \
                         {                                                      \
-                                N##_element_free(el);                          \
-                                N##_element_copy(el, &new_el);                 \
+                                T##_free(el);                                  \
+                                T##_copy(el, &new_el);                         \
                         }                                                      \
                         else                                                   \
                         {                                                      \

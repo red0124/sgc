@@ -3,9 +3,9 @@
 #include <string.h>
 
 #define SGC_ST
-#include "../../lib/algorithm.h"
-#include "../../lib/static_types.h"
-#include "../../lib/static_unordered_map.h"
+#include "../lib/algorithm.h"
+#include "../lib/static_types.h"
+#include "../lib/static_unordered_map.h"
 
 #define STATIC_MAX 400000
 SGC_INIT_STATIC_PAIR(UNORDERED_MAP, int, int, STATIC_MAX, map);

@@ -184,10 +184,10 @@ void test_avector(void)
         avector_pop_back(&v);
         avector_erase_at(&v, avector_size(&v) - 1);
 
-        avector_set_share(1);
+        avector_set_share(&v, 1);
         ++allocation_count;
         avector_push_back(&v, (al){(int *)malloc(sizeof(int))});
-        avector_set_share(0);
+        avector_set_share(&v, 0);
 
         avector_free(&v);
 
@@ -223,9 +223,9 @@ void test_vector_vector(void)
         vector_push_back(&tmp, 2);
         // {0, 1, 2}
 
-        vvector_set_share(1);
+        vvector_set_share(&v, 1);
         vvector_push_back(&v, tmp);
-        vvector_set_share(0);
+        vvector_set_share(&v, 0);
         // pushed vector into vvector, it will use the original
 
         // {{0}, {0, 1}, {0, 1, 2}}

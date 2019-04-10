@@ -24,6 +24,8 @@ enum sgc_node_state
         struct N                                                               \
         {                                                                      \
                 size_t _size;                                                  \
+                size_t _shared;                                                \
+                size_t _shared_key;                                            \
                 struct N##_node _data[S];                                      \
         };                                                                     \
                                                                                \
@@ -35,137 +37,6 @@ enum sgc_node_state
         size_t N##_max()                                                       \
         {                                                                      \
                 return S;                                                      \
-        }                                                                      \
-                                                                               \
-        /* =================== */                                              \
-        /*  ELEMENT FUNCTIONS  */                                              \
-        /* =================== */                                              \
-                                                                               \
-        static void (*N##_element_init)(V *) = V##_init;                       \
-                                                                               \
-        void N##_set_init(void (*init)(V *))                                   \
-        {                                                                      \
-                N##_element_init = init;                                       \
-        }                                                                      \
-                                                                               \
-        static void (*N##_element_copy)(V *, const V *const) = V##_copy;       \
-                                                                               \
-        void N##_set_copy(void (*copy)(V *, const V *const))                   \
-        {                                                                      \
-                N##_element_copy = copy;                                       \
-        }                                                                      \
-                                                                               \
-        static void N##_flat_copy(V *dst, const V *const src)                  \
-        {                                                                      \
-                *dst = *src;                                                   \
-        }                                                                      \
-                                                                               \
-        void N##_set_share(int is_shared)                                      \
-        {                                                                      \
-                if(is_shared)                                                  \
-                {                                                              \
-                        N##_set_copy(N##_flat_copy);                           \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        N##_set_copy(V##_copy);                                \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        static void (*N##_element_copy_key)(K *, const K *const) = K##_copy;   \
-                                                                               \
-        void N##_set_copy_key(void (*copy)(K *, const K *const))               \
-        {                                                                      \
-                N##_element_copy_key = copy;                                   \
-        }                                                                      \
-                                                                               \
-        static void N##_flat_copy_key(K *dst, const K *const src)              \
-        {                                                                      \
-                *dst = *src;                                                   \
-        }                                                                      \
-                                                                               \
-        void N##_set_share_key(int is_shared)                                  \
-        {                                                                      \
-                if(is_shared)                                                  \
-                {                                                              \
-                        N##_set_copy_key(N##_flat_copy_key);                   \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        N##_set_copy_key(K##_copy);                            \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        static int (*N##_element_equal)(const V *const, const V *const) =      \
-            V##_equal;                                                         \
-                                                                               \
-        void N##_set_equal(int (*equal)(const V *const, const V *const))       \
-        {                                                                      \
-                N##_element_equal = equal;                                     \
-        }                                                                      \
-                                                                               \
-        static int (*N##_element_equal_key)(const K *const, const K *const) =  \
-            K##_equal;                                                         \
-                                                                               \
-        void N##_set_equal_key(int (*equal)(const K *const, const K *const))   \
-        {                                                                      \
-                N##_element_equal_key = equal;                                 \
-        }                                                                      \
-                                                                               \
-        static size_t (*N##_element_hash)(const K *const) = K##_hash;          \
-                                                                               \
-        void N##_set_hash(size_t (*hash)(const K *const))                      \
-        {                                                                      \
-                N##_element_hash = hash;                                       \
-        }                                                                      \
-                                                                               \
-        static void (*N##_element_free_key)(K *) = K##_free;                   \
-                                                                               \
-        void N##_set_free_key(void (*free)(K *))                               \
-        {                                                                      \
-                N##_element_free_key = free;                                   \
-        }                                                                      \
-                                                                               \
-        static void (*N##_element_free)(V *) = V##_free;                       \
-                                                                               \
-        void N##_set_free(void (*free)(V *))                                   \
-        {                                                                      \
-                N##_element_free = free;                                       \
-        }                                                                      \
-                                                                               \
-        V *N##_at(struct N *, K);                                              \
-                                                                               \
-        static void N##_at_wrap(struct N *m, K k)                              \
-        {                                                                      \
-                N##_at(m, k);                                                  \
-        }                                                                      \
-                                                                               \
-        static void (*N##_default_insert_function)(struct N *, K) =            \
-            N##_at_wrap;                                                       \
-                                                                               \
-        void N##_set_default_insert(void (*insert)(N *, K))                    \
-        {                                                                      \
-                N##_default_insert_function = insert;                          \
-        }                                                                      \
-                                                                               \
-        void N##_default_insert(struct N *d, K k)                              \
-        {                                                                      \
-                N##_default_insert_function(d, k);                             \
-        }                                                                      \
-                                                                               \
-        void N##_set_at(struct N *, K, V);                                     \
-                                                                               \
-        static void (*N##_default_insert_pair_function)(struct N *, K, V) =    \
-            N##_set_at;                                                        \
-                                                                               \
-        void N##_set_default_insert_pair(void (*insert)(N *, K, V))            \
-        {                                                                      \
-                N##_default_insert_pair_function = insert;                     \
-        }                                                                      \
-                                                                               \
-        void N##_default_insert_pair(struct N *d, K k, V v)                    \
-        {                                                                      \
-                N##_default_insert_pair_function(d, k, v);                     \
         }                                                                      \
                                                                                \
         /* ========== */                                                       \
@@ -329,6 +200,16 @@ enum sgc_node_state
         /*  MAP FUNCTIONS  */                                                  \
         /* =============== */                                                  \
                                                                                \
+        void N##_set_share(N *u, int is_shared)                                \
+        {                                                                      \
+                u->_shared = is_shared;                                        \
+        }                                                                      \
+                                                                               \
+        void N##_set_share_key(N *u, int is_shared)                            \
+        {                                                                      \
+                u->_shared_key = is_shared;                                    \
+        }                                                                      \
+                                                                               \
         size_t N##_size(const struct N *const u)                               \
         {                                                                      \
                 return u->_size;                                               \
@@ -337,6 +218,7 @@ enum sgc_node_state
         void N##_init(struct N *u)                                             \
         {                                                                      \
                 u->_size = 0;                                                  \
+                u->_shared = u->_shared_key = 0;                               \
                 for(size_t i = 0; i < S; ++i)                                  \
                 {                                                              \
                         u->_data[i]._state = SGC_NODE_STATE_OPEN;              \
@@ -352,12 +234,10 @@ enum sgc_node_state
                         struct N##_iterator it_second = N##_cbegin(second);    \
                         while(N##_iterator_valid(it_first))                    \
                         {                                                      \
-                                if(!N##_element_equal_key(                     \
-                                       N##_iterator_ckey(it_first),            \
-                                       N##_iterator_ckey(it_second)) ||        \
-                                   !N##_element_equal(                         \
-                                       N##_iterator_cvalue(it_first),          \
-                                       N##_iterator_cvalue(it_second)))        \
+                                if(!K##_equal(N##_iterator_ckey(it_first),     \
+                                              N##_iterator_ckey(it_second)) || \
+                                   !V##_equal(N##_iterator_cvalue(it_first),   \
+                                              N##_iterator_cvalue(it_second))) \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -373,14 +253,33 @@ enum sgc_node_state
         void N##_copy(N *__restrict__ dst, const N *__restrict__ const src)    \
         {                                                                      \
                 dst->_size = src->_size;                                       \
+                dst->_shared = src->_shared;                                   \
+                dst->_shared_key = src->_shared_key;                           \
                 for(size_t i = 0; i < S; ++i)                                  \
                 {                                                              \
                         if(src->_data[i]._state == SGC_NODE_STATE_USED)        \
                         {                                                      \
-                                N##_element_copy_key(&dst->_data[i]._key,      \
-                                                     &src->_data[i]._key);     \
-                                N##_element_copy(&dst->_data[i]._value,        \
+                                if(!src->_shared_key)                          \
+                                {                                              \
+                                        K##_copy(&dst->_data[i]._key,          \
+                                                 &src->_data[i]._key);         \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        dst->_data[i]._key =                   \
+                                            src->_data[i]._key;                \
+                                }                                              \
+                                                                               \
+                                if(!src->_shared)                              \
+                                {                                              \
+                                        V##_copy(&dst->_data[i]._value,        \
                                                  &src->_data[i]._value);       \
+                                }                                              \
+                                else                                           \
+                                {                                              \
+                                        dst->_data[i]._value =                 \
+                                            src->_data[i]._value;              \
+                                }                                              \
                         }                                                      \
                         dst->_data[i]._state = src->_data[i]._state;           \
                 }                                                              \
@@ -394,16 +293,13 @@ enum sgc_node_state
                         {                                                      \
                                 if(u->_data[i]._state == SGC_NODE_STATE_USED)  \
                                 {                                              \
-                                        if(N##_element_copy_key !=             \
-                                           N##_flat_copy_key)                  \
+                                        if(!u->_shared_key)                    \
                                         {                                      \
-                                                N##_element_free_key(          \
-                                                    &u->_data[i]._key);        \
+                                                K##_free(&u->_data[i]._key);   \
                                         }                                      \
-                                        if(N##_element_copy != N##_flat_copy)  \
+                                        if(!u->_shared)                        \
                                         {                                      \
-                                                N##_element_free(              \
-                                                    &u->_data[i]._value);      \
+                                                V##_free(&u->_data[i]._value); \
                                         }                                      \
                                 }                                              \
                         }                                                      \
@@ -422,8 +318,7 @@ enum sgc_node_state
                         {                                                      \
                                 if(u->_data[position]._state ==                \
                                        SGC_NODE_STATE_USED &&                  \
-                                   N##_element_equal_key(                      \
-                                       &u->_data[position]._key, k))           \
+                                   K##_equal(&u->_data[position]._key, k))     \
                                 {                                              \
                                         ret = (struct N##_iterator){           \
                                             position,                          \
@@ -445,21 +340,25 @@ enum sgc_node_state
                                                                                \
         struct N##_iterator N##_find(struct N *u, const K k)                   \
         {                                                                      \
-                size_t hash = N##_element_hash(&k);                            \
+                size_t hash = K##_hash(&k);                                    \
                 return N##_find_by_hash(u, &k, hash);                          \
         }                                                                      \
                                                                                \
         void N##_set_at(struct N *u, const K k, const V v)                     \
         {                                                                      \
-                size_t hash = N##_element_hash(&k);                            \
+                size_t hash = K##_hash(&k);                                    \
                 struct N##_iterator i = N##_find_by_hash(u, &k, hash);         \
                 if(i._is_valid)                                                \
                 {                                                              \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!u->_shared)                                        \
                         {                                                      \
-                                N##_element_free(&i._data[i._curr]._value);    \
+                                V##_free(&i._data[i._curr]._value);            \
+                                V##_copy(&i._data[i._curr]._value, &v);        \
                         }                                                      \
-                        N##_element_copy(&i._data[i._curr]._value, &v);        \
+                        else                                                   \
+                        {                                                      \
+                                i._data[i._curr]._value = v;                   \
+                        }                                                      \
                 }                                                              \
                 else if(u->_size < S - 1)                                      \
                 {                                                              \
@@ -476,8 +375,22 @@ enum sgc_node_state
                                         ++position;                            \
                                 }                                              \
                         }                                                      \
-                        N##_element_copy(&u->_data[position]._value, &v);      \
-                        N##_element_copy_key(&u->_data[position]._key, &k);    \
+                        if(!u->_shared)                                        \
+                        {                                                      \
+                                V##_copy(&u->_data[position]._value, &v);      \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                u->_data[position]._value = v;                 \
+                        }                                                      \
+                        if(!u->_shared_key)                                    \
+                        {                                                      \
+                                K##_copy(&u->_data[position]._key, &k);        \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                u->_data[position]._key = k;                   \
+                        }                                                      \
                         u->_data[position]._state = SGC_NODE_STATE_USED;       \
                         ++u->_size;                                            \
                 }                                                              \
@@ -485,7 +398,7 @@ enum sgc_node_state
                                                                                \
         V *N##_at(struct N *u, const K k)                                      \
         {                                                                      \
-                size_t hash = N##_element_hash(&k);                            \
+                size_t hash = K##_hash(&k);                                    \
                 struct N##_iterator i = N##_find_by_hash(u, &k, hash);         \
                 V *ret = NULL;                                                 \
                 if(i._is_valid)                                                \
@@ -495,7 +408,7 @@ enum sgc_node_state
                 else if(u->_size < S - 1)                                      \
                 {                                                              \
                         V v;                                                   \
-                        N##_element_init(&v);                                  \
+                        V##_init(&v);                                          \
                         size_t position = hash % S;                            \
                         while(u->_data[position]._state ==                     \
                               SGC_NODE_STATE_USED)                             \
@@ -509,8 +422,22 @@ enum sgc_node_state
                                         ++position;                            \
                                 }                                              \
                         }                                                      \
-                        N##_element_copy(&u->_data[position]._value, &v);      \
-                        N##_element_copy_key(&u->_data[position]._key, &k);    \
+                        if(!u->_shared)                                        \
+                        {                                                      \
+                                V##_copy(&u->_data[position]._value, &v);      \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                u->_data[position]._value = v;                 \
+                        }                                                      \
+                        if(!u->_shared_key)                                    \
+                        {                                                      \
+                                K##_copy(&u->_data[position]._key, &k);        \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                u->_data[position]._key = k;                   \
+                        }                                                      \
                         u->_data[position]._state = SGC_NODE_STATE_USED;       \
                         ++u->_size;                                            \
                         ret = &u->_data[position]._value;                      \
@@ -526,13 +453,13 @@ enum sgc_node_state
                         V *value = N##_iterator_value(*i);                     \
                         i->_data[i->_curr]._state = SGC_NODE_STATE_ERASED;     \
                         N##_iterator_next(i);                                  \
-                        if(N##_element_copy_key != N##_flat_copy_key)          \
+                        if(!u->_shared_key)                                    \
                         {                                                      \
-                                N##_element_free_key(key);                     \
+                                K##_free(key);                                 \
                         }                                                      \
-                        if(N##_element_copy != N##_flat_copy)                  \
+                        if(!u->_shared)                                        \
                         {                                                      \
-                                N##_element_free(value);                       \
+                                V##_free(value);                               \
                         }                                                      \
                         --u->_size;                                            \
                 }                                                              \

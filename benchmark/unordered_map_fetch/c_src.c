@@ -5,24 +5,32 @@
 #define SGC_ST
 #include "../lib/algorithm.h"
 #include "../lib/static_types.h"
-#include "../lib/priority_queue.h"
+#include "../lib/unordered_map.h"
 
-SGC_INIT(PRIORITY_QUEUE, int, pqueue);
+SGC_INIT_PAIR(UNORDERED_MAP, int, int, map);
 
 #define INPUT_FILE "input.txt"
 #define BUFF_SIZE 64
 
 static void meassure(size_t num_of_elements)
 {
-	pqueue p;
-	pqueue_init(&p);
+	map m;
+	map_init(&m);
 
 	for(size_t i = 0; i < num_of_elements; ++i)
 	{
-		pqueue_push(&p, i);
+		map_set_at(&m, i, i);
 	}
 
-	pqueue_free(&p);
+	for(size_t i = 0; i < num_of_elements; ++i)
+	{
+		for(size_t j = 0; j < 9; ++j)
+		{
+			++*map_at(&m, i);
+		}
+	}
+
+	map_free(&m);
 }
 
 int main(int argc, char* argv[])
