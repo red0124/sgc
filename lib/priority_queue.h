@@ -32,7 +32,7 @@
         {                                                                      \
                 p->_size = p->_max = 0;                                        \
                 p->_data = NULL;                                               \
-		p->_shared = 0;                                                \
+                p->_shared = 0;                                                \
         }                                                                      \
                                                                                \
         size_t N##_size(const struct N *p)                                     \
@@ -83,7 +83,7 @@
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
                         dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
-			dst->_shared = src->_shared;                           \
+                        dst->_shared = src->_shared;                           \
                         if(src->_shared)                                       \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \

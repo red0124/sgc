@@ -6,7 +6,7 @@
         {                                                                      \
                 size_t _size;                                                  \
                 size_t _max;                                                   \
-		size_t _shared;\
+                size_t _shared;                                                \
                 T *_data;                                                      \
         };                                                                     \
                                                                                \
@@ -15,24 +15,20 @@
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
                                                                                \
-        /* =================== */                                              \
-        /*  ELEMENT FUNCTIONS  */                                              \
-        /* =================== */                                              \
-                                                                               \
-        void N##_set_share(N* v, int is_shared)                                  \
-        {                                                                      \
-		v->_shared = is_shared;\
-        }                                                                      \
-                                                                               \
         /* ================== */                                               \
         /*  VECTOR FUNCTIONS  */                                               \
         /* ================== */                                               \
+                                                                               \
+        void N##_set_share(N *v, int is_shared)                                \
+        {                                                                      \
+                v->_shared = is_shared;                                        \
+        }                                                                      \
                                                                                \
         void N##_init(struct N *v)                                             \
         {                                                                      \
                 v->_size = v->_max = 0;                                        \
                 v->_data = NULL;                                               \
-		v->_shared = 0;\
+                v->_shared = 0;                                                \
         }                                                                      \
                                                                                \
         size_t N##_size(const struct N *v)                                     \
@@ -44,11 +40,11 @@
         {                                                                      \
                 if(v->_data)                                                   \
                 {                                                              \
-                        if(!v->_shared)                  \
+                        if(!v->_shared)                                        \
                         {                                                      \
                                 for(size_t i = 0; i < v->_size; ++i)           \
                                 {                                              \
-                                        T##_free(&v->_data[i]);        \
+                                        T##_free(&v->_data[i]);                \
                                 }                                              \
                         }                                                      \
                         free(v->_data);                                        \
@@ -64,8 +60,8 @@
                         equal = 1;                                             \
                         for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
-                                if(!T##_equal(&first->_data[i],        \
-                                                      &second->_data[i]))      \
+                                if(!T##_equal(&first->_data[i],                \
+                                              &second->_data[i]))              \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -83,8 +79,8 @@
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
                         dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
-			dst->_shared = src->_shared;\
-                        if(!dst->_shared)                  \
+                        dst->_shared = src->_shared;                           \
+                        if(!dst->_shared)                                      \
                         {                                                      \
                                 memcpy(dst->_data, src->_data,                 \
                                        src->_size * sizeof(T));                \
@@ -93,8 +89,8 @@
                         {                                                      \
                                 for(size_t i = 0; i < dst->_size; ++i)         \
                                 {                                              \
-                                        T##_copy(&dst->_data[i],       \
-                                                         &src->_data[i]);      \
+                                        T##_copy(&dst->_data[i],               \
+                                                 &src->_data[i]);              \
                                 }                                              \
                         }                                                      \
                 }                                                              \
@@ -107,12 +103,11 @@
                 {                                                              \
                         v->_max = v->_size = size;                             \
                         v->_data = (T *)malloc(sizeof(T) * size);              \
-			v->_shared = 0;\
-			for(size_t i = 0; i < v->_size; ++i)           \
-			{                                              \
-				T##_copy(&v->_data[i],         \
-						 &arr[i]);             \
-			}                                              \
+                        v->_shared = 0;                                        \
+                        for(size_t i = 0; i < v->_size; ++i)                   \
+                        {                                                      \
+                                T##_copy(&v->_data[i], &arr[i]);               \
+                        }                                                      \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -123,11 +118,11 @@
                                                                                \
         void N##_shrink(struct N *v)                                           \
         {                                                                      \
-                if(!v->_shared)                          \
+                if(!v->_shared)                                                \
                 {                                                              \
                         for(size_t i = v->_size; i < v->_max; ++i)             \
                         {                                                      \
-                                T##_free(&v->_data[i]);                \
+                                T##_free(&v->_data[i]);                        \
                         }                                                      \
                 }                                                              \
                 v->_data = (T *)realloc(v->_data, sizeof(T) * v->_size);       \
@@ -137,8 +132,7 @@
         {                                                                      \
                 if(v->_size == v->_max)                                        \
                 {                                                              \
-                        v->_max = (v->_max == 0) ? 1               \
-                                                 : v->_max * 2; \
+                        v->_max = (v->_max == 0) ? 1 : v->_max * 2;            \
                         v->_data =                                             \
                             (T *)realloc(v->_data, sizeof(T) * v->_max);       \
                 }                                                              \
@@ -147,14 +141,14 @@
         void N##_push_back(struct N *v, T el)                                  \
         {                                                                      \
                 N##_resize(v);                                                 \
-		if(!v->_shared)\
-		{\
-                T##_copy(&v->_data[v->_size], &el);                    \
-		}\
-		else\
-		{\
-			v->_data[v->_size] = el;\
-		}\
+                if(!v->_shared)                                                \
+                {                                                              \
+                        T##_copy(&v->_data[v->_size], &el);                    \
+                }                                                              \
+                else                                                           \
+                {                                                              \
+                        v->_data[v->_size] = el;                               \
+                }                                                              \
                 ++v->_size;                                                    \
         }                                                                      \
                                                                                \
@@ -163,9 +157,9 @@
                 if(v->_size)                                                   \
                 {                                                              \
                         T *el = &v->_data[--v->_size];                         \
-                        if(!v->_shared)                  \
+                        if(!v->_shared)                                        \
                         {                                                      \
-                                T##_free(el);                          \
+                                T##_free(el);                                  \
                         }                                                      \
                 }                                                              \
         }                                                                      \
@@ -177,14 +171,14 @@
                         N##_resize(v);                                         \
                         memmove(v->_data + at + 1, v->_data + at,              \
                                 (v->_size - at) * sizeof(T));                  \
-			if(!v->_shared)\
-			{\
-                        T##_copy(&v->_data[at], &el);                  \
-			}\
-			else\
-			{\
-				v->_data[at] = el;\
-			}\
+                        if(!v->_shared)                                        \
+                        {                                                      \
+                                T##_copy(&v->_data[at], &el);                  \
+                        }                                                      \
+                        else                                                   \
+                        {                                                      \
+                                v->_data[at] = el;                             \
+                        }                                                      \
                         ++v->_size;                                            \
                 }                                                              \
                 else                                                           \
@@ -208,10 +202,10 @@
                 if(at < v->_size)                                              \
                 {                                                              \
                         T *el = &v->_data[at];                                 \
-                        if(!v->_shared)                  \
+                        if(!v->_shared)                                        \
                         {                                                      \
-                                T##_free(el);                          \
-                                T##_copy(el, &new_el);                 \
+                                T##_free(el);                                  \
+                                T##_copy(el, &new_el);                         \
                         }                                                      \
                         else                                                   \
                         {                                                      \
@@ -244,9 +238,9 @@
         {                                                                      \
                 if(at < v->_size)                                              \
                 {                                                              \
-                        if(!v->_shared)                  \
+                        if(!v->_shared)                                        \
                         {                                                      \
-                                T##_free(&v->_data[at]);               \
+                                T##_free(&v->_data[at]);                       \
                         }                                                      \
                         memmove(v->_data + at, v->_data + at + 1,              \
                                 (v->_size - at) * sizeof(T));                  \

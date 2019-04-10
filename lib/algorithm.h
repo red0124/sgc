@@ -337,15 +337,14 @@
                 N##_type *ret = NULL;                                          \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
-                        if(T##_equal(&el, N##_iterator_value(begin)))  \
+                        if(T##_equal(&el, N##_iterator_value(begin)))          \
                         {                                                      \
                                 ret = N##_iterator_value(begin);               \
                         }                                                      \
                         while(!ret && !N##_iterator_equal(begin, end))         \
                         {                                                      \
                                 N##_iterator_next(&begin);                     \
-                                if(T##_equal(                          \
-                                       &el, N##_iterator_value(begin)))        \
+                                if(T##_equal(&el, N##_iterator_value(begin)))  \
                                 {                                              \
                                         ret = N##_iterator_value(begin);       \
                                 }                                              \
@@ -365,21 +364,20 @@
                 int found = 0;                                                 \
                 struct N##_iterator begin = N##_cbegin(c);                     \
                 struct N##_iterator end = N##_cend(c);                         \
-                if(!T##_equal(&el, N##_iterator_value(begin)))         \
+                if(!T##_equal(&el, N##_iterator_value(begin)))                 \
                 {                                                              \
                         while(!N##_iterator_equal(begin, end))                 \
                         {                                                      \
                                 ++ret;                                         \
                                 N##_iterator_next(&begin);                     \
-                                if(T##_equal(                          \
-                                       &el, N##_iterator_value(begin)))        \
+                                if(T##_equal(&el, N##_iterator_value(begin)))  \
                                 {                                              \
                                         found = 1;                             \
                                         break;                                 \
                                 }                                              \
                         }                                                      \
                 }                                                              \
-                if(!T##_equal(&el, N##_iterator_value(begin)))         \
+                if(!T##_equal(&el, N##_iterator_value(begin)))                 \
                 {                                                              \
                         ++ret;                                                 \
                         found = 1;                                             \
@@ -395,15 +393,14 @@
                 struct N##_iterator end = N##_cend(c);                         \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
-                        if(T##_equal(&el, N##_iterator_value(begin)))  \
+                        if(T##_equal(&el, N##_iterator_value(begin)))          \
                         {                                                      \
                                 ++ret;                                         \
                         }                                                      \
                         while(!N##_iterator_equal(begin, end))                 \
                         {                                                      \
                                 N##_iterator_next(&begin);                     \
-                                if(T##_equal(                          \
-                                       &el, N##_iterator_value(begin)))        \
+                                if(T##_equal(&el, N##_iterator_value(begin)))  \
                                 {                                              \
                                         ++ret;                                 \
                                 }                                              \
@@ -421,7 +418,7 @@
                 int done = 0;                                                  \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
-                        if(T##_equal(&el, N##_iterator_value(begin)))  \
+                        if(T##_equal(&el, N##_iterator_value(begin)))          \
                         {                                                      \
                                 ret = begin;                                   \
                                 done = 1;                                      \
@@ -429,8 +426,7 @@
                         while(!done && !N##_iterator_equal(begin, end))        \
                         {                                                      \
                                 N##_iterator_next(&begin);                     \
-                                if(T##_equal(                          \
-                                       &el, N##_iterator_value(begin)))        \
+                                if(T##_equal(&el, N##_iterator_value(begin)))  \
                                 {                                              \
                                         ret = begin;                           \
                                         done = 1;                              \
@@ -458,7 +454,7 @@
                         {                                                      \
                                 m = l + (r - l) / 2;                           \
                                 N##_type *curr = N##_at(c, m);                 \
-                                if(T##_equal(curr, &el))               \
+                                if(T##_equal(curr, &el))                       \
                                 {                                              \
                                         ret = N##_at(c, m);                    \
                                         break;                                 \
@@ -489,7 +485,7 @@
                         {                                                      \
                                 m = l + (r - l) / 2;                           \
                                 N##_type *curr = N##_at(c, m);                 \
-                                if(T##_equal(curr, &el))               \
+                                if(T##_equal(curr, &el))                       \
                                 {                                              \
                                         ret = m;                               \
                                         break;                                 \
