@@ -194,7 +194,7 @@
                                                                                \
         T *N##_at(struct N *v, size_t at)                                      \
         {                                                                      \
-                return &v->_data[at];                                          \
+                return v->_data + at;                                          \
         }                                                                      \
                                                                                \
         void N##_set_at(struct N *v, size_t at, T new_el)                      \

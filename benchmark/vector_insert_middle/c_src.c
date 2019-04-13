@@ -3,9 +3,9 @@
 #include <string.h>
 
 #define SGC_ST
-#include "../../lib/algorithm.h"
-#include "../../lib/static_types.h"
-#include "../../lib/vector.h"
+#include "../lib/algorithm.h"
+#include "../lib/static_types.h"
+#include "../lib/vector.h"
 
 SGC_INIT(VECTOR, int, vector);
 

@@ -390,10 +390,17 @@ void test_for_each(void)
                 vector_push_back(&v, i);
         }
 
-        SGC_FOR_EACH(vector, v, i, *i += 1);
+        sgc_for_each(i, v, vector)
+	{
+		*i += 1;
+	}
 
         size_t j = 1;
-        SGC_FOR_EACH(vector, v, i, TEST_ASSERT_EQUAL_INT(*i, j); ++j);
+        sgc_for_each(i, v, vector)
+	{
+		TEST_ASSERT_EQUAL_INT(*i, j); 
+		++j;
+	}
 
         vector_free(&v);
 }
@@ -408,8 +415,15 @@ void test_for_each_pair(void)
                 map_set_at(&m, i, i);
         }
 
-        SGC_FOR_EACH_PAIR(map, m, k, v, (void)k; *v += 1);
-        SGC_FOR_EACH_PAIR(map, m, k, v, TEST_ASSERT_EQUAL_INT(*v, *k + 1));
+        sgc_for_each_pair(i, m, map)
+	{
+		*i.value += 1;
+	}
+
+        sgc_for_each_pair(i, m, map)
+	{
+		TEST_ASSERT_EQUAL_INT(*i.value, *i.key + 1);
+	}
 
         map_free(&m);
 }

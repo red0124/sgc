@@ -12,7 +12,7 @@
 
 #define SGC_INIT4(C, T, N, A1)                                                 \
         SGC_INIT_##C(T, N);                                                    \
-        SGC_INIT_##A1(N);
+        SGC_INIT_##A1(T, N);
 
 #define SGC_INIT5(C, T, N, A1, A2)                                             \
         SGC_INIT_##C(T, N);                                                    \
@@ -131,7 +131,7 @@
 
 #define SGC_INIT_STATIC_PAIR9(C, K, V, S, N, A1, A2, A3, A4)                   \
         SGC_INIT_STATIC_##C(K, V, S, N);                                       \
-        \ SGC_INIT_##A1(V, N);                                                 \
+        SGC_INIT_##A1(V, N);                                                   \
         SGC_INIT_##A2(V, N);                                                   \
         SGC_INIT_##A3(V, N);                                                   \
         SGC_INIT_##A4(V, N);
@@ -842,67 +842,83 @@
 
 #ifndef SGC_HELPERS
 #define SGC_HELPERS
-#define SGC_FOR_EACH(N, C, EL, ACT)                                            \
-        do                                                                     \
-        {                                                                      \
-                N##_type *EL;                                                  \
-                struct N##_iterator __sgc_it_begin = N##_cbegin(&C);           \
-                struct N##_iterator __sgc_it_end = N##_cend(&C);               \
-                if(!N##_iterator_valid(__sgc_it_begin) ||                      \
-                   !N##_iterator_valid(__sgc_it_end))                          \
-                {                                                              \
-                        break;                                                 \
-                }                                                              \
-                if(!N##_iterator_equal(__sgc_it_begin, __sgc_it_end))          \
-                {                                                              \
-                        EL = N##_iterator_value(__sgc_it_begin);               \
-                        do                                                     \
-                        {                                                      \
-                                ACT;                                           \
-                        } while(0);                                            \
-                }                                                              \
-                while(!N##_iterator_equal(__sgc_it_begin, __sgc_it_end))       \
-                {                                                              \
-                        N##_iterator_next(&__sgc_it_begin);                    \
-                        EL = N##_iterator_value(__sgc_it_begin);               \
-                        do                                                     \
-                        {                                                      \
-                                ACT;                                           \
-                        } while(0);                                            \
-                }                                                              \
-        } while(0);
 
-#define SGC_FOR_EACH_PAIR(N, C, K, V, ACT)                                     \
-        do                                                                     \
+#define SGC_TOKENPASTE(x, y) x##y
+#define SGC_TOKENPASTE2(x, y) SGC_TOKENPASTE(x, y)
+#define SGC_UNIQUE(x) SGC_TOKENPASTE2(__sgc_unique_##x, __LINE__)
+
+#define sgc_for_each(EL, C, N)                                                 \
+        int SGC_UNIQUE(valid) = 0;                                             \
+        int SGC_UNIQUE(tmp) = 0;                                               \
+        struct N##_iterator SGC_UNIQUE(curr) = N##_begin(&C);                  \
+        struct N##_iterator SGC_UNIQUE(end) = N##_end(&C);                     \
+        SGC_UNIQUE(valid) = N##_iterator_valid(SGC_UNIQUE(curr)) &&            \
+                            N##_iterator_valid(SGC_UNIQUE(end));               \
+        for(N##_type *EL = N##_iterator_value(SGC_UNIQUE(curr));               \
+            SGC_UNIQUE(valid); SGC_UNIQUE(tmp) = !N##_iterator_equal(          \
+                                   SGC_UNIQUE(curr), SGC_UNIQUE(end)),         \
+                     SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                      \
+                     N##_iterator_next(&SGC_UNIQUE(curr)),                     \
+                     EL = N##_iterator_value(SGC_UNIQUE(curr)))
+
+#define sgc_for_each_reverse(EL, C, N)                                         \
+        int SGC_UNIQUE(valid) = 0;                                             \
+        int SGC_UNIQUE(tmp) = 0;                                               \
+        struct N##_iterator SGC_UNIQUE(curr) = N##_end(&C);                    \
+        struct N##_iterator SGC_UNIQUE(begin) = N##_begin(&C);                 \
+        SGC_UNIQUE(valid) = N##_iterator_valid(SGC_UNIQUE(curr)) &&            \
+                            N##_iterator_valid(SGC_UNIQUE(begin));             \
+        for(N##_type *EL = N##_iterator_value(SGC_UNIQUE(curr));               \
+            SGC_UNIQUE(valid); SGC_UNIQUE(tmp) = !N##_iterator_equal(          \
+                                   SGC_UNIQUE(curr), SGC_UNIQUE(begin)),       \
+                     SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                      \
+                     N##_iterator_prev(&SGC_UNIQUE(curr)),                     \
+                     EL = N##_iterator_value(SGC_UNIQUE(curr)))
+
+#define sgc_for_each_pair(EL, C, N)                                            \
+        int SGC_UNIQUE(valid) = 0;                                             \
+        int SGC_UNIQUE(tmp) = 0;                                               \
+        struct N##_iterator SGC_UNIQUE(curr) = N##_begin(&C);                  \
+        struct N##_iterator SGC_UNIQUE(end) = N##_end(&C);                     \
+        SGC_UNIQUE(valid) = N##_iterator_valid(SGC_UNIQUE(curr)) &&            \
+                            N##_iterator_valid(SGC_UNIQUE(end));               \
+        struct SGC_UNIQUE(pair)                                                \
         {                                                                      \
-                const N##_key *K;                                              \
-                N##_value *V;                                                  \
-                struct N##_iterator __sgc_it_begin = N##_cbegin(&C);           \
-                struct N##_iterator __sgc_it_end = N##_cend(&C);               \
-                if(!N##_iterator_valid(__sgc_it_begin) ||                      \
-                   !N##_iterator_valid(__sgc_it_end))                          \
-                {                                                              \
-                        break;                                                 \
-                }                                                              \
-                if(!N##_iterator_equal(__sgc_it_begin, __sgc_it_end))          \
-                {                                                              \
-                        V = N##_iterator_value(__sgc_it_begin);                \
-                        K = N##_iterator_key(__sgc_it_begin);                  \
-                        do                                                     \
-                        {                                                      \
-                                ACT;                                           \
-                        } while(0);                                            \
-                }                                                              \
-                while(!N##_iterator_equal(__sgc_it_begin, __sgc_it_end))       \
-                {                                                              \
-                        N##_iterator_next(&__sgc_it_begin);                    \
-                        V = N##_iterator_value(__sgc_it_begin);                \
-                        K = N##_iterator_key(__sgc_it_begin);                  \
-                        do                                                     \
-                        {                                                      \
-                                ACT;                                           \
-                        } while(0);                                            \
-                }                                                              \
-        } while(0);
+                const N##_key *key;                                            \
+                N##_value *value;                                              \
+        };                                                                     \
+        for(struct SGC_UNIQUE(pair)                                            \
+                EL = {N##_iterator_ckey(SGC_UNIQUE(curr)),                     \
+                      N##_iterator_value(SGC_UNIQUE(curr))};                   \
+            SGC_UNIQUE(valid); SGC_UNIQUE(tmp) = !N##_iterator_equal(          \
+                                   SGC_UNIQUE(curr), SGC_UNIQUE(end)),         \
+                SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                           \
+                N##_iterator_next(&SGC_UNIQUE(curr)),                          \
+                EL = (struct SGC_UNIQUE(pair)){                                \
+                    N##_iterator_ckey(SGC_UNIQUE(curr)),                       \
+                    N##_iterator_value(SGC_UNIQUE(curr))})
+
+#define sgc_for_each_pair_reverse(EL, C, N)                                    \
+        int SGC_UNIQUE(valid) = 0;                                             \
+        int SGC_UNIQUE(tmp) = 0;                                               \
+        struct N##_iterator SGC_UNIQUE(curr) = N##_end(&C);                    \
+        struct N##_iterator SGC_UNIQUE(begin) = N##_begin(&C);                 \
+        SGC_UNIQUE(valid) = N##_iterator_valid(SGC_UNIQUE(curr)) &&            \
+                            N##_iterator_valid(SGC_UNIQUE(begin));             \
+        struct SGC_UNIQUE(pair)                                                \
+        {                                                                      \
+                const N##_key *key;                                            \
+                N##_value *value;                                              \
+        };                                                                     \
+        for(struct SGC_UNIQUE(pair)                                            \
+                EL = {N##_iterator_ckey(SGC_UNIQUE(curr)),                     \
+                      N##_iterator_value(SGC_UNIQUE(curr))};                   \
+            SGC_UNIQUE(valid); SGC_UNIQUE(tmp) = !N##_iterator_equal(          \
+                                   SGC_UNIQUE(curr), SGC_UNIQUE(begin)),       \
+                SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                           \
+                N##_iterator_prev(&SGC_UNIQUE(curr)),                          \
+                EL = (struct SGC_UNIQUE(pair)){                                \
+                    N##_iterator_ckey(SGC_UNIQUE(curr)),                       \
+                    N##_iterator_value(SGC_UNIQUE(curr))})
 
 #endif

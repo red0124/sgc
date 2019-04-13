@@ -1,6 +1,6 @@
 all:
-	gcc -O3 -flto c_src.c -o c_prog
-	g++ -O3 -flto cpp_src.cpp -o cpp_prog
+	gcc -O0 -flto c_src.c -o c_prog
+	g++ -O0 -flto cpp_src.cpp -o cpp_prog
 
 test:
 	./test.sh

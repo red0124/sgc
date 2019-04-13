@@ -16,6 +16,7 @@ static void meassure(size_t num_of_elements)
 {
 	map m;
 	map_init(&m);
+	map_set_share(&m, 1);
 
 	for(size_t i = 0; i < num_of_elements; ++i)
 	{
