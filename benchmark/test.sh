@@ -11,11 +11,11 @@ CPP_SRC=cpp_src.cpp
 ##  change this  ##
 ###################
 
-POW_BASE=1.2
-POW_MIN=50
-POW_MAX=60
+num_elements=(0.1 1 10 20 30 40 50 60 70 80 90 100)
+factor=9000
+repeat_max=900000
 
-OUTPUT_DOCUMENT='vector_vs_cpp_map_find_for_fun'
+OUTPUT_TXT_FILE='unordered_map_fetch.txt'
 
 ###################
 ###################
@@ -23,37 +23,26 @@ OUTPUT_DOCUMENT='vector_vs_cpp_map_find_for_fun'
 meassure()
 {
 	echo "num of elements = $2" >> $OUTPUT_FILE
+	echo "num of repetitions = $3" >> $OUTPUT_FILE
 	echo $2 > $INPUT_FILE
+	echo $3 >> $INPUT_FILE
 	hyperfine -i -r $NUM_OF_RUNS ./$1 | grep "Time" >> $OUTPUT_FILE
-}
-
-power()
-{
-	let num_of_elements=$2
-	let power=$2
-	let base=$1
-	let num_of_elements=$(($base**$power))
 }
 
 echo '' > $OUTPUT_FILE
 echo 'c' >> $OUTPUT_FILE
 echo '' >> $OUTPUT_FILE
 
-for (( i = $POW_MIN; i < $POW_MAX; i++ )); do
-	power POW_BASE i
-	meassure c_prog $num_of_elements
+for i in ${num_elements[@]}; do
+	meassure c_prog $((i * factor)) $((repeat_max/(i*factor)))
 done
 
 echo '' >> $OUTPUT_FILE
 echo 'cpp' >> $OUTPUT_FILE
 echo '' >> $OUTPUT_FILE
 
-for (( i = $POW_MIN; i < $POW_MAX; i++ )); do
-	power POW_BASE i
-	meassure cpp_prog $num_of_elements
+for i in ${num_elements[@]}; do
+	meassure cpp_prog $((i * factor)) $((repeat_max/(i*factor)))
 done
 
-mkdir -p $OUTPUT_DOCUMENT
-cp $OUTPUT_FILE $OUTPUT_DOCUMENT
-cp $C_SRC $OUTPUT_DOCUMENT
-cp $CPP_SRC $OUTPUT_DOCUMENT
+cp $OUTPUT_FILE $OUTPUT_TXT_FILE
