@@ -14,9 +14,13 @@
 #include "../lib/map.h"
 #include "../lib/list.h"
 #include "../lib/unordered_map.h"
+#include "../lib/static_unordered_map.h"
+
+#define STATIC_MAX 400000
 
 SGC_INIT(VECTOR, int, vector);
 SGC_INIT_PAIR(UNORDERED_MAP, int, int, umap);
+SGC_INIT_STATIC_PAIR(UNORDERED_MAP, int, int, STATIC_MAX, sumap);
 
 /*
    ===========================
@@ -24,12 +28,32 @@ SGC_INIT_PAIR(UNORDERED_MAP, int, int, umap);
    ===========================
 */
 
-#define MEASSURE test_umap_fetch
+#define MEASSURE test_sumap_fetch
 
 /*
    ===========================
    ===========================
 */
+
+void test_sumap_fetch(size_t num_el, size_t num_rep)
+{
+	sumap m;
+	sumap_init(&m);
+
+	for(size_t i = 0; i < num_el; ++i)
+	{
+		sumap_set_at(&m, i * 9999, i);
+	}
+
+	REPEAT(num_rep)
+	for(size_t i = 0; i < num_el; ++i)
+	{
+		++*sumap_at(&m, i * 9999);
+	}
+
+	sumap_free(&m);
+}
+
 
 void test_umap_fetch(size_t num_el, size_t num_rep)
 {
@@ -38,13 +62,13 @@ void test_umap_fetch(size_t num_el, size_t num_rep)
 
 	for(size_t i = 0; i < num_el; ++i)
 	{
-		umap_set_at(&m, i, i);
+		umap_set_at(&m, i * 9999, i);
 	}
 
 	REPEAT(num_rep)
 	for(size_t i = 0; i < num_el; ++i)
 	{
-		++*umap_at(&m, i);
+		++*umap_at(&m, i * 9999);
 	}
 
 	umap_free(&m);

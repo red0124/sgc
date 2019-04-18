@@ -396,13 +396,17 @@ enum sgc_node_state
                 }                                                              \
         }                                                                      \
                                                                                \
-        V *N##_at(struct N *u, const K k)                                      \
+        V *N##_at(struct N *u, K k)                                            \
         {                                                                      \
                 size_t hash = K##_hash(&k);                                    \
                 struct N##_iterator i = N##_find_by_hash(u, &k, hash);         \
                 V *ret = NULL;                                                 \
                 if(i._is_valid)                                                \
                 {                                                              \
+                        if(u->_shared_key)                                     \
+                        {                                                      \
+                                K##_free(&k);                                  \
+                        }                                                      \
                         ret = &i._data[i._curr]._value;                        \
                 }                                                              \
                 else if(u->_size < S - 1)                                      \

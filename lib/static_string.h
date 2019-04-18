@@ -1,21 +1,8 @@
 #pragma once
 
-#ifndef SGC_STRING_BUFF_SIZE
-#define SGC_STRING_BUFF_SIZE 128
-#endif
-
-#define SGC_INIT_STRING_N(_1, _2, NAME, ...) NAME
-#define SGC_INIT_STRING(...)                                                   \
-        SGC_INIT_STRING_N(__VA_ARGS__, SGC_INIT_STRING2, SGC_INIT_STRING1)     \
-        (__VA_ARGS__);
-
-#define SGC_INIT_STRING2(S, N) SGC_INIT_STRING_WITH_BUFFER(N, S);
-#define SGC_INIT_STRING1(N)                                                    \
-        SGC_INIT_STRING_WITH_BUFFER(N, SGC_STRING_BUFF_SIZE);
-
-#define SGC_INIT_STRING_WITH_BUFFER(N, S)                                      \
+#define SGC_INIT_STATIC_STRING(S, N)                                           \
                                                                                \
-        typedef char *N;                                                       \
+        typedef char N[S];                                                     \
         typedef char N##_value;                                                \
         typedef char N##_type;                                                 \
         typedef char N##_key;                                                  \
@@ -25,23 +12,22 @@
                 if(*second)                                                    \
                 {                                                              \
                         size_t size = strlen(*second) + 1;                     \
-                        *first = (N)malloc(sizeof(char) * size);               \
                         memcpy(*first, *second, size);                         \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        *first = NULL;                                         \
+                        *first[0] = '\0';                                      \
                 }                                                              \
         }                                                                      \
                                                                                \
         void N##_init(N *s)                                                    \
         {                                                                      \
-                *s = NULL;                                                     \
+                **s = '\0';                                                  \
         }                                                                      \
                                                                                \
         void N##_free(N *s)                                                    \
         {                                                                      \
-                free(*s);                                                      \
+		(void)s;\
         }                                                                      \
                                                                                \
         int N##_equal(const N *const first, const N *const second)             \
@@ -68,7 +54,7 @@
         size_t N##_hash(const N *const s)                                      \
         {                                                                      \
                 size_t hash = 5381;                                            \
-                N str = *s;                                                    \
+                const char* str = (const char*)*s;                             \
                 int c;                                                         \
                                                                                \
                 while((c = *str++))                                            \
@@ -81,10 +67,12 @@
                                                                                \
         void N##_push_back(N *s, const char c)                                 \
         {                                                                      \
-                size_t len = (*s) ? strlen(*s) : 0;                            \
-                *s = (N)realloc(*s, sizeof(char) * (len + 2));                 \
-                (*s)[len] = c;                                                 \
-                (*s)[len + 1] = '\0';                                          \
+                size_t len = strlen(*s);                            \
+		if(len + 1 < S)\
+		{\
+			(*s)[len] = c;                                                 \
+			(*s)[len + 1] = '\0';                                          \
+		}\
         }                                                                      \
                                                                                \
         void N##_pop_back(N *s)                                                \
@@ -101,28 +89,13 @@
                 if(*second)                                                    \
                 {                                                              \
                         char *const second_p = (char *)second;                 \
-                        N##_copy(first, &second_p);                            \
+                        N##_copy(first, (const N* const)&second_p);            \
                 }                                                              \
         }                                                                      \
                                                                                \
-        N N##_create(const char *const second)                                 \
+        int N##_read(N* s, FILE *f)                                            \
         {                                                                      \
-                N ret = NULL;                                                  \
-                N##_from_cstring(&ret, second);                                \
-                return ret;                                                    \
-        }                                                                      \
-                                                                               \
-        N N##_read(FILE *f)                                                    \
-        {                                                                      \
-                N s = NULL;                                                    \
-                char buff[S] = "\0";                                           \
-                if(fgets(buff, S - 1, f))                                      \
-                {                                                              \
-                        size_t size = strlen(buff);                            \
-                        s = (N)malloc(sizeof(char) * (size + 1));              \
-                        memcpy(s, buff, sizeof(char) * (size + 1));            \
-                }                                                              \
-                return s;                                                      \
+                return fgets(*s, S - 1, f) != NULL;                            \
         }                                                                      \
                                                                                \
         static int N##_char_find(const char *const del, char c)                \
@@ -140,9 +113,8 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        N N##_read_untill(FILE *f, const char *const del)                      \
+        int N##_read_untill(N* s, FILE *f, const char *const del)              \
         {                                                                      \
-                N s = NULL;                                                    \
                 char c;                                                        \
                 size_t size = 0;                                               \
                 char buff[S] = "\0";                                           \
@@ -159,19 +131,17 @@
                 {                                                              \
                         buff[size] = '\0';                                     \
                         size_t size = strlen(buff);                            \
-                        s = (N)malloc(sizeof(char) * (size + 1));              \
                         memcpy(s, buff, sizeof(char) * (size + 1));            \
                 }                                                              \
-                return s;                                                      \
+		return size != 0;\
         }                                                                      \
                                                                                \
-        N N##_read_file(const char *const file_name)                           \
+        int N##_read_file(N* s, const char *const file_name)                   \
         {                                                                      \
-                N s;                                                           \
                 FILE *f = fopen(file_name, "r");                               \
-                s = N##_read_untill(f, "");                                    \
+                int ret = N##_read_untill(s, f, "");                           \
                 fclose(f);                                                     \
-                return s;                                                      \
+		return ret;\
         }                                                                      \
                                                                                \
         struct N##_iterator                                                    \
@@ -206,7 +176,7 @@
                                                                                \
         void N##_iterator_cbegin(const N *const s, struct N##_iterator *i)     \
         {                                                                      \
-                i->_curr = *s;                                                 \
+                i->_curr = (char*)*s;                                        \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_begin(N *s)                                    \
@@ -230,7 +200,7 @@
                                                                                \
         void N##_iterator_cend(const N *const s, struct N##_iterator *i)       \
         {                                                                      \
-                i->_curr = *s + strlen(*s) - 1;                                \
+                i->_curr = (char*)*s + strlen(*s) - 1;                         \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_end(N *s)                                      \
@@ -255,7 +225,7 @@
         void N##_iterator_cfrom(const N *const s, struct N##_iterator *i,      \
                                 size_t at)                                     \
         {                                                                      \
-                i->_curr = *s + at;                                            \
+                i->_curr = (char*)*s + at;                                     \
         }                                                                      \
                                                                                \
         struct N##_iterator N##_from(N *s, size_t at)                          \

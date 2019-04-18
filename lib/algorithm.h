@@ -39,6 +39,8 @@
                           SGC_INIT_STATIC4, SGC_INIT_STATIC3)                  \
         (__VA_ARGS__)
 
+#define SGC_INIT_STATIC3(C, S, N) SGC_INIT_STATIC_##C(S, N);
+
 #define SGC_INIT_STATIC4(C, T, S, N) SGC_INIT_STATIC_##C(T, S, N);
 
 #define SGC_INIT_STATIC5(C, T, S, N, A1)                                       \

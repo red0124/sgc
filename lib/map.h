@@ -805,6 +805,10 @@ static size_t sgc_log_two(size_t size)
                         }                                                      \
                         else                                                   \
                         {                                                      \
+                                if(m->_shared_key)                             \
+                                {                                              \
+                                        K##_free(k);                           \
+                                }                                              \
                                 v = &parent->_value;                           \
                                 break;                                         \
                         }                                                      \

@@ -755,13 +755,17 @@ static size_t sgc_next_prime(size_t n)
                 }                                                              \
         }                                                                      \
                                                                                \
-        V *N##_at(struct N *u, const K k)                                      \
+        V *N##_at(struct N *u, K k)                                            \
         {                                                                      \
                 size_t hash = K##_hash(&k);                                    \
                 struct N##_iterator i = N##_find_by_hash(u, &k, hash);         \
                 V *ret;                                                        \
                 if(i._curr)                                                    \
                 {                                                              \
+                        if(u->_shared_key)                                     \
+                        {                                                      \
+                                K##_free(&k);                                  \
+                        }                                                      \
                         ret = &i._curr->_value;                                \
                 }                                                              \
                 else                                                           \

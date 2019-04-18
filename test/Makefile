@@ -44,6 +44,9 @@ unordered_map:
 priority_queue:
 	$(CC) $(UNITY) test_priority_queue.c -g -o $(NAME) $(CFLAGS)
 
+static_string:
+	$(CC) $(UNITY) test_static_string.c -g -o $(NAME) $(CFLAGS)
+
 static_stack:
 	$(CC) $(UNITY) test_static_stack.c -g -o $(NAME) $(CFLAGS)
 
@@ -100,6 +103,9 @@ all:
 	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_priority_queue.c -g -o $(NAME) $(CFLAGS)
+	$(VAL) ./$(NAME)
+
+	$(CC) $(UNITY) test_static_string.c -g -o $(NAME) $(CFLAGS)
 	$(VAL) ./$(NAME)
 
 	$(CC) $(UNITY) test_static_stack.c -g -o $(NAME) $(CFLAGS)

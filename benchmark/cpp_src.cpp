@@ -5,18 +5,38 @@
 #define INPUT_FILE "input.txt"
 #define REPEAT(N) for(size_t _i = 0; _i < N; ++_i)
 
+#define STATIC_MAX 400000
+
 /*
    ===========================
       function to meassure
    ===========================
 */
 
-#define MEASSURE test_umap_fetch
+#define MEASSURE test_sumap_fetch
 
 /*
    ===========================
    ===========================
 */
+
+void test_sumap_fetch(size_t num_el, size_t num_rep)
+{
+	std::unordered_map<int, int> m;
+	m.reserve(STATIC_MAX);
+
+	for(size_t i = 0; i < num_el; ++i)
+	{
+		m.emplace(i * 9999, i);
+	}
+
+	REPEAT(num_rep)
+	for(size_t i = 0; i < num_el; ++i)
+	{
+		++m[i * 9999];
+	}
+}
+
 
 void test_umap_fetch(size_t num_el, size_t num_rep)
 {
@@ -24,13 +44,13 @@ void test_umap_fetch(size_t num_el, size_t num_rep)
 
 	for(size_t i = 0; i < num_el; ++i)
 	{
-		m.emplace(i, i);
+		m.emplace(i * 9999, i);
 	}
 
 	REPEAT(num_rep)
 	for(size_t i = 0; i < num_el; ++i)
 	{
-		++m[i];
+		++m[i * 9999];
 	}
 }
 
