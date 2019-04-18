@@ -1,6 +1,10 @@
 #pragma once
 
-#define SGC_INIT_QUEUE(T, N)                                                   \
+#define SGC_INIT_STATIC_FUNCTIONS_QUEUE(T, N)                                  \
+        static void N##_move(size_t *flag, size_t max);                        \
+        static void N##_resize(struct N *q);
+
+#define SGC_INIT_HEADERS_QUEUE(T, N)                                           \
                                                                                \
         struct N                                                               \
         {                                                                      \
@@ -16,6 +20,26 @@
         typedef T N##_type;                                                    \
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
+                                                                               \
+        void N##_set_share(N *q, int is_shared);                               \
+        size_t N##_size(const struct N *const q);                              \
+        void N##_init(struct N *q);                                            \
+        void N##_free(struct N *q);                                            \
+        int N##_equal(const struct N *const first,                             \
+                      const struct N *const second);                           \
+        void N##_copy(struct N *__restrict__ dst,                              \
+                      const struct N *__restrict__ const src);                 \
+        void N##_push(struct N *q, T el);                                      \
+        T *N##_front(struct N *q);                                             \
+        void N##_set_front(struct N *q, T new_el);                             \
+        T *N##_back(struct N *q);                                              \
+        void N##_set_back(struct N *q, T new_el);                              \
+        void N##_pop(struct N *q);                                             \
+        int N##_empty(const struct N *const q);
+
+#define SGC_INIT_QUEUE(T, N)                                                   \
+        SGC_INIT_HEADERS_QUEUE(T, N);                                          \
+        SGC_INIT_STATIC_FUNCTIONS_QUEUE(T, N);                                 \
                                                                                \
         /* ================= */                                                \
         /*  QUEUE FUNCTIONS  */                                                \

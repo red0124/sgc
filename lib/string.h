@@ -19,7 +19,7 @@
         typedef char N##_value;                                                \
         typedef char N##_type;                                                 \
         typedef char N##_key;                                                  \
-	typedef char static_##N[S];                                            \
+        typedef char static_##N[S];                                            \
                                                                                \
         void N##_copy(N *first, const N *const second)                         \
         {                                                                      \
@@ -154,7 +154,7 @@
                         }                                                      \
                         s[size++] = c;                                         \
                 }                                                              \
-		s[size] = '\0';                                     \
+                s[size] = '\0';                                                \
                 return (size == 0) ? NULL : s;                                 \
         }                                                                      \
                                                                                \

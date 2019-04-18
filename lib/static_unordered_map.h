@@ -34,7 +34,7 @@ enum sgc_node_state
         typedef V N##_value;                                                   \
         typedef K N##_key;                                                     \
                                                                                \
-        size_t N##_max()                                                       \
+        size_t N##_max(void)                                                   \
         {                                                                      \
                 return S;                                                      \
         }                                                                      \

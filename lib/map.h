@@ -37,7 +37,42 @@ static size_t sgc_log_two(size_t size)
 }
 #endif
 
-#define SGC_INIT_MAP(K, V, N)                                                  \
+#define SGC_INIT_STATIC_FUNCTIONS_MAP(K, V, N)                                 \
+        static struct N##_node *N##_node_begin(struct N##_node *n);            \
+        static struct N##_node *N##_node_end(struct N##_node *n);              \
+        static struct N##_node *N##_node_new(                                  \
+            const K *const k, const V *const v, int is_shared_key,             \
+            int is_shared);                                                    \
+        static size_t N##_stack_size(size_t size);                             \
+        static int N##_is_left_child(const struct N##_node *const n,           \
+                                     const struct N##_node *const parent);     \
+        static struct N##_node *N##_sibling(                                   \
+            const struct N##_node *const n,                                    \
+            const struct N##_node *const parent);                              \
+        static void N##_rotate_left(struct N *m, struct N##_node *parent,      \
+                                    struct N##_node *gparent);                 \
+        static void N##_rotate_right(struct N *m, struct N##_node *parent,     \
+                                     struct N##_node *gparent);                \
+        static void N##_rotate_left_right(struct N *m, struct N##_node *n,     \
+                                          struct N##_node *parent,             \
+                                          struct N##_node *gparent);           \
+        static void N##_rotate_right_left(struct N *m, struct N##_node *n,     \
+                                          struct N##_node *parent,             \
+                                          struct N##_node *gparent);           \
+        static void N##_rotate(struct N *m, struct N##_node *n,                \
+                               struct N##_node *parent,                        \
+                               struct N##_node *gparent);                      \
+        static void N##_corect_tree(struct N *m, struct N##_node *n,           \
+                                    struct N##_node *p, struct N##_node *gp);  \
+        static void N##_check_color(struct N *m, struct N##_node *n);          \
+        static void N##_insert_node(struct N *m, K *k, V *v);                  \
+        static V *N##_insert_or_get_node(struct N *m, K *k);                   \
+        static struct N##_node *N##_find_node(struct N *m, K k);               \
+        static void N##_erase_rebalanse(struct N *m, struct N##_node *n,       \
+                                        struct N##_node *p);                   \
+        static struct N##_node *N##_erase_node(struct N *m, struct N##_node *n);
+
+#define SGC_INIT_HEADERS_MAP(K, V, N)                                          \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
@@ -61,6 +96,53 @@ static size_t sgc_log_two(size_t size)
                 size_t _shared_key;                                            \
                 struct N##_node *_root;                                        \
         };                                                                     \
+                                                                               \
+        struct N##_iterator                                                    \
+        {                                                                      \
+                struct N##_node *_curr;                                        \
+                struct N##_node *_next;                                        \
+                int _is_valid;                                                 \
+        };                                                                     \
+                                                                               \
+        K *N##_iterator_key(struct N##_iterator i);                            \
+        const K *N##_iterator_ckey(struct N##_iterator i);                     \
+        V *N##_iterator_value(struct N##_iterator i);                          \
+        const V *N##_iterator_cvalue(struct N##_iterator i);                   \
+        void N##_iterator_next(struct N##_iterator *i);                        \
+        void N##_iterator_begin(struct N *m, struct N##_iterator *i);          \
+        void N##_iterator_cbegin(const struct N *const m,                      \
+                                 struct N##_iterator *i);                      \
+        void N##_iterator_prev(struct N##_iterator *i);                        \
+        void N##_iterator_end(struct N *m, struct N##_iterator *i);            \
+        void N##_iterator_cend(const struct N *const m,                        \
+                               struct N##_iterator *i);                        \
+        struct N##_iterator N##_begin(struct N *m);                            \
+        struct N##_iterator N##_cbegin(const struct N *const m);               \
+        struct N##_iterator N##_end(struct N *m);                              \
+        struct N##_iterator N##_cend(const struct N *const m);                 \
+        int N##_iterator_equal(const struct N##_iterator first,                \
+                               const struct N##_iterator second);              \
+        int N##_iterator_valid(const struct N##_iterator i);                   \
+                                                                               \
+        void N##_set_share(N *m, int is_shared);                               \
+        void N##_set_share_key(N *m, int is_shared);                           \
+        size_t N##_size(const struct N *const m);                              \
+        void N##_init(struct N *m);                                            \
+        void N##_free(struct N *m);                                            \
+        int N##_equal(const struct N *const first,                             \
+                      const struct N *const second);                           \
+        void N##_copy(struct N *__restrict__ dst,                              \
+                      const struct N *__restrict__ const src);                 \
+        void N##_set_at(struct N *m, K k, V v);                                \
+        V *N##_at(struct N *m, K k);                                           \
+        struct N##_iterator N##_find(struct N *m, K k);                        \
+        int N##_erase(struct N *m, const K key);                               \
+        int N##_iterator_erase(struct N *m, struct N##_iterator *i);           \
+        int N##_empty(const struct N *const m);
+
+#define SGC_INIT_MAP(K, V, N)                                                  \
+        SGC_INIT_HEADERS_MAP(K, V, N);                                         \
+        SGC_INIT_STATIC_FUNCTIONS_MAP(K, V, N);                                \
                                                                                \
         /* ================ */                                                 \
         /*  NODE FUNCTIONS  */                                                 \
@@ -116,13 +198,6 @@ static size_t sgc_log_two(size_t size)
         /* ========== */                                                       \
         /*  ITERATOR  */                                                       \
         /* ========== */                                                       \
-                                                                               \
-        struct N##_iterator                                                    \
-        {                                                                      \
-                struct N##_node *_curr;                                        \
-                struct N##_node *_next;                                        \
-                int _is_valid;                                                 \
-        };                                                                     \
                                                                                \
         K *N##_iterator_key(struct N##_iterator i)                             \
         {                                                                      \

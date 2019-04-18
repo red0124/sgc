@@ -16,7 +16,7 @@
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
                                                                                \
-        size_t N##_max()                                                       \
+        size_t N##_max(void)                                                   \
         {                                                                      \
                 return S;                                                      \
         }                                                                      \
