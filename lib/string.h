@@ -139,6 +139,31 @@
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
+	\
+        N N##_buffer_read_untill(N s, FILE *f, const char *const del)  \
+        {                                                                      \
+		N ret = NULL;\
+                char c;                                                        \
+                size_t size = 0;                                               \
+                char buff[S] = "\0";                                           \
+                while(1)                                                       \
+                {                                                              \
+                        c = fgetc(f);                                          \
+                        if(c == EOF || N##_char_find(del, c))                  \
+                        {                                                      \
+                                break;                                         \
+                        }                                                      \
+                        buff[size++] = c;                                      \
+                }                                                              \
+                if(size)                                                       \
+                {                                                              \
+			ret = s;\
+                        buff[size] = '\0';                                     \
+                        size_t size = strlen(buff);                            \
+                        memcpy(s, buff, sizeof(char) * (size + 1));            \
+                }                                                              \
+                return ret;                                                      \
+        }                                                                      \
                                                                                \
         N N##_read_untill(FILE *f, const char *const del)                      \
         {                                                                      \
