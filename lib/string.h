@@ -19,6 +19,7 @@
         typedef char N##_value;                                                \
         typedef char N##_type;                                                 \
         typedef char N##_key;                                                  \
+	typedef char static_##N[S];                                            \
                                                                                \
         void N##_copy(N *first, const N *const second)                         \
         {                                                                      \
@@ -139,13 +140,11 @@
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
-	\
-        N N##_buffer_read_untill(N s, FILE *f, const char *const del)  \
+                                                                               \
+        N N##_buffer_read_untill(N s, FILE *f, const char *const del)          \
         {                                                                      \
-		N ret = NULL;\
                 char c;                                                        \
                 size_t size = 0;                                               \
-                char buff[S] = "\0";                                           \
                 while(1)                                                       \
                 {                                                              \
                         c = fgetc(f);                                          \
@@ -153,16 +152,10 @@
                         {                                                      \
                                 break;                                         \
                         }                                                      \
-                        buff[size++] = c;                                      \
+                        s[size++] = c;                                         \
                 }                                                              \
-                if(size)                                                       \
-                {                                                              \
-			ret = s;\
-                        buff[size] = '\0';                                     \
-                        size_t size = strlen(buff);                            \
-                        memcpy(s, buff, sizeof(char) * (size + 1));            \
-                }                                                              \
-                return ret;                                                      \
+		s[size] = '\0';                                     \
+                return (size == 0) ? NULL : s;                                 \
         }                                                                      \
                                                                                \
         N N##_read_untill(FILE *f, const char *const del)                      \
