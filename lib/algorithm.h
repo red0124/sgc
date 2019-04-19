@@ -145,23 +145,6 @@
         size_t N##_binary_find_index(struct N *c, const N##_type el);
 
 #define SGC_INIT_HEADERS_ITERATE_PAIR(V, N)                                    \
-        void N##_fold_range_pair(                                              \
-            struct N##_iterator begin, struct N##_iterator end,                \
-            void (*fun)(const N##_key *const, const N##_value *const, void *), \
-            void *argout);                                                     \
-                                                                               \
-        void N##_fold_pair(                                                    \
-            const struct N *const c,                                           \
-            void (*fun)(const N##_key *const, const N##_value *const, void *), \
-            void *argout);                                                     \
-                                                                               \
-        void N##_execute_range_pair(                                           \
-            struct N##_iterator begin, struct N##_iterator end,                \
-            void (*fun)(const N##_key *const, const N##_value *const));        \
-                                                                               \
-        void N##_execute_pair(                                                 \
-            const struct N *const c,                                           \
-            void (*fun)(const N##_key *const, const N##_value *const));        \
                                                                                \
         void N##_fprintf_range_pair(struct N##_iterator begin,                 \
                                     struct N##_iterator end,                   \
@@ -169,24 +152,6 @@
                                                                                \
         void N##_fprintf_pair(const struct N *const c,                         \
                               const char *const format, FILE *file);           \
-                                                                               \
-        void N##_fold_range_reverse_pair(                                      \
-            struct N##_iterator begin, struct N##_iterator end,                \
-            void (*fun)(const N##_key *const, const N##_value *const, void *), \
-            void *argout);                                                     \
-                                                                               \
-        void N##_fold_reverse_pair(                                            \
-            const struct N *const c,                                           \
-            void (*fun)(const N##_key *const, const N##_value *const, void *), \
-            void *argout);                                                     \
-                                                                               \
-        void N##_execute_range_reverse_pair(                                   \
-            struct N##_iterator begin, struct N##_iterator end,                \
-            void (*fun)(const N##_key *const, const N##_value *const));        \
-                                                                               \
-        void N##_execute_reverse_pair(                                         \
-            const struct N *const c,                                           \
-            void (*fun)(const N##_key *const, const N##_value *const));        \
                                                                                \
         void N##_fprintf_range_reverse_pair(                                   \
             struct N##_iterator begin, struct N##_iterator end,                \
@@ -359,11 +324,11 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                fun(N##_iterator_value(begin), argout);                        \
+                fun(N##_iterator_data(begin), argout);                         \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_next(&begin);                             \
-                        fun(N##_iterator_value(begin), argout);                \
+                        fun(N##_iterator_data(begin), argout);                 \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -382,11 +347,11 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                fun(N##_iterator_value(begin));                                \
+                fun(N##_iterator_data(begin));                                 \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_next(&begin);                             \
-                        fun(N##_iterator_value(begin));                        \
+                        fun(N##_iterator_data(begin));                         \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -403,11 +368,11 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                fprintf(file, format, *N##_iterator_value(begin));             \
+                fprintf(file, format, *N##_iterator_data(begin));              \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_next(&begin);                             \
-                        fprintf(file, format, *N##_iterator_value(begin));     \
+                        fprintf(file, format, *N##_iterator_data(begin));      \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -425,12 +390,12 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                sprintf(buff, format, *N##_iterator_value(begin));             \
+                sprintf(buff, format, *N##_iterator_data(begin));              \
                 buff += strlen(buff);                                          \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_next(&begin);                             \
-                        sprintf(buff, format, *N##_iterator_value(begin));     \
+                        sprintf(buff, format, *N##_iterator_data(begin));      \
                         buff += strlen(buff);                                  \
                 }                                                              \
         }                                                                      \
@@ -449,11 +414,11 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                fun(N##_iterator_value(end), argout);                          \
+                fun(N##_iterator_data(end), argout);                           \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_prev(&end);                               \
-                        fun(N##_iterator_value(end), argout);                  \
+                        fun(N##_iterator_data(end), argout);                   \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -473,11 +438,11 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                fun(N##_iterator_value(end));                                  \
+                fun(N##_iterator_data(end));                                   \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_prev(&end);                               \
-                        fun(N##_iterator_value(end));                          \
+                        fun(N##_iterator_data(end));                           \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -495,11 +460,11 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                fprintf(file, format, *N##_iterator_value(end));               \
+                fprintf(file, format, *N##_iterator_data(end));                \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_prev(&end);                               \
-                        fprintf(file, format, *N##_iterator_value(end));       \
+                        fprintf(file, format, *N##_iterator_data(end));        \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -518,12 +483,12 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                sprintf(buff, format, *N##_iterator_value(end));               \
+                sprintf(buff, format, *N##_iterator_data(end));                \
                 buff += strlen(buff);                                          \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_prev(&end);                               \
-                        sprintf(buff, format, *N##_iterator_value(end));       \
+                        sprintf(buff, format, *N##_iterator_data(end));        \
                         buff += strlen(buff);                                  \
                 }                                                              \
         }                                                                      \
@@ -544,16 +509,16 @@
                 N##_type *ret = NULL;                                          \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
-                        if(T##_equal(&el, N##_iterator_value(begin)))          \
+                        if(T##_equal(&el, N##_iterator_data(begin)))           \
                         {                                                      \
-                                ret = N##_iterator_value(begin);               \
+                                ret = N##_iterator_data(begin);                \
                         }                                                      \
                         while(!ret && !N##_iterator_equal(begin, end))         \
                         {                                                      \
                                 N##_iterator_next(&begin);                     \
-                                if(T##_equal(&el, N##_iterator_value(begin)))  \
+                                if(T##_equal(&el, N##_iterator_data(begin)))   \
                                 {                                              \
-                                        ret = N##_iterator_value(begin);       \
+                                        ret = N##_iterator_data(begin);        \
                                 }                                              \
                         }                                                      \
                 }                                                              \
@@ -571,20 +536,20 @@
                 int found = 0;                                                 \
                 struct N##_iterator begin = N##_cbegin(c);                     \
                 struct N##_iterator end = N##_cend(c);                         \
-                if(!T##_equal(&el, N##_iterator_value(begin)))                 \
+                if(!T##_equal(&el, N##_iterator_data(begin)))                  \
                 {                                                              \
                         while(!N##_iterator_equal(begin, end))                 \
                         {                                                      \
                                 ++ret;                                         \
                                 N##_iterator_next(&begin);                     \
-                                if(T##_equal(&el, N##_iterator_value(begin)))  \
+                                if(T##_equal(&el, N##_iterator_data(begin)))   \
                                 {                                              \
                                         found = 1;                             \
                                         break;                                 \
                                 }                                              \
                         }                                                      \
                 }                                                              \
-                if(!T##_equal(&el, N##_iterator_value(begin)))                 \
+                if(!T##_equal(&el, N##_iterator_data(begin)))                  \
                 {                                                              \
                         ++ret;                                                 \
                         found = 1;                                             \
@@ -600,14 +565,14 @@
                 struct N##_iterator end = N##_cend(c);                         \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
-                        if(T##_equal(&el, N##_iterator_value(begin)))          \
+                        if(T##_equal(&el, N##_iterator_data(begin)))           \
                         {                                                      \
                                 ++ret;                                         \
                         }                                                      \
                         while(!N##_iterator_equal(begin, end))                 \
                         {                                                      \
                                 N##_iterator_next(&begin);                     \
-                                if(T##_equal(&el, N##_iterator_value(begin)))  \
+                                if(T##_equal(&el, N##_iterator_data(begin)))   \
                                 {                                              \
                                         ++ret;                                 \
                                 }                                              \
@@ -626,7 +591,7 @@
                 int done = 0;                                                  \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
-                        if(T##_equal(&el, N##_iterator_value(begin)))          \
+                        if(T##_equal(&el, N##_iterator_data(begin)))           \
                         {                                                      \
                                 ret = begin;                                   \
                                 done = 1;                                      \
@@ -634,7 +599,7 @@
                         while(!done && !N##_iterator_equal(begin, end))        \
                         {                                                      \
                                 N##_iterator_next(&begin);                     \
-                                if(T##_equal(&el, N##_iterator_value(begin)))  \
+                                if(T##_equal(&el, N##_iterator_data(begin)))   \
                                 {                                              \
                                         ret = begin;                           \
                                         done = 1;                              \
@@ -715,56 +680,6 @@
 
 #define SGC_INIT_ITERATE_PAIR(T, N)                                            \
         SGC_INIT_HEADERS_ITERATE_PAIR(T, N);                                   \
-        void N##_fold_range_pair(                                              \
-            struct N##_iterator begin, struct N##_iterator end,                \
-            void (*fun)(const N##_key *const, const N##_value *const, void *), \
-            void *argout)                                                      \
-        {                                                                      \
-                if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
-                fun(N##_iterator_key(begin), N##_iterator_value(begin),        \
-                    argout);                                                   \
-                while(!N##_iterator_equal(begin, end))                         \
-                {                                                              \
-                        N##_iterator_next(&begin);                             \
-                        fun(N##_iterator_key(begin),                           \
-                            N##_iterator_value(begin), argout);                \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        void N##_fold_pair(                                                    \
-            const N *const c,                                                  \
-            void (*fun)(const N##_key *const, const N##_value *const, void *), \
-            void *argout)                                                      \
-        {                                                                      \
-                N##_fold_range_pair(N##_cbegin(c), N##_cend(c), fun, argout);  \
-        }                                                                      \
-                                                                               \
-        void N##_execute_range_pair(                                           \
-            struct N##_iterator begin, struct N##_iterator end,                \
-            void (*fun)(const N##_key *const, const N##_value *const))         \
-        {                                                                      \
-                if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
-                fun(N##_iterator_key(begin), N##_iterator_value(begin));       \
-                while(!N##_iterator_equal(begin, end))                         \
-                {                                                              \
-                        N##_iterator_next(&begin);                             \
-                        fun(N##_iterator_key(begin),                           \
-                            N##_iterator_value(begin));                        \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        void N##_execute_pair(                                                 \
-            const N *const c,                                                  \
-            void (*fun)(const N##_key *const, const N##_value *const))         \
-        {                                                                      \
-                N##_execute_range_pair(N##_cbegin(c), N##_cend(c), fun);       \
-        }                                                                      \
                                                                                \
         void N##_fprintf_range_pair(struct N##_iterator begin,                 \
                                     struct N##_iterator end,                   \
@@ -774,13 +689,13 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                fprintf(file, format, *N##_iterator_key(begin),                \
-                        *N##_iterator_value(begin));                           \
+                fprintf(file, format, N##_iterator_data(begin)->key,           \
+                        N##_iterator_data(begin)->value);                      \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_next(&begin);                             \
-                        fprintf(file, format, *N##_iterator_key(begin),        \
-                                *N##_iterator_value(begin));                   \
+                        fprintf(file, format, N##_iterator_data(begin)->key,   \
+                                N##_iterator_data(begin)->value);              \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -799,14 +714,14 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                sprintf(buff, format, *N##_iterator_key(begin),                \
-                        *N##_iterator_value(begin));                           \
+                sprintf(buff, format, N##_iterator_data(begin)->key,           \
+                        N##_iterator_data(begin)->value);                      \
                 buff += strlen(buff);                                          \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_next(&begin);                             \
-                        sprintf(buff, format, *N##_iterator_key(begin),        \
-                                *N##_iterator_value(begin));                   \
+                        sprintf(buff, format, N##_iterator_data(begin)->key,   \
+                                N##_iterator_data(begin)->value);              \
                         buff += strlen(buff);                                  \
                 }                                                              \
         }                                                                      \
@@ -818,57 +733,6 @@
                                        buff);                                  \
         }                                                                      \
                                                                                \
-        void N##_fold_range_reverse_pair(                                      \
-            struct N##_iterator begin, struct N##_iterator end,                \
-            void (*fun)(const N##_key *const, const N##_value *const, void *), \
-            void *argout)                                                      \
-        {                                                                      \
-                if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
-                fun(N##_iterator_key(end), N##_iterator_value(end), argout);   \
-                while(!N##_iterator_equal(begin, end))                         \
-                {                                                              \
-                        N##_iterator_prev(&end);                               \
-                        fun(N##_iterator_key(end), N##_iterator_value(end),    \
-                            argout);                                           \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        void N##_fold_reverse_pair(                                            \
-            const N *const c,                                                  \
-            void (*fun)(const N##_key *const, const N##_value *const, void *), \
-            void *argout)                                                      \
-        {                                                                      \
-                N##_fold_range_reverse_pair(N##_cbegin(c), N##_cend(c), fun,   \
-                                            argout);                           \
-        }                                                                      \
-                                                                               \
-        void N##_execute_range_reverse_pair(                                   \
-            struct N##_iterator begin, struct N##_iterator end,                \
-            void (*fun)(const N##_key *const, const N##_value *const))         \
-        {                                                                      \
-                if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
-                {                                                              \
-                        return;                                                \
-                }                                                              \
-                fun(N##_iterator_key(end), N##_iterator_value(end));           \
-                while(!N##_iterator_equal(begin, end))                         \
-                {                                                              \
-                        N##_iterator_prev(&end);                               \
-                        fun(N##_iterator_key(end), N##_iterator_value(end));   \
-                }                                                              \
-        }                                                                      \
-                                                                               \
-        void N##_execute_reverse_pair(                                         \
-            const N *const c,                                                  \
-            void (*fun)(const N##_key *const, const N##_value *const))         \
-        {                                                                      \
-                N##_execute_range_reverse_pair(N##_cbegin(c), N##_cend(c),     \
-                                               fun);                           \
-        }                                                                      \
-                                                                               \
         void N##_fprintf_range_reverse_pair(                                   \
             struct N##_iterator begin, struct N##_iterator end,                \
             const char *const format, FILE *file)                              \
@@ -877,13 +741,13 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                fprintf(file, format, *N##_iterator_key(end),                  \
-                        *N##_iterator_value(end));                             \
+                fprintf(file, format, N##_iterator_data(end)->key,             \
+                        N##_iterator_data(end)->value);                        \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_prev(&end);                               \
-                        fprintf(file, format, *N##_iterator_key(end),          \
-                                *N##_iterator_value(end));                     \
+                        fprintf(file, format, N##_iterator_data(end)->key,     \
+                                N##_iterator_data(end)->value);                \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -902,14 +766,14 @@
                 {                                                              \
                         return;                                                \
                 }                                                              \
-                sprintf(buff, format, *N##_iterator_key(end),                  \
-                        *N##_iterator_value(end));                             \
+                sprintf(buff, format, N##_iterator_data(end)->value,           \
+                        N##_iterator_data(end)->key);                          \
                 buff += strlen(buff);                                          \
                 while(!N##_iterator_equal(begin, end))                         \
                 {                                                              \
                         N##_iterator_prev(&end);                               \
-                        sprintf(buff, format, *N##_iterator_key(end),          \
-                                *N##_iterator_value(end));                     \
+                        sprintf(buff, format, N##_iterator_data(end)->key,     \
+                                N##_iterator_data(end)->value);                \
                         buff += strlen(buff);                                  \
                 }                                                              \
         }                                                                      \
@@ -1059,21 +923,21 @@
 #define SGC_TOKENPASTE2(x, y) SGC_TOKENPASTE(x, y)
 #define SGC_UNIQUE(x) SGC_TOKENPASTE2(__sgc_unique_##x, __LINE__)
 
-#define sgc_for_each(EL, C, N)                                                 \
+#define sgc_for_each1(EL, C, N)                                                \
         int SGC_UNIQUE(valid) = 0;                                             \
         int SGC_UNIQUE(tmp) = 0;                                               \
         struct N##_iterator SGC_UNIQUE(curr) = N##_begin(&C);                  \
         struct N##_iterator SGC_UNIQUE(end) = N##_end(&C);                     \
         SGC_UNIQUE(valid) = N##_iterator_valid(SGC_UNIQUE(curr)) &&            \
                             N##_iterator_valid(SGC_UNIQUE(end));               \
-        for(N##_type *EL = N##_iterator_value(SGC_UNIQUE(curr));               \
+        for(N##_type *EL = N##_iterator_data(SGC_UNIQUE(curr));                \
             SGC_UNIQUE(valid); SGC_UNIQUE(tmp) = !N##_iterator_equal(          \
                                    SGC_UNIQUE(curr), SGC_UNIQUE(end)),         \
                      SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                      \
                      N##_iterator_next(&SGC_UNIQUE(curr)),                     \
-                     EL = N##_iterator_value(SGC_UNIQUE(curr)))
+                     EL = N##_iterator_data(SGC_UNIQUE(curr)))
 
-#define sgc_for_each_twice(EL, C1, N1, C2, N2)                                 \
+#define sgc_for_each2(EL, C1, N1, C2, N2)                                      \
         int SGC_UNIQUE(valid1) = 0;                                            \
         int SGC_UNIQUE(tmp1) = 0;                                              \
         int SGC_UNIQUE(valid2) = 0;                                            \
@@ -1089,11 +953,11 @@
         struct SGC_UNIQUE(pair)                                                \
         {                                                                      \
                 N1##_type *first;                                              \
-                N1##_type *second;                                             \
+                N2##_type *second;                                             \
         };                                                                     \
         for(struct SGC_UNIQUE(pair)                                            \
-                EL = {N1##_iterator_value(SGC_UNIQUE(curr1)),                  \
-                      N2##_iterator_value(SGC_UNIQUE(curr2))};                 \
+                EL = {N1##_iterator_data(SGC_UNIQUE(curr1)),                   \
+                      N2##_iterator_data(SGC_UNIQUE(curr2))};                  \
             SGC_UNIQUE(valid1) && SGC_UNIQUE(valid2);                          \
             SGC_UNIQUE(tmp1) =                                                 \
                 !N1##_iterator_equal(SGC_UNIQUE(curr1), SGC_UNIQUE(end1)),     \
@@ -1102,69 +966,151 @@
                 SGC_UNIQUE(valid1) = SGC_UNIQUE(tmp1),                         \
                 SGC_UNIQUE(valid2) = SGC_UNIQUE(tmp2),                         \
                 N1##_iterator_next(&SGC_UNIQUE(curr1)),                        \
-                N1##_iterator_next(&SGC_UNIQUE(curr2)),                        \
+                N2##_iterator_next(&SGC_UNIQUE(curr2)),                        \
                 EL = (struct SGC_UNIQUE(pair)){                                \
-                    N1##_iterator_value(SGC_UNIQUE(curr1)),                    \
-                    N2##_iterator_value(SGC_UNIQUE(curr2))})
+                    N1##_iterator_data(SGC_UNIQUE(curr1)),                     \
+                    N2##_iterator_data(SGC_UNIQUE(curr2))})
 
-#define sgc_for_each_reverse(EL, C, N)                                         \
+#define sgc_for_each3(EL, C1, N1, C2, N2, C3, N3)                              \
+        int SGC_UNIQUE(valid1) = 0;                                            \
+        int SGC_UNIQUE(tmp1) = 0;                                              \
+        int SGC_UNIQUE(valid2) = 0;                                            \
+        int SGC_UNIQUE(tmp2) = 0;                                              \
+        int SGC_UNIQUE(valid3) = 0;                                            \
+        int SGC_UNIQUE(tmp3) = 0;                                              \
+        struct N1##_iterator SGC_UNIQUE(curr1) = N1##_begin(&C1);              \
+        struct N1##_iterator SGC_UNIQUE(end1) = N1##_end(&C1);                 \
+        struct N2##_iterator SGC_UNIQUE(curr2) = N2##_begin(&C2);              \
+        struct N2##_iterator SGC_UNIQUE(end2) = N2##_end(&C2);                 \
+        struct N3##_iterator SGC_UNIQUE(curr3) = N3##_begin(&C3);              \
+        struct N3##_iterator SGC_UNIQUE(end3) = N3##_end(&C3);                 \
+        SGC_UNIQUE(valid1) = N1##_iterator_valid(SGC_UNIQUE(curr1)) &&         \
+                             N1##_iterator_valid(SGC_UNIQUE(end1));            \
+        SGC_UNIQUE(valid2) = N2##_iterator_valid(SGC_UNIQUE(curr2)) &&         \
+                             N2##_iterator_valid(SGC_UNIQUE(end2));            \
+        SGC_UNIQUE(valid3) = N3##_iterator_valid(SGC_UNIQUE(curr3)) &&         \
+                             N3##_iterator_valid(SGC_UNIQUE(end3));            \
+        struct SGC_UNIQUE(pair)                                                \
+        {                                                                      \
+                N1##_type *first;                                              \
+                N2##_type *second;                                             \
+                N3##_type *third;                                              \
+        };                                                                     \
+        for(struct SGC_UNIQUE(pair)                                            \
+                EL = {N1##_iterator_data(SGC_UNIQUE(curr1)),                   \
+                      N2##_iterator_data(SGC_UNIQUE(curr2)),                   \
+                      N3##_iterator_data(SGC_UNIQUE(curr3))};                  \
+            SGC_UNIQUE(valid1) && SGC_UNIQUE(valid2) && SGC_UNIQUE(valid3);    \
+            SGC_UNIQUE(tmp1) =                                                 \
+                !N1##_iterator_equal(SGC_UNIQUE(curr1), SGC_UNIQUE(end1)),     \
+                SGC_UNIQUE(tmp2) =                                             \
+                    !N2##_iterator_equal(SGC_UNIQUE(curr2), SGC_UNIQUE(end2)), \
+                SGC_UNIQUE(tmp3) =                                             \
+                    !N3##_iterator_equal(SGC_UNIQUE(curr3), SGC_UNIQUE(end3)), \
+                SGC_UNIQUE(valid1) = SGC_UNIQUE(tmp1),                         \
+                SGC_UNIQUE(valid2) = SGC_UNIQUE(tmp2),                         \
+                SGC_UNIQUE(valid3) = SGC_UNIQUE(tmp3),                         \
+                N1##_iterator_next(&SGC_UNIQUE(curr1)),                        \
+                N2##_iterator_next(&SGC_UNIQUE(curr2)),                        \
+                N3##_iterator_next(&SGC_UNIQUE(curr3)),                        \
+                EL = (struct SGC_UNIQUE(pair)){                                \
+                    N1##_iterator_data(SGC_UNIQUE(curr1)),                     \
+                    N2##_iterator_data(SGC_UNIQUE(curr2)),                     \
+                    N3##_iterator_data(SGC_UNIQUE(curr3))})
+
+#define sgc_for_each_reverse1(EL, C, N)                                        \
         int SGC_UNIQUE(valid) = 0;                                             \
         int SGC_UNIQUE(tmp) = 0;                                               \
         struct N##_iterator SGC_UNIQUE(curr) = N##_end(&C);                    \
         struct N##_iterator SGC_UNIQUE(begin) = N##_begin(&C);                 \
         SGC_UNIQUE(valid) = N##_iterator_valid(SGC_UNIQUE(curr)) &&            \
                             N##_iterator_valid(SGC_UNIQUE(begin));             \
-        for(N##_type *EL = N##_iterator_value(SGC_UNIQUE(curr));               \
+        for(N##_type *EL = N##_iterator_data(SGC_UNIQUE(curr));                \
             SGC_UNIQUE(valid); SGC_UNIQUE(tmp) = !N##_iterator_equal(          \
                                    SGC_UNIQUE(curr), SGC_UNIQUE(begin)),       \
                      SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                      \
                      N##_iterator_prev(&SGC_UNIQUE(curr)),                     \
-                     EL = N##_iterator_value(SGC_UNIQUE(curr)))
+                     EL = N##_iterator_data(SGC_UNIQUE(curr)))
 
-#define sgc_for_each_pair(EL, C, N)                                            \
-        int SGC_UNIQUE(valid) = 0;                                             \
-        int SGC_UNIQUE(tmp) = 0;                                               \
-        struct N##_iterator SGC_UNIQUE(curr) = N##_begin(&C);                  \
-        struct N##_iterator SGC_UNIQUE(end) = N##_end(&C);                     \
-        SGC_UNIQUE(valid) = N##_iterator_valid(SGC_UNIQUE(curr)) &&            \
-                            N##_iterator_valid(SGC_UNIQUE(end));               \
+#define sgc_for_each_reverse2(EL, C1, N1, C2, N2)                              \
+        int SGC_UNIQUE(valid1) = 0;                                            \
+        int SGC_UNIQUE(tmp1) = 0;                                              \
+        int SGC_UNIQUE(valid2) = 0;                                            \
+        int SGC_UNIQUE(tmp2) = 0;                                              \
+        struct N1##_iterator SGC_UNIQUE(curr1) = N1##_end(&C1);                \
+        struct N1##_iterator SGC_UNIQUE(begin1) = N1##_begin(&C1);             \
+        struct N2##_iterator SGC_UNIQUE(curr2) = N2##_end(&C2);                \
+        struct N2##_iterator SGC_UNIQUE(begin2) = N2##_begin(&C2);             \
+        SGC_UNIQUE(valid1) = N1##_iterator_valid(SGC_UNIQUE(curr1)) &&         \
+                             N1##_iterator_valid(SGC_UNIQUE(begin));           \
+        SGC_UNIQUE(valid2) = N2##_iterator_valid(SGC_UNIQUE(curr2)) &&         \
+                             N2##_iterator_valid(SGC_UNIQUE(begin2));          \
         struct SGC_UNIQUE(pair)                                                \
         {                                                                      \
-                const N##_key *key;                                            \
-                N##_value *value;                                              \
+                N1##_type *first;                                              \
+                N2##_type *second;                                             \
         };                                                                     \
         for(struct SGC_UNIQUE(pair)                                            \
-                EL = {N##_iterator_ckey(SGC_UNIQUE(curr)),                     \
-                      N##_iterator_value(SGC_UNIQUE(curr))};                   \
-            SGC_UNIQUE(valid); SGC_UNIQUE(tmp) = !N##_iterator_equal(          \
-                                   SGC_UNIQUE(curr), SGC_UNIQUE(end)),         \
-                SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                           \
-                N##_iterator_next(&SGC_UNIQUE(curr)),                          \
+                EL = {N1##_iterator_data(SGC_UNIQUE(curr1)),                   \
+                      N2##_iterator_data(SGC_UNIQUE(curr2))};                  \
+            SGC_UNIQUE(valid1) && SGC_UNIQUE(valid2);                          \
+            SGC_UNIQUE(tmp1) =                                                 \
+                !N1##_iterator_equal(SGC_UNIQUE(curr1), SGC_UNIQUE(begin1)),   \
+                SGC_UNIQUE(tmp2) = !N2##_iterator_equal(SGC_UNIQUE(curr2),     \
+                                                        SGC_UNIQUE(begin2)),   \
+                SGC_UNIQUE(valid1) = SGC_UNIQUE(tmp1),                         \
+                SGC_UNIQUE(valid2) = SGC_UNIQUE(tmp2),                         \
+                N1##_iterator_prev(&SGC_UNIQUE(curr1)),                        \
+                N2##_iterator_prev(&SGC_UNIQUE(curr2)),                        \
                 EL = (struct SGC_UNIQUE(pair)){                                \
-                    N##_iterator_ckey(SGC_UNIQUE(curr)),                       \
-                    N##_iterator_value(SGC_UNIQUE(curr))})
+                    N1##_iterator_data(SGC_UNIQUE(curr1)),                     \
+                    N2##_iterator_data(SGC_UNIQUE(curr2))})
 
-#define sgc_for_each_pair_reverse(EL, C, N)                                    \
-        int SGC_UNIQUE(valid) = 0;                                             \
-        int SGC_UNIQUE(tmp) = 0;                                               \
-        struct N##_iterator SGC_UNIQUE(curr) = N##_end(&C);                    \
-        struct N##_iterator SGC_UNIQUE(begin) = N##_begin(&C);                 \
-        SGC_UNIQUE(valid) = N##_iterator_valid(SGC_UNIQUE(curr)) &&            \
-                            N##_iterator_valid(SGC_UNIQUE(begin));             \
+#define sgc_for_each_reverse3(EL, C1, N1, C2, N2, C3, N3)                      \
+        int SGC_UNIQUE(valid1) = 0;                                            \
+        int SGC_UNIQUE(tmp1) = 0;                                              \
+        int SGC_UNIQUE(valid2) = 0;                                            \
+        int SGC_UNIQUE(tmp2) = 0;                                              \
+        int SGC_UNIQUE(valid3) = 0;                                            \
+        int SGC_UNIQUE(tmp3) = 0;                                              \
+        struct N1##_iterator SGC_UNIQUE(curr1) = N1##_end(&C1);                \
+        struct N1##_iterator SGC_UNIQUE(begin1) = N1##_begin(&C1);             \
+        struct N2##_iterator SGC_UNIQUE(curr2) = N2##_end(&C2);                \
+        struct N2##_iterator SGC_UNIQUE(begin2) = N2##_begin(&C2);             \
+        struct N3##_iterator SGC_UNIQUE(curr3) = N3##_end(&C3);                \
+        struct N3##_iterator SGC_UNIQUE(begin3) = N3##_begin(&C3);             \
+        SGC_UNIQUE(valid1) = N1##_iterator_valid(SGC_UNIQUE(curr1)) &&         \
+                             N1##_iterator_valid(SGC_UNIQUE(begin1));          \
+        SGC_UNIQUE(valid2) = N2##_iterator_valid(SGC_UNIQUE(curr2)) &&         \
+                             N2##_iterator_valid(SGC_UNIQUE(begin2));          \
+        SGC_UNIQUE(valid3) = N3##_iterator_valid(SGC_UNIQUE(curr3)) &&         \
+                             N3##_iterator_valid(SGC_UNIQUE(begin3));          \
         struct SGC_UNIQUE(pair)                                                \
         {                                                                      \
-                const N##_key *key;                                            \
-                N##_value *value;                                              \
+                N1##_type *first;                                              \
+                N2##_type *second;                                             \
+                N3##_type *third;                                              \
         };                                                                     \
         for(struct SGC_UNIQUE(pair)                                            \
-                EL = {N##_iterator_ckey(SGC_UNIQUE(curr)),                     \
-                      N##_iterator_value(SGC_UNIQUE(curr))};                   \
-            SGC_UNIQUE(valid); SGC_UNIQUE(tmp) = !N##_iterator_equal(          \
-                                   SGC_UNIQUE(curr), SGC_UNIQUE(begin)),       \
-                SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                           \
-                N##_iterator_prev(&SGC_UNIQUE(curr)),                          \
+                EL = {N1##_iterator_data(SGC_UNIQUE(curr1)),                   \
+                      N2##_iterator_data(SGC_UNIQUE(curr2)),                   \
+                      N3##_iterator_data(SGC_UNIQUE(curr3))};                  \
+            SGC_UNIQUE(valid1) && SGC_UNIQUE(valid2) && SGC_UNIQUE(valid3);    \
+            SGC_UNIQUE(tmp1) =                                                 \
+                !N1##_iterator_equal(SGC_UNIQUE(curr1), SGC_UNIQUE(begin1)),   \
+                SGC_UNIQUE(tmp2) = !N2##_iterator_equal(SGC_UNIQUE(curr2),     \
+                                                        SGC_UNIQUE(begin2)),   \
+                SGC_UNIQUE(tmp3) = !N3##_iterator_equal(SGC_UNIQUE(curr3),     \
+                                                        SGC_UNIQUE(begin3)),   \
+                SGC_UNIQUE(valid1) = SGC_UNIQUE(tmp1),                         \
+                SGC_UNIQUE(valid2) = SGC_UNIQUE(tmp2),                         \
+                SGC_UNIQUE(valid3) = SGC_UNIQUE(tmp3),                         \
+                N1##_iterator_prev(&SGC_UNIQUE(curr1)),                        \
+                N2##_iterator_prev(&SGC_UNIQUE(curr2)),                        \
+                N3##_iterator_prev(&SGC_UNIQUE(curr3)),                        \
                 EL = (struct SGC_UNIQUE(pair)){                                \
-                    N##_iterator_ckey(SGC_UNIQUE(curr)),                       \
-                    N##_iterator_value(SGC_UNIQUE(curr))})
+                    N1##_iterator_data(SGC_UNIQUE(curr1)),                     \
+                    N2##_iterator_data(SGC_UNIQUE(curr2)),                     \
+                    N3##_iterator_data(SGC_UNIQUE(curr3))})
 
 #endif

@@ -18,8 +18,6 @@
                                                                                \
         typedef struct N N;                                                    \
         typedef T N##_type;                                                    \
-        typedef T N##_value;                                                   \
-        typedef T N##_key;                                                     \
                                                                                \
         void N##_set_share(N *p, int is_shared);                               \
         void N##_init(struct N *p);                                            \

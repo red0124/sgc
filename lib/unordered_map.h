@@ -55,10 +55,15 @@ static size_t sgc_next_prime(size_t n)
 
 #define SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                \
                                                                                \
+        struct N##_pair                                                        \
+        {                                                                      \
+                K key;                                                         \
+                V value;                                                       \
+        };                                                                     \
+                                                                               \
         struct N##_node                                                        \
         {                                                                      \
-                K _key;                                                        \
-                V _value;                                                      \
+                struct N##_pair _data;                                         \
                 struct N##_node *_next;                                        \
         };                                                                     \
                                                                                \
@@ -72,7 +77,7 @@ static size_t sgc_next_prime(size_t n)
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-        typedef V N##_type;                                                    \
+        typedef struct N##_pair N##_type;                                      \
         typedef V N##_value;                                                   \
         typedef K N##_key;                                                     \
                                                                                \
@@ -91,10 +96,8 @@ static size_t sgc_next_prime(size_t n)
                 int _is_valid;                                                 \
         };                                                                     \
                                                                                \
-        K *N##_iterator_key(struct N##_iterator i);                            \
-        const K *N##_iterator_ckey(struct N##_iterator i);                     \
-        V *N##_iterator_value(struct N##_iterator i);                          \
-        const V *N##_iterator_cvalue(struct N##_iterator i);                   \
+        struct N##_pair *N##_iterator_data(struct N##_iterator i);             \
+        const struct N##_pair *N##_iterator_cdata(struct N##_iterator i);      \
         void N##_iterator_next(struct N##_iterator *i);                        \
         void N##_iterator_begin(struct N *m, struct N##_iterator *i);          \
         void N##_iterator_cbegin(const struct N *const m,                      \
@@ -141,19 +144,19 @@ static size_t sgc_next_prime(size_t n)
                     (struct N##_node *)malloc(sizeof(struct N##_node));        \
                 if(!is_shared_key)                                             \
                 {                                                              \
-                        K##_copy(&new_node->_key, key);                        \
+                        K##_copy(&new_node->_data.key, key);                   \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        new_node->_key = *key;                                 \
+                        new_node->_data.key = *key;                            \
                 }                                                              \
                 if(!is_shared)                                                 \
                 {                                                              \
-                        V##_copy(&new_node->_value, value);                    \
+                        V##_copy(&new_node->_data.value, value);               \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        new_node->_value = *value;                             \
+                        new_node->_data.value = *value;                        \
                 }                                                              \
                 new_node->_next = NULL;                                        \
                 return new_node;                                               \
@@ -172,11 +175,11 @@ static size_t sgc_next_prime(size_t n)
                                 next = curr->_next;                            \
                                 if(!is_shared_key)                             \
                                 {                                              \
-                                        K##_free(&curr->_key);                 \
+                                        K##_free(&curr->_data.key);            \
                                 }                                              \
                                 if(!is_shared)                                 \
                                 {                                              \
-                                        V##_free(&curr->_value);               \
+                                        V##_free(&curr->_data.value);          \
                                 }                                              \
                                 free(curr);                                    \
                                 curr = NULL;                                   \
@@ -221,7 +224,7 @@ static size_t sgc_next_prime(size_t n)
                 struct N##_node *prev = bucket;                                \
                 while(tmp)                                                     \
                 {                                                              \
-                        if(K##_equal(&tmp->_key, key))                         \
+                        if(K##_equal(&tmp->_data.key, key))                    \
                         {                                                      \
                                 if(tmp == bucket)                              \
                                 {                                              \
@@ -230,11 +233,11 @@ static size_t sgc_next_prime(size_t n)
                                 prev->_next = tmp->_next;                      \
                                 if(!is_shared_key)                             \
                                 {                                              \
-                                        K##_free(&tmp->_key);                  \
+                                        K##_free(&tmp->_data.key);             \
                                 }                                              \
                                 if(!is_shared)                                 \
                                 {                                              \
-                                        V##_free(&tmp->_value);                \
+                                        V##_free(&tmp->_data.value);           \
                                 }                                              \
                                 free(tmp);                                     \
                                 --*size;                                       \
@@ -287,24 +290,14 @@ static size_t sgc_next_prime(size_t n)
         /*  ITERATOR  */                                                       \
         /* ========== */                                                       \
                                                                                \
-        K *N##_iterator_key(struct N##_iterator i)                             \
+        struct N##_pair *N##_iterator_data(struct N##_iterator i)              \
         {                                                                      \
-                return &i._curr->_key;                                         \
+                return &i._curr->_data;                                        \
         }                                                                      \
                                                                                \
-        const K *N##_iterator_ckey(struct N##_iterator i)                      \
+        const struct N##_pair *N##_iterator_cdata(struct N##_iterator i)       \
         {                                                                      \
-                return &i._curr->_key;                                         \
-        }                                                                      \
-                                                                               \
-        V *N##_iterator_value(struct N##_iterator i)                           \
-        {                                                                      \
-                return &i._curr->_value;                                       \
-        }                                                                      \
-                                                                               \
-        const V *N##_iterator_cvalue(struct N##_iterator i)                    \
-        {                                                                      \
-                return &i._curr->_value;                                       \
+                return &i._curr->_data;                                        \
         }                                                                      \
                                                                                \
         void N##_iterator_next(struct N##_iterator *i)                         \
@@ -533,10 +526,10 @@ static size_t sgc_next_prime(size_t n)
                         struct N##_iterator it_second = N##_cbegin(second);    \
                         while(N##_iterator_valid(it_first))                    \
                         {                                                      \
-                                if(!K##_equal(&it_first._curr->_key,           \
-                                              &it_second._curr->_key) ||       \
-                                   !V##_equal(&it_first._curr->_value,         \
-                                              &it_second._curr->_value))       \
+                                if(!K##_equal(&it_first._curr->_data.key,      \
+                                              &it_second._curr->_data.key) ||  \
+                                   !V##_equal(&it_first._curr->_data.value,    \
+                                              &it_second._curr->_data.value))  \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -571,23 +564,23 @@ static size_t sgc_next_prime(size_t n)
                                     sizeof(struct N##_node));                  \
                                 if(!dst->_shared_key)                          \
                                 {                                              \
-                                        K##_copy(&dst->_data[i]->_key,         \
-                                                 &src->_data[i]->_key);        \
+                                        K##_copy(&dst->_data[i]->_data.key,    \
+                                                 &src->_data[i]->_data.key);   \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        dst->_data[i]->_key =                  \
-                                            src->_data[i]->_key;               \
+                                        dst->_data[i]->_data.key =             \
+                                            src->_data[i]->_data.key;          \
                                 }                                              \
                                 if(!dst->_shared)                              \
                                 {                                              \
-                                        V##_copy(&dst->_data[i]->_value,       \
-                                                 &src->_data[i]->_value);      \
+                                        V##_copy(&dst->_data[i]->_data.value,  \
+                                                 &src->_data[i]->_data.value); \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        dst->_data[i]->_value =                \
-                                            src->_data[i]->_value;             \
+                                        dst->_data[i]->_data.value =           \
+                                            src->_data[i]->_data.value;        \
                                 }                                              \
                                 struct N##_node *curr_src = src->_data[i];     \
                                 struct N##_node *curr_dst = dst->_data[i];     \
@@ -604,23 +597,25 @@ static size_t sgc_next_prime(size_t n)
                                             sizeof(struct N##_node));          \
                                         if(!dst->_shared_key)                  \
                                         {                                      \
-                                                K##_copy(&tmp_dst->_key,       \
-                                                         &tmp_src->_key);      \
+                                                K##_copy(&tmp_dst->_data.key,  \
+                                                         &tmp_src->_data.key); \
                                         }                                      \
                                         else                                   \
                                         {                                      \
-                                                dst->_data[i]->_key =          \
-                                                    src->_data[i]->_key;       \
+                                                dst->_data[i]->_data.key =     \
+                                                    src->_data[i]->_data.key;  \
                                         }                                      \
                                         if(!dst->_shared)                      \
                                         {                                      \
-                                                V##_copy(&tmp_dst->_value,     \
-                                                         &tmp_src->_value);    \
+                                                V##_copy(                      \
+                                                    &tmp_dst->_data.value,     \
+                                                    &tmp_src->_data.value);    \
                                         }                                      \
                                         else                                   \
                                         {                                      \
-                                                dst->_data[i]->_value =        \
-                                                    src->_data[i]->_value;     \
+                                                dst->_data[i]->_data.value =   \
+                                                    src->_data[i]              \
+                                                        ->_data.value;         \
                                         }                                      \
                                         curr_dst->_next = tmp_dst;             \
                                         curr_dst = tmp_dst;                    \
@@ -661,7 +656,7 @@ static size_t sgc_next_prime(size_t n)
                         struct N##_node *tmp = u->_data[position];             \
                         while(tmp)                                             \
                         {                                                      \
-                                if(K##_equal(&tmp->_key, k))                   \
+                                if(K##_equal(&tmp->_data.key, k))              \
                                 {                                              \
                                         ret = (struct N##_iterator){           \
                                             u->_data, tmp, position, u->_max,  \
@@ -705,7 +700,7 @@ static size_t sgc_next_prime(size_t n)
                 struct N##_node *next;                                         \
                 for(size_t i = 0; i < u->_size; ++i)                           \
                 {                                                              \
-                        key = &tmp._curr->_key;                                \
+                        key = &tmp._curr->_data.key;                           \
                         position = K##_hash(key) % new_max;                    \
                         next = tmp._curr->_next;                               \
                         tmp._curr->_next = NULL;                               \
@@ -752,7 +747,7 @@ static size_t sgc_next_prime(size_t n)
                         struct N##_node *next;                                 \
                         for(size_t i = 0; i < u->_size; ++i)                   \
                         {                                                      \
-                                key = &tmp._curr->_key;                        \
+                                key = &tmp._curr->_data.key;                   \
                                 position = K##_hash(key) % new_max;            \
                                 next = tmp._curr->_next;                       \
                                 tmp._curr->_next = NULL;                       \
@@ -788,12 +783,12 @@ static size_t sgc_next_prime(size_t n)
                 {                                                              \
                         if(!u->_shared)                                        \
                         {                                                      \
-                                V##_free(&i._curr->_value);                    \
-                                V##_copy(&i._curr->_value, &v);                \
+                                V##_free(&i._curr->_data.value);               \
+                                V##_copy(&i._curr->_data.value, &v);           \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                i._curr->_value = v;                           \
+                                i._curr->_data.value = v;                      \
                         }                                                      \
                 }                                                              \
                 else                                                           \
@@ -826,7 +821,7 @@ static size_t sgc_next_prime(size_t n)
                         {                                                      \
                                 K##_free(&k);                                  \
                         }                                                      \
-                        ret = &i._curr->_value;                                \
+                        ret = &i._curr->_data.value;                           \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -846,7 +841,7 @@ static size_t sgc_next_prime(size_t n)
                                 u->_data[position] = new_node;                 \
                         }                                                      \
                         ++u->_size;                                            \
-                        ret = &new_node->_value;                               \
+                        ret = &new_node->_data.value;                          \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
@@ -867,7 +862,7 @@ static size_t sgc_next_prime(size_t n)
         {                                                                      \
                 if(N##_iterator_valid(*i))                                     \
                 {                                                              \
-                        K key = i->_curr->_key;                                \
+                        K key = i->_curr->_data.key;                           \
                         N##_iterator_next(i);                                  \
                         N##_erase(u, key);                                     \
                 }                                                              \

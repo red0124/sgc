@@ -74,18 +74,23 @@ static size_t sgc_log_two(size_t size)
 
 #define SGC_INIT_HEADERS_MAP(K, V, N)                                          \
                                                                                \
+        struct N##_pair                                                        \
+        {                                                                      \
+                K key;                                                         \
+                V value;                                                       \
+        };                                                                     \
+                                                                               \
         struct N##_node                                                        \
         {                                                                      \
                 struct N##_node *_parent;                                      \
                 struct N##_node *_left;                                        \
                 struct N##_node *_right;                                       \
-                K _key;                                                        \
-                V _value;                                                      \
+                struct N##_pair _data;                                         \
                 enum sgc_map_color _color;                                     \
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
-        typedef V N##_type;                                                    \
+        typedef struct N##_pair N##_type;                                      \
         typedef V N##_value;                                                   \
         typedef K N##_key;                                                     \
                                                                                \
@@ -104,10 +109,8 @@ static size_t sgc_log_two(size_t size)
                 int _is_valid;                                                 \
         };                                                                     \
                                                                                \
-        K *N##_iterator_key(struct N##_iterator i);                            \
-        const K *N##_iterator_ckey(struct N##_iterator i);                     \
-        V *N##_iterator_value(struct N##_iterator i);                          \
-        const V *N##_iterator_cvalue(struct N##_iterator i);                   \
+        struct N##_pair *N##_iterator_data(struct N##_iterator i);             \
+        const struct N##_pair *N##_iterator_cdata(struct N##_iterator i);      \
         void N##_iterator_next(struct N##_iterator *i);                        \
         void N##_iterator_begin(struct N *m, struct N##_iterator *i);          \
         void N##_iterator_cbegin(const struct N *const m,                      \
@@ -175,20 +178,20 @@ static size_t sgc_log_two(size_t size)
                                                                                \
                 if(!is_shared_key)                                             \
                 {                                                              \
-                        K##_copy(&n->_key, k);                                 \
+                        K##_copy(&n->_data.key, k);                            \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        n->_key = *k;                                          \
+                        n->_data.key = *k;                                     \
                 }                                                              \
                                                                                \
                 if(!is_shared)                                                 \
                 {                                                              \
-                        V##_copy(&n->_value, v);                               \
+                        V##_copy(&n->_data.value, v);                          \
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        n->_value = *v;                                        \
+                        n->_data.value = *v;                                   \
                 }                                                              \
                 n->_left = n->_right = SGC_MAP_LEAF;                           \
                 n->_color = SGC_MAP_RED;                                       \
@@ -199,24 +202,14 @@ static size_t sgc_log_two(size_t size)
         /*  ITERATOR  */                                                       \
         /* ========== */                                                       \
                                                                                \
-        K *N##_iterator_key(struct N##_iterator i)                             \
+        struct N##_pair *N##_iterator_data(struct N##_iterator i)              \
         {                                                                      \
-                return &i._curr->_key;                                         \
+                return &i._curr->_data;                                        \
         }                                                                      \
                                                                                \
-        const K *N##_iterator_ckey(struct N##_iterator i)                      \
+        const struct N##_pair *N##_iterator_cdata(struct N##_iterator i)       \
         {                                                                      \
-                return &i._curr->_key;                                         \
-        }                                                                      \
-                                                                               \
-        V *N##_iterator_value(struct N##_iterator i)                           \
-        {                                                                      \
-                return &i._curr->_value;                                       \
-        }                                                                      \
-                                                                               \
-        const V *N##_iterator_cvalue(struct N##_iterator i)                    \
-        {                                                                      \
-                return &i._curr->_value;                                       \
+                return &i._curr->_data;                                        \
         }                                                                      \
                                                                                \
         void N##_iterator_next(struct N##_iterator *i)                         \
@@ -409,11 +402,11 @@ static size_t sgc_log_two(size_t size)
                                 curr = curr->_right;                           \
                                 if(!m->_shared)                                \
                                 {                                              \
-                                        V##_free(&tmp->_value);                \
+                                        V##_free(&tmp->_data.value);           \
                                 }                                              \
                                 if(!m->_shared_key)                            \
                                 {                                              \
-                                        K##_free(&tmp->_key);                  \
+                                        K##_free(&tmp->_data.key);             \
                                 }                                              \
                                 free(tmp);                                     \
                         }                                                      \
@@ -438,10 +431,11 @@ static size_t sgc_log_two(size_t size)
                                                                                \
                         for(size_t i = 0; i < first->_size; ++i)               \
                         {                                                      \
-                                if((!K##_equal(&it_first._curr->_key,          \
-                                               &it_second._curr->_key) ||      \
-                                    !V##_equal(&it_first._curr->_value,        \
-                                               &it_second._curr->_value)))     \
+                                if((!K##_equal(&it_first._curr->_data.key,     \
+                                               &it_second._curr->_data.key) || \
+                                    !V##_equal(                                \
+                                        &it_first._curr->_data.value,          \
+                                        &it_second._curr->_data.value)))       \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -468,21 +462,22 @@ static size_t sgc_log_two(size_t size)
                                                                                \
                         if(!src->_shared)                                      \
                         {                                                      \
-                                V##_copy(&dst->_root->_value,                  \
-                                         &src->_root->_value);                 \
+                                V##_copy(&dst->_root->_data.value,             \
+                                         &src->_root->_data.value);            \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                dst->_root->_value = src->_root->_value;       \
+                                dst->_root->_data.value =                      \
+                                    src->_root->_data.value;                   \
                         }                                                      \
                         if(!src->_shared_key)                                  \
                         {                                                      \
-                                K##_copy(&dst->_root->_key,                    \
-                                         &src->_root->_key);                   \
+                                K##_copy(&dst->_root->_data.key,               \
+                                         &src->_root->_data.key);              \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                dst->_root->_key = src->_root->_key;           \
+                                dst->_root->_data.key = src->_root->_data.key; \
                         }                                                      \
                         dst->_root->_color = src->_root->_color;               \
                         dst->_root->_left = dst->_root->_right =               \
@@ -545,21 +540,23 @@ static size_t sgc_log_two(size_t size)
                                 curr_dst = tmp;                                \
                                 if(!src->_shared)                              \
                                 {                                              \
-                                        V##_copy(&curr_dst->_value,            \
-                                                 &curr_src->_value);           \
+                                        V##_copy(&curr_dst->_data.value,       \
+                                                 &curr_src->_data.value);      \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        curr_dst->_value = curr_src->_value;   \
+                                        curr_dst->_data.value =                \
+                                            curr_src->_data.value;             \
                                 }                                              \
                                 if(!src->_shared_key)                          \
                                 {                                              \
-                                        K##_copy(&curr_dst->_key,              \
-                                                 &curr_src->_key);             \
+                                        K##_copy(&curr_dst->_data.key,         \
+                                                 &curr_src->_data.key);        \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        curr_dst->_key = curr_src->_key;       \
+                                        curr_dst->_data.key =                  \
+                                            curr_src->_data.key;               \
                                 }                                              \
                                 curr_dst->_color = curr_src->_color;           \
                                 stack_src[stack_size] = curr_src;              \
@@ -770,7 +767,7 @@ static size_t sgc_log_two(size_t size)
                 struct N##_node *new_node = NULL;                              \
                 for(;;)                                                        \
                 {                                                              \
-                        int compare = (K##_compare(&parent->_key, k));         \
+                        int compare = (K##_compare(&parent->_data.key, k));    \
                                                                                \
                         if(compare > 0)                                        \
                         {                                                      \
@@ -796,16 +793,16 @@ static size_t sgc_log_two(size_t size)
                                 }                                              \
                                 parent = parent->_right;                       \
                         }                                                      \
-                        else if(!V##_equal(&parent->_value, v))                \
+                        else if(!V##_equal(&parent->_data.value, v))           \
                         {                                                      \
                                 if(!m->_shared)                                \
                                 {                                              \
-                                        V##_free(&parent->_value);             \
-                                        V##_copy(&parent->_value, v);          \
+                                        V##_free(&parent->_data.value);        \
+                                        V##_copy(&parent->_data.value, v);     \
                                 }                                              \
                                 else                                           \
                                 {                                              \
-                                        parent->_value = *v;                   \
+                                        parent->_data.value = *v;              \
                                 }                                              \
                                 return;                                        \
                         }                                                      \
@@ -844,7 +841,7 @@ static size_t sgc_log_two(size_t size)
                 struct N##_node *new_node = NULL;                              \
                 for(;;)                                                        \
                 {                                                              \
-                        int compare = (K##_compare(&parent->_key, k));         \
+                        int compare = (K##_compare(&parent->_data.key, k));    \
                                                                                \
                         if(compare > 0)                                        \
                         {                                                      \
@@ -853,7 +850,7 @@ static size_t sgc_log_two(size_t size)
                                         V##_init(v);                           \
                                         new_node = N##_node_new(               \
                                             k, v, m->_shared_key, m->_shared); \
-                                        v = &new_node->_value;                 \
+                                        v = &new_node->_data.value;            \
                                         parent->_left = new_node;              \
                                         m->_size++;                            \
                                         new_node->_parent = parent;            \
@@ -869,7 +866,7 @@ static size_t sgc_log_two(size_t size)
                                         V##_init(v);                           \
                                         new_node = N##_node_new(               \
                                             k, v, m->_shared_key, m->_shared); \
-                                        v = &new_node->_value;                 \
+                                        v = &new_node->_data.value;            \
                                         parent->_right = new_node;             \
                                         m->_size++;                            \
                                         new_node->_parent = parent;            \
@@ -884,7 +881,7 @@ static size_t sgc_log_two(size_t size)
                                 {                                              \
                                         K##_free(k);                           \
                                 }                                              \
-                                v = &parent->_value;                           \
+                                v = &parent->_data.value;                      \
                                 break;                                         \
                         }                                                      \
                 }                                                              \
@@ -904,7 +901,7 @@ static size_t sgc_log_two(size_t size)
                         new_node->_parent = SGC_MAP_LEAF;                      \
                         m->_root = new_node;                                   \
                         m->_size = 1;                                          \
-                        ret = &m->_root->_value;                               \
+                        ret = &m->_root->_data.value;                          \
                 }                                                              \
                 else                                                           \
                 {                                                              \
@@ -924,7 +921,8 @@ static size_t sgc_log_two(size_t size)
                         while(curr)                                            \
                         {                                                      \
                                 prev = curr;                                   \
-                                int compare = (K##_compare(&curr->_key, &k));  \
+                                int compare =                                  \
+                                    (K##_compare(&curr->_data.key, &k));       \
                                                                                \
                                 if(compare > 0)                                \
                                 {                                              \
@@ -1086,23 +1084,23 @@ static size_t sgc_log_two(size_t size)
                 {                                                              \
                         if(!m->_shared)                                        \
                         {                                                      \
-                                V##_free(&n->_value);                          \
-                                V##_copy(&n->_value, &succ->_value);           \
-                                V##_free(&succ->_value);                       \
+                                V##_free(&n->_data.value);                     \
+                                V##_copy(&n->_data.value, &succ->_data.value); \
+                                V##_free(&succ->_data.value);                  \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                n->_value = succ->_value;                      \
+                                n->_data.value = succ->_data.value;            \
                         }                                                      \
                         if(!m->_shared_key)                                    \
                         {                                                      \
-                                K##_free(&n->_key);                            \
-                                K##_copy(&n->_key, &succ->_key);               \
-                                K##_free(&succ->_key);                         \
+                                K##_free(&n->_data.key);                       \
+                                K##_copy(&n->_data.key, &succ->_data.key);     \
+                                K##_free(&succ->_data.key);                    \
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                n->_key = succ->_key;                          \
+                                n->_data.key = succ->_data.key;                \
                         }                                                      \
                         /* relinking nodes would be better */                  \
                 }                                                              \

@@ -15,8 +15,6 @@
                                                                                \
         typedef struct N N;                                                    \
         typedef T N##_type;                                                    \
-        typedef T N##_value;                                                   \
-        typedef T N##_key;                                                     \
                                                                                \
         void N##_set_share(N *s, int is_shared);                               \
         size_t N##_size(const struct N *const s);                              \

@@ -11,8 +11,6 @@
                                                                                \
         typedef struct N N;                                                    \
         typedef T N##_type;                                                    \
-        typedef T N##_value;                                                   \
-        typedef T N##_key;                                                     \
                                                                                \
         size_t N##_max(void);                                                  \
         void N##_set_share(N *s, int is_shared);                               \

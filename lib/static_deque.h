@@ -17,8 +17,6 @@
                                                                                \
         typedef struct N N;                                                    \
         typedef T N##_type;                                                    \
-        typedef T N##_value;                                                   \
-        typedef T N##_key;                                                     \
                                                                                \
         size_t N##_max(void);                                                  \
         void N##_set_share(N *d, int is_shared);                               \
@@ -51,8 +49,8 @@
                 int _is_valid;                                                 \
         };                                                                     \
                                                                                \
-        T *N##_iterator_value(struct N##_iterator i);                          \
-        const T *N##_iterator_cvalue(const struct N##_iterator i);             \
+        T *N##_iterator_data(struct N##_iterator i);                           \
+        const T *N##_iterator_cdata(const struct N##_iterator i);              \
         void N##_iterator_next(struct N##_iterator *i);                        \
         void N##_iterator_prev(struct N##_iterator *i);                        \
         void N##_iterator_begin(struct N *d, struct N##_iterator *i);          \
@@ -540,12 +538,12 @@
         /*  DEQUE ITERATOR  */                                                 \
         /* ================ */                                                 \
                                                                                \
-        T *N##_iterator_value(struct N##_iterator i)                           \
+        T *N##_iterator_data(struct N##_iterator i)                            \
         {                                                                      \
                 return &i._data[i._curr];                                      \
         }                                                                      \
                                                                                \
-        const T *N##_iterator_cvalue(const struct N##_iterator i)              \
+        const T *N##_iterator_cdata(const struct N##_iterator i)               \
         {                                                                      \
                 return &i._data[i._curr];                                      \
         }                                                                      \

@@ -85,8 +85,6 @@ static size_t sgc_log_two(size_t size)
                                                                                \
         typedef struct N N;                                                    \
         typedef V N##_type;                                                    \
-        typedef V N##_value;                                                   \
-        typedef V N##_key;                                                     \
                                                                                \
         struct N                                                               \
         {                                                                      \
@@ -104,8 +102,8 @@ static size_t sgc_log_two(size_t size)
                 int _is_valid;                                                 \
         };                                                                     \
                                                                                \
-        V *N##_iterator_value(struct N##_iterator i);                          \
-        const V *N##_iterator_cvalue(struct N##_iterator i);                   \
+        V *N##_iterator_data(struct N##_iterator i);                           \
+        const V *N##_iterator_cdata(struct N##_iterator i);                    \
         void N##_iterator_next(struct N##_iterator *i);                        \
         void N##_iterator_begin(struct N *s, struct N##_iterator *i);          \
         void N##_iterator_cbegin(const struct N *const s,                      \
@@ -187,12 +185,12 @@ static size_t sgc_log_two(size_t size)
         /*  ITERATOR  */                                                       \
         /* ========== */                                                       \
                                                                                \
-        V *N##_iterator_value(struct N##_iterator i)                           \
+        V *N##_iterator_data(struct N##_iterator i)                            \
         {                                                                      \
                 return &i._curr->_value;                                       \
         }                                                                      \
                                                                                \
-        const V *N##_iterator_cvalue(struct N##_iterator i)                    \
+        const V *N##_iterator_cdata(struct N##_iterator i)                     \
         {                                                                      \
                 return &i._curr->_value;                                       \
         }                                                                      \

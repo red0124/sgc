@@ -33,8 +33,6 @@ enum sgc_node_state
                                                                                \
         typedef struct N N;                                                    \
         typedef V N##_type;                                                    \
-        typedef V N##_value;                                                   \
-        typedef V N##_key;                                                     \
                                                                                \
         size_t N##_max(void);                                                  \
                                                                                \
@@ -45,8 +43,8 @@ enum sgc_node_state
                 int _is_valid;                                                 \
         };                                                                     \
                                                                                \
-        const V *N##_iterator_cvalue(struct N##_iterator i);                   \
-        V *N##_iterator_value(struct N##_iterator i);                          \
+        const V *N##_iterator_cdata(struct N##_iterator i);                    \
+        V *N##_iterator_data(struct N##_iterator i);                           \
         void N##_iterator_next(struct N##_iterator *i);                        \
         void N##_iterator_begin(struct N *m, struct N##_iterator *i);          \
         void N##_iterator_cbegin(const struct N *const m,                      \
@@ -89,12 +87,12 @@ enum sgc_node_state
         /*  ITERATOR  */                                                       \
         /* ========== */                                                       \
                                                                                \
-        const V *N##_iterator_cvalue(struct N##_iterator i)                    \
+        const V *N##_iterator_cdata(struct N##_iterator i)                     \
         {                                                                      \
                 return &i._data[i._curr]._value;                               \
         }                                                                      \
                                                                                \
-        V *N##_iterator_value(struct N##_iterator i)                           \
+        V *N##_iterator_data(struct N##_iterator i)                            \
         {                                                                      \
                 return &i._data[i._curr]._value;                               \
         }                                                                      \
@@ -258,8 +256,8 @@ enum sgc_node_state
                         struct N##_iterator it_second = N##_cbegin(second);    \
                         while(N##_iterator_valid(it_first))                    \
                         {                                                      \
-                                if(!V##_equal(N##_iterator_cvalue(it_first),   \
-                                              N##_iterator_cvalue(it_second))) \
+                                if(!V##_equal(N##_iterator_cdata(it_first),    \
+                                              N##_iterator_cdata(it_second)))  \
                                 {                                              \
                                         equal = 0;                             \
                                         break;                                 \
@@ -415,7 +413,7 @@ enum sgc_node_state
                 (void)(u);                                                     \
                 if(N##_iterator_valid(*i))                                     \
                 {                                                              \
-                        V *value = N##_iterator_value(*i);                     \
+                        V *value = N##_iterator_data(*i);                      \
                         i->_data[i->_curr]._state = SGC_NODE_STATE_ERASED;     \
                         N##_iterator_next(i);                                  \
                         if(!u->_shared)                                        \

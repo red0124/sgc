@@ -32,8 +32,6 @@
                                                                                \
         typedef char *N;                                                       \
         typedef char N##_value;                                                \
-        typedef char N##_type;                                                 \
-        typedef char N##_key;                                                  \
         typedef char static_##N[S];                                            \
                                                                                \
         void N##_copy(N *first, const N *const second);                        \
@@ -58,8 +56,8 @@
                 char *_curr;                                                   \
         };                                                                     \
                                                                                \
-        char *N##_iterator_value(struct N##_iterator i);                       \
-        const char *N##_iterator_cvalue(const struct N##_iterator i);          \
+        char *N##_iterator_data(struct N##_iterator i);                        \
+        const char *N##_iterator_cdata(const struct N##_iterator i);           \
         void N##_iterator_next(struct N##_iterator *i);                        \
         void N##_iterator_prev(struct N##_iterator *i);                        \
         void N##_iterator_begin(N *s, struct N##_iterator *i);                 \
@@ -257,12 +255,12 @@
                 return s;                                                      \
         }                                                                      \
                                                                                \
-        char *N##_iterator_value(struct N##_iterator i)                        \
+        char *N##_iterator_data(struct N##_iterator i)                         \
         {                                                                      \
                 return i._curr;                                                \
         }                                                                      \
                                                                                \
-        const char *N##_iterator_cvalue(const struct N##_iterator i)           \
+        const char *N##_iterator_cdata(const struct N##_iterator i)            \
         {                                                                      \
                 return i._curr;                                                \
         }                                                                      \
