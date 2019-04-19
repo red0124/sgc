@@ -255,30 +255,30 @@ void test_deque_iterator(void)
         for(struct deque_iterator it = deque_begin(&v);
             !deque_iterator_equal(it, deque_end(&v)); deque_iterator_next(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*deque_iterator_value(it),
+                TEST_ASSERT_EQUAL_INT(*deque_iterator_data(it),
                                       *deque_at(&v, i));
                 ++i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*deque_iterator_value(deque_end(&v)),
+        TEST_ASSERT_EQUAL_INT(*deque_iterator_data(deque_end(&v)),
                               *deque_at(&v, i));
 
         for(struct deque_iterator it = deque_end(&v);
             !deque_iterator_equal(it, deque_begin(&v));
             deque_iterator_prev(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*deque_iterator_value(it),
+                TEST_ASSERT_EQUAL_INT(*deque_iterator_data(it),
                                       *deque_at(&v, i));
                 --i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*deque_iterator_value(deque_begin(&v)),
+        TEST_ASSERT_EQUAL_INT(*deque_iterator_data(deque_begin(&v)),
                               *deque_at(&v, i));
 
         i = TEST_ELEMENTS_NUM / 2;
         struct deque_iterator it = deque_from(&v, i);
 
-        TEST_ASSERT_EQUAL_INT(*deque_iterator_value(it), *deque_at(&v, i));
+        TEST_ASSERT_EQUAL_INT(*deque_iterator_data(it), *deque_at(&v, i));
 
         deque_free(&v);
 }

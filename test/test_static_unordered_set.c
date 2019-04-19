@@ -36,7 +36,7 @@ void test_set_insert_erase(void)
 
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; i++)
         {
-                TEST_ASSERT_EQUAL_INT(i, *set_iterator_value(set_find(&v, i)));
+                TEST_ASSERT_EQUAL_INT(i, *set_iterator_data(set_find(&v, i)));
         }
 
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
@@ -61,7 +61,7 @@ void test_set_insert_multiple(void)
 
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; i++)
         {
-                TEST_ASSERT_EQUAL_INT(0, *set_iterator_value(set_find(&v, 0)));
+                TEST_ASSERT_EQUAL_INT(0, *set_iterator_data(set_find(&v, 0)));
         }
 
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
@@ -204,8 +204,8 @@ void test_set_set(void)
         // {{0}, {0, 1}, {0, 1, 2}}
 
         TEST_ASSERT_EQUAL_INT(
-            0, *set_iterator_value(
-                   set_find(vset_iterator_value(vset_find(&v, tmp)), 0)));
+            0, *set_iterator_data(
+                   set_find(vset_iterator_data(vset_find(&v, tmp)), 0)));
 
         vset_free(&v);
         // no memory should be left dealocated
@@ -226,21 +226,21 @@ void test_set_iterator(void)
         for(struct set_iterator it = set_begin(&v);
             !set_iterator_equal(it, set_end(&v)); set_iterator_next(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*set_iterator_value(it), i);
+                TEST_ASSERT_EQUAL_INT(*set_iterator_data(it), i);
                 ++i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*set_iterator_value(set_end(&v)),
+        TEST_ASSERT_EQUAL_INT(*set_iterator_data(set_end(&v)),
                               TEST_ELEMENTS_NUM - 1);
 
         for(struct set_iterator it = set_end(&v);
             !set_iterator_equal(it, set_begin(&v)); set_iterator_prev(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*set_iterator_value(it), i);
+                TEST_ASSERT_EQUAL_INT(*set_iterator_data(it), i);
                 --i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*set_iterator_value(set_begin(&v)), 0);
+        TEST_ASSERT_EQUAL_INT(*set_iterator_data(set_begin(&v)), 0);
 
         set_free(&v);
 }

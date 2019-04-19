@@ -347,23 +347,23 @@ void test_list_iterator(void)
         for(struct list_iterator it = list_begin(&l);
             !list_iterator_equal(it, list_end(&l)); list_iterator_next(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*list_iterator_value(it),
+                TEST_ASSERT_EQUAL_INT(*list_iterator_data(it),
                                       *list_at(&l, i));
                 ++i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*list_iterator_value(list_end(&l)),
+        TEST_ASSERT_EQUAL_INT(*list_iterator_data(list_end(&l)),
                               *list_at(&l, i));
 
         for(struct list_iterator it = list_end(&l);
             !list_iterator_equal(it, list_begin(&l)); list_iterator_prev(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*list_iterator_value(it),
+                TEST_ASSERT_EQUAL_INT(*list_iterator_data(it),
                                       *list_at(&l, i));
                 --i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*list_iterator_value(list_begin(&l)),
+        TEST_ASSERT_EQUAL_INT(*list_iterator_data(list_begin(&l)),
                               *list_at(&l, i));
 
         list_free(&l);

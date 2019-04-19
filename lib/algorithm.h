@@ -923,7 +923,15 @@
 #define SGC_TOKENPASTE2(x, y) SGC_TOKENPASTE(x, y)
 #define SGC_UNIQUE(x) SGC_TOKENPASTE2(__sgc_unique_##x, __LINE__)
 
-#define sgc_for_each1(EL, C, N)                                                \
+#define SGC_NONE() (void *)NULL;
+
+#define SGC_FOR_EACH_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
+#define sgc_for_each(...)                                                      \
+        SGC_FOR_EACH_N(__VA_ARGS__, SGC_FOR_EACH3, SGC_FOR_EACH_SAME2,         \
+                       SGC_FOR_EACH2, SGC_NONE, SGC_FOR_EACH1)                 \
+        (__VA_ARGS__)
+
+#define SGC_FOR_EACH1(EL, C, N)                                                \
         int SGC_UNIQUE(valid) = 0;                                             \
         int SGC_UNIQUE(tmp) = 0;                                               \
         struct N##_iterator SGC_UNIQUE(curr) = N##_begin(&C);                  \
@@ -937,7 +945,9 @@
                      N##_iterator_next(&SGC_UNIQUE(curr)),                     \
                      EL = N##_iterator_data(SGC_UNIQUE(curr)))
 
-#define sgc_for_each2(EL, C1, N1, C2, N2)                                      \
+#define SGC_FOR_EACH_SAME2(EL, C1, C2, N) SGC_FOR_EACH2(EL, C1, N, C2, N)
+
+#define SGC_FOR_EACH2(EL, C1, N1, C2, N2)                                      \
         int SGC_UNIQUE(valid1) = 0;                                            \
         int SGC_UNIQUE(tmp1) = 0;                                              \
         int SGC_UNIQUE(valid2) = 0;                                            \
@@ -971,7 +981,7 @@
                     N1##_iterator_data(SGC_UNIQUE(curr1)),                     \
                     N2##_iterator_data(SGC_UNIQUE(curr2))})
 
-#define sgc_for_each3(EL, C1, N1, C2, N2, C3, N3)                              \
+#define SGC_FOR_EACH3(EL, C1, N1, C2, N2, C3, N3)                              \
         int SGC_UNIQUE(valid1) = 0;                                            \
         int SGC_UNIQUE(tmp1) = 0;                                              \
         int SGC_UNIQUE(valid2) = 0;                                            \
@@ -1018,7 +1028,14 @@
                     N2##_iterator_data(SGC_UNIQUE(curr2)),                     \
                     N3##_iterator_data(SGC_UNIQUE(curr3))})
 
-#define sgc_for_each_reverse1(EL, C, N)                                        \
+#define SGC_FOR_EACH_REVERSE_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
+#define sgc_for_each_reverse(...)                                              \
+        SGC_FOR_EACH_REVERSE_N(                                                \
+            __VA_ARGS__, SGC_FOR_EACH_REVERSE3, SGC_FOR_EACH_SAME_REVERSE2,    \
+            SGC_FOR_EACH_REVERSE2, SGC_NONE, SGC_FOR_EACH_REVERSE1)            \
+        (__VA_ARGS__)
+
+#define SGC_FOR_EACH_REVERSE(EL, C, N)                                         \
         int SGC_UNIQUE(valid) = 0;                                             \
         int SGC_UNIQUE(tmp) = 0;                                               \
         struct N##_iterator SGC_UNIQUE(curr) = N##_end(&C);                    \
@@ -1032,7 +1049,10 @@
                      N##_iterator_prev(&SGC_UNIQUE(curr)),                     \
                      EL = N##_iterator_data(SGC_UNIQUE(curr)))
 
-#define sgc_for_each_reverse2(EL, C1, N1, C2, N2)                              \
+#define SGC_FOR_EACH_SAME_REVERSE2(EL, C1, C2, N)                              \
+        SGC_FOR_EACH_REVERSE2(EL, C1, N, C2, N)
+
+#define SGC_FOR_EACH_REVERSE2(EL, C1, N1, C2, N2)                              \
         int SGC_UNIQUE(valid1) = 0;                                            \
         int SGC_UNIQUE(tmp1) = 0;                                              \
         int SGC_UNIQUE(valid2) = 0;                                            \
@@ -1042,7 +1062,7 @@
         struct N2##_iterator SGC_UNIQUE(curr2) = N2##_end(&C2);                \
         struct N2##_iterator SGC_UNIQUE(begin2) = N2##_begin(&C2);             \
         SGC_UNIQUE(valid1) = N1##_iterator_valid(SGC_UNIQUE(curr1)) &&         \
-                             N1##_iterator_valid(SGC_UNIQUE(begin));           \
+                             N1##_iterator_valid(SGC_UNIQUE(begin1));          \
         SGC_UNIQUE(valid2) = N2##_iterator_valid(SGC_UNIQUE(curr2)) &&         \
                              N2##_iterator_valid(SGC_UNIQUE(begin2));          \
         struct SGC_UNIQUE(pair)                                                \
@@ -1066,7 +1086,7 @@
                     N1##_iterator_data(SGC_UNIQUE(curr1)),                     \
                     N2##_iterator_data(SGC_UNIQUE(curr2))})
 
-#define sgc_for_each_reverse3(EL, C1, N1, C2, N2, C3, N3)                      \
+#define SGC_FOR_EACH_REVERSE3(EL, C1, N1, C2, N2, C3, N3)                      \
         int SGC_UNIQUE(valid1) = 0;                                            \
         int SGC_UNIQUE(tmp1) = 0;                                              \
         int SGC_UNIQUE(valid2) = 0;                                            \
@@ -1112,5 +1132,48 @@
                     N1##_iterator_data(SGC_UNIQUE(curr1)),                     \
                     N2##_iterator_data(SGC_UNIQUE(curr2)),                     \
                     N3##_iterator_data(SGC_UNIQUE(curr3))})
+
+#define SGC_FOR_EACH_INTERSECT_N(_1, _2, _3, _4, _5, NAME, ...) NAME
+#define sgc_for_each_intersect(...)                                            \
+        SGC_FOR_EACH_INTERSECT_N(__VA_ARGS__, sgc_for_each_intersect1,         \
+                                 SGC_FOR_EACH_SAME_INTERSECT, SGC_NONE)        \
+        (__VA_ARGS__)
+
+#define SGC_FOR_EACH_SAME_INTERSECT(EL, C1, C2, N)                             \
+        sgc_for_each_intersect1(EL, C1, N, C2, N)
+
+#define sgc_for_each_intersect1(EL, C1, N1, C2, N2)                            \
+        int SGC_UNIQUE(valid1) = 0;                                            \
+        int SGC_UNIQUE(tmp1) = 0;                                              \
+        int SGC_UNIQUE(valid2) = 0;                                            \
+        int SGC_UNIQUE(tmp2) = 0;                                              \
+        struct N1##_iterator SGC_UNIQUE(curr1) = N1##_begin(&C1);              \
+        struct N1##_iterator SGC_UNIQUE(end1) = N1##_end(&C1);                 \
+        struct N2##_iterator SGC_UNIQUE(curr2) = N2##_end(&C2);                \
+        struct N2##_iterator SGC_UNIQUE(begin2) = N2##_begin(&C2);             \
+        SGC_UNIQUE(valid1) = N1##_iterator_valid(SGC_UNIQUE(curr1)) &&         \
+                             N1##_iterator_valid(SGC_UNIQUE(end1));            \
+        SGC_UNIQUE(valid2) = N2##_iterator_valid(SGC_UNIQUE(curr2)) &&         \
+                             N2##_iterator_valid(SGC_UNIQUE(begin2));          \
+        struct SGC_UNIQUE(pair)                                                \
+        {                                                                      \
+                N1##_type *first;                                              \
+                N2##_type *second;                                             \
+        };                                                                     \
+        for(struct SGC_UNIQUE(pair)                                            \
+                EL = {N1##_iterator_data(SGC_UNIQUE(curr1)),                   \
+                      N2##_iterator_data(SGC_UNIQUE(curr2))};                  \
+            SGC_UNIQUE(valid1) && SGC_UNIQUE(valid2);                          \
+            SGC_UNIQUE(tmp1) =                                                 \
+                !N1##_iterator_equal(SGC_UNIQUE(curr1), SGC_UNIQUE(end1)),     \
+                SGC_UNIQUE(tmp2) = !N2##_iterator_equal(SGC_UNIQUE(curr2),     \
+                                                        SGC_UNIQUE(begin2)),   \
+                SGC_UNIQUE(valid1) = SGC_UNIQUE(tmp1),                         \
+                SGC_UNIQUE(valid2) = SGC_UNIQUE(tmp2),                         \
+                N1##_iterator_next(&SGC_UNIQUE(curr1)),                        \
+                N2##_iterator_prev(&SGC_UNIQUE(curr2)),                        \
+                EL = (struct SGC_UNIQUE(pair)){                                \
+                    N1##_iterator_data(SGC_UNIQUE(curr1)),                     \
+                    N2##_iterator_data(SGC_UNIQUE(curr2))})
 
 #endif

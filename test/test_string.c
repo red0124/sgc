@@ -86,26 +86,26 @@ void test_string_iterator(void)
             !string_iterator_equal(it, string_end(&v));
             string_iterator_next(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*string_iterator_value(it), v[i]);
+                TEST_ASSERT_EQUAL_INT(*string_iterator_data(it), v[i]);
                 ++i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*string_iterator_value(string_end(&v)), v[i]);
+        TEST_ASSERT_EQUAL_INT(*string_iterator_data(string_end(&v)), v[i]);
 
         for(struct string_iterator it = string_end(&v);
             !string_iterator_equal(it, string_begin(&v));
             string_iterator_prev(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*string_iterator_value(it), v[i]);
+                TEST_ASSERT_EQUAL_INT(*string_iterator_data(it), v[i]);
                 --i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*string_iterator_value(string_begin(&v)), v[i]);
+        TEST_ASSERT_EQUAL_INT(*string_iterator_data(string_begin(&v)), v[i]);
 
         i = TEST_ELEMENTS_NUM / 2;
         struct string_iterator it = string_from(&v, i);
 
-        TEST_ASSERT_EQUAL_INT(*string_iterator_value(it), v[i]);
+        TEST_ASSERT_EQUAL_INT(*string_iterator_data(it), v[i]);
 
         string_free(&v);
 }

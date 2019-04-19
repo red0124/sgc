@@ -212,21 +212,21 @@ void test_map_iterator(void)
         for(struct map_iterator it = map_begin(&v);
             !map_iterator_equal(it, map_end(&v)); map_iterator_next(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*map_iterator_value(it), i);
+                TEST_ASSERT_EQUAL_INT(map_iterator_data(it)->value, i);
                 ++i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*map_iterator_value(map_end(&v)),
+        TEST_ASSERT_EQUAL_INT(map_iterator_data(map_end(&v))->value,
                               TEST_ELEMENTS_NUM - 1);
 
         for(struct map_iterator it = map_end(&v);
             !map_iterator_equal(it, map_begin(&v)); map_iterator_prev(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*map_iterator_value(it), i);
+                TEST_ASSERT_EQUAL_INT(map_iterator_data(it)->value, i);
                 --i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*map_iterator_value(map_begin(&v)), 0);
+        TEST_ASSERT_EQUAL_INT(map_iterator_data(map_begin(&v))->value, 0);
 
         map_free(&v);
 }

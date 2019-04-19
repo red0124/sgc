@@ -259,30 +259,30 @@ void test_vector_iterator(void)
             !vector_iterator_equal(it, vector_end(&v));
             vector_iterator_next(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*vector_iterator_value(it),
+                TEST_ASSERT_EQUAL_INT(*vector_iterator_data(it),
                                       *vector_at(&v, i));
                 ++i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*vector_iterator_value(vector_end(&v)),
+        TEST_ASSERT_EQUAL_INT(*vector_iterator_data(vector_end(&v)),
                               *vector_at(&v, i));
 
         for(struct vector_iterator it = vector_end(&v);
             !vector_iterator_equal(it, vector_begin(&v));
             vector_iterator_prev(&it))
         {
-                TEST_ASSERT_EQUAL_INT(*vector_iterator_value(it),
+                TEST_ASSERT_EQUAL_INT(*vector_iterator_data(it),
                                       *vector_at(&v, i));
                 --i;
         }
 
-        TEST_ASSERT_EQUAL_INT(*vector_iterator_value(vector_begin(&v)),
+        TEST_ASSERT_EQUAL_INT(*vector_iterator_data(vector_begin(&v)),
                               *vector_at(&v, i));
 
         i = TEST_ELEMENTS_NUM / 2;
         struct vector_iterator it = vector_from(&v, i);
 
-        TEST_ASSERT_EQUAL_INT(*vector_iterator_value(it), *vector_at(&v, i));
+        TEST_ASSERT_EQUAL_INT(*vector_iterator_data(it), *vector_at(&v, i));
 
         vector_free(&v);
 }
