@@ -91,12 +91,12 @@
         void N##_execute(const struct N *const c,                              \
                          void (*fun)(const N##_type *const));                  \
                                                                                \
-        void N##_printf_range(struct N##_iterator begin,                       \
-                              struct N##_iterator end,                         \
-                              const char *const format, FILE *file);           \
+        void N##_fprintf_range(struct N##_iterator begin,                      \
+                               struct N##_iterator end,                        \
+                               const char *const format, FILE *file);          \
                                                                                \
-        void N##_printf(const struct N *const c, const char *const format,     \
-                        FILE *file);                                           \
+        void N##_fprintf(const struct N *const c, const char *const format,    \
+                         FILE *file);                                          \
                                                                                \
         void N##_fold_range_reverse(                                           \
             struct N##_iterator begin, struct N##_iterator end,                \
@@ -113,12 +113,12 @@
         void N##_execute_reverse(const struct N *const c,                      \
                                  void (*fun)(const N##_type *const));          \
                                                                                \
-        void N##_printf_range_reverse(struct N##_iterator begin,               \
-                                      struct N##_iterator end,                 \
-                                      const char *const format, FILE *file);   \
+        void N##_fprintf_range_reverse(struct N##_iterator begin,              \
+                                       struct N##_iterator end,                \
+                                       const char *const format, FILE *file);  \
                                                                                \
-        void N##_printf_reverse(const struct N *const c,                       \
-                                const char *const format, FILE *file);
+        void N##_fprintf_reverse(const struct N *const c,                      \
+                                 const char *const format, FILE *file);
 
 #define SGC_INIT_HEADERS_FIND(T, N)                                            \
         N##_type *N##_find_el_range(struct N##_iterator begin,                 \
@@ -163,12 +163,12 @@
             const struct N *const c,                                           \
             void (*fun)(const N##_key *const, const N##_value *const));        \
                                                                                \
-        void N##_printf_range_pair(struct N##_iterator begin,                  \
-                                   struct N##_iterator end,                    \
-                                   const char *const format, FILE *file);      \
+        void N##_fprintf_range_pair(struct N##_iterator begin,                 \
+                                    struct N##_iterator end,                   \
+                                    const char *const format, FILE *file);     \
                                                                                \
-        void N##_printf_pair(const struct N *const c,                          \
-                             const char *const format, FILE *file);            \
+        void N##_fprintf_pair(const struct N *const c,                         \
+                              const char *const format, FILE *file);           \
                                                                                \
         void N##_fold_range_reverse_pair(                                      \
             struct N##_iterator begin, struct N##_iterator end,                \
@@ -188,12 +188,12 @@
             const struct N *const c,                                           \
             void (*fun)(const N##_key *const, const N##_value *const));        \
                                                                                \
-        void N##_printf_range_reverse_pair(                                    \
+        void N##_fprintf_range_reverse_pair(                                   \
             struct N##_iterator begin, struct N##_iterator end,                \
             const char *const format, FILE *file);                             \
                                                                                \
-        void N##_printf_reverse_pair(const struct N *const c,                  \
-                                     const char *const format, FILE *file);
+        void N##_fprintf_reverse_pair(const struct N *const c,                 \
+                                      const char *const format, FILE *file);
 
 #define SGC_INIT_STATIC_FUNCTIONS_QSORT(T, N)                                  \
         static void N##_memswp(char *i, char *j);                              \
