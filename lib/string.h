@@ -31,7 +31,7 @@
 #define SGC_INIT_STATIC_FUNCTIONS_STRING_WITH_BUFFER(N, S)                     \
                                                                                \
         typedef char *N;                                                       \
-        typedef char N##_value;                                                \
+        typedef char N##_type;                                                 \
         typedef char static_##N[S];                                            \
                                                                                \
         void N##_copy(N *first, const N *const second);                        \
