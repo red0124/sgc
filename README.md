@@ -356,22 +356,22 @@ Compared to **C++ STL** libraries.
 [> Back to content](#content)
 
 **Static containers have similar performance to their non static counterparts
-only static_unordered_map is different since it uses closhed hashing compared
-to the non static one which uses open hashing**
+except the unordered containers since they use closhed hashing compared
+to the non static ones which use open hashing.**
 
-**Unordered Map insert, C++ map reserved**
+**Unordered Map insert, C++ map is reserved**
 
 ![alt text](https://gitlab.com/ado0/sgc/raw/master/img/static_unordered_map_insert.png)
 
 [> Back to content](#content)
 
-**Unordered Map fetch, C++ map reserved**
+**Unordered Map fetch, C++ map is reserved**
 
 ![alt text](https://gitlab.com/ado0/sgc/raw/master/img/static_unordered_map_fetch.png)
 
 [> Back to content](#content)
 
-**Unordered Map iterate, C++ map reserved**
+**Unordered Map iterate, C++ map is reserved**
 
 ![alt text](https://gitlab.com/ado0/sgc/raw/master/img/static_unordered_map_iterate.png)
 
