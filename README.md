@@ -283,11 +283,12 @@ sgc_for_each(element, container_instance, container_name);
 # Benchmarks
 Compared to **C++ STL** libraries.
 
+![alt text]("https://gitlab.com/ado0/sgc/img/vector_push_back.png")
 
 
 [> Back to content](#content)
 # Examples
-\>\> Count the number of each word in a file then print every element who is not unique:
+\>\> Count the number of each word in a file then print every non unique element:
 
 ```c
 #include <stdio.h>
