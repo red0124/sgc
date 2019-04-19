@@ -13,7 +13,7 @@ Algorithms and data structures written in **C** using macros. The data structure
   - Can be used used anywhere without any dependencies, just the standard library.
   - It is as simple as possible to use.
   - Can be used on any type of data.
-  - Fast since it does not use **void*** al elements.
+  - Fast since it does not use **void*** as elements.
   - Memory can be shared.
   - Separate compiling is possible.
   - It has static containers which do not need memory allocation making them usable for **microcontrollers**.
