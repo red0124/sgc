@@ -428,6 +428,77 @@ void test_for_each_pair(void)
         map_free(&m);
 }
 
+void test_for_each_twice(void)
+{
+        vector v1;
+        vector v2;
+        vector_init(&v1);
+        vector_init(&v2);
+
+        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
+        {
+                vector_push_back(&v1, i);
+                vector_push_back(&v2, 2 * i);
+        }
+
+        sgc_for_each_twice(i, v1, vector, v2, vector)
+	{
+		*i.first += 1;
+		*i.second += 2;
+	}
+
+        size_t j = 1;
+        sgc_for_each(i, v1, vector)
+	{
+		TEST_ASSERT_EQUAL_INT(*i, j); 
+		++j;
+	}
+
+	j = 2;
+        sgc_for_each(i, v2, vector)
+	{
+		TEST_ASSERT_EQUAL_INT(*i, j);
+		j += 2;
+	}
+
+        sgc_for_each_twice(i, v1, vector, v2, vector)
+	{
+		TEST_ASSERT_EQUAL_INT(*i.first * 2, *i.second);
+		j += 2;
+	}
+
+        vector_free(&v1);
+        vector_free(&v2);
+}
+
+void test_for_each_pair_twice(void)
+{
+	/*
+        map m1;
+        map m2;
+        map_init(&m1);
+        map_init(&m2);
+
+        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
+        {
+                map_set_at(&m1, i, i);
+                map_set_at(&m1, i, 2 * i);
+        }
+
+        sgc_for_each_twice(i, m, map)
+	{
+		*i.value += 1;
+	}
+
+        sgc_for_each_pair(i, m, map)
+	{
+		TEST_ASSERT_EQUAL_INT(*i.value, *i.key + 1);
+	}
+
+        map_free(&m);
+	*/
+}
+
 int main(void)
 {
         UNITY_BEGIN();
@@ -442,6 +513,7 @@ int main(void)
         RUN_TEST(test_execute_map_pair);
         RUN_TEST(test_for_each);
         RUN_TEST(test_for_each_pair);
+        RUN_TEST(test_for_each_twice);
 
         return UNITY_END();
 }
