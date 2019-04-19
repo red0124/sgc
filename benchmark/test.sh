@@ -12,10 +12,10 @@ CPP_SRC=cpp_src.cpp
 ###################
 
 num_elements=(0.1 1 10 20 30 40 50 60 70 80 90 100)
-factor=10
+factor=3500
 repeat_max=800000
 
-OUTPUT_TXT_FILE='static_unordered_map_fetch.txt'
+OUTPUT_TXT_FILE='vector_push_back.txt'
 
 ###################
 ###################

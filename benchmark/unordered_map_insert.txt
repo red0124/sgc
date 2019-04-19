@@ -1,0 +1,78 @@
+
+c
+
+num of elements = 350.
+num of repetitions = 2285.7142857142858
+  Time (mean ± σ):       9.9 ms ±   1.1 ms    [User: 9.3 ms, System: 0.6 ms]
+num of elements = 3500
+num of repetitions = 228
+  Time (mean ± σ):       9.6 ms ±   0.5 ms    [User: 9.0 ms, System: 0.6 ms]
+num of elements = 35000
+num of repetitions = 22
+  Time (mean ± σ):      12.1 ms ±   0.8 ms    [User: 11.3 ms, System: 0.7 ms]
+num of elements = 70000
+num of repetitions = 11
+  Time (mean ± σ):      17.5 ms ±   1.8 ms    [User: 14.9 ms, System: 2.4 ms]
+num of elements = 105000
+num of repetitions = 7
+  Time (mean ± σ):      27.1 ms ±   2.7 ms    [User: 24.4 ms, System: 2.4 ms]
+num of elements = 140000
+num of repetitions = 5
+  Time (mean ± σ):      40.1 ms ±  13.0 ms    [User: 37.1 ms, System: 2.5 ms]
+num of elements = 175000
+num of repetitions = 4
+  Time (mean ± σ):      33.5 ms ±   2.1 ms    [User: 30.5 ms, System: 2.8 ms]
+num of elements = 210000
+num of repetitions = 3
+  Time (mean ± σ):      52.3 ms ±   2.4 ms    [User: 47.1 ms, System: 4.7 ms]
+num of elements = 245000
+num of repetitions = 3
+  Time (mean ± σ):      63.6 ms ±   5.3 ms    [User: 58.9 ms, System: 4.3 ms]
+num of elements = 280000
+num of repetitions = 2
+  Time (mean ± σ):      72.1 ms ±  17.2 ms    [User: 65.8 ms, System: 5.2 ms]
+num of elements = 315000
+num of repetitions = 2
+  Time (mean ± σ):      91.5 ms ±  20.4 ms    [User: 83.0 ms, System: 6.6 ms]
+num of elements = 350000
+num of repetitions = 2
+  Time (mean ± σ):      85.3 ms ±  12.5 ms    [User: 78.3 ms, System: 5.2 ms]
+
+cpp
+
+num of elements = 350.
+num of repetitions = 2285.7142857142858
+  Time (mean ± σ):      29.1 ms ±   6.2 ms    [User: 26.7 ms, System: 1.2 ms]
+num of elements = 3500
+num of repetitions = 228
+  Time (mean ± σ):      26.8 ms ±   4.0 ms    [User: 25.8 ms, System: 0.8 ms]
+num of elements = 35000
+num of repetitions = 22
+  Time (mean ± σ):      43.4 ms ±   7.8 ms    [User: 40.7 ms, System: 1.8 ms]
+num of elements = 70000
+num of repetitions = 11
+  Time (mean ± σ):      61.8 ms ±  14.3 ms    [User: 58.0 ms, System: 2.3 ms]
+num of elements = 105000
+num of repetitions = 7
+  Time (mean ± σ):      61.0 ms ±   8.8 ms    [User: 56.9 ms, System: 1.9 ms]
+num of elements = 140000
+num of repetitions = 5
+  Time (mean ± σ):      92.0 ms ±  16.3 ms    [User: 84.1 ms, System: 5.1 ms]
+num of elements = 175000
+num of repetitions = 4
+  Time (mean ± σ):      87.5 ms ±  15.0 ms    [User: 80.9 ms, System: 4.8 ms]
+num of elements = 210000
+num of repetitions = 3
+  Time (mean ± σ):      83.5 ms ±   6.9 ms    [User: 77.1 ms, System: 5.4 ms]
+num of elements = 245000
+num of repetitions = 3
+  Time (mean ± σ):     102.5 ms ±   8.6 ms    [User: 94.0 ms, System: 6.6 ms]
+num of elements = 280000
+num of repetitions = 2
+  Time (mean ± σ):      89.0 ms ±   6.3 ms    [User: 78.9 ms, System: 6.7 ms]
+num of elements = 315000
+num of repetitions = 2
+  Time (mean ± σ):      88.3 ms ±   8.4 ms    [User: 78.9 ms, System: 7.2 ms]
+num of elements = 350000
+num of repetitions = 2
+  Time (mean ± σ):      83.2 ms ±   6.3 ms    [User: 75.2 ms, System: 6.9 ms]

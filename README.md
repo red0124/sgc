@@ -1,5 +1,24 @@
-﻿# Semi-Generic C
+﻿
+# Semi-Generic C
 Algorithms and data structures written in **C** using macros. The data structures used are similar to the ones used in the **C++ STL** with little difference.
+
+# Content
+ - [Purpose](#purpose)
+ - [Install](#install)
+ - [Usage](#how-to-use-it)
+ - [Benchmarks](#benchmarks)
+ - [Examples](#examples)
+
+# Purpose
+  - Can be used used anywhere without any dependencies, just the standard library.
+  - It is as simple as possible to use.
+  - Can be used on any type of data.
+  - Fast since it does not use **void*** al elements.
+  - Memory can be shared.
+  - Separate compiling is possible.
+  - It has static containers which do not need memory allocation making them usable for **microcontrollers**.
+
+[> Back to content](#content)
 # Install
 Just run the following commands in your shell:
 ```bash
@@ -9,6 +28,7 @@ $ sudo make install
 ```
 The source files will be installed to your include file and are ready for usage. 
 
+[> Back to content](#content)
 ## How to use it:
 The headers are located int the **SGC** directory in your include file, simply include them like this:
 ```c
@@ -66,16 +86,9 @@ SGC_INIT_STATIC(DEQUE, float, 100, dq);
 // ...
 ```
 
-Everything can be initialized separately too:
-
-```c
-SGC_INIT_CONTAINER(required_arguments);
-SGC_INIT_ALGORITHM(required_arguments);
-```
-
 The containers may use **malloc**, **free**, **fprintf**, **memcpy**, and other **C** functions so we require those functions to be defined before creating the containers.
 
-Now a simple example, **"test.c"**:
+Simple example, **"test.c"**:
 
 ```c
 #include <stdlib.h>
@@ -99,7 +112,7 @@ int main(void)
 	list_push_back(&l, "random");	
 	list_push_back(&l, "strings");
 	
-	list_printf(&l, "%s\n", stdout);
+	list_fprintf(&l, "%s\n", stdout);
 	
 	list_free(&l);
 	return 0;
@@ -115,9 +128,9 @@ random
 strings
 ```
 
-First will called **list_init** to set the default values of our structure so we can use it, **push_back** is used to insert some elements into the container, the elements in the container will be a copy of the elements passed into the function, and using **list_free** we free all the memory allocated.
+First we called **list_init** to set the default values of our structure so we can use it, **push_back** is used to insert some elements into the container, the elements in the container will be a copy of the elements passed into the function, and using **list_free** we free all the memory allocated.
 
-The **ITERATE** algorithm is required to use the **list_printf** function.
+The **ITERATE** algorithm is required to use the **list_fprintf** function.
 
 To use a type as an element of a given container, some functions have to be defined so the container may know how to allocate, copy, free and compare the elements:
 
@@ -171,9 +184,9 @@ int main(int)
 	list_push_back(&l, s);
 	
 	// use the string itself as shared
-	list_set_share(1);
+	list_set_share(&l, 1);
 	list_push_back(&l, s);
-	list_set_share(0);
+	list_set_share(&l, 0);
 
 	// this will also free the string since it is shared 
 	// so no memory will be left allocated
@@ -187,7 +200,7 @@ To use primitive types we have to include :
 #include <SGC/static_types.h>
 ```
 
-Where some types have their functions defined by default, and more can be added using the **SGC_INIT_STATIC** macro, or when creating a primitive structure (structure of primitive types and primitive structures)  **SGC_INIT_STATIC_STRUCT** :
+Where some types have their functions defined by default, and more can be added using the **SGC_INIT_STATIC_TYPE** macro, or when creating a primitive structure (structure of primitive types and primitive structures)  **SGC_INIT_STATIC_STRUCT** :
 
 ```c
 #include <stdlib.h>
@@ -241,11 +254,11 @@ int main(void)
 
 	vector v;
 	vector_init(&v);
-
 	vector_push_back(&v, "hello");
-	list_set_share(1);
+	
+	list_set_share(&l, 1);
 	list_push_back(&l, v);
-	list_set_share(0);
+	list_set_share(&l, 0);
 
 	// no leaks
 	list_free(&l);
@@ -253,25 +266,35 @@ int main(void)
 }
 ```
 
-An easy way to traverse through the container is by using the **SGC_FOR_EACH** macro
+An easy way to traverse through the container is by using the **sgc_for_each** macro
 
 ```c
-SGC_FOR_EACH(container_type, container_instance, element, ACTION);
+sgc_for_each(element, container_instance, container_name);
+{
+	// actions on element
+}
 ```
 **container_name ::** name of the container we iterate through
 **container_instance ::** the container we iterate through
 **element ::** the name of the pointer we access the elements with
-**ACTION ::** actions to be executed on each element
 
 Similar for map-like containers:
 ```c
-SGC_FOR_EACH_PAIR(container_type, container_instance, key, value, ACTION);
+sgc_for_each_pair(element_pair, container_instance, container_name)
+{
+	// ACTIONS on element_pair.key and element_pair.value
+}
 ```
-**key ::** the name of the const pointer we access the elements key value
-**value ::** the name of the const pointer we access the elements value
+[> Back to content](#content)
 
-Example:
-Count the number of each character in a file:
+# Benchmarks
+Compared to **C++ STL** libraries.
+
+
+
+[> Back to content](#content)
+# Examples
+\>\> Count the number of each word in a file then print every element who is not unique:
 
 ```c
 #include <stdio.h>
@@ -284,32 +307,36 @@ Count the number of each character in a file:
 #include <SGC/unordered_map.h>
 
 #define BUFF_SIZE 256
-#define FILE_NAME "dict.txt"
+#define FILE_NAME "words.txt"
 
-SGC_INIT(STRING, string);
-SGC_INIT_PAIR(UNORDERED_MAP, char, int, map, ITERATE_PAIR);
+SGC_INIT(STRING, BUFF_SIZE, string);
+SGC_INIT_PAIR(UNORDERED_MAP, string, int, map, ITERATE_PAIR);
 
 int main(void)
 {
         map m;
         map_init(&m);
 
-        char buff[BUFF_SIZE];
+        static_string buff;
+        
         FILE *in = fopen(FILE_NAME, "r");
-
-        while(fgets(buff, BUFF_SIZE - 1, in))
+	while(string_buffer_read_until(buff, in, "\n"))
+	{
+		++*map_at(&m, buff);
+	}
+	fclose(in);
+	
+        sgc_for_each(i, m, map)
         {
-                string s = buff;
-                SGC_FOR_EACH(string, s, el,
-		     ++*map_at(&m, *el);
-		);
-        }
-
-        map_printf_pair(&m, "%c -> %d\n", stdout);
-
+	        if(*i.value > 1)
+	        {
+		        printf("%s -> %d", *i.key, *i.value);
+		}
+	}
         map_free(&m);
         return 0;
 }
 ```
 
+[> Back to content](#content)
 
