@@ -278,13 +278,6 @@ sgc_for_each(element, container_instance, container_name);
 **container_instance ::** the container we iterate through
 **element ::** the name of the pointer we access the elements with
 
-Similar for map-like containers:
-```c
-sgc_for_each_pair(element_pair, container_instance, container_name)
-{
-	// ACTIONS on element_pair.key and element_pair.value
-}
-```
 [> Back to content](#content)
 
 # Benchmarks
