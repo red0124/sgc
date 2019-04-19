@@ -1,6 +1,9 @@
 #pragma once
 
-#define SGC_INIT_STACK(T, N)                                                   \
+#define SGC_INIT_STATIC_FUNCTIONS_STACK(T, N)                                  \
+        static void N##_resize(struct N *s);
+
+#define SGC_INIT_HEADERS_STACK(T, N)                                           \
                                                                                \
         struct N                                                               \
         {                                                                      \
@@ -14,6 +17,23 @@
         typedef T N##_type;                                                    \
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
+                                                                               \
+        void N##_set_share(N *s, int is_shared);                               \
+        size_t N##_size(const struct N *const s);                              \
+        void N##_init(struct N *const s);                                      \
+        void N##_free(struct N *s);                                            \
+        int N##_equal(const struct N *const first,                             \
+                      const struct N *const second);                           \
+        void N##_copy(struct N *__restrict__ dst,                              \
+                      const struct N *__restrict__ const src);                 \
+        void N##_push(struct N *s, T el);                                      \
+        void N##_pop(struct N *s);                                             \
+        T *N##_top(struct N *s);                                               \
+        void N##_set_top(struct N *s, T new_el);                               \
+        int N##_empty(struct N *s);
+
+#define SGC_INIT_STACK(T, N)                                                   \
+        SGC_INIT_HEADERS_STACK(T, N);                                          \
                                                                                \
         /* ================= */                                                \
         /*  STACK FUNCTIONS  */                                                \

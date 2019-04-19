@@ -1,6 +1,6 @@
 #pragma once
 
-#define SGC_INIT_STATIC_STACK(T, S, N)                                         \
+#define SGC_INIT_HEADERS_STATIC_STACK(T, S, N)                                 \
                                                                                \
         struct N                                                               \
         {                                                                      \
@@ -13,6 +13,23 @@
         typedef T N##_type;                                                    \
         typedef T N##_value;                                                   \
         typedef T N##_key;                                                     \
+                                                                               \
+        size_t N##_max(void);                                                  \
+        void N##_set_share(N *s, int is_shared);                               \
+        void N##_init(struct N *s);                                            \
+        size_t N##_size(const struct N *s);                                    \
+        void N##_free(struct N *s);                                            \
+        int N##_equal(const struct N *first, const struct N *second);          \
+        void N##_copy(struct N *__restrict__ dst,                              \
+                      const struct N *__restrict__ const src);                 \
+        void N##_push(struct N *s, T el);                                      \
+        void N##_pop(struct N *s);                                             \
+        T *N##_top(struct N *s);                                               \
+        void N##_set_top(struct N *s, T new_el);                               \
+        int N##_empty(struct N *s);
+
+#define SGC_INIT_STATIC_STACK(T, S, N)                                         \
+        SGC_INIT_HEADERS_STATIC_STACK(T, S, N);                                \
                                                                                \
         size_t N##_max(void)                                                   \
         {                                                                      \

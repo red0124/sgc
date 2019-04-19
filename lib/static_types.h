@@ -5,7 +5,17 @@
 #warning "contains function definitions, define SGC_ST kill warning"
 #endif
 
+#define SGC_INIT_HEADERS_STATIC_TYPE(T, N)                                     \
+                                                                               \
+        void N##_init(T *el);                                                  \
+        void N##_free(T *el);                                                  \
+        void N##_copy(T *dst, const T *const src);                             \
+        int N##_equal(const T *const first, const T *const second);            \
+        int N##_compare(const T *const first, const T *const second);          \
+        int N##_void_compare(const void *const first, const void *const second);
+
 #define SGC_INIT_STATIC_TYPE(T, N)                                             \
+        SGC_INIT_HEADERS_STATIC_TYPE(T, N);                                    \
                                                                                \
         void N##_init(T *el)                                                   \
         {                                                                      \
@@ -50,7 +60,10 @@ SGC_INIT_STATIC_TYPE(float, float);
 SGC_INIT_STATIC_TYPE(double, double);
 SGC_INIT_STATIC_TYPE(long double, long_double);
 
+#define SGC_INIT_HEADERS_HASH(T, N) size_t N##_hash(const T *const el);
+
 #define SGC_INIT_HASH(T, N)                                                    \
+        SGC_INIT_HEADERS_HASH(T, N);                                           \
                                                                                \
         size_t N##_hash(const T *const el)                                     \
         {                                                                      \
@@ -66,7 +79,14 @@ SGC_INIT_HASH(unsigned int, unsigned_int);
 SGC_INIT_HASH(long, long);
 SGC_INIT_HASH(unsigned long, unsigned_long);
 
+#define SGC_INIT_HEADERS_STATIC_STRUCT(T, N)                                   \
+        void N##_init(T *el);                                                  \
+        void N##_free(T *el);                                                  \
+        void N##_copy(T *dst, const T *const src);                             \
+        int N##_equal(const T *const first, const T *const second);
+
 #define SGC_INIT_STATIC_STRUCT(T, N)                                           \
+        SGC_INIT_HEADERS_STATIC_STRUCT(T, N);                                  \
                                                                                \
         void N##_init(T *el)                                                   \
         {                                                                      \

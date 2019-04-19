@@ -38,7 +38,23 @@ static size_t sgc_next_prime(size_t n)
 
 #endif
 
-#define SGC_INIT_UNORDERED_SET(V, N)                                           \
+#define SGC_INIT_STATIC_FUNCTIONS_UNORDERED_SET(V, N)                          \
+        static void N##_bucket_free(struct N##_node *bucket,                   \
+                                    size_t is_shared);                         \
+        static void N##_bucket_insert(struct N##_node *bucket,                 \
+                                      struct N##_node *new_node);              \
+        static size_t N##_bucket_node_size(struct N##_node *bucket);           \
+        static struct N##_node *N##_bucket_remove(                             \
+            struct N##_node *bucket, const V *const value, size_t *size,       \
+            size_t is_shared);                                                 \
+        static struct N##_node *N##_bucket_end(struct N##_node *bucket);       \
+        static struct N##_iterator N##_find_by_hash(                           \
+            struct N *u, const V *const v, size_t hash);                       \
+        static void N##_rehash_size(const struct N *const u, size_t *max,      \
+                                    size_t *new_max);                          \
+        static void N##_resize(struct N *u);
+
+#define SGC_INIT_HEADERS_UNORDERED_SET(V, N)                                   \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
@@ -58,6 +74,55 @@ static size_t sgc_next_prime(size_t n)
         typedef V N##_type;                                                    \
         typedef V N##_value;                                                   \
         typedef V N##_key;                                                     \
+                                                                               \
+        struct N##_node *N##_node_new(const V *const value, size_t is_shared); \
+        size_t N##_bucket_count(const struct N *const u);                      \
+        size_t N##_bucket_size(const struct N *const u, size_t n);             \
+        size_t N##_buckets_used(const struct N *const u);                      \
+                                                                               \
+        struct N##_iterator                                                    \
+        {                                                                      \
+                struct N##_node **_data;                                       \
+                struct N##_node *_curr;                                        \
+                size_t _curr_bucket;                                           \
+                size_t _max;                                                   \
+                int _is_valid;                                                 \
+        };                                                                     \
+                                                                               \
+        const V *N##_iterator_cvalue(struct N##_iterator i);                   \
+        V *N##_iterator_value(struct N##_iterator i);                          \
+        void N##_iterator_next(struct N##_iterator *i);                        \
+        void N##_iterator_begin(struct N *m, struct N##_iterator *i);          \
+        void N##_iterator_cbegin(const struct N *const m,                      \
+                                 struct N##_iterator *i);                      \
+        void N##_iterator_prev(struct N##_iterator *i);                        \
+        void N##_iterator_end(struct N *m, struct N##_iterator *i);            \
+        void N##_iterator_cend(const struct N *const m,                        \
+                               struct N##_iterator *i);                        \
+        struct N##_iterator N##_begin(struct N *m);                            \
+        struct N##_iterator N##_cbegin(const struct N *const m);               \
+        struct N##_iterator N##_end(struct N *m);                              \
+        struct N##_iterator N##_cend(const struct N *const m);                 \
+        int N##_iterator_equal(const struct N##_iterator first,                \
+                               const struct N##_iterator second);              \
+        int N##_iterator_valid(const struct N##_iterator i);                   \
+        void N##_set_share(N *u, int is_shared);                               \
+        size_t N##_size(const struct N *const u);                              \
+        void N##_init(struct N *u);                                            \
+        int N##_equal(const N *const first, const N *const second);            \
+        void N##_copy(N *__restrict__ dst, const N *__restrict__ const src);   \
+        void N##_free(struct N *u);                                            \
+        struct N##_iterator N##_find(struct N *u, const V v);                  \
+        void N##_rehash(struct N *u, size_t new_max);                          \
+        void N##_insert(struct N *u, const V v);                               \
+        void N##_insert_multiple(struct N *u, const V v);                      \
+        void N##_erase(struct N *u, const V v);                                \
+        void N##_iterator_erase(struct N *u, struct N##_iterator *i);          \
+        int N##_empty(const struct N *const u);
+
+#define SGC_INIT_UNORDERED_SET(V, N)                                           \
+        SGC_INIT_HEADERS_UNORDERED_SET(V, N);                                  \
+        SGC_INIT_STATIC_FUNCTIONS_UNORDERED_SET(V, N);                         \
                                                                                \
         /* ================== */                                               \
         /*  BUCKET FUNCTIONS  */                                               \
@@ -197,15 +262,6 @@ static size_t sgc_next_prime(size_t n)
         /* ========== */                                                       \
         /*  ITERATOR  */                                                       \
         /* ========== */                                                       \
-                                                                               \
-        struct N##_iterator                                                    \
-        {                                                                      \
-                struct N##_node **_data;                                       \
-                struct N##_node *_curr;                                        \
-                size_t _curr_bucket;                                           \
-                size_t _max;                                                   \
-                int _is_valid;                                                 \
-        };                                                                     \
                                                                                \
         const V *N##_iterator_cvalue(struct N##_iterator i)                    \
         {                                                                      \
