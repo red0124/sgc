@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #define SGC_INIT_HEADERS_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
 #define SGC_INIT_HEADER(...)                                                   \
         SGC_INIT_HEADERS_N(__VA_ARGS__, SGC_INIT_HEADER7, SGC_INIT_HEADER6,    \

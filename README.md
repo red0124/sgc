@@ -1,6 +1,45 @@
-﻿
-# Semi-Generic C 1.0.0
+﻿# Semi-Generic C 1.0.0
 Algorithms and data structures written in **C** using macros. The data structures used are similar to the ones used in the **C++ STL** with little difference.
+
+# Simple Example
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <SGC/algorithm.h>
+#include <SGC/static_types.h>
+#include <SGC/vector.h>
+
+struct person
+{
+        char first_name[32];
+        char last_name[32];
+        int age;
+};
+
+SGC_INIT_STATIC_STRUCT(struct person, person);
+SGC_INIT(VECTOR, person, vec);
+
+int main(void)
+{
+        vec v;
+        vec_init(&v);
+
+        vec_push_back(&v, (person){"a", "a", 10});
+        vec_push_back(&v, (person){"b", "b", 20});
+        vec_push_back(&v, (person){"c", "c", 30});
+
+        sgc_for_each(i, v, vec)
+        {
+                printf("%s %s %d\n", i->first_name, i->last_name, i->age);
+        }
+
+        vec_free(&v);
+        return 0;
+}
+```
 
 # Content
  - [Purpose](#purpose)
@@ -12,7 +51,7 @@ Algorithms and data structures written in **C** using macros. The data structure
 # Purpose
   - Can be used used anywhere without any dependencies, just the standard library.
   - It is as simple as possible to use.
-  - Can be used on any type of data.
+  - Can be used on any data type.
   - Fast since it does not use **void*** as elements.
   - Memory can be shared.
   - Separate compiling is possible.

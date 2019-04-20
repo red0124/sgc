@@ -80,6 +80,7 @@ SGC_INIT_HASH(long, long);
 SGC_INIT_HASH(unsigned long, unsigned_long);
 
 #define SGC_INIT_HEADERS_STATIC_STRUCT(T, N)                                   \
+	typedef T N;                                                           \
         void N##_init(T *el);                                                  \
         void N##_free(T *el);                                                  \
         void N##_copy(T *dst, const T *const src);                             \
