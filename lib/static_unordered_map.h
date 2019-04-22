@@ -344,6 +344,7 @@ enum sgc_node_state
                                         }                                      \
                                 }                                              \
                         }                                                      \
+			u->_size = 0;\
                 }                                                              \
         }                                                                      \
                                                                                \

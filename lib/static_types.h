@@ -29,7 +29,7 @@
                                                                                \
         void N##_copy(T *dst, const T *const src)                              \
         {                                                                      \
-                *dst = *src;                                                   \
+                *dst = *(T*)src;                                               \
         }                                                                      \
                                                                                \
         int N##_equal(const T *const first, const T *const second)             \
