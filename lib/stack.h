@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 #define SGC_INIT_STATIC_FUNCTIONS_STACK(T, N)                                  \
         static void N##_resize(struct N *s);
 
@@ -65,7 +67,7 @@
                                         T##_free(&s->_data[i]);                \
                                 }                                              \
                         }                                                      \
-                        free(s->_data);                                        \
+                        sgc_free(s->_data);                                    \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -96,7 +98,7 @@
                 {                                                              \
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
-                        dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
+                        dst->_data = (T *)sgc_malloc(dst->_max * sizeof(T));   \
                         dst->_shared = src->_shared;                           \
                         if(src->_shared)                                       \
                         {                                                      \
@@ -121,7 +123,7 @@
                         s->_max = (s->_max == 0) ? 1 : s->_max * 2;            \
                                                                                \
                         s->_data =                                             \
-                            (T *)realloc(s->_data, sizeof(T) * s->_max);       \
+                            (T *)sgc_realloc(s->_data, sizeof(T) * s->_max);   \
                 }                                                              \
         }                                                                      \
                                                                                \

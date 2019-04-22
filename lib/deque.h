@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 #define SGC_INIT_STATIC_FUNCTIONS_DEQUE(T, N)                                  \
         static void N##_move(size_t *flag, size_t max);                        \
         static void N##_move_back(size_t *flag, size_t max);                   \
@@ -140,7 +142,7 @@
                                 }                                              \
                                 T##_free(&d->_data[i]);                        \
                         }                                                      \
-                        free(d->_data);                                        \
+                        sgc_free(d->_data);                                    \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -173,7 +175,7 @@
         {                                                                      \
                 if(src->_size != 0)                                            \
                 {                                                              \
-                        dst->_data = (T *)malloc(src->_size * sizeof(T));      \
+                        dst->_data = (T *)sgc_malloc(src->_size * sizeof(T));  \
                         dst->_shared = src->_shared;                           \
                         if(dst->_shared)                                       \
                         {                                                      \
@@ -221,7 +223,7 @@
                         d->_max = (d->_max == 0) ? 1 : d->_max * 2;            \
                                                                                \
                         d->_data =                                             \
-                            (T *)realloc(d->_data, sizeof(T) * d->_max);       \
+                            (T *)sgc_realloc(d->_data, sizeof(T) * d->_max);   \
                                                                                \
                         if(d->_front > d->_back)                               \
                         {                                                      \

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 #ifndef SGC_STACK
 #define SGC_STACK
 #define SGC_STACK_SIZE 64
@@ -148,7 +150,7 @@
                         {                                                      \
                                 T##_free(&tmp->_data);                         \
                         }                                                      \
-                        free(tmp);                                             \
+                        sgc_free(tmp);                                         \
                 }                                                              \
                 l->_head = l->_tail = NULL;                                    \
                 l->_size = 0;                                                  \
@@ -184,7 +186,7 @@
                 dst->_shared = src->_shared;                                   \
                 if(src->_size != 0)                                            \
                 {                                                              \
-                        dst->_head = (struct N##_node *)malloc(                \
+                        dst->_head = (struct N##_node *)sgc_malloc(            \
                             sizeof(struct N##_node));                          \
                         if(src->_shared)                                       \
                         {                                                      \
@@ -206,7 +208,7 @@
                                 {                                              \
                                         break;                                 \
                                 }                                              \
-                                tmp_dst = (struct N##_node *)malloc(           \
+                                tmp_dst = (struct N##_node *)sgc_malloc(       \
                                     sizeof(struct N##_node));                  \
                                 if(src->_shared)                               \
                                 {                                              \
@@ -234,7 +236,7 @@
         void N##_push_back(struct N *l, T el)                                  \
         {                                                                      \
                 struct N##_node *new_el =                                      \
-                    (struct N##_node *)malloc(sizeof(struct N##_node));        \
+                    (struct N##_node *)sgc_malloc(sizeof(struct N##_node));    \
                 if(!l->_shared)                                                \
                 {                                                              \
                         T##_copy(&new_el->_data, &el);                         \
@@ -311,7 +313,7 @@
                         {                                                      \
                                 T##_free(&tmp->_data);                         \
                         }                                                      \
-                        free(tmp);                                             \
+                        sgc_free(tmp);                                         \
                         if(l->_tail)                                           \
                         {                                                      \
                                 l->_tail->_next = NULL;                        \
@@ -323,7 +325,7 @@
         void N##_push_front(struct N *l, const T el)                           \
         {                                                                      \
                 struct N##_node *new_el =                                      \
-                    (struct N##_node *)malloc(sizeof(struct N##_node));        \
+                    (struct N##_node *)sgc_malloc(sizeof(struct N##_node));    \
                 if(!l->_shared)                                                \
                 {                                                              \
                         T##_copy(&new_el->_data, &el);                         \
@@ -389,7 +391,7 @@
                         {                                                      \
                                 T##_free(&tmp->_data);                         \
                         }                                                      \
-                        free(tmp);                                             \
+                        sgc_free(tmp);                                         \
                         --l->_size;                                            \
                 }                                                              \
         }                                                                      \
@@ -453,7 +455,7 @@
                 {                                                              \
                         T##_free(&n->_data);                                   \
                 }                                                              \
-                free(n);                                                       \
+                sgc_free(n);                                                   \
                 n = NULL;                                                      \
         }                                                                      \
                                                                                \
@@ -534,8 +536,9 @@
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct N##_node *new_node = (struct N##_node *)malloc( \
-                            sizeof(struct N##_node));                          \
+                        struct N##_node *new_node =                            \
+                            (struct N##_node *)sgc_malloc(                     \
+                                sizeof(struct N##_node));                      \
                         if(!l->_shared)                                        \
                         {                                                      \
                                 T##_copy(&new_node->_data, &el);               \
@@ -577,8 +580,9 @@
                 }                                                              \
                 else                                                           \
                 {                                                              \
-                        struct N##_node *new_node = (struct N##_node *)malloc( \
-                            sizeof(struct N##_node));                          \
+                        struct N##_node *new_node =                            \
+                            (struct N##_node *)sgc_malloc(                     \
+                                sizeof(struct N##_node));                      \
                         if(!l->_shared)                                        \
                         {                                                      \
                                 T##_copy(&new_node->_data, &el);               \
@@ -743,7 +747,7 @@
                                                                                \
         void N##_sort(struct N *l, int (*comp)(const void *, const void *))    \
         {                                                                      \
-                struct N##_node **nodes_ptr = (struct N##_node **)malloc(      \
+                struct N##_node **nodes_ptr = (struct N##_node **)sgc_malloc(  \
                     sizeof(struct N##_node *) * l->_size);                     \
                 struct N##_node *curr = l->_head;                              \
                                                                                \
@@ -755,7 +759,7 @@
                                                                                \
                 N##_qsort(nodes_ptr, l->_size, comp);                          \
                 N##_ptr_array_to_list(nodes_ptr, l);                           \
-                free(nodes_ptr);                                               \
+                sgc_free(nodes_ptr);                                           \
         }                                                                      \
                                                                                \
         /* =============== */                                                  \

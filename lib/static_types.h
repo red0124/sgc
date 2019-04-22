@@ -48,18 +48,6 @@
                 return (int)(*(T *)first - *(T *)second);                      \
         }
 
-SGC_INIT_STATIC_TYPE(char, char);
-SGC_INIT_STATIC_TYPE(unsigned char, unsigned_char);
-SGC_INIT_STATIC_TYPE(short, short);
-SGC_INIT_STATIC_TYPE(unsigned short, unsigned_short);
-SGC_INIT_STATIC_TYPE(int, int);
-SGC_INIT_STATIC_TYPE(unsigned int, unsigned_int);
-SGC_INIT_STATIC_TYPE(long, long);
-SGC_INIT_STATIC_TYPE(unsigned long, unsigned_long);
-SGC_INIT_STATIC_TYPE(float, float);
-SGC_INIT_STATIC_TYPE(double, double);
-SGC_INIT_STATIC_TYPE(long double, long_double);
-
 #define SGC_INIT_HEADERS_HASH(T, N) size_t N##_hash(const T *const el);
 
 #define SGC_INIT_HASH(T, N)                                                    \
@@ -70,17 +58,8 @@ SGC_INIT_STATIC_TYPE(long double, long_double);
                 return (size_t)*el;                                            \
         }
 
-SGC_INIT_HASH(char, char);
-SGC_INIT_HASH(unsigned char, unsigned_char);
-SGC_INIT_HASH(short, short);
-SGC_INIT_HASH(unsigned short, unsigned_short);
-SGC_INIT_HASH(int, int);
-SGC_INIT_HASH(unsigned int, unsigned_int);
-SGC_INIT_HASH(long, long);
-SGC_INIT_HASH(unsigned long, unsigned_long);
-
 #define SGC_INIT_HEADERS_STATIC_STRUCT(T, N)                                   \
-	typedef T N;                                                           \
+        typedef T N;                                                           \
         void N##_init(T *el);                                                  \
         void N##_free(T *el);                                                  \
         void N##_copy(T *dst, const T *const src);                             \
@@ -108,3 +87,24 @@ SGC_INIT_HASH(unsigned long, unsigned_long);
         {                                                                      \
                 return memcmp(first, second, sizeof(T)) == 0;                  \
         }
+
+SGC_INIT_STATIC_TYPE(char, char);
+SGC_INIT_STATIC_TYPE(unsigned char, unsigned_char);
+SGC_INIT_STATIC_TYPE(short, short);
+SGC_INIT_STATIC_TYPE(unsigned short, unsigned_short);
+SGC_INIT_STATIC_TYPE(int, int);
+SGC_INIT_STATIC_TYPE(unsigned int, unsigned_int);
+SGC_INIT_STATIC_TYPE(long, long);
+SGC_INIT_STATIC_TYPE(unsigned long, unsigned_long);
+SGC_INIT_STATIC_TYPE(float, float);
+SGC_INIT_STATIC_TYPE(double, double);
+SGC_INIT_STATIC_TYPE(long double, long_double);
+
+SGC_INIT_HASH(char, char);
+SGC_INIT_HASH(unsigned char, unsigned_char);
+SGC_INIT_HASH(short, short);
+SGC_INIT_HASH(unsigned short, unsigned_short);
+SGC_INIT_HASH(int, int);
+SGC_INIT_HASH(unsigned int, unsigned_int);
+SGC_INIT_HASH(long, long);
+SGC_INIT_HASH(unsigned long, unsigned_long);

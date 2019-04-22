@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 #ifndef SGC_MAP
 #define SGC_MAP
 #define SGC_MAP_LEAF NULL
@@ -167,7 +169,7 @@ static size_t sgc_log_two(size_t size)
                                              size_t is_shared)                 \
         {                                                                      \
                 struct N##_node *n =                                           \
-                    (struct N##_node *)malloc(sizeof(struct N##_node));        \
+                    (struct N##_node *)sgc_malloc(sizeof(struct N##_node));    \
                 if(!is_shared)                                                 \
                 {                                                              \
                         V##_copy(&n->_value, v);                               \
@@ -351,7 +353,7 @@ static size_t sgc_log_two(size_t size)
                         return;                                                \
                 }                                                              \
                 struct N##_node **stack =                                      \
-                    (struct N##_node **)malloc(N##_stack_size(s->_size));      \
+                    (struct N##_node **)sgc_malloc(N##_stack_size(s->_size));  \
                                                                                \
                 struct N##_node *curr = s->_root;                              \
                 struct N##_node *tmp = NULL;                                   \
@@ -377,10 +379,10 @@ static size_t sgc_log_two(size_t size)
                                 {                                              \
                                         V##_free(&tmp->_value);                \
                                 }                                              \
-                                free(tmp);                                     \
+                                sgc_free(tmp);                                 \
                         }                                                      \
                 }                                                              \
-                free(stack);                                                   \
+                sgc_free(stack);                                               \
                 s->_root = SGC_MAP_LEAF;                                       \
                 s->_size = 0;                                                  \
         }                                                                      \
@@ -422,7 +424,7 @@ static size_t sgc_log_two(size_t size)
                                                                                \
                 if(src->_size != 0)                                            \
                 {                                                              \
-                        dst->_root = (struct N##_node *)malloc(                \
+                        dst->_root = (struct N##_node *)sgc_malloc(            \
                             sizeof(struct N##_node));                          \
                                                                                \
                         if(!dst->_shared)                                      \
@@ -439,13 +441,13 @@ static size_t sgc_log_two(size_t size)
                             dst->_root->_parent = SGC_MAP_LEAF;                \
                                                                                \
                         struct N##_node **stack_src =                          \
-                            (struct N##_node **)malloc(                        \
+                            (struct N##_node **)sgc_malloc(                    \
                                 N##_stack_size(src->_size));                   \
                                                                                \
                         struct N##_node *curr_src = src->_root;                \
                                                                                \
                         struct N##_node **stack_dst =                          \
-                            (struct N##_node **)malloc(                        \
+                            (struct N##_node **)sgc_malloc(                    \
                                 N##_stack_size(dst->_size));                   \
                                                                                \
                         struct N##_node *curr_dst = dst->_root;                \
@@ -475,7 +477,7 @@ static size_t sgc_log_two(size_t size)
                                    curr_dst->_left == SGC_MAP_LEAF)            \
                                 {                                              \
                                         curr_dst->_left =                      \
-                                            (struct N##_node *)malloc(         \
+                                            (struct N##_node *)sgc_malloc(     \
                                                 sizeof(struct N##_node));      \
                                         tmp = curr_dst->_left;                 \
                                         tmp->_parent = curr_dst;               \
@@ -484,7 +486,7 @@ static size_t sgc_log_two(size_t size)
                                 else                                           \
                                 {                                              \
                                         curr_dst->_right =                     \
-                                            (struct N##_node *)malloc(         \
+                                            (struct N##_node *)sgc_malloc(     \
                                                 sizeof(struct N##_node));      \
                                         tmp = curr_dst->_right;                \
                                         tmp->_parent = curr_dst;               \
@@ -507,8 +509,8 @@ static size_t sgc_log_two(size_t size)
                                 ++stack_size;                                  \
                         }                                                      \
                                                                                \
-                        free(stack_src);                                       \
-                        free(stack_dst);                                       \
+                        sgc_free(stack_src);                                   \
+                        sgc_free(stack_dst);                                   \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -1067,7 +1069,7 @@ static size_t sgc_log_two(size_t size)
                         {                                                      \
                                 V##_free(&n->_value);                          \
                         }                                                      \
-                        free(N##_erase_node(m, n));                            \
+                        sgc_free(N##_erase_node(m, n));                        \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
@@ -1083,7 +1085,7 @@ static size_t sgc_log_two(size_t size)
                         {                                                      \
                                 V##_free(&i->_curr->_value);                   \
                         }                                                      \
-                        free(N##_erase_node(m, i->_curr));                     \
+                        sgc_free(N##_erase_node(m, i->_curr));                 \
                 }                                                              \
                 i->_curr = tmp._curr;                                          \
                 i->_next = tmp._next;                                          \

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 #define SGC_INIT_STATIC_FUNCTIONS_PRIORITY_QUEUE(T, N)                         \
         static void N##_resize(struct N *p);                                   \
         static void N##_memswp(T *i, T *j);                                    \
@@ -71,7 +73,7 @@
                                         T##_free(&p->_data[i]);                \
                                 }                                              \
                         }                                                      \
-                        free(p->_data);                                        \
+                        sgc_free(p->_data);                                    \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -102,7 +104,7 @@
                 {                                                              \
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
-                        dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
+                        dst->_data = (T *)sgc_malloc(dst->_max * sizeof(T));   \
                         dst->_shared = src->_shared;                           \
                         if(src->_shared)                                       \
                         {                                                      \
@@ -129,7 +131,7 @@
                                 T##_free(&p->_data[i]);                        \
                         }                                                      \
                 }                                                              \
-                p->_data = (T *)realloc(p->_data, sizeof(T) * p->_size);       \
+                p->_data = (T *)sgc_realloc(p->_data, sizeof(T) * p->_size);   \
         }                                                                      \
                                                                                \
         static void N##_resize(struct N *p)                                    \
@@ -138,7 +140,7 @@
                 {                                                              \
                         p->_max = (p->_max == 0) ? 1 : p->_max * 2;            \
                         p->_data =                                             \
-                            (T *)realloc(p->_data, sizeof(T) * p->_max);       \
+                            (T *)sgc_realloc(p->_data, sizeof(T) * p->_max);   \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -255,7 +257,7 @@
                 if(size)                                                       \
                 {                                                              \
                         p->_max = size;                                        \
-                        p->_data = (T *)malloc(sizeof(T) * p->_max);           \
+                        p->_data = (T *)sgc_malloc(sizeof(T) * p->_max);       \
                         p->_size = 0;                                          \
                         for(size_t i = 0; i < size; ++i)                       \
                         {                                                      \

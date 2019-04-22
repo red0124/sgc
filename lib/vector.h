@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 #define SGC_INIT_STATIC_FUNCTIONS_VECTOR(T, N)                                 \
         static void N##_resize(struct N *v);
 
@@ -111,7 +113,7 @@
                                         T##_free(&v->_data[i]);                \
                                 }                                              \
                         }                                                      \
-                        free(v->_data);                                        \
+                        sgc_free(v->_data);                                    \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -142,7 +144,7 @@
                 {                                                              \
                         dst->_size = src->_size;                               \
                         dst->_max = src->_size;                                \
-                        dst->_data = (T *)malloc(dst->_max * sizeof(T));       \
+                        dst->_data = (T *)sgc_malloc(dst->_max * sizeof(T));   \
                         dst->_shared = src->_shared;                           \
                         if(!dst->_shared)                                      \
                         {                                                      \
@@ -166,7 +168,7 @@
                 if(size)                                                       \
                 {                                                              \
                         v->_max = v->_size = size;                             \
-                        v->_data = (T *)malloc(sizeof(T) * size);              \
+                        v->_data = (T *)sgc_malloc(sizeof(T) * size);          \
                         v->_shared = 0;                                        \
                         for(size_t i = 0; i < v->_size; ++i)                   \
                         {                                                      \
@@ -189,7 +191,7 @@
                                 T##_free(&v->_data[i]);                        \
                         }                                                      \
                 }                                                              \
-                v->_data = (T *)realloc(v->_data, sizeof(T) * v->_size);       \
+                v->_data = (T *)sgc_realloc(v->_data, sizeof(T) * v->_size);   \
         }                                                                      \
                                                                                \
         static void N##_resize(struct N *v)                                    \
@@ -198,7 +200,7 @@
                 {                                                              \
                         v->_max = (v->_max == 0) ? 1 : v->_max * 2;            \
                         v->_data =                                             \
-                            (T *)realloc(v->_data, sizeof(T) * v->_max);       \
+                            (T *)sgc_realloc(v->_data, sizeof(T) * v->_max);   \
                 }                                                              \
         }                                                                      \
                                                                                \

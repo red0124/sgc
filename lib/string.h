@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 #ifndef SGC_STRING_BUFF_SIZE
 #define SGC_STRING_BUFF_SIZE 128
 #endif
@@ -89,7 +91,7 @@
                 if(*second)                                                    \
                 {                                                              \
                         size_t size = strlen(*second) + 1;                     \
-                        *first = (N)malloc(sizeof(char) * size);               \
+                        *first = (N)sgc_malloc(sizeof(char) * size);           \
                         memcpy(*first, *second, size);                         \
                 }                                                              \
                 else                                                           \
@@ -105,7 +107,7 @@
                                                                                \
         void N##_free(N *s)                                                    \
         {                                                                      \
-                free(*s);                                                      \
+                sgc_free(*s);                                                  \
         }                                                                      \
                                                                                \
         int N##_equal(const N *const first, const N *const second)             \
@@ -146,7 +148,7 @@
         void N##_push_back(N *s, const char c)                                 \
         {                                                                      \
                 size_t len = (*s) ? strlen(*s) : 0;                            \
-                *s = (N)realloc(*s, sizeof(char) * (len + 2));                 \
+                *s = (N)sgc_realloc(*s, sizeof(char) * (len + 2));             \
                 (*s)[len] = c;                                                 \
                 (*s)[len + 1] = '\0';                                          \
         }                                                                      \
@@ -183,7 +185,7 @@
                 if(fgets(buff, S - 1, f))                                      \
                 {                                                              \
                         size_t size = strlen(buff);                            \
-                        s = (N)malloc(sizeof(char) * (size + 1));              \
+                        s = (N)sgc_malloc(sizeof(char) * (size + 1));          \
                         memcpy(s, buff, sizeof(char) * (size + 1));            \
                 }                                                              \
                 return s;                                                      \
@@ -240,7 +242,7 @@
                 {                                                              \
                         buff[size] = '\0';                                     \
                         size_t size = strlen(buff);                            \
-                        s = (N)malloc(sizeof(char) * (size + 1));              \
+                        s = (N)sgc_malloc(sizeof(char) * (size + 1));          \
                         memcpy(s, buff, sizeof(char) * (size + 1));            \
                 }                                                              \
                 return s;                                                      \

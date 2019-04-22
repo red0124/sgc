@@ -6,7 +6,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#define SGC_ST
 #include "../lib/deque.h"
 #include "../lib/list.h"
 #include "../lib/map.h"

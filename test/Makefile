@@ -1,7 +1,7 @@
 CC = gcc -O2 -flto
 CFLAGS = -Wall -Wextra
 NAME = program
-VAL = 
+VAL = valgrind
 
 UNITY = ./Unity/src/unity.c
 

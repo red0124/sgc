@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 #define SGC_INIT_STATIC_FUNCTIONS_QUEUE(T, N)                                  \
         static void N##_move(size_t *flag, size_t max);                        \
         static void N##_resize(struct N *q);
@@ -86,7 +88,7 @@
                                 }                                              \
                                 T##_free(&q->_data[i]);                        \
                         }                                                      \
-                        free(q->_data);                                        \
+                        sgc_free(q->_data);                                    \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -120,7 +122,7 @@
                 dst->_shared = src->_shared;                                   \
                 if(src->_size != 0)                                            \
                 {                                                              \
-                        dst->_data = (T *)malloc(src->_size * sizeof(T));      \
+                        dst->_data = (T *)sgc_malloc(src->_size * sizeof(T));  \
                         if(src->_shared)                                       \
                         {                                                      \
                                 if(src->_front < src->_back)                   \
@@ -167,7 +169,7 @@
                         q->_max = (q->_max == 0) ? 1 : q->_max * 2;            \
                                                                                \
                         q->_data =                                             \
-                            (T *)realloc(q->_data, sizeof(T) * q->_max);       \
+                            (T *)sgc_realloc(q->_data, sizeof(T) * q->_max);   \
                                                                                \
                         if(q->_front > q->_back)                               \
                         {                                                      \

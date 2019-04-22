@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 #ifndef SGC_NEXT_PRIME
 #define SGC_NEXT_PRIME
 
@@ -39,8 +41,8 @@ static size_t sgc_next_prime(size_t n)
 #endif
 
 #define SGC_INIT_STATIC_FUNCTIONS_UNORDERED_SET(V, N)                          \
-        static void N##_bucket_free(struct N##_node *bucket,                   \
-                                    size_t is_shared);                         \
+        static void N##_bucket_sgc_free(struct N##_node *bucket,               \
+                                        size_t is_shared);                     \
         static void N##_bucket_insert(struct N##_node *bucket,                 \
                                       struct N##_node *new_node);              \
         static size_t N##_bucket_node_size(struct N##_node *bucket);           \
@@ -129,7 +131,7 @@ static size_t sgc_next_prime(size_t n)
         struct N##_node *N##_node_new(const V *const value, size_t is_shared)  \
         {                                                                      \
                 struct N##_node *new_node =                                    \
-                    (struct N##_node *)malloc(sizeof(struct N##_node));        \
+                    (struct N##_node *)sgc_malloc(sizeof(struct N##_node));    \
                 if(!is_shared)                                                 \
                 {                                                              \
                         V##_copy(&new_node->_value, value);                    \
@@ -142,7 +144,8 @@ static size_t sgc_next_prime(size_t n)
                 return new_node;                                               \
         }                                                                      \
                                                                                \
-        static void N##_bucket_free(struct N##_node *bucket, size_t is_shared) \
+        static void N##_bucket_sgc_free(struct N##_node *bucket,               \
+                                        size_t is_shared)                      \
         {                                                                      \
                 if(bucket)                                                     \
                 {                                                              \
@@ -156,7 +159,7 @@ static size_t sgc_next_prime(size_t n)
                                 {                                              \
                                         V##_free(&curr->_value);               \
                                 }                                              \
-                                free(curr);                                    \
+                                sgc_free(curr);                                \
                                 curr = NULL;                                   \
                         }                                                      \
                 }                                                              \
@@ -210,7 +213,7 @@ static size_t sgc_next_prime(size_t n)
                                 {                                              \
                                         V##_free(&tmp->_value);                \
                                 }                                              \
-                                free(tmp);                                     \
+                                sgc_free(tmp);                                 \
                                 --*size;                                       \
                                 break;                                         \
                         }                                                      \
@@ -516,14 +519,14 @@ static size_t sgc_next_prime(size_t n)
                 }                                                              \
                 dst->_size = src->_size;                                       \
                 dst->_max = src->_max;                                         \
-                dst->_data = (struct N##_node **)malloc(                       \
+                dst->_data = (struct N##_node **)sgc_malloc(                   \
                     sizeof(struct N##_node *) * dst->_max);                    \
                 dst->_shared = src->_shared;                                   \
                 for(size_t i = 0; i < src->_max; ++i)                          \
                 {                                                              \
                         if(src->_data[i])                                      \
                         {                                                      \
-                                dst->_data[i] = (struct N##_node *)malloc(     \
+                                dst->_data[i] = (struct N##_node *)sgc_malloc( \
                                     sizeof(struct N##_node));                  \
                                 if(!src->_shared)                              \
                                 {                                              \
@@ -546,8 +549,9 @@ static size_t sgc_next_prime(size_t n)
                                         {                                      \
                                                 break;                         \
                                         }                                      \
-                                        tmp_dst = (struct N##_node *)malloc(   \
-                                            sizeof(struct N##_node));          \
+                                        tmp_dst =                              \
+                                            (struct N##_node *)sgc_malloc(     \
+                                                sizeof(struct N##_node));      \
                                         if(!src->_shared)                      \
                                         {                                      \
                                                 V##_copy(&tmp_dst->_value,     \
@@ -577,12 +581,12 @@ static size_t sgc_next_prime(size_t n)
                 {                                                              \
                         for(size_t i = 0; i < u->_max; ++i)                    \
                         {                                                      \
-                                N##_bucket_free(u->_data[i], u->_shared);      \
+                                N##_bucket_sgc_free(u->_data[i], u->_shared);  \
                         }                                                      \
                 }                                                              \
                 if(u->_data)                                                   \
                 {                                                              \
-                        free(u->_data);                                        \
+                        sgc_free(u->_data);                                    \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -626,7 +630,7 @@ static size_t sgc_next_prime(size_t n)
                                                                                \
         void N##_rehash(struct N *u, size_t new_max)                           \
         {                                                                      \
-                struct N##_node **new_data = (struct N##_node **)malloc(       \
+                struct N##_node **new_data = (struct N##_node **)sgc_malloc(   \
                     sizeof(struct N##_node *) * new_max);                      \
                 for(size_t i = 0; i < new_max; ++i)                            \
                 {                                                              \
@@ -661,7 +665,7 @@ static size_t sgc_next_prime(size_t n)
                                 N##_iterator_next(&tmp);                       \
                         }                                                      \
                 }                                                              \
-                free(u->_data);                                                \
+                sgc_free(u->_data);                                            \
                 u->_data = new_data;                                           \
                 u->_max = new_max;                                             \
         }                                                                      \
@@ -673,7 +677,7 @@ static size_t sgc_next_prime(size_t n)
                 if(u->_size == max)                                            \
                 {                                                              \
                         struct N##_node **new_data =                           \
-                            (struct N##_node **)malloc(                        \
+                            (struct N##_node **)sgc_malloc(                    \
                                 sizeof(struct N##_node *) * new_max);          \
                         for(size_t i = 0; i < new_max; ++i)                    \
                         {                                                      \
@@ -708,7 +712,7 @@ static size_t sgc_next_prime(size_t n)
                                         N##_iterator_next(&tmp);               \
                                 }                                              \
                         }                                                      \
-                        free(u->_data);                                        \
+                        sgc_free(u->_data);                                    \
                         u->_data = new_data;                                   \
                         u->_max = new_max;                                     \
                 }                                                              \
