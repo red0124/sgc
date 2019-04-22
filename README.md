@@ -65,6 +65,7 @@ $
   - Memory can be shared.
   - Separate compiling is possible.
   - It has static containers which do not need memory allocation making them usable for **microcontrollers**.
+  - It has support for custom allocators
 
 [> Back to content](#content)
 # Install
@@ -433,6 +434,7 @@ to the non static ones which use open hashing.**
 
 [> Back to content](#content)
 # Examples
+## The examples are not ment to be solved the best possible way, they are here just to show the usage of the library !
 \>\> Count the number of each word in a file then print every non unique element:
 
 ```c
@@ -467,9 +469,9 @@ int main(void)
 	
         sgc_for_each(i, m, map)
         {
-	        if(*i.value > 1)
+	        if(i->value > 1)
 	        {
-		        printf("%s -> %d", *i.key, *i.value);
+		        printf("%s -> %d", i->key, i->value);
 		}
 	}
         map_free(&m);
@@ -496,7 +498,9 @@ int main(void)
 
 // this custom allocator uses an unordered_set to store
 // the addresses of the allocated memory blocks
-// perevents leaks and double freeing
+// can't think of a simpler one, just a malloc wraper, 
+// a bit pointless but perevents leaks and double freeing
+
 SGC_INIT_STATIC(UNORDERED_SET, long, 100, set);
 set used_addrs;
 
@@ -529,7 +533,7 @@ void my_free(void *addr)
         }
         else
         {
-                printf("double free\n");
+                printf("double free prevented\n");
         }
 }
 
@@ -578,7 +582,61 @@ int main(void)
 Output:
 ```bash
 $ ./program
-double free
+double free prevented
+```
+
+[> Back to content](#content)
+
+\>\> Read strings from stdin, save those which are palindromes and store them in a sorted manner into a txt file
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <SGC/vector.h>
+#include <SGC/string.h>
+#include <SGC/algorithm.h>
+
+SGC_INIT(STRING, string);
+SGC_INIT(VECTOR, string, vector, QSORT, ITERATE);
+
+int main(void)
+{
+
+	char buff[32];
+	string s = buff;
+
+	vector v;
+	vector_init(&v);
+
+	while(string_buffer_read_untill(buff, stdin, "\n "))
+	{
+		int palindrome = 1;
+		sgc_for_each_intersect(i, s, s, string)
+		{
+			if(*i.first != *i.second)
+			{
+				palindrome = 0;
+				break;
+			}
+		}
+		if(palindrome)
+		{
+			printf("Perfectly balanced. As all things shoud be.\n");
+			vector_push_back(&v, s);
+		}
+	}
+
+	vector_sort(&v, NULL);
+
+	FILE* f = fopen("out.txt", "w");
+	vector_fprintf(&v, "%s\n", f);
+	fclose(f);
+
+	vector_free(&v);
+        return 0;
+}
 ```
 
 [> Back to content](#content)
