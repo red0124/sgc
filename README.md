@@ -41,6 +41,15 @@ int main(void)
 }
 ```
 
+Output:
+```bash
+$ ./program
+a a 10
+b b 20
+c c 30
+$ 
+```
+
 # Content
  - [Purpose](#purpose)
  - [Install](#install)
@@ -216,8 +225,8 @@ int main(int)
 	list l;
 	list_init(&l);
 
-	string s = (string)malloc(sizeof(char) * 10);
-	strcpy(s, "hello");
+	string s;
+	s = string_create("hello");
 
 	// allocate memory and copy the string
 	list_push_back(&l, s);
@@ -316,6 +325,14 @@ sgc_for_each(element, container_instance, container_name);
 **container_name ::** name of the container we iterate through
 **container_instance ::** the container we iterate through
 **element ::** the name of the pointer we access the elements with
+
+Custom allocators can be set by defining SGC_CUSTOM_ALLOCATOR before including
+the header then later calling: 
+```c
+SGC_INIT_ALLOCATOR(custom_malloc, custom_realloc, custom_free);
+```
+
+And your containers will use those instead of the default ones.
 
 [> Back to content](#content)
 
@@ -462,3 +479,106 @@ int main(void)
 
 [> Back to content](#content)
 
+\>\> Simple custom allocator
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define SGC_CUSTOM_ALLOCATOR
+
+#include <SGC/algorithm.h>
+#include <SGC/list.h>
+#include <SGC/static_types.h>
+#include <SGC/static_unordered_set.h>
+#include <SGC/string.h>
+
+// this custom allocator uses an unordered_set to store
+// the addresses of the allocated memory blocks
+// perevents leaks and double freeing
+SGC_INIT_STATIC(UNORDERED_SET, long, 100, set);
+set used_addrs;
+
+void *my_malloc(size_t n)
+{
+        void *addr = malloc(n);
+        set_insert(&used_addrs, (long)addr);
+        return addr;
+}
+
+void *my_realloc(void *addr, size_t n)
+{
+        void *old_addr = addr;
+        addr = realloc(addr, n);
+        set_insert(&used_addrs, (long)addr);
+        if(addr != old_addr)
+        {
+                set_erase(&used_addrs, (long)old_addr);
+        }
+        return addr;
+}
+
+void my_free(void *addr)
+{
+        struct set_iterator it = set_find(&used_addrs, (long)addr);
+        if(set_iterator_valid(it))
+        {
+                set_iterator_erase(&used_addrs, &it);
+                free(addr);
+        }
+        else
+        {
+                printf("double free\n");
+        }
+}
+
+void my_allocator_init(void)
+{
+        set_init(&used_addrs);
+}
+
+void my_allocator_clean(void)
+{
+        sgc_for_each(i, used_addrs, set)
+        {
+                my_free((void *)*i);
+        }
+	set_free(&used_addrs);
+}
+
+SGC_INIT_ALLOCATOR(my_malloc, my_realloc, my_free);
+SGC_INIT(STRING, string);
+SGC_INIT(LIST, string, list);
+
+int main(void)
+{
+        my_allocator_init();
+
+        list l;
+        list_init(&l);
+        list_set_share(&l, 1);
+
+        string s;
+        s = string_create("hello");
+
+        list_push_back(&l, s);
+        list_push_back(&l, s);
+        list_push_back(&l, s);
+        list_push_back(&l, s);
+
+	// this will free all memory
+        my_allocator_clean();
+
+	// tries double free
+        my_free(s);
+        return 0;
+}
+```
+Output:
+```bash
+$ ./program
+double free
+```
+
+[> Back to content](#content)
