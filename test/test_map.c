@@ -93,8 +93,8 @@ void al_copy(al *dst, const al *const src)
 
 void al_free(al *a)
 {
-	--allocation_count;
-	free(a->el);
+        --allocation_count;
+        free(a->el);
 }
 
 int al_equal(const al *const first, const al *const second)

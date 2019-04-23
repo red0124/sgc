@@ -20,7 +20,7 @@ OUTPUT_TXT_FILE='vector_push_back.txt'
 ###################
 ###################
 
-meassure()
+measure()
 {
 	echo "num of elements = $2" >> $OUTPUT_FILE
 	echo "num of repetitions = $3" >> $OUTPUT_FILE
@@ -34,7 +34,7 @@ echo 'c' >> $OUTPUT_FILE
 echo '' >> $OUTPUT_FILE
 
 for i in ${num_elements[@]}; do
-	meassure c_prog $((i * factor)) $((repeat_max/(i*factor)))
+	measure c_prog $((i * factor)) $((repeat_max/(i*factor)))
 done
 
 echo '' >> $OUTPUT_FILE
@@ -42,7 +42,7 @@ echo 'cpp' >> $OUTPUT_FILE
 echo '' >> $OUTPUT_FILE
 
 for i in ${num_elements[@]}; do
-	meassure cpp_prog $((i * factor)) $((repeat_max/(i*factor)))
+	measure cpp_prog $((i * factor)) $((repeat_max/(i*factor)))
 done
 
 cp $OUTPUT_FILE $OUTPUT_TXT_FILE

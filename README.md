@@ -610,7 +610,7 @@ int main(void)
 	vector v;
 	vector_init(&v);
 
-	while(string_buffer_read_untill(buff, stdin, "\n "))
+	while(string_buffer_read_until(buff, stdin, "\n "))
 	{
 		int palindrome = 1;
 		sgc_for_each_intersect(i, s, s, string)
