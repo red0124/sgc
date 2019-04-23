@@ -35,7 +35,6 @@ void test_string_push_pop(void)
                 string_push_back(&v, i);
         }
 
-        printf("aham\n");
         for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
         {
                 TEST_ASSERT_EQUAL_INT(i + 'a', v[i]);
