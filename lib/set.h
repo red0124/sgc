@@ -1,45 +1,10 @@
 #pragma once
 
-#include "allocator.h"
-#include "utils.h"
-#include "basic_types.h"
-
-#ifndef SGC_MAP
-#define SGC_MAP
-#define SGC_MAP_LEAF NULL
-#endif
-
-#ifndef SGC_MAP_COLOR
-#define SGC_MAP_COLOR
-enum sgc_map_color
-{
-        SGC_MAP_RED,
-        SGC_MAP_BLACK,
-};
-#endif
-
-#ifndef SGC_MAP_LOG
-#define SGC_MAP_LOG
-static size_t sgc_exp_two(size_t curr)
-{
-        size_t power = 1;
-        for(size_t i = 0; i < curr; ++i)
-        {
-                power *= 2;
-        }
-        return power;
-}
-
-static size_t sgc_log_two(size_t size)
-{
-        size_t curr = 1;
-        while(size >= sgc_exp_two(curr))
-        {
-                ++curr;
-        }
-        return curr + 1;
-}
-#endif
+#include "sgc_allocator.h"
+#include "sgc_basic_types.h"
+#include "sgc_log.h"
+#include "sgc_tree_node.h"
+#include "sgc_utils.h"
 
 #define SGC_INIT_STATIC_FUNCTIONS_SET(V, N)                                    \
         static struct N##_node *N##_node_begin(struct N##_node *n);            \

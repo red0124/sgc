@@ -1,29 +1,9 @@
 #pragma once
 
-#include "allocator.h"
-#include "utils.h"
-#include "basic_types.h"
-
-#ifndef SGC_STACK
-#define SGC_STACK
-#define SGC_STACK_SIZE 64
-
-#define SGC_PREPARE_STACK                                                      \
-        char *stack[SGC_STACK_SIZE];                                           \
-        char **stackptr = stack
-
-#define SGC_STACK_PUSH(array, limit)                                           \
-        stackptr[0] = array;                                                   \
-        stackptr[1] = limit;                                                   \
-        stackptr += 2
-
-#define SGC_STACK_POP(array, limit)                                            \
-        stackptr -= 2;                                                         \
-        array = stackptr[0];                                                   \
-        limit = stackptr[1]
-
-#define SGC_STACK_THRESH 7
-#endif
+#include "sgc_allocator.h"
+#include "sgc_basic_types.h"
+#include "sgc_sort_stack.h"
+#include "sgc_utils.h"
 
 #define SGC_INIT_STATIC_FUNCTIONS_FORWARD_LIST(T, N)                           \
         static struct N##_node *N##_prev(struct N##_node *head,                \

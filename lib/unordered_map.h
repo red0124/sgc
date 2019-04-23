@@ -1,45 +1,10 @@
 #pragma once
 
-#include "allocator.h"
-#include "utils.h"
+#include "sgc_allocator.h"
+#include "sgc_basic_types.h"
+#include "sgc_prime.h"
+#include "sgc_utils.h"
 
-#ifndef SGC_NEXT_PRIME
-#define SGC_NEXT_PRIME
-
-static size_t sgc_sqrt(size_t n)
-{
-        size_t i = 1;
-        while(i * i <= n)
-        {
-                ++i;
-        }
-        return i;
-}
-
-static int sgc_is_prime(size_t n)
-{
-        int is_prime = 1;
-        for(size_t i = 2; i <= sgc_sqrt(n); ++i)
-        {
-                if(n % i == 0)
-                {
-                        is_prime = 0;
-                        break;
-                }
-        }
-        return is_prime;
-}
-
-static size_t sgc_next_prime(size_t n)
-{
-        while(!sgc_is_prime(n))
-        {
-                ++n;
-        }
-        return n;
-}
-
-#endif
 #define SGC_INIT_STATIC_FUNCTIONS_UNORDERED_MAP(K, V, N)                       \
         static void N##_bucket_sgc_free(                                       \
             struct N##_node *bucket, size_t is_shared_key, size_t is_shared);  \

@@ -8,8 +8,6 @@ Algorithms and data structures written in **C** using macros. The data structure
 #include <stdlib.h>
 #include <string.h>
 
-#include <SGC/algorithm.h>
-#include <SGC/static_types.h>
 #include <SGC/vector.h>
 
 struct person
@@ -19,7 +17,7 @@ struct person
         int age;
 };
 
-SGC_INIT_STATIC(STRUCT, struct person, person);
+SGC_INIT(STATIC_STRUCT, struct person, person);
 SGC_INIT(VECTOR, person, vec);
 
 int main(void)
@@ -212,6 +210,7 @@ If you want to disable copying and destroying elements when using a container si
 
 ```c
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <SGC/string.h>
@@ -221,7 +220,7 @@ If you want to disable copying and destroying elements when using a container si
 SGC_INIT(STRING, string);
 SGC_INIT(FORWARD_LIST, string, list);
 
-int main(int)
+int main(void)
 {
 	list l;
 	list_init(&l);
@@ -231,7 +230,7 @@ int main(int)
 
 	// allocate memory and copy the string
 	list_push_back(&l, s);
-	
+
 	// use the string itself as shared
 	list_set_share(&l, 1);
 	list_push_back(&l, s);
@@ -243,20 +242,13 @@ int main(int)
 	return 0;
 }
 ```
-To use primitive types we have to include :
-
-```c
-#include <SGC/static_types.h>
-```
-
-Where some types have their functions defined by default, and more can be added using the **SGC_INIT_STATIC_TYPE** macro, or when creating a primitive structure (structure of primitive types and primitive structures)  **SGC_INIT_STATIC_STRUCT** :
+Some types have their functions defined by default, and more can be added using the **SGC_INIT_BASIC_TYPE** macro, or when creating a primitive structure (structure of primitive types and primitive structures)  **SGC_INIT_STATIC_STRUCT** :
 
 ```c
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
-#include <SGC/static_types.h>
-#include <SGC/algorithm.h>
 #include <SGC/stack.h>
 
 struct point
@@ -265,10 +257,8 @@ struct point
 	double y;
 };
 
-typedef struct point pt;
-
-SGC_INIT_STATIC(STRUCT, pt, pt);
-SGC_INIT(STACK, int, stack);
+SGC_INIT(STATIC_STRUCT, struct point, pt);
+SGC_INIT(STACK, pt, stack);
 
 int main(void)
 {
@@ -442,16 +432,13 @@ to the non static ones which use open hashing.**
 #include <stdlib.h>
 #include <string.h>
 
-#include <SGC/algorithm.h>
-#include <SGC/static_types.h>
+#define FILE_NAME "words.txt"
+
 #include <SGC/string.h>
 #include <SGC/unordered_map.h>
 
-#define BUFF_SIZE 256
-#define FILE_NAME "words.txt"
-
-SGC_INIT(STRING, BUFF_SIZE, string);
-SGC_INIT_PAIR(UNORDERED_MAP, string, int, map, ITERATE_PAIR);
+SGC_INIT(STRING, string);
+SGC_INIT_PAIR(UNORDERED_MAP, string, int, map);
 
 int main(void)
 {
@@ -490,11 +477,9 @@ int main(void)
 
 #define SGC_CUSTOM_ALLOCATOR
 
-#include <SGC/algorithm.h>
 #include <SGC/list.h>
-#include <SGC/static_types.h>
-#include <SGC/static_unordered_set.h>
 #include <SGC/string.h>
+#include <SGC/static_unordered_set.h>
 
 // this custom allocator uses an unordered_set to store
 // the addresses of the allocated memory blocks
@@ -647,10 +632,8 @@ int main(void)
 #include <stdio.h>
 #include <string.h>
 
-#include <SGC/static_types.h>
-#include <SGC/static_priority_queue.h>
 #include <SGC/static_vector.h>
-#include <SGC/algorithm.h>
+#include <SGC/static_priority_queue.h>
 
 struct task
 {
@@ -667,7 +650,7 @@ int task_compare(const struct task* first,
 
 #define MAX_TASKS 32
 
-SGC_INIT_STATIC_STRUCT(struct task, task);
+SGC_INIT_STATIC(STRUCT, struct task, task);
 SGC_INIT_STATIC(PRIORITY_QUEUE, task, MAX_TASKS, pqueue);
 SGC_INIT_STATIC(VECTOR, task, MAX_TASKS, vector);
 

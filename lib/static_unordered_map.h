@@ -1,19 +1,8 @@
 #pragma once
 
-#include "utils.h"
-#include "basic_types.h"
-
-#ifndef SGC_NODE_STATE
-#define SGC_NODE_STATE
-
-enum sgc_node_state
-{
-        SGC_NODE_STATE_OPEN,
-        SGC_NODE_STATE_USED,
-        SGC_NODE_STATE_ERASED,
-};
-
-#endif
+#include "sgc_basic_types.h"
+#include "sgc_hash_node_state.h"
+#include "sgc_utils.h"
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_UNORDERED_MAP(K, V, S, N)             \
         static struct N##_iterator N##_find_by_hash(                           \

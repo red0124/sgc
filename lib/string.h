@@ -1,7 +1,7 @@
 #pragma once
 
-#include "allocator.h"
-#include "utils.h"
+#include "sgc_allocator.h"
+#include "sgc_utils.h"
 
 #ifndef SGC_STRING_BUFF_SIZE
 #define SGC_STRING_BUFF_SIZE 128

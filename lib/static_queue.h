@@ -1,7 +1,7 @@
 #pragma once
 
-#include "utils.h"
-#include "basic_types.h"
+#include "sgc_basic_types.h"
+#include "sgc_utils.h"
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_QUEUE(T, S, N)                        \
         static void N##_move(size_t *flag);

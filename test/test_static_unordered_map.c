@@ -6,19 +6,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#define SGC_ST
-#include "../lib/static_types.h"
 #include "../lib/static_unordered_map.h"
-
-//#define __UNITY
-#ifndef __UNITY
 #include "./Unity/src/unity.h"
-#else
-#define TEST_ASSERT_EQUAL_INT(a, b) (printf((a != b) ? "?\n" : ""))
-#define RUN_TEST(x) (x())
-#define UNITY_BEGIN() (0)
-#define UNITY_END() (1)
-#endif
 
 #define TEST_ELEMENTS_NUM 50
 #define MAP_MAX 128

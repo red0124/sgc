@@ -16,12 +16,12 @@
 
 #define SGC_INIT_ALLOCATOR_N(_1, _2, _3, _4, NAME, ...) NAME
 #define SGC_INIT_ALLOCATOR(...)                                                \
-        SGC_INIT_ALLOCATOR_N(__VA_ARGS__, SGC_INIT_ALLOCATOR4,         \
+        SGC_INIT_ALLOCATOR_N(__VA_ARGS__, SGC_INIT_ALLOCATOR4,                 \
                              SGC_INIT_ALLOCATOR3)                              \
         (__VA_ARGS__)
 
 #define SGC_INIT_ALLOCATOR3(MALLOC, REALLOC, FREE)                             \
-        SGC_INIT_ALLOCATOR4(MALLOC, REALLOC, FREE, static);
+        SGC_INIT_ALLOCATOR4(MALLOC, REALLOC, FREE, static inline);
 
 #define SGC_INIT_ALLOCATOR4(MALLOC, REALLOC, FREE, F)                          \
         SGC_INIT_HEADERS_ALLOCATOR4(MALLOC, REALLOC, FREE, F)                  \
@@ -41,5 +41,5 @@
         }
 
 #ifndef SGC_CUSTOM_ALLOCATOR
-SGC_INIT_ALLOCATOR(malloc, realloc, free, static);
+SGC_INIT_ALLOCATOR(malloc, realloc, free, static inline);
 #endif
