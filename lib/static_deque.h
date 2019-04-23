@@ -1,5 +1,8 @@
 #pragma once
 
+#include "utils.h"
+#include "basic_types.h"
+
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_DEQUE(T, S, N)                        \
         static void N##_move(size_t *flag);                                    \
         static void N##_move_back(size_t *flag);

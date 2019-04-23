@@ -1,6 +1,8 @@
 #pragma once
 
 #include "allocator.h"
+#include "utils.h"
+#include "basic_types.h"
 
 #ifndef SGC_MAP
 #define SGC_MAP

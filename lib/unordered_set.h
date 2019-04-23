@@ -1,6 +1,8 @@
 #pragma once
 
 #include "allocator.h"
+#include "utils.h"
+#include "basic_types.h"
 
 #ifndef SGC_NEXT_PRIME
 #define SGC_NEXT_PRIME

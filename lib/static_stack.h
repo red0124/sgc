@@ -1,5 +1,8 @@
 #pragma once
 
+#include "utils.h"
+#include "basic_types.h"
+
 #define SGC_INIT_HEADERS_STATIC_STACK(T, S, N)                                 \
                                                                                \
         struct N                                                               \

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "utils.h"
+#include "basic_types.h"
+
 #define SGC_INIT_HEADER_STATIC_VECTOR(T, S, N)                                 \
         struct N                                                               \
         {                                                                      \

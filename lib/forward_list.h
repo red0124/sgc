@@ -1,6 +1,8 @@
 #pragma once
 
 #include "allocator.h"
+#include "utils.h"
+#include "basic_types.h"
 
 #ifndef SGC_STACK
 #define SGC_STACK

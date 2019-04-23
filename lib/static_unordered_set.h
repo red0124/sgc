@@ -1,5 +1,8 @@
 #pragma once
 
+#include "utils.h"
+#include "basic_types.h"
+
 #ifndef SGC_NODE_STATE
 #define SGC_NODE_STATE
 

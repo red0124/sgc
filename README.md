@@ -19,7 +19,7 @@ struct person
         int age;
 };
 
-SGC_INIT_STATIC_STRUCT(struct person, person);
+SGC_INIT_STATIC(STRUCT, struct person, person);
 SGC_INIT(VECTOR, person, vec);
 
 int main(void)
@@ -267,7 +267,7 @@ struct point
 
 typedef struct point pt;
 
-SGC_INIT_STATIC_STRUCT(pt, pt);
+SGC_INIT_STATIC(STRUCT, pt, pt);
 SGC_INIT(STACK, int, stack);
 
 int main(void)

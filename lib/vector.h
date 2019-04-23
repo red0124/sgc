@@ -1,6 +1,8 @@
 #pragma once
 
 #include "allocator.h"
+#include "utils.h"
+#include "basic_types.h"
 
 #define SGC_INIT_STATIC_FUNCTIONS_VECTOR(T, N)                                 \
         static void N##_resize(struct N *v);

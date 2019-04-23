@@ -1,6 +1,7 @@
 #pragma once
 
 #include "allocator.h"
+#include "utils.h"
 
 #ifndef SGC_STRING_BUFF_SIZE
 #define SGC_STRING_BUFF_SIZE 128
@@ -27,10 +28,10 @@
 #define SGC_INIT_HEADERS_STRING1(N)                                            \
         SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, SGC_STRING_BUFF_SIZE);
 
-#define SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, S)                              \
+#define SGC_INIT_STATIC_FUNCTIONS_STRING_WITH_BUFFER(N, S)                     \
         static int N##_char_find(const char *const del, char c);
 
-#define SGC_INIT_STATIC_FUNCTIONS_STRING_WITH_BUFFER(N, S)                     \
+#define SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, S)                              \
                                                                                \
         typedef char *N;                                                       \
         typedef char N##_type;                                                 \

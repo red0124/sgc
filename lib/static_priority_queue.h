@@ -1,5 +1,8 @@
 #pragma once
 
+#include "utils.h"
+#include "basic_types.h"
+
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_PRIORITY_QUEUE(T, S, N)               \
         static void N##_memswp(T *i, T *j);                                    \
         static void N##_fix_insert(struct N *p);                               \
