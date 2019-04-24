@@ -77,6 +77,7 @@
                 struct N##_node *_next;                                        \
                 int _is_valid;                                                 \
         };                                                                     \
+        typedef struct N##_iterator N##_iterator;                              \
                                                                                \
         struct N##_pair *N##_iterator_data(struct N##_iterator i);             \
         const struct N##_pair *N##_iterator_cdata(struct N##_iterator i);      \

@@ -77,6 +77,8 @@
                 struct N##_node *_head;                                        \
         };                                                                     \
                                                                                \
+        typedef struct N##_iterator N##_iterator;                              \
+                                                                               \
         T *N##_iterator_data(struct N##_iterator i);                           \
         const T *N##_iterator_cdata(const struct N##_iterator i);              \
         void N##_iterator_next(struct N##_iterator *i);                        \

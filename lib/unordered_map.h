@@ -64,6 +64,8 @@
                 int _is_valid;                                                 \
         };                                                                     \
                                                                                \
+        typedef struct N##_iterator N##_iterator;                              \
+                                                                               \
         struct N##_pair *N##_iterator_data(struct N##_iterator i);             \
         const struct N##_pair *N##_iterator_cdata(struct N##_iterator i);      \
         void N##_iterator_next(struct N##_iterator *i);                        \

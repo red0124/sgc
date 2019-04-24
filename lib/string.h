@@ -36,6 +36,7 @@
         typedef char *N;                                                       \
         typedef char N##_type;                                                 \
         typedef char static_##N[S];                                            \
+        typedef char *N##_iterator;                                            \
                                                                                \
         void N##_copy(N *first, const N *const second);                        \
         void N##_init(N *s);                                                   \
@@ -48,40 +49,33 @@
         void N##_push_back(N *s, const char c);                                \
         void N##_pop_back(N *s);                                               \
         void N##_from_cstring(N *first, const char *const second);             \
-        N N##_create(const char *const second);                                \
-        N N##_read(FILE *f);                                                   \
-        N N##_buffer_read_untill(N s, FILE *f, const char *const del);         \
-        N N##_read_untill(FILE *f, const char *const del);                     \
-        N N##_read_file(const char *const file_name);                          \
+        N N##_read(N *s, FILE *f);                                             \
+        N N##_buffer_read_until(N s, FILE *f, const char *const del);          \
+        N N##_read_until(N *s, FILE *f, const char *const del);                \
+        N N##_read_file(N *s, const char *const file_name);                    \
                                                                                \
-        struct N##_iterator                                                    \
-        {                                                                      \
-                char *_curr;                                                   \
-        };                                                                     \
-                                                                               \
-        char *N##_iterator_data(struct N##_iterator i);                        \
-        const char *N##_iterator_cdata(const struct N##_iterator i);           \
-        void N##_iterator_next(struct N##_iterator *i);                        \
-        void N##_iterator_prev(struct N##_iterator *i);                        \
-        void N##_iterator_begin(N *s, struct N##_iterator *i);                 \
-        void N##_iterator_cbegin(const N *const s, struct N##_iterator *i);    \
-        struct N##_iterator N##_begin(N *s);                                   \
-        struct N##_iterator N##_cbegin(const N *const s);                      \
-        void N##_iterator_end(N *s, struct N##_iterator *i);                   \
-        void N##_iterator_cend(const N *const s, struct N##_iterator *i);      \
-        struct N##_iterator N##_end(N *s);                                     \
-        struct N##_iterator N##_cend(const N *const s);                        \
-        void N##_iterator_from(N *s, struct N##_iterator *i, size_t at);       \
-        void N##_iterator_cfrom(const N *const s, struct N##_iterator *i,      \
-                                size_t at);                                    \
-        struct N##_iterator N##_from(N *s, size_t at);                         \
-        struct N##_iterator N##_cfrom(const N *const s, size_t at);            \
-        void N##_iterator_jump(struct N##_iterator *i, ssize_t range);         \
-        int N##_iterator_equal(const struct N##_iterator first,                \
-                               const struct N##_iterator second);              \
-        ssize_t N##_iterator_range(const struct N##_iterator first,            \
-                                   const struct N##_iterator second);          \
-        int N##_iterator_valid(const struct N##_iterator i);
+        char *N##_iterator_data(N##_iterator i);                               \
+        const char *N##_iterator_cdata(const N##_iterator i);                  \
+        void N##_iterator_next(N##_iterator *i);                               \
+        void N##_iterator_prev(N##_iterator *i);                               \
+        void N##_iterator_begin(N *s, N##_iterator *i);                        \
+        void N##_iterator_cbegin(const N *const s, N##_iterator *i);           \
+        N##_iterator N##_begin(N *s);                                          \
+        N##_iterator N##_cbegin(const N *const s);                             \
+        void N##_iterator_end(N *s, N##_iterator *i);                          \
+        void N##_iterator_cend(const N *const s, N##_iterator *i);             \
+        N##_iterator N##_end(N *s);                                            \
+        N##_iterator N##_cend(const N *const s);                               \
+        void N##_iterator_from(N *s, N##_iterator *i, size_t at);              \
+        void N##_iterator_cfrom(const N *const s, N##_iterator *i, size_t at); \
+        N##_iterator N##_from(N *s, size_t at);                                \
+        N##_iterator N##_cfrom(const N *const s, size_t at);                   \
+        void N##_iterator_jump(N##_iterator *i, ssize_t range);                \
+        int N##_iterator_equal(const N##_iterator first,                       \
+                               const N##_iterator second);                     \
+        ssize_t N##_iterator_range(const N##_iterator first,                   \
+                                   const N##_iterator second);                 \
+        int N##_iterator_valid(const N##_iterator i);
 
 #define SGC_INIT_STRING_WITH_BUFFER(N, S)                                      \
         SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, S);                             \
@@ -89,15 +83,12 @@
                                                                                \
         void N##_copy(N *first, const N *const second)                         \
         {                                                                      \
+                *first = NULL;                                                 \
                 if(*second)                                                    \
                 {                                                              \
                         size_t size = strlen(*second) + 1;                     \
                         *first = (N)sgc_malloc(sizeof(char) * size);           \
                         memcpy(*first, *second, size);                         \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        *first = NULL;                                         \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -113,8 +104,8 @@
                                                                                \
         int N##_equal(const N *const first, const N *const second)             \
         {                                                                      \
-                int ret = 0;                                                   \
-                if(*first && *second)                                          \
+                int ret = (*first == *second);                                 \
+                if(ret == 0 && *first && *second)                              \
                 {                                                              \
                         ret = strcmp(*first, *second) == 0;                    \
                 }                                                              \
@@ -172,24 +163,17 @@
                 }                                                              \
         }                                                                      \
                                                                                \
-        N N##_create(const char *const second)                                 \
+        N N##_read(N *s, FILE *f)                                              \
         {                                                                      \
-                N ret = NULL;                                                  \
-                N##_from_cstring(&ret, second);                                \
-                return ret;                                                    \
-        }                                                                      \
-                                                                               \
-        N N##_read(FILE *f)                                                    \
-        {                                                                      \
-                N s = NULL;                                                    \
+                *s = NULL;                                                     \
                 char buff[S] = "\0";                                           \
                 if(fgets(buff, S - 1, f))                                      \
                 {                                                              \
                         size_t size = strlen(buff);                            \
-                        s = (N)sgc_malloc(sizeof(char) * (size + 1));          \
-                        memcpy(s, buff, sizeof(char) * (size + 1));            \
+                        *s = (N)sgc_malloc(sizeof(char) * (size + 1));         \
+                        memcpy(*s, buff, sizeof(char) * (size + 1));           \
                 }                                                              \
-                return s;                                                      \
+                return *s;                                                     \
         }                                                                      \
                                                                                \
         static int N##_char_find(const char *const del, char c)                \
@@ -207,7 +191,7 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        N N##_buffer_read_untill(N s, FILE *f, const char *const del)          \
+        N N##_buffer_read_until(N s, FILE *f, const char *const del)           \
         {                                                                      \
                 char c;                                                        \
                 size_t size = 0;                                               \
@@ -224,9 +208,9 @@
                 return (size == 0) ? NULL : s;                                 \
         }                                                                      \
                                                                                \
-        N N##_read_untill(FILE *f, const char *const del)                      \
+        N N##_read_until(N *s, FILE *f, const char *const del)                 \
         {                                                                      \
-                N s = NULL;                                                    \
+                *s = NULL;                                                     \
                 char c;                                                        \
                 size_t size = 0;                                               \
                 char buff[S] = "\0";                                           \
@@ -243,132 +227,130 @@
                 {                                                              \
                         buff[size] = '\0';                                     \
                         size_t size = strlen(buff);                            \
-                        s = (N)sgc_malloc(sizeof(char) * (size + 1));          \
+                        *s = (N)sgc_malloc(sizeof(char) * (size + 1));         \
                         memcpy(s, buff, sizeof(char) * (size + 1));            \
                 }                                                              \
-                return s;                                                      \
+                return *s;                                                     \
         }                                                                      \
                                                                                \
-        N N##_read_file(const char *const file_name)                           \
+        N N##_read_file(N *s, const char *const file_name)                     \
         {                                                                      \
-                N s;                                                           \
                 FILE *f = fopen(file_name, "r");                               \
-                s = N##_read_untill(f, "");                                    \
+                *s = N##_read_until(s, f, "");                                 \
                 fclose(f);                                                     \
-                return s;                                                      \
+                return *s;                                                     \
         }                                                                      \
                                                                                \
-        char *N##_iterator_data(struct N##_iterator i)                         \
+        char *N##_iterator_data(N##_iterator i)                                \
         {                                                                      \
-                return i._curr;                                                \
+                return i;                                                      \
         }                                                                      \
                                                                                \
-        const char *N##_iterator_cdata(const struct N##_iterator i)            \
+        const char *N##_iterator_cdata(const N##_iterator i)                   \
         {                                                                      \
-                return i._curr;                                                \
+                return i;                                                      \
         }                                                                      \
                                                                                \
-        void N##_iterator_next(struct N##_iterator *i)                         \
+        void N##_iterator_next(N##_iterator *i)                                \
         {                                                                      \
-                ++i->_curr;                                                    \
+                ++*i;                                                          \
         }                                                                      \
                                                                                \
-        void N##_iterator_prev(struct N##_iterator *i)                         \
+        void N##_iterator_prev(N##_iterator *i)                                \
         {                                                                      \
-                --i->_curr;                                                    \
+                --*i;                                                          \
         }                                                                      \
                                                                                \
-        void N##_iterator_begin(N *s, struct N##_iterator *i)                  \
+        void N##_iterator_begin(N *s, N##_iterator *i)                         \
         {                                                                      \
-                i->_curr = *s;                                                 \
+                *i = *s;                                                       \
         }                                                                      \
                                                                                \
-        void N##_iterator_cbegin(const N *const s, struct N##_iterator *i)     \
+        void N##_iterator_cbegin(const N *const s, N##_iterator *i)            \
         {                                                                      \
-                i->_curr = *s;                                                 \
+                *i = *s;                                                       \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_begin(N *s)                                    \
+        N##_iterator N##_begin(N *s)                                           \
         {                                                                      \
-                struct N##_iterator i;                                         \
+                N##_iterator i;                                                \
                 N##_iterator_begin(s, &i);                                     \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_cbegin(const N *const s)                       \
+        N##_iterator N##_cbegin(const N *const s)                              \
         {                                                                      \
-                struct N##_iterator i;                                         \
+                N##_iterator i;                                                \
                 N##_iterator_cbegin(s, &i);                                    \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        void N##_iterator_end(N *s, struct N##_iterator *i)                    \
+        void N##_iterator_end(N *s, N##_iterator *i)                           \
         {                                                                      \
-                i->_curr = *s + strlen(*s) - 1;                                \
+                *i = *s + strlen(*s) - 1;                                      \
         }                                                                      \
                                                                                \
-        void N##_iterator_cend(const N *const s, struct N##_iterator *i)       \
+        void N##_iterator_cend(const N *const s, N##_iterator *i)              \
         {                                                                      \
-                i->_curr = *s + strlen(*s) - 1;                                \
+                *i = *s + strlen(*s) - 1;                                      \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_end(N *s)                                      \
+        N##_iterator N##_end(N *s)                                             \
         {                                                                      \
-                struct N##_iterator i;                                         \
+                N##_iterator i;                                                \
                 N##_iterator_end(s, &i);                                       \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_cend(const N *const s)                         \
+        N##_iterator N##_cend(const N *const s)                                \
         {                                                                      \
-                struct N##_iterator i;                                         \
+                N##_iterator i;                                                \
                 N##_iterator_cend(s, &i);                                      \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        void N##_iterator_from(N *s, struct N##_iterator *i, size_t at)        \
+        void N##_iterator_from(N *s, N##_iterator *i, size_t at)               \
         {                                                                      \
-                i->_curr = *s + at;                                            \
+                *i = *s + at;                                                  \
         }                                                                      \
                                                                                \
-        void N##_iterator_cfrom(const N *const s, struct N##_iterator *i,      \
-                                size_t at)                                     \
+        void N##_iterator_cfrom(const N *const s, N##_iterator *i, size_t at)  \
         {                                                                      \
-                i->_curr = *s + at;                                            \
+                *i = *s + at;                                                  \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_from(N *s, size_t at)                          \
+        N##_iterator N##_from(N *s, size_t at)                                 \
         {                                                                      \
-                struct N##_iterator i;                                         \
+                N##_iterator i;                                                \
                 N##_iterator_from(s, &i, at);                                  \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_cfrom(const N *const s, size_t at)             \
+        N##_iterator N##_cfrom(const N *const s, size_t at)                    \
         {                                                                      \
-                struct N##_iterator i;                                         \
+                N##_iterator i;                                                \
                 N##_iterator_cfrom(s, &i, at);                                 \
                 return i;                                                      \
         }                                                                      \
                                                                                \
-        void N##_iterator_jump(struct N##_iterator *i, ssize_t range)          \
+        void N##_iterator_jump(N##_iterator *i, ssize_t range)                 \
         {                                                                      \
-                i->_curr = i->_curr + range;                                   \
+                *i = *i + range;                                               \
         }                                                                      \
                                                                                \
-        int N##_iterator_equal(const struct N##_iterator first,                \
-                               const struct N##_iterator second)               \
+        int N##_iterator_equal(const N##_iterator first,                       \
+                               const N##_iterator second)                      \
         {                                                                      \
-                return first._curr == second._curr;                            \
+                return *first == *second;                                      \
         }                                                                      \
                                                                                \
-        ssize_t N##_iterator_range(const struct N##_iterator first,            \
-                                   const struct N##_iterator second)           \
+        ssize_t N##_iterator_range(const N##_iterator first,                   \
+                                   const N##_iterator second)                  \
         {                                                                      \
-                return second._curr - first._curr;                             \
+                return *second - *first;                                       \
         }                                                                      \
                                                                                \
-        int N##_iterator_valid(const struct N##_iterator i)                    \
+        int N##_iterator_valid(const N##_iterator i)                           \
         {                                                                      \
                 (void)i;                                                       \
                 return 1;                                                      \
