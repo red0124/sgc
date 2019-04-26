@@ -227,8 +227,8 @@
 
 #define SGC_FOR_EACH_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
 #define sgc_for_each(...)                                                      \
-        SGC_FOR_EACH_N(__VA_ARGS__, SGC_FOR_EACH3, SGC_FOR_EACH_SAME2,         \
-                       SGC_FOR_EACH2, SGC_NONE, SGC_FOR_EACH1)                 \
+        SGC_FOR_EACH_N(__VA_ARGS__, SGC_FOR_EACH3, SGC_NONE,                   \
+                       SGC_FOR_EACH2, SGC_FOR_EACH_SAME2, SGC_FOR_EACH1)       \
         (__VA_ARGS__)
 
 #define SGC_FOR_EACH1(EL, C, N)                                                \
@@ -475,3 +475,10 @@
                 EL = (struct SGC_UNIQUE(pair)){                                \
                     N1##_iterator_data(SGC_UNIQUE(curr1)),                     \
                     N2##_iterator_data(SGC_UNIQUE(curr2))})
+
+#ifndef SGC_NO_KEYWORDS
+
+#define in ,
+#define as ,
+
+#endif

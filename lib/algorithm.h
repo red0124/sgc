@@ -7,87 +7,87 @@
 
 #define SGC_INIT_HEADERS_ITERATE(T, N)                                         \
         void N##_fold_range(                                                   \
-            struct N##_iterator begin, struct N##_iterator end,                \
+            N##_iterator begin, N##_iterator end,                \
             void (*fun)(const N##_type *const, void *), void *argout);         \
                                                                                \
-        void N##_fold(const struct N *const c,                                 \
+        void N##_fold(const N *const c,                                 \
                       void (*fun)(const N##_type *const, void *),              \
                       void *argout);                                           \
                                                                                \
-        void N##_execute_range(struct N##_iterator begin,                      \
-                               struct N##_iterator end,                        \
+        void N##_execute_range(N##_iterator begin,                      \
+                               N##_iterator end,                        \
                                void (*fun)(const N##_type *const));            \
                                                                                \
-        void N##_execute(const struct N *const c,                              \
+        void N##_execute(const N *const c,                              \
                          void (*fun)(const N##_type *const));                  \
                                                                                \
-        void N##_fprintf_range(struct N##_iterator begin,                      \
-                               struct N##_iterator end,                        \
+        void N##_fprintf_range(N##_iterator begin,                      \
+                               N##_iterator end,                        \
                                const char *const format, FILE *file);          \
                                                                                \
-        void N##_fprintf(const struct N *const c, const char *const format,    \
+        void N##_fprintf(const N *const c, const char *const format,    \
                          FILE *file);                                          \
                                                                                \
         void N##_fold_range_reverse(                                           \
-            struct N##_iterator begin, struct N##_iterator end,                \
+            N##_iterator begin, N##_iterator end,                \
             void (*fun)(const N##_type *const, void *), void *argout);         \
                                                                                \
-        void N##_fold_reverse(const struct N *const c,                         \
+        void N##_fold_reverse(const N *const c,                         \
                               void (*fun)(const N##_type *const, void *),      \
                               void *argout);                                   \
                                                                                \
-        void N##_execute_range_reverse(struct N##_iterator begin,              \
-                                       struct N##_iterator end,                \
+        void N##_execute_range_reverse(N##_iterator begin,              \
+                                       N##_iterator end,                \
                                        void (*fun)(const N##_type *const));    \
                                                                                \
-        void N##_execute_reverse(const struct N *const c,                      \
+        void N##_execute_reverse(const N *const c,                      \
                                  void (*fun)(const N##_type *const));          \
                                                                                \
-        void N##_fprintf_range_reverse(struct N##_iterator begin,              \
-                                       struct N##_iterator end,                \
+        void N##_fprintf_range_reverse(N##_iterator begin,              \
+                                       N##_iterator end,                \
                                        const char *const format, FILE *file);  \
                                                                                \
-        void N##_fprintf_reverse(const struct N *const c,                      \
+        void N##_fprintf_reverse(const N *const c,                      \
                                  const char *const format, FILE *file);
 
 #define SGC_INIT_HEADERS_FIND(T, N)                                            \
-        N##_type *N##_find_el_range(struct N##_iterator begin,                 \
-                                    struct N##_iterator end,                   \
+        N##_type *N##_find_el_range(N##_iterator begin,                 \
+                                    N##_iterator end,                   \
                                     const N##_type el);                        \
                                                                                \
-        N##_type *N##_find_el(const struct N *const c, const N##_type el);     \
+        N##_type *N##_find_el(const N *const c, const N##_type el);     \
                                                                                \
-        ssize_t N##_find_index(const struct N *const c, const N##_type el);    \
+        ssize_t N##_find_index(const N *const c, const N##_type el);    \
                                                                                \
         size_t N##_count(const N *const c, const N##_type el);
 
 #define SGC_INIT_HEADERS_FIND_ITERATOR(T, N)                                   \
-        struct N##_iterator N##_find_range(struct N##_iterator begin,          \
-                                           struct N##_iterator end,            \
+        N##_iterator N##_find_range(N##_iterator begin,          \
+                                           N##_iterator end,            \
                                            const N##_type el);                 \
                                                                                \
-        struct N##_iterator N##_find(const struct N *const c,                  \
+        N##_iterator N##_find(const N *const c,                  \
                                      const N##_type el);
 
 #define SGC_INIT_HEADERS_BINARY_FIND(T, N)                                     \
-        N##_type *N##_binary_find_el(struct N *c, const N##_type el);          \
+        N##_type *N##_binary_find_el(N *c, const N##_type el);          \
                                                                                \
-        size_t N##_binary_find_index(struct N *c, const N##_type el);
+        size_t N##_binary_find_index(N *c, const N##_type el);
 
 #define SGC_INIT_HEADERS_ITERATE_PAIR(V, N)                                    \
                                                                                \
-        void N##_fprintf_range_pair(struct N##_iterator begin,                 \
-                                    struct N##_iterator end,                   \
+        void N##_fprintf_range_pair(N##_iterator begin,                 \
+                                    N##_iterator end,                   \
                                     const char *const format, FILE *file);     \
                                                                                \
-        void N##_fprintf_pair(const struct N *const c,                         \
+        void N##_fprintf_pair(const N *const c,                         \
                               const char *const format, FILE *file);           \
                                                                                \
         void N##_fprintf_range_reverse_pair(                                   \
-            struct N##_iterator begin, struct N##_iterator end,                \
+            N##_iterator begin, N##_iterator end,                \
             const char *const format, FILE *file);                             \
                                                                                \
-        void N##_fprintf_reverse_pair(const struct N *const c,                 \
+        void N##_fprintf_reverse_pair(const N *const c,                 \
                                       const char *const format, FILE *file);
 
 #define SGC_INIT_STATIC_FUNCTIONS_QSORT(T, N)                                  \
@@ -101,7 +101,7 @@
 #define SGC_INIT_ITERATE(T, N)                                                 \
         SGC_INIT_HEADERS_ITERATE(T, N);                                        \
         void N##_fold_range(                                                   \
-            struct N##_iterator begin, struct N##_iterator end,                \
+            N##_iterator begin, N##_iterator end,                \
             void (*fun)(const N##_type *const, void *), void *argout)          \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -123,8 +123,8 @@
                 N##_fold_range(N##_cbegin(c), N##_cend(c), fun, argout);       \
         }                                                                      \
                                                                                \
-        void N##_execute_range(struct N##_iterator begin,                      \
-                               struct N##_iterator end,                        \
+        void N##_execute_range(N##_iterator begin,                      \
+                               N##_iterator end,                        \
                                void (*fun)(const N##_type *const))             \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -144,8 +144,8 @@
                 N##_execute_range(N##_cbegin(c), N##_cend(c), fun);            \
         }                                                                      \
                                                                                \
-        void N##_fprintf_range(struct N##_iterator begin,                      \
-                               struct N##_iterator end,                        \
+        void N##_fprintf_range(N##_iterator begin,                      \
+                               N##_iterator end,                        \
                                const char *const format, FILE *file)           \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -166,8 +166,8 @@
                 N##_fprintf_range(N##_cbegin(c), N##_cend(c), format, file);   \
         }                                                                      \
                                                                                \
-        void N##_sprintf_range(struct N##_iterator begin,                      \
-                               struct N##_iterator end,                        \
+        void N##_sprintf_range(N##_iterator begin,                      \
+                               N##_iterator end,                        \
                                const char *const format, char *buff)           \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -191,7 +191,7 @@
         }                                                                      \
                                                                                \
         void N##_fold_range_reverse(                                           \
-            struct N##_iterator begin, struct N##_iterator end,                \
+            N##_iterator begin, N##_iterator end,                \
             void (*fun)(const N##_type *const, void *), void *argout)          \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -214,8 +214,8 @@
                                        argout);                                \
         }                                                                      \
                                                                                \
-        void N##_execute_range_reverse(struct N##_iterator begin,              \
-                                       struct N##_iterator end,                \
+        void N##_execute_range_reverse(N##_iterator begin,              \
+                                       N##_iterator end,                \
                                        void (*fun)(const N##_type *const))     \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -236,8 +236,8 @@
                 N##_execute_range_reverse(N##_cbegin(c), N##_cend(c), fun);    \
         }                                                                      \
                                                                                \
-        void N##_fprintf_range_reverse(struct N##_iterator begin,              \
-                                       struct N##_iterator end,                \
+        void N##_fprintf_range_reverse(N##_iterator begin,              \
+                                       N##_iterator end,                \
                                        const char *const format, FILE *file)   \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -259,8 +259,8 @@
                                           file);                               \
         }                                                                      \
                                                                                \
-        void N##_sprintf_range_reverse(struct N##_iterator begin,              \
-                                       struct N##_iterator end,                \
+        void N##_sprintf_range_reverse(N##_iterator begin,              \
+                                       N##_iterator end,                \
                                        const char *const format, char *buff)   \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -286,8 +286,8 @@
 
 #define SGC_INIT_FIND(T, N)                                                    \
         SGC_INIT_HEADERS_FIND(T, N);                                           \
-        N##_type *N##_find_el_range(struct N##_iterator begin,                 \
-                                    struct N##_iterator end,                   \
+        N##_type *N##_find_el_range(N##_iterator begin,                 \
+                                    N##_iterator end,                   \
                                     const N##_type el)                         \
         {                                                                      \
                 N##_type *ret = NULL;                                          \
@@ -318,8 +318,8 @@
         {                                                                      \
                 ssize_t ret = -1;                                              \
                 int found = 0;                                                 \
-                struct N##_iterator begin = N##_cbegin(c);                     \
-                struct N##_iterator end = N##_cend(c);                         \
+                N##_iterator begin = N##_cbegin(c);                     \
+                N##_iterator end = N##_cend(c);                         \
                 if(!T##_equal(&el, N##_iterator_data(begin)))                  \
                 {                                                              \
                         while(!N##_iterator_equal(begin, end))                 \
@@ -345,8 +345,8 @@
         size_t N##_count(const N *const c, const N##_type el)                  \
         {                                                                      \
                 size_t ret = 0;                                                \
-                struct N##_iterator begin = N##_cbegin(c);                     \
-                struct N##_iterator end = N##_cend(c);                         \
+                N##_iterator begin = N##_cbegin(c);                     \
+                N##_iterator end = N##_cend(c);                         \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
                         if(T##_equal(&el, N##_iterator_data(begin)))           \
@@ -367,11 +367,11 @@
 
 #define SGC_INIT_FIND_ITERATOR(T, N)                                           \
         SGC_INIT_HEADERS_FIND_ITERATOR(T, N);                                  \
-        struct N##_iterator N##_find_range(struct N##_iterator begin,          \
-                                           struct N##_iterator end,            \
+        N##_iterator N##_find_range(N##_iterator begin,          \
+                                           N##_iterator end,            \
                                            const N##_type el)                  \
         {                                                                      \
-                struct N##_iterator ret = end;                                 \
+                N##_iterator ret = end;                                 \
                 int done = 0;                                                  \
                 if(N##_iterator_valid(begin) || N##_iterator_valid(end))       \
                 {                                                              \
@@ -393,7 +393,7 @@
                 return ret;                                                    \
         }                                                                      \
                                                                                \
-        struct N##_iterator N##_find(const N *const c, const N##_type el)      \
+        N##_iterator N##_find(const N *const c, const N##_type el)      \
         {                                                                      \
                 return N##_find_range(N##_cbegin(c), N##_cend(c), el);         \
         }
@@ -465,8 +465,8 @@
 #define SGC_INIT_ITERATE_PAIR(T, N)                                            \
         SGC_INIT_HEADERS_ITERATE_PAIR(T, N);                                   \
                                                                                \
-        void N##_fprintf_range_pair(struct N##_iterator begin,                 \
-                                    struct N##_iterator end,                   \
+        void N##_fprintf_range_pair(N##_iterator begin,                 \
+                                    N##_iterator end,                   \
                                     const char *const format, FILE *file)      \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -490,8 +490,8 @@
                                        file);                                  \
         }                                                                      \
                                                                                \
-        void N##_sprintf_range_pair(struct N##_iterator begin,                 \
-                                    struct N##_iterator end,                   \
+        void N##_sprintf_range_pair(N##_iterator begin,                 \
+                                    N##_iterator end,                   \
                                     const char *const format, char *buff)      \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -518,7 +518,7 @@
         }                                                                      \
                                                                                \
         void N##_fprintf_range_reverse_pair(                                   \
-            struct N##_iterator begin, struct N##_iterator end,                \
+            N##_iterator begin, N##_iterator end,                \
             const char *const format, FILE *file)                              \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
@@ -543,7 +543,7 @@
         }                                                                      \
                                                                                \
         void N##_sprintf_range_reverse_pair(                                   \
-            struct N##_iterator begin, struct N##_iterator end,                \
+            N##_iterator begin, N##_iterator end,                \
             const char *const format, char *buff)                              \
         {                                                                      \
                 if(!N##_iterator_valid(begin) || !N##_iterator_valid(end))     \
