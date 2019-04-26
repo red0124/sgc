@@ -41,6 +41,7 @@
         void N##_copy(N *first, const N *const second);                        \
         void N##_init(N *s);                                                   \
         void N##_free(N *s);                                                   \
+        size_t N##_size(N *s);                                                 \
         int N##_equal(const N *const first, const N *const second);            \
         int N##_compare(const N *const first, const N *const second);          \
         int N##_void_compare(const void *const first,                          \
@@ -49,10 +50,12 @@
         void N##_push_back(N *s, const char c);                                \
         void N##_pop_back(N *s);                                               \
         void N##_from_cstring(N *first, const char *const second);             \
-        N N##_read(N *s, FILE *f);                                             \
         N N##_buffer_read_until(N s, FILE *f, const char *const del);          \
+        N N##_buffer_read(N s, FILE *f);                                       \
         N N##_read_until(N *s, FILE *f, const char *const del);                \
+        N N##_read(N *s, FILE *f);                                             \
         N N##_read_file(N *s, const char *const file_name);                    \
+        N##_type *N##_array(N *);                                              \
                                                                                \
         char *N##_iterator_data(N##_iterator i);                               \
         const char *N##_iterator_cdata(const N##_iterator i);                  \
@@ -100,6 +103,11 @@
         void N##_free(N *s)                                                    \
         {                                                                      \
                 sgc_free(*s);                                                  \
+        }                                                                      \
+                                                                               \
+        size_t N##_size(N *s)                                                  \
+        {                                                                      \
+                return strlen(*s);                                             \
         }                                                                      \
                                                                                \
         int N##_equal(const N *const first, const N *const second)             \
@@ -208,6 +216,12 @@
                 return (size == 0) ? NULL : s;                                 \
         }                                                                      \
                                                                                \
+        N N##_buffer_read(N buff, FILE *f)                                     \
+        {                                                                      \
+                buff[0] = '\0';                                                \
+                return fgets(buff, S - 1, f);                                  \
+        }                                                                      \
+                                                                               \
         N N##_read_until(N *s, FILE *f, const char *const del)                 \
         {                                                                      \
                 *s = NULL;                                                     \
@@ -235,9 +249,19 @@
                                                                                \
         N N##_read_file(N *s, const char *const file_name)                     \
         {                                                                      \
+                *s = NULL;                                                     \
                 FILE *f = fopen(file_name, "r");                               \
-                *s = N##_read_until(s, f, "");                                 \
-                fclose(f);                                                     \
+                /* forgot to check to evade undefined behavior!*/              \
+                if(f)                                                          \
+                {                                                              \
+                        *s = N##_read_until(s, f, "");                         \
+                        fclose(f);                                             \
+                }                                                              \
+                return *s;                                                     \
+        }                                                                      \
+                                                                               \
+        N##_type *N##_array(N *s)                                              \
+        {                                                                      \
                 return *s;                                                     \
         }                                                                      \
                                                                                \
