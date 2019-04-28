@@ -66,13 +66,9 @@
                                                                                \
         static void N##_move(size_t *flag, size_t max)                         \
         {                                                                      \
-                if(*flag + 1 == max)                                           \
+                if((++*flag) == max)                                           \
                 {                                                              \
                         *flag = 0;                                             \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        ++*flag;                                               \
                 }                                                              \
         }                                                                      \
                                                                                \

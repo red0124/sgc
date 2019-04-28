@@ -68,13 +68,9 @@
                                                                                \
         static void N##_move(size_t *flag)                                     \
         {                                                                      \
-                if(*flag + 1 == S)                                             \
+                if(++*flag  == S)                                              \
                 {                                                              \
                         *flag = 0;                                             \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        ++*flag;                                               \
                 }                                                              \
         }                                                                      \
                                                                                \
