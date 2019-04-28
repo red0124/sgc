@@ -132,14 +132,7 @@
         void N##_push(struct N *s, T el)                                       \
         {                                                                      \
                 N##_resize(s);                                                 \
-                if(!s->_shared)                                                \
-                {                                                              \
-                        T##_copy(&s->_data[s->_size], &el);                    \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        s->_data[s->_size] = el;                               \
-                }                                                              \
+                SGC_COPY(T##_copy, s->_data[s->_size], el, s->_shared);        \
                 ++s->_size;                                                    \
         }                                                                      \
                                                                                \
@@ -170,16 +163,9 @@
         {                                                                      \
                 if(s->_size)                                                   \
                 {                                                              \
-                        T *el = &s->_data[s->_size - 1];                       \
-                        if(!s->_shared)                                        \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free,                        \
+                                    s->_data[s->_size - 1], new_el,            \
+                                    s->_shared);                               \
                 }                                                              \
         }                                                                      \
                                                                                \

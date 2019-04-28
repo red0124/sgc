@@ -199,14 +199,7 @@
         {                                                                      \
                 N##_resize(q);                                                 \
                 N##_move(&q->_back, q->_max);                                  \
-                if(!q->_shared)                                                \
-                {                                                              \
-                        T##_copy(&q->_data[q->_back], &el);                    \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        q->_data[q->_back] = el;                               \
-                }                                                              \
+                SGC_COPY(T##_copy, q->_data[q->_back], el, q->_shared);        \
                 ++q->_size;                                                    \
         }                                                                      \
                                                                                \
@@ -224,16 +217,8 @@
         {                                                                      \
                 if(q->_size)                                                   \
                 {                                                              \
-                        T *el = &q->_data[q->_front];                          \
-                        if(!q->_shared)                                        \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free, q->_data[q->_front],   \
+                                    new_el, q->_shared);                       \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -251,16 +236,8 @@
         {                                                                      \
                 if(q->_size)                                                   \
                 {                                                              \
-                        T *el = &q->_data[q->_back];                           \
-                        if(!q->_shared)                                        \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free, q->_data[q->_back],    \
+                                    new_el, q->_shared);                       \
                 }                                                              \
         }                                                                      \
                                                                                \

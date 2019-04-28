@@ -99,14 +99,7 @@
         {                                                                      \
                 struct N##_node *new_node =                                    \
                     (struct N##_node *)sgc_malloc(sizeof(struct N##_node));    \
-                if(!is_shared)                                                 \
-                {                                                              \
-                        V##_copy(&new_node->_value, value);                    \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        new_node->_value = *value;                             \
-                }                                                              \
+                SGC_COPY(V##_copy, new_node->_value, *value, is_shared);       \
                 new_node->_next = NULL;                                        \
                 return new_node;                                               \
         }                                                                      \
@@ -495,16 +488,8 @@
                         {                                                      \
                                 dst->_data[i] = (struct N##_node *)sgc_malloc( \
                                     sizeof(struct N##_node));                  \
-                                if(!src->_shared)                              \
-                                {                                              \
-                                        V##_copy(&dst->_data[i]->_value,       \
-                                                 &src->_data[i]->_value);      \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        dst->_data[i]->_value =                \
-                                            src->_data[i]->_value;             \
-                                }                                              \
+                                SGC_COPY(V##_copy, dst->_data[i]->_value,      \
+                                         src->_data[i]->_value, src->_shared); \
                                 struct N##_node *curr_src = src->_data[i];     \
                                 struct N##_node *curr_dst = dst->_data[i];     \
                                 struct N##_node *tmp_src = NULL;               \
@@ -519,16 +504,9 @@
                                         tmp_dst =                              \
                                             (struct N##_node *)sgc_malloc(     \
                                                 sizeof(struct N##_node));      \
-                                        if(!src->_shared)                      \
-                                        {                                      \
-                                                V##_copy(&tmp_dst->_value,     \
-                                                         &tmp_src->_value);    \
-                                        }                                      \
-                                        else                                   \
-                                        {                                      \
-                                                tmp_dst->_value =              \
-                                                    tmp_src->_value;           \
-                                        }                                      \
+                                        SGC_COPY(V##_copy, tmp_dst->_value,    \
+                                                 tmp_src->_value,              \
+                                                 src->_shared);                \
                                         curr_dst->_next = tmp_dst;             \
                                         curr_dst = tmp_dst;                    \
                                         curr_src = tmp_src;                    \

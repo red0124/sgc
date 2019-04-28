@@ -167,15 +167,8 @@
                 {                                                              \
                         dst->_head = (struct N##_node *)sgc_malloc(            \
                             sizeof(struct N##_node));                          \
-                        if(!src->_shared)                                      \
-                        {                                                      \
-                                T##_copy(&dst->_head->_data,                   \
-                                         &src->_head->_data);                  \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                dst->_head->_data = src->_head->_data;         \
-                        }                                                      \
+                        SGC_COPY(T##_copy, dst->_head->_data,                  \
+                                 src->_head->_data, src->_shared);             \
                         struct N##_node *curr_src = src->_head;                \
                         struct N##_node *curr_dst = dst->_head;                \
                         struct N##_node *tmp_src = NULL;                       \
@@ -189,15 +182,8 @@
                                 }                                              \
                                 tmp_dst = (struct N##_node *)sgc_malloc(       \
                                     sizeof(struct N##_node));                  \
-                                if(!src->_shared)                              \
-                                {                                              \
-                                        T##_copy(&tmp_dst->_data,              \
-                                                 &tmp_src->_data);             \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        tmp_dst->_data = tmp_src->_data;       \
-                                }                                              \
+                                SGC_COPY(T##_copy, tmp_dst->_data,             \
+                                         tmp_src->_data, src->_shared);        \
                                 tmp_dst->_prev = curr_dst;                     \
                                 curr_dst->_next = tmp_dst;                     \
                                 curr_dst = tmp_dst;                            \
@@ -260,16 +246,8 @@
         {                                                                      \
                 if(l->_size)                                                   \
                 {                                                              \
-                        T *el = &l->_tail->_data;                              \
-                        if(!l->_shared)                                        \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free, l->_tail->_data,       \
+                                    new_el, l->_shared);                       \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -296,14 +274,7 @@
         {                                                                      \
                 struct N##_node *new_el =                                      \
                     (struct N##_node *)sgc_malloc(sizeof(struct N##_node));    \
-                if(!l->_shared)                                                \
-                {                                                              \
-                        T##_copy(&new_el->_data, &el);                         \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        new_el->_data = el;                                    \
-                }                                                              \
+                SGC_COPY(T##_copy, new_el->_data, el, l->_shared);             \
                 new_el->_prev = NULL;                                          \
                 switch(l->_size)                                               \
                 {                                                              \
@@ -340,16 +311,8 @@
                 T *ret = NULL;                                                 \
                 if(l->_size)                                                   \
                 {                                                              \
-                        T *el = &l->_head->_data;                              \
-                        if(!l->_shared)                                        \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free, l->_head->_data,       \
+                                    new_el, l->_shared);                       \
                 }                                                              \
                 return ret;                                                    \
         }                                                                      \
@@ -405,15 +368,8 @@
                 T *el = N##_at(l, at);                                         \
                 if(el)                                                         \
                 {                                                              \
-                        if(!l->_shared)                                        \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free, *el, new_el,           \
+                                    l->_shared);                               \
                 }                                                              \
         }                                                                      \
                                                                                \

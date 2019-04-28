@@ -178,14 +178,7 @@
         void N##_push(struct N *p, T el)                                       \
         {                                                                      \
                 N##_resize(p);                                                 \
-                if(!p->_shared)                                                \
-                {                                                              \
-                        T##_copy(&p->_data[p->_size], &el);                    \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        p->_data[p->_size] = el;                               \
-                }                                                              \
+                SGC_COPY(T##_copy, p->_data[p->_size], el, p->_shared);        \
                 N##_fix_insert(p);                                             \
                 ++p->_size;                                                    \
         }                                                                      \

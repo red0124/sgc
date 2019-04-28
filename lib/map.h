@@ -146,23 +146,9 @@
                 struct N##_node *n =                                           \
                     (struct N##_node *)sgc_malloc(sizeof(struct N##_node));    \
                                                                                \
-                if(!is_shared_key)                                             \
-                {                                                              \
-                        K##_copy(&n->_data.key, k);                            \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        n->_data.key = *k;                                     \
-                }                                                              \
+                SGC_COPY(K##_copy, n->_data.key, *k, is_shared_key);           \
+                SGC_COPY(V##_copy, n->_data.value, *v, is_shared);             \
                                                                                \
-                if(!is_shared)                                                 \
-                {                                                              \
-                        V##_copy(&n->_data.value, v);                          \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        n->_data.value = *v;                                   \
-                }                                                              \
                 n->_left = n->_right = SGC_MAP_LEAF;                           \
                 n->_color = SGC_MAP_RED;                                       \
                 return n;                                                      \
@@ -430,25 +416,11 @@
                         dst->_root = (struct N##_node *)sgc_malloc(            \
                             sizeof(struct N##_node));                          \
                                                                                \
-                        if(!src->_shared)                                      \
-                        {                                                      \
-                                V##_copy(&dst->_root->_data.value,             \
-                                         &src->_root->_data.value);            \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                dst->_root->_data.value =                      \
-                                    src->_root->_data.value;                   \
-                        }                                                      \
-                        if(!src->_shared_key)                                  \
-                        {                                                      \
-                                K##_copy(&dst->_root->_data.key,               \
-                                         &src->_root->_data.key);              \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                dst->_root->_data.key = src->_root->_data.key; \
-                        }                                                      \
+                        SGC_COPY(K##_copy, dst->_root->_data.key,              \
+                                 src->_root->_data.key, src->_shared_key);     \
+                        SGC_COPY(V##_copy, dst->_root->_data.value,            \
+                                 src->_root->_data.value, src->_shared);       \
+                                                                               \
                         dst->_root->_color = src->_root->_color;               \
                         dst->_root->_left = dst->_root->_right =               \
                             dst->_root->_parent = SGC_MAP_LEAF;                \
@@ -508,26 +480,11 @@
                                 }                                              \
                                 tmp->_left = tmp->_right = SGC_MAP_LEAF;       \
                                 curr_dst = tmp;                                \
-                                if(!src->_shared)                              \
-                                {                                              \
-                                        V##_copy(&curr_dst->_data.value,       \
-                                                 &curr_src->_data.value);      \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        curr_dst->_data.value =                \
-                                            curr_src->_data.value;             \
-                                }                                              \
-                                if(!src->_shared_key)                          \
-                                {                                              \
-                                        K##_copy(&curr_dst->_data.key,         \
-                                                 &curr_src->_data.key);        \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        curr_dst->_data.key =                  \
-                                            curr_src->_data.key;               \
-                                }                                              \
+                                SGC_COPY(K##_copy, curr_dst->_data.key,        \
+                                         curr_src->_data.key,                  \
+                                         src->_shared_key);                    \
+                                SGC_COPY(V##_copy, curr_dst->_data.value,      \
+                                         curr_src->_data.value, src->_shared); \
                                 curr_dst->_color = curr_src->_color;           \
                                 stack_src[stack_size] = curr_src;              \
                                 stack_dst[stack_size] = curr_dst;              \
@@ -765,15 +722,9 @@
                         }                                                      \
                         else if(!V##_equal(&parent->_data.value, v))           \
                         {                                                      \
-                                if(!m->_shared)                                \
-                                {                                              \
-                                        V##_free(&parent->_data.value);        \
-                                        V##_copy(&parent->_data.value, v);     \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        parent->_data.value = *v;              \
-                                }                                              \
+                                SGC_REPLACE(V##_copy, V##_free,                \
+                                            parent->_data.value, *v,           \
+                                            m->_shared);                       \
                                 return;                                        \
                         }                                                      \
                         else                                                   \

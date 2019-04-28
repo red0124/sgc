@@ -255,14 +255,7 @@
         {                                                                      \
                 N##_resize(d);                                                 \
                 N##_move(&d->_back, d->_max);                                  \
-                if(!d->_shared)                                                \
-                {                                                              \
-                        T##_copy(&d->_data[d->_back], &el);                    \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        d->_data[d->_back] = el;                               \
-                }                                                              \
+                SGC_COPY(T##_copy, d->_data[d->_back], el, d->_shared);        \
                 ++d->_size;                                                    \
         }                                                                      \
                                                                                \
@@ -296,15 +289,8 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_front];                          \
-                        if(!d->_shared)                                        \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free, *el, new_el,           \
+                                    d->_shared);                               \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -323,15 +309,8 @@
                 if(d->_size)                                                   \
                 {                                                              \
                         T *el = &d->_data[d->_back];                           \
-                        if(d->_shared)                                         \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free, *el, new_el,           \
+                                    d->_shared);                               \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -437,16 +416,9 @@
                                 N##_move_back(&d->_front, d->_max);            \
                         }                                                      \
                         ++d->_size;                                            \
-                        if(!d->_shared)                                        \
-                        {                                                      \
-                                T##_copy(                                      \
-                                    &d->_data[(at + d->_front) % d->_max],     \
-                                    &el);                                      \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                d->_data[(at + d->_front) % d->_max] = el;     \
-                        }                                                      \
+                        SGC_COPY(T##_copy,                                     \
+                                 d->_data[(at + d->_front) % d->_max], el,     \
+                                 d->_shared);                                  \
                 }                                                              \
         }                                                                      \
                                                                                \
@@ -526,15 +498,8 @@
                 if(at < d->_size)                                              \
                 {                                                              \
                         T *el = &d->_data[(d->_front + at) % d->_max];         \
-                        if(!d->_shared)                                        \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free, *el, new_el,           \
+                                    d->_shared);                               \
                 }                                                              \
         }                                                                      \
                                                                                \

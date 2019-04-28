@@ -272,15 +272,8 @@
                 {                                                              \
                         if(src->_data[i]._state == SGC_NODE_STATE_USED)        \
                         {                                                      \
-                                if(!src->_shared)                              \
-                                {                                              \
-                                        V##_copy(&dst->_data[i]._value,        \
-                                                 &src->_data[i]._value);       \
-                                }                                              \
-                                {                                              \
-                                        dst->_data[i]._value =                 \
-                                            src->_data[i]._value;              \
-                                }                                              \
+                                SGC_COPY(V##_copy, dst->_data[i]._value,       \
+                                         src->_data[i]._value, src->_shared);  \
                         }                                                      \
                         dst->_data[i]._state = src->_data[i]._state;           \
                 }                                                              \
@@ -360,14 +353,8 @@
                                         ++position;                            \
                                 }                                              \
                         }                                                      \
-                        if(!u->_shared)                                        \
-                        {                                                      \
-                                V##_copy(&u->_data[position]._value, &v);      \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                u->_data[position]._value = v;                 \
-                        }                                                      \
+                        SGC_COPY(V##_copy, u->_data[position]._value, v,       \
+                                 u->_shared);                                  \
                         u->_data[position]._state = SGC_NODE_STATE_USED;       \
                         ++u->_size;                                            \
                 }                                                              \
@@ -390,14 +377,8 @@
                                         ++position;                            \
                                 }                                              \
                         }                                                      \
-                        if(!u->_shared)                                        \
-                        {                                                      \
-                                V##_copy(&u->_data[position]._value, &v);      \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                u->_data[position]._value = v;                 \
-                        }                                                      \
+                        SGC_COPY(V##_copy, u->_data[position]._value, v,       \
+                                 u->_shared);                                  \
                         u->_data[position]._state = SGC_NODE_STATE_USED;       \
                         ++u->_size;                                            \
                 }                                                              \

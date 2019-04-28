@@ -211,14 +211,7 @@
         void N##_push_back(struct N *v, T el)                                  \
         {                                                                      \
                 N##_resize(v);                                                 \
-                if(!v->_shared)                                                \
-                {                                                              \
-                        T##_copy(&v->_data[v->_size], &el);                    \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        v->_data[v->_size] = el;                               \
-                }                                                              \
+                SGC_COPY(T##_copy, v->_data[v->_size], el, v->_shared);        \
                 ++v->_size;                                                    \
         }                                                                      \
                                                                                \
@@ -241,14 +234,7 @@
                         N##_resize(v);                                         \
                         memmove(v->_data + at + 1, v->_data + at,              \
                                 (v->_size - at) * sizeof(T));                  \
-                        if(!v->_shared)                                        \
-                        {                                                      \
-                                T##_copy(&v->_data[at], &el);                  \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                v->_data[at] = el;                             \
-                        }                                                      \
+                        SGC_COPY(T##_copy, v->_data[at], el, v->_shared);      \
                         ++v->_size;                                            \
                 }                                                              \
                 else                                                           \
@@ -271,16 +257,8 @@
         {                                                                      \
                 if(at < v->_size)                                              \
                 {                                                              \
-                        T *el = &v->_data[at];                                 \
-                        if(!v->_shared)                                        \
-                        {                                                      \
-                                T##_free(el);                                  \
-                                T##_copy(el, &new_el);                         \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                *el = new_el;                                  \
-                        }                                                      \
+                        SGC_REPLACE(T##_copy, T##_free, v->_data[at], new_el,  \
+                                    v->_shared);                               \
                 }                                                              \
         }                                                                      \
                                                                                \

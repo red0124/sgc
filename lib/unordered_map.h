@@ -112,22 +112,8 @@
         {                                                                      \
                 struct N##_node *new_node =                                    \
                     (struct N##_node *)sgc_malloc(sizeof(struct N##_node));    \
-                if(!is_shared_key)                                             \
-                {                                                              \
-                        K##_copy(&new_node->_data.key, key);                   \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        new_node->_data.key = *key;                            \
-                }                                                              \
-                if(!is_shared)                                                 \
-                {                                                              \
-                        V##_copy(&new_node->_data.value, value);               \
-                }                                                              \
-                else                                                           \
-                {                                                              \
-                        new_node->_data.value = *value;                        \
-                }                                                              \
+                SGC_COPY(K##_copy, new_node->_data.key, *key, is_shared_key);  \
+                SGC_COPY(V##_copy, new_node->_data.value, *value, is_shared);  \
                 new_node->_next = NULL;                                        \
                 return new_node;                                               \
         }                                                                      \
@@ -532,26 +518,12 @@
                         {                                                      \
                                 dst->_data[i] = (struct N##_node *)sgc_malloc( \
                                     sizeof(struct N##_node));                  \
-                                if(!dst->_shared_key)                          \
-                                {                                              \
-                                        K##_copy(&dst->_data[i]->_data.key,    \
-                                                 &src->_data[i]->_data.key);   \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        dst->_data[i]->_data.key =             \
-                                            src->_data[i]->_data.key;          \
-                                }                                              \
-                                if(!dst->_shared)                              \
-                                {                                              \
-                                        V##_copy(&dst->_data[i]->_data.value,  \
-                                                 &src->_data[i]->_data.value); \
-                                }                                              \
-                                else                                           \
-                                {                                              \
-                                        dst->_data[i]->_data.value =           \
-                                            src->_data[i]->_data.value;        \
-                                }                                              \
+                                SGC_COPY(K##_copy, dst->_data[i]->_data.key,   \
+                                         src->_data[i]->_data.key,             \
+                                         src->_shared_key);                    \
+                                SGC_COPY(V##_copy, dst->_data[i]->_data.value, \
+                                         src->_data[i]->_data.value,           \
+                                         src->_shared);                        \
                                 struct N##_node *curr_src = src->_data[i];     \
                                 struct N##_node *curr_dst = dst->_data[i];     \
                                 struct N##_node *tmp_src = NULL;               \
@@ -566,28 +538,13 @@
                                         tmp_dst =                              \
                                             (struct N##_node *)sgc_malloc(     \
                                                 sizeof(struct N##_node));      \
-                                        if(!dst->_shared_key)                  \
-                                        {                                      \
-                                                K##_copy(&tmp_dst->_data.key,  \
-                                                         &tmp_src->_data.key); \
-                                        }                                      \
-                                        else                                   \
-                                        {                                      \
-                                                dst->_data[i]->_data.key =     \
-                                                    src->_data[i]->_data.key;  \
-                                        }                                      \
-                                        if(!dst->_shared)                      \
-                                        {                                      \
-                                                V##_copy(                      \
-                                                    &tmp_dst->_data.value,     \
-                                                    &tmp_src->_data.value);    \
-                                        }                                      \
-                                        else                                   \
-                                        {                                      \
-                                                dst->_data[i]->_data.value =   \
-                                                    src->_data[i]              \
-                                                        ->_data.value;         \
-                                        }                                      \
+                                        SGC_COPY(K##_copy, tmp_dst->_data.key, \
+                                                 tmp_src->_data.key,           \
+                                                 src->_shared_key);            \
+                                        SGC_COPY(V##_copy,                     \
+                                                 tmp_dst->_data.value,         \
+                                                 tmp_src->_data.value,         \
+                                                 src->_shared);                \
                                         curr_dst->_next = tmp_dst;             \
                                         curr_dst = tmp_dst;                    \
                                         curr_src = tmp_src;                    \
@@ -752,15 +709,8 @@
                 struct N##_iterator i = N##_find_by_hash(u, &k, hash);         \
                 if(i._curr)                                                    \
                 {                                                              \
-                        if(!u->_shared)                                        \
-                        {                                                      \
-                                V##_free(&i._curr->_data.value);               \
-                                V##_copy(&i._curr->_data.value, &v);           \
-                        }                                                      \
-                        else                                                   \
-                        {                                                      \
-                                i._curr->_data.value = v;                      \
-                        }                                                      \
+                        SGC_REPLACE(V##_copy, V##_free, i._curr->_data.value,  \
+                                    v, i._curr);                               \
                 }                                                              \
                 else                                                           \
                 {                                                              \

@@ -219,6 +219,27 @@
         SGC_INIT_##A4(V, N);                                                   \
         SGC_INIT_##A5(V, N);
 
+#define SGC_COPY(COPY_FUN, DST, SRC, IS_SHARED)                                \
+        if(!IS_SHARED)                                                         \
+        {                                                                      \
+                COPY_FUN(&DST, &SRC);                                          \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+                DST = SRC;                                                     \
+        }
+
+#define SGC_REPLACE(COPY_FUN, FREE_FUN, DST, SRC, IS_SHARED)                   \
+        if(!IS_SHARED)                                                         \
+        {                                                                      \
+                FREE_FUN(&DST);                                                \
+                COPY_FUN(&DST, &SRC);                                          \
+        }                                                                      \
+        else                                                                   \
+        {                                                                      \
+                DST = SRC;                                                     \
+        }
+
 #define SGC_TOKENPASTE(x, y) x##y
 #define SGC_TOKENPASTE2(x, y) SGC_TOKENPASTE(x, y)
 #define SGC_UNIQUE(x) SGC_TOKENPASTE2(__sgc_unique_##x, __LINE__)
@@ -227,8 +248,8 @@
 
 #define SGC_FOR_EACH_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
 #define sgc_for_each(...)                                                      \
-        SGC_FOR_EACH_N(__VA_ARGS__, SGC_FOR_EACH3, SGC_NONE,                   \
-                       SGC_FOR_EACH2, SGC_FOR_EACH_SAME2, SGC_FOR_EACH1)       \
+        SGC_FOR_EACH_N(__VA_ARGS__, SGC_FOR_EACH3, SGC_NONE, SGC_FOR_EACH2,    \
+                       SGC_FOR_EACH_SAME2, SGC_FOR_EACH1)                      \
         (__VA_ARGS__)
 
 #define SGC_FOR_EACH1(EL, C, N)                                                \
