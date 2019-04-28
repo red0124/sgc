@@ -1,7 +1,7 @@
 ﻿# Semi-Generic C 1.0.0
 Algorithms and data structures written in **C** using macros. The data structures used are similar to the ones used in the **C++ STL** with little difference.
 
-# Simple Example
+# Simple Example 'intro.c'
 
 ```c
 #include <stdio.h>
@@ -29,7 +29,7 @@ int main(void)
         vec_push_back(&v, (person){"b", "b", 20});
         vec_push_back(&v, (person){"c", "c", 30});
 
-        sgc_for_each(i, v, vec)
+        for_each(i in v as vec)
         {
                 printf("%s %s %d\n", i->first_name, i->last_name, i->age);
         }
@@ -447,14 +447,19 @@ int main(void)
 
         static_string buff;
         
-        FILE *in = fopen(FILE_NAME, "r");
-	while(string_buffer_read_until(buff, in, "\n"))
+        FILE *fin = fopen(FILE_NAME, "r");
+	if(!fin)
+	{
+		exit(EXIT_FAILURE);
+	}
+
+	while(string_buffer_read_until(buff, fin, "\n"))
 	{
 		++*map_at(&m, buff);
 	}
-	fclose(in);
+	fclose(fin);
 	
-        sgc_for_each(i, m, map)
+        for_each(i in m as map)
         {
 	        if(i->value > 1)
 	        {
@@ -529,7 +534,7 @@ void my_allocator_init(void)
 
 void my_allocator_clean(void)
 {
-        sgc_for_each(i, used_addrs, set)
+        for_each(i in used_addrs as set)
         {
                 my_free((void *)*i);
         }
@@ -598,11 +603,16 @@ int main(void)
 	while(string_buffer_read_until(buff, stdin, "\n "))
 	{
 		int palindrome = 1;
-		sgc_for_each_intersect(i, s, s, string)
+		// for each intersect
+		for_eachi(i in s, s as string)
 		{
 			if(*i.first != *i.second)
 			{
 				palindrome = 0;
+				break;
+			}
+			if(i.first == i.second)
+			{
 				break;
 			}
 		}
@@ -616,6 +626,10 @@ int main(void)
 	vector_sort(&v, NULL);
 
 	FILE* f = fopen("out.txt", "w");
+	if(!f)
+	{
+		exit(EXIT_FAILURE);
+	}
 	vector_fprintf(&v, "%s\n", f);
 	fclose(f);
 
@@ -694,7 +708,7 @@ void sched_run(void)
 
 		if(pqueue_empty(&sched_pqueue))
 		{
-			sgc_for_each(i, sched_vector, vector)
+			for_each(i in sched_vector as vector)
 			{
 				pqueue_push(&sched_pqueue, *i);
 			}

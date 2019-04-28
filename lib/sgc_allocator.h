@@ -41,7 +41,7 @@
         }
 
 #ifndef SGC_FAIL
-#define SGC_FAIL exit(1);
+#define SGC_FAIL exit(EXIT_FAILURE);
 #endif
 
 #ifdef SGC_SAFE_ALLOCATOR
