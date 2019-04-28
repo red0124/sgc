@@ -749,13 +749,13 @@ int main(void)
 
 [> Back to content](#content)
 
-# Purpose
+# Todo
 
-implement container_clean for everything
-implement vector and deque wrap_array
-implement list concat
-implement mergesort
-make set and map erase not allocate anything new, relink nodes
-make deque copy use memcpy
+ - implement container_clean for everything
+ - implement vector and deque wrap_array
+ - implement list concat
+ - implement mergesort
+ - make set and map erase not allocate anything new, relink nodes
+ - make deque copy use memcpy
 
 [> Back to content](#content)
