@@ -10,7 +10,7 @@
 
 #define TEST_ELEMENTS_NUM 20
 
-SGC_INIT_STRING(string);
+SGC_INIT(STRING, string);
 
 void test_string_push_pop(void)
 {
@@ -68,7 +68,7 @@ void test_string_iterator(void)
 
         size_t i = 0;
 
-        for(struct string_iterator it = string_begin(&v);
+        for(string_iterator it = string_begin(&v);
             !string_iterator_equal(it, string_end(&v));
             string_iterator_next(&it))
         {
@@ -78,7 +78,7 @@ void test_string_iterator(void)
 
         TEST_ASSERT_EQUAL_INT(*string_iterator_data(string_end(&v)), v[i]);
 
-        for(struct string_iterator it = string_end(&v);
+        for(string_iterator it = string_end(&v);
             !string_iterator_equal(it, string_begin(&v));
             string_iterator_prev(&it))
         {
@@ -89,7 +89,7 @@ void test_string_iterator(void)
         TEST_ASSERT_EQUAL_INT(*string_iterator_data(string_begin(&v)), v[i]);
 
         i = TEST_ELEMENTS_NUM / 2;
-        struct string_iterator it = string_from(&v, i);
+        string_iterator it = string_from(&v, i);
 
         TEST_ASSERT_EQUAL_INT(*string_iterator_data(it), v[i]);
 

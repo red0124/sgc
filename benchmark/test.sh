@@ -15,7 +15,7 @@ num_elements=(0.1 1 10 20 30 40 50 60 70 80 90 100)
 factor=3500
 repeat_max=800000
 
-OUTPUT_TXT_FILE='vector_push_back.txt'
+OUTPUT_TXT_FILE='list_push_back.txt'
 
 ###################
 ###################

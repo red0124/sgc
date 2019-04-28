@@ -480,5 +480,10 @@
 
 #define in ,
 #define as ,
+#define for_each sgc_for_each
+#define for_each_reverse sgc_for_each_reverse
+#define for_eachr sgc_for_each_reverse
+#define for_each_intersect sgc_for_each_intersect
+#define for_eachi sgc_for_each_intersect
 
 #endif

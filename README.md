@@ -226,7 +226,7 @@ int main(void)
 	list_init(&l);
 
 	string s;
-	s = string_create("hello");
+	string_from_cstring(&s, "hello");
 
 	// allocate memory and copy the string
 	list_push_back(&l, s);

@@ -47,33 +47,34 @@
 #ifdef SGC_SAFE_ALLOCATOR
 static void *sgc_safe_malloc(size_t n)
 {
-	void* ret = malloc(n);
-	if(!ret)
-	{
-		SGC_FAIL;
-	}
-	return  ret;
+        void *ret = malloc(n);
+        if(!ret)
+        {
+                SGC_FAIL;
+        }
+        return ret;
 }
 
-static void *sgc_safe_realloc(void* addr, size_t n)
+static void *sgc_safe_realloc(void *addr, size_t n)
 {
-	void* ret = realloc(addr, n);
-	if(!ret)
-	{
-		SGC_FAIL;
-	}
-	return ret;
+        void *ret = realloc(addr, n);
+        if(!ret)
+        {
+                SGC_FAIL;
+        }
+        return ret;
 }
 
-static void safe_free(void* addr)
+static void sgc_safe_free(void *addr)
 {
-	free(addr);
+        free(addr);
 }
 
-SGC_INIT_ALLOCATOR(sgc_safe_malloc, sgc_safe_realloc, sgc_safe_free, static inline);
+SGC_INIT_ALLOCATOR(sgc_safe_malloc, sgc_safe_realloc, sgc_safe_free,
+                   static inline);
 
 #else
 #ifndef SGC_CUSTOM_ALLOCATOR
 SGC_INIT_ALLOCATOR(malloc, realloc, free, static inline);
 #endif
-
+#endif

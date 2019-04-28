@@ -16,7 +16,7 @@
    ===========================
 */
 
-#define MEASURE test_vector_push_back
+#define MEASURE test_list_push_back
 
 /*
    ===========================

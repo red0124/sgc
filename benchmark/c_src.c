@@ -7,12 +7,11 @@
 
 #define REPEAT(N) for(size_t _i = 0; _i < N; ++_i)
 
-#define SGC_ST
+#define SGC_SAFE_ALLOCATOR
 #include "../lib/algorithm.h"
 #include "../lib/list.h"
 #include "../lib/map.h"
 #include "../lib/priority_queue.h"
-#include "../lib/static_types.h"
 #include "../lib/static_unordered_map.h"
 #include "../lib/unordered_map.h"
 #include "../lib/vector.h"
@@ -32,7 +31,7 @@ SGC_INIT_STATIC_PAIR(UNORDERED_MAP, int, int, STATIC_MAX, sumap);
    ===========================
 */
 
-#define MEASURE test_vector_push_back
+#define MEASURE test_list_push_back
 
 /*
    ===========================
@@ -306,16 +305,16 @@ void test_vector_push_back(size_t num_el, size_t num_rep)
 
 int main(int argc, char *argv[])
 {
-        FILE *in = fopen(INPUT_FILE, "r");
+        FILE *input = fopen(INPUT_FILE, "r");
         char buff[BUFF_SIZE];
 
-        fgets(buff, BUFF_SIZE - 1, in);
+        fgets(buff, BUFF_SIZE - 1, input);
         size_t num_of_elements = atoi(buff);
 
-        fgets(buff, BUFF_SIZE - 1, in);
+        fgets(buff, BUFF_SIZE - 1, input);
         size_t num_of_repetitions = atoi(buff);
 
-        fclose(in);
+        fclose(input);
 
         MEASURE(num_of_elements, num_of_repetitions);
 

@@ -1,13 +1,19 @@
 #pragma once
 
-static inline size_t sgc_sqrt(size_t n)
+static inline float sgc_abs(float num)
 {
-        size_t i = 1;
-        while(i * i <= n)
+        return (num < 0) ? -num : num;
+}
+
+static inline size_t sgc_sqrt(int n)
+{
+        const float diff = 1;
+        float guess = 1;
+        while(sgc_abs(guess * guess - n) >= diff)
         {
-                ++i;
+                guess = (n / guess + guess) / 2.0;
         }
-        return i;
+        return (int)(guess) + 1;
 }
 
 static inline int sgc_is_prime(size_t n)
