@@ -562,7 +562,6 @@ int main(void)
         list_push_back(&l, s);
         list_push_back(&l, s);
 
-	// this will free all memory
         my_allocator_clean();
 
 	// tries double free
@@ -755,6 +754,8 @@ int main(void)
  - implement vector and deque wrap_array
  - implement list concat
  - implement mergesort
+ - implement contains
+ - implement reserve
  - make set and map erase not allocate anything new, relink nodes
  - make deque copy use memcpy
 
