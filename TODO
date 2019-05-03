@@ -2,5 +2,7 @@ implement container_clean for everything
 implement vector and deque wrap_array
 implement list concat
 implement mergesort
+implement cointains
+implement reserve
 make set and map erase not allocate anything new, relink nodes
 make deque copy use memcpy

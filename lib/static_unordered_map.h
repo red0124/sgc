@@ -407,10 +407,6 @@
                 V *ret = NULL;                                                 \
                 if(i._is_valid)                                                \
                 {                                                              \
-                        if(u->_shared_key)                                     \
-                        {                                                      \
-                                K##_free(&k);                                  \
-                        }                                                      \
                         ret = &i._data[i._curr]._data.value;                   \
                 }                                                              \
                 else if(u->_size < S - 1)                                      \

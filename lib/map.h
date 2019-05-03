@@ -798,10 +798,6 @@
                         }                                                      \
                         else                                                   \
                         {                                                      \
-                                if(m->_shared_key)                             \
-                                {                                              \
-                                        K##_free(k);                           \
-                                }                                              \
                                 v = &parent->_data.value;                      \
                                 break;                                         \
                         }                                                      \

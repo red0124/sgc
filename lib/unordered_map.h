@@ -738,10 +738,6 @@
                 V *ret;                                                        \
                 if(i._curr)                                                    \
                 {                                                              \
-                        if(u->_shared_key)                                     \
-                        {                                                      \
-                                K##_free(&k);                                  \
-                        }                                                      \
                         ret = &i._curr->_data.value;                           \
                 }                                                              \
                 else                                                           \

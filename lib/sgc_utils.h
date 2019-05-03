@@ -506,5 +506,8 @@
 #define for_eachr sgc_for_each_reverse
 #define for_each_intersect sgc_for_each_intersect
 #define for_eachi sgc_for_each_intersect
+#define fore sgc_for_each
+#define fori sgc_for_each_intersect
+#define forr sgc_for_each_reverse
 
 #endif
