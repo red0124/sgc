@@ -2,13 +2,13 @@
 
 #include "sgc_allocator.h"
 #include "sgc_basic_types.h"
-#include "sgc_common.h"
-#include "sgc_dll_type.h"
-#include "sgc_list_type.h"
 #include "sgc_sort_stack.h"
 #include "sgc_utils.h"
+#include "sgc_dll_type.h"
+#include "sgc_list_type.h"
+#include "sgc_common.h"
 
-#define SGC_INIT_STATIC_FUNCTIONS_LIST(T, N)                                   \
+#define SGC_INIT_HEADERS_STATIC_FUNCTIONS_STATIC_LIST(T, N)                    \
         static struct N##_node *N##_find_node(const struct N *const l,         \
                                               const T el);                     \
         static void N##_node_erase(struct N *l, struct N##_node *n);           \
@@ -26,7 +26,7 @@
         static struct N##_node *N##_node_alloc(struct N *l);                   \
         static void N##_node_free(struct N *l, struct N##_node *n);
 
-#define SGC_INIT_HEADERS_LIST(T, N)                                            \
+#define SGC_INIT_HEADERS_STATIC_LIST(T, S, N)                                  \
                                                                                \
         struct N##_node                                                        \
         {                                                                      \
@@ -41,6 +41,8 @@
                 size_t _shared;                                                \
                 struct N##_node *_head;                                        \
                 struct N##_node *_tail;                                        \
+                struct N##_node _pool[S];                                      \
+                struct N##_node *_node_free_list;                              \
         };                                                                     \
                                                                                \
         typedef struct N N;                                                    \
@@ -48,6 +50,7 @@
                                                                                \
         void N##_set_share(N *l, int is_shared);                               \
         size_t N##_size(const struct N *const l);                              \
+        size_t N##_max();                                                      \
         void N##_init(struct N *l);                                            \
         void N##_free(struct N *l);                                            \
         int N##_equal(const struct N *const first,                             \
@@ -97,9 +100,9 @@
                                const struct N##_iterator second);              \
         int N##_iterator_valid(const struct N##_iterator i);
 
-#define SGC_INIT_LIST(T, N)                                                    \
-        SGC_INIT_HEADERS_LIST(T, N)                                            \
-        SGC_INIT_STATIC_FUNCTIONS_LIST(T, N)                                   \
-        SGC_INIT_LIST_TYPE_FUNCTIONS(T, 0, N)                                  \
-        SGC_INIT_DLL_TYPE_FUNCTIONS(T, 0, N)                                   \
-        SGC_INIT_COMMON_FUNCTIONS(T, N)
+#define SGC_INIT_STATIC_LIST(T, S, N)                                          \
+        SGC_INIT_HEADERS_STATIC_LIST(T, S, N)                                  \
+        SGC_INIT_HEADERS_STATIC_FUNCTIONS_STATIC_LIST(T, N)                    \
+        SGC_INIT_STATIC_LIST_TYPE_FUNCTIONS(T, S, N)                           \
+        SGC_INIT_DLL_TYPE_FUNCTIONS(T, S, N)                                   \
+        SGC_INIT_STATIC_COMMON_FUNCTIONS(T, S, N)
