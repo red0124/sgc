@@ -200,7 +200,7 @@
                         else                                                   \
                         {                                                      \
                                 N##_node_erase(l, curr, prev);                 \
-                l->_size--;                                                    \
+                                l->_size--;                                    \
                         }                                                      \
                 }                                                              \
                 return found;                                                  \
@@ -248,6 +248,10 @@
         int N##_insert_sorted(struct N *l, const T el,                         \
                               int (*compare)(const T *const, const T *const))  \
         {                                                                      \
+                if(S > 0 && l->_size == S)                                     \
+                {                                                              \
+                        return 0;                                              \
+                }                                                              \
                 int sorted = 1;                                                \
                 if(l->_head == NULL)                                           \
                 {                                                              \

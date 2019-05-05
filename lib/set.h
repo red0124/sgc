@@ -1,10 +1,10 @@
 #pragma once
 
-#include "sgc_allocator.h"
-#include "sgc_basic_types.h"
-#include "sgc_log.h"
-#include "sgc_tree_node.h"
-#include "sgc_utils.h"
+#include "inc/sgc_allocator.h"
+#include "inc/sgc_basic_types.h"
+#include "inc/sgc_log.h"
+#include "inc/sgc_tree_node.h"
+#include "inc/sgc_utils.h"
 
 #define SGC_INIT_STATIC_FUNCTIONS_SET(V, N)                                    \
         static struct N##_node *N##_node_begin(struct N##_node *n);            \

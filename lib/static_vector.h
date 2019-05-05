@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sgc_basic_types.h"
-#include "sgc_utils.h"
+#include "inc/sgc_basic_types.h"
+#include "inc/sgc_utils.h"
 
 #define SGC_INIT_HEADER_STATIC_VECTOR(T, S, N)                                 \
         struct N                                                               \

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sgc_basic_types.h"
-#include "sgc_utils.h"
+#include "inc/sgc_basic_types.h"
+#include "inc/sgc_utils.h"
 
 #define SGC_INIT_HEADERS_STATIC_STACK(T, S, N)                                 \
                                                                                \

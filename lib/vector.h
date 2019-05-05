@@ -1,8 +1,10 @@
 #pragma once
 
-#include "sgc_allocator.h"
-#include "sgc_basic_types.h"
-#include "sgc_utils.h"
+#include "inc/sgc_allocator.h"
+#include "inc/sgc_basic_types.h"
+#include "inc/sgc_utils.h"
+#include "inc/sgc_array.h"
+#include "inc/sgc_common.h"
 
 #define SGC_INIT_STATIC_FUNCTIONS_VECTOR(T, N)                                 \
         static void N##_resize(struct N *v);
@@ -84,10 +86,7 @@
 #define SGC_INIT_VECTOR(T, N)                                                  \
         SGC_INIT_HEADERS_VECTOR(T, N);                                         \
         SGC_INIT_STATIC_FUNCTIONS_VECTOR(T, N);                                \
-                                                                               \
-        /* ================== */                                               \
-        /*  VECTOR FUNCTIONS  */                                               \
-        /* ================== */                                               \
+	SGC_INIT_ARRAY_TYPE_FUNCTIONS(T, 0, N)\
                                                                                \
         void N##_set_share(N *v, int is_shared)                                \
         {                                                                      \

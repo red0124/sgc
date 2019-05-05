@@ -1,12 +1,12 @@
 #pragma once
 
-#include "sgc_allocator.h"
-#include "sgc_basic_types.h"
-#include "sgc_sort_stack.h"
-#include "sgc_utils.h"
-#include "sgc_dll_type.h"
-#include "sgc_list_type.h"
-#include "sgc_common.h"
+#include "inc/sgc_allocator.h"
+#include "inc/sgc_basic_types.h"
+#include "inc/sgc_sort_stack.h"
+#include "inc/sgc_utils.h"
+#include "inc/sgc_dll_type.h"
+#include "inc/sgc_list_type.h"
+#include "inc/sgc_common.h"
 
 #define SGC_INIT_HEADERS_STATIC_FUNCTIONS_STATIC_LIST(T, N)                    \
         static struct N##_node *N##_find_node(const struct N *const l,         \

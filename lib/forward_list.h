@@ -1,12 +1,12 @@
 #pragma once
 
-#include "sgc_allocator.h"
-#include "sgc_basic_types.h"
-#include "sgc_common.h"
-#include "sgc_list_type.h"
-#include "sgc_sll_type.h"
-#include "sgc_sort_stack.h"
-#include "sgc_utils.h"
+#include "inc/sgc_allocator.h"
+#include "inc/sgc_basic_types.h"
+#include "inc/sgc_common.h"
+#include "inc/sgc_list_type.h"
+#include "inc/sgc_sll_type.h"
+#include "inc/sgc_sort_stack.h"
+#include "inc/sgc_utils.h"
 
 #define SGC_INIT_STATIC_FUNCTIONS_FORWARD_LIST(T, N)                           \
         static struct N##_node *N##_prev(struct N##_node *head,                \

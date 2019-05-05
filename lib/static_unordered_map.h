@@ -1,8 +1,8 @@
 #pragma once
 
-#include "sgc_basic_types.h"
-#include "sgc_hash_node_state.h"
-#include "sgc_utils.h"
+#include "inc/sgc_basic_types.h"
+#include "inc/sgc_hash_node_state.h"
+#include "inc/sgc_utils.h"
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_UNORDERED_MAP(K, V, S, N)             \
         static struct N##_iterator N##_find_by_hash(                           \

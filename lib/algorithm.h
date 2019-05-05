@@ -1,9 +1,9 @@
 #pragma once
 
-#include "sgc_allocator.h"
-#include "sgc_basic_types.h"
-#include "sgc_sort_stack.h"
-#include "sgc_utils.h"
+#include "inc/sgc_allocator.h"
+#include "inc/sgc_basic_types.h"
+#include "inc/sgc_sort_stack.h"
+#include "inc/sgc_utils.h"
 
 #define SGC_INIT_HEADERS_ITERATE(T, N)                                         \
         void N##_fold_range(N##_iterator begin, N##_iterator end,              \
