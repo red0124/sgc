@@ -1,5 +1,7 @@
 #pragma once
 
+#define SGC_INIT_ARRAY_TYPE_FUNCTIONS(T, S, N)\
+
 #define SGC_INIT_COMMON_ARRAY_TYPE_FUNCTIONS(T, S, N)\
         int N##_equal(const struct N *const first,                             \
                       const struct N *const second)                            \
@@ -21,9 +23,6 @@
                 return equal;                                                  \
         }                                                                      \
                                                                                \
-
-#define SGC_INIT_ARRAY_TYPE_FUNCTIONS(T, S, N)\
-#define SGC_INIT_COMMON_ARRAY_TYPE_FUNCTIONS(T, S, N)\
 	void N##_free(struct N *a)                                             \
         {                                                                      \
                 if(a->_data)                                                   \
@@ -64,3 +63,4 @@
                 }                                                              \
         }                                                                      \
                                                                                \
+

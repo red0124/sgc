@@ -24,7 +24,7 @@ clean:
 
 run: 
 	@for i in $(TESTS); do \
-		valgrind ./$$i; \
+		./$$i; \
 	done
 
 # don't use any implicit rules
