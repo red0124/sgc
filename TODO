@@ -1,4 +1,4 @@
-implement container_clean for everything
+implement clean funcion for every container
 implement vector and deque wrap_array
 implement list concat
 implement mergesort
