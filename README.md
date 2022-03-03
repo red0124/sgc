@@ -662,6 +662,7 @@ void sched_run(void)
 	{
 		return;
 	}
+
 	while(1)
 	{
 		task curr = *pqueue_top(&sched_pqueue);
