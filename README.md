@@ -70,7 +70,7 @@ $
 # Install
 Just run the following commands in your shell:
 ```bash
-$ git clone https://gitlab.com/ado0/sgc
+$ git clone https://github.com/red0124/sgc
 $ cd sgc
 $ sudo make install
 ```
@@ -333,73 +333,73 @@ Compared to **C++ STL** libraries.
 
 **Vector push_back**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/vector_push_back.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/vector_push_back.png)
 
 [> Back to content](#content)
 
 **Vector fetch element**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/vector_fetch.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/vector_fetch.png)
 
 [> Back to content](#content)
 
 **List push_back**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/list_push_back.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/list_push_back.png)
 
 [> Back to content](#content)
 
 **List iterate**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/list_iterate.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/list_iterate.png)
 
 [> Back to content](#content)
 
 **Priority Queue push**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/priority_queue_push.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/priority_queue_push.png)
 
 [> Back to content](#content)
 
 **Priority Queue push and pop**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/priority_queue_pop.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/priority_queue_pop.png)
 
 [> Back to content](#content)
 
 **Map insert**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/map_insert.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/map_insert.png)
 
 [> Back to content](#content)
 
 **Map fetch**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/map_fetch.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/map_fetch.png)
 
 [> Back to content](#content)
 
 **Map iterate**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/map_iterate.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/map_iterate.png)
 
 [> Back to content](#content)
 
 **Unordered Map insert**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/unordered_map_insert.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/unordered_map_insert.png)
 
 [> Back to content](#content)
 
 **Unordered Map fetch**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/unordered_map_fetch.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/unordered_map_fetch.png)
 
 [> Back to content](#content)
 
 **Unordered Map iterate**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/unordered_map_iterate.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/unordered_map_iterate.png)
 
 [> Back to content](#content)
 
@@ -409,19 +409,19 @@ to the non static ones which use open hashing.**
 
 **Static Unordered Map insert, C++ map is reserved**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/static_unordered_map_insert.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/static_unordered_map_insert.png)
 
 [> Back to content](#content)
 
 **Static Unordered Map fetch, C++ map is reserved**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/static_unordered_map_fetch.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/static_unordered_map_fetch.png)
 
 [> Back to content](#content)
 
 **Static Unordered Map iterate, C++ map is reserved**
 
-![alt text](https://gitlab.com/ado0/sgc/raw/master/img/static_unordered_map_iterate.png)
+![alt text](https://github.com/red0124/sgc/raw/master/img/static_unordered_map_iterate.png)
 
 [> Back to content](#content)
 # Examples
