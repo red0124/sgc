@@ -1,17 +1,10 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "../lib/static_deque.h"
-#include "./Unity/src/unity.h"
+#include "test_common.h"
+#include <sgc/static_deque.h>
 
 #define TEST_ELEMENTS_NUM 50
 #define DEQUE_MAX 512
 
-SGC_INIT_STATIC_DEQUE(int, DEQUE_MAX, deque);
+SGC_INIT_STATIC_DEQUE(int, DEQUE_MAX, deque)
 
 void test_deque_push_pop(void)
 {
@@ -153,7 +146,7 @@ int al_equal(const al *const first, const al *const second)
         return *first->el == *second->el;
 }
 
-SGC_INIT_STATIC_DEQUE(al, DEQUE_MAX, adeque);
+SGC_INIT_STATIC_DEQUE(al, DEQUE_MAX, adeque)
 
 void test_adeque(void)
 {
@@ -182,7 +175,7 @@ void test_adeque(void)
         // no memory should be left dealocated
 }
 
-SGC_INIT_STATIC_DEQUE(deque, DEQUE_MAX, vdeque);
+SGC_INIT_STATIC_DEQUE(deque, DEQUE_MAX, vdeque)
 int *vdeque_at_pair(vdeque *l, size_t m, size_t n)
 {
         return deque_at(vdeque_at(l, m), n);

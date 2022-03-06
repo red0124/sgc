@@ -1,16 +1,9 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "../lib/static_map.h"
-#include "./Unity/src/unity.h"
+#include <sgc/static_map.h>
+#include "test_common.h"
 
 #define TEST_ELEMENTS_NUM 50
 
-SGC_INIT_STATIC_MAP(int, int, 100, map);
+SGC_INIT_STATIC_MAP(int, int, 100, map)
 
 void test_map_insert_erase(void)
 {
@@ -101,7 +94,7 @@ void al_init(al *a)
         a->el = NULL;
 }
 
-SGC_INIT_STATIC_MAP(al, al, 100, amap);
+SGC_INIT_STATIC_MAP(al, al, 100, amap)
 
 void test_amap(void)
 {
@@ -139,7 +132,7 @@ int map_compare(const map *const first, const map *const second)
         return map_size(first) - map_size(second);
 }
 
-SGC_INIT_STATIC_MAP(map, map, 100, vmap);
+SGC_INIT_STATIC_MAP(map, map, 100, vmap)
 
 void test_map_map(void)
 {

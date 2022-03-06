@@ -1,247 +1,216 @@
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "../lib/unordered_set.h"
-#include "./Unity/src/unity.h"
+#include "test_common.h"
+#include <sgc/unordered_set.h>
 
 #define TEST_ELEMENTS_NUM 50
 
-SGC_INIT_UNORDERED_SET(int, set);
+SGC_INIT_UNORDERED_SET(int, set)
 
-void test_set_insert_erase(void)
-{
-        set v;
-        set_init(&v);
+void test_set_insert_erase(void) {
+    set v;
+    set_init(&v);
 
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; i++)
-        {
-                set_insert(&v, i);
-        }
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
+        set_insert(&v, i);
+    }
 
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; i++)
-        {
-                TEST_ASSERT_EQUAL_INT(i, *set_iterator_data(set_find(&v, i)));
-        }
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
+        TEST_ASSERT_EQUAL_INT(i, *set_iterator_data(set_find(&v, i)));
+    }
 
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                set_erase(&v, i);
-        }
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        set_erase(&v, i);
+    }
 
-        TEST_ASSERT_EQUAL_INT(0, set_size(&v));
+    TEST_ASSERT_EQUAL_INT(0, set_size(&v));
 
-        set_free(&v);
+    set_free(&v);
 }
 
-void test_set_insert_multiple(void)
-{
-        set v;
-        set_init(&v);
+void test_set_insert_multiple(void) {
+    set v;
+    set_init(&v);
 
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; i++)
-        {
-                set_insert_multiple(&v, 0);
-        }
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
+        set_insert_multiple(&v, 0);
+    }
 
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; i++)
-        {
-                TEST_ASSERT_EQUAL_INT(0, *set_iterator_data(set_find(&v, 0)));
-        }
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
+        TEST_ASSERT_EQUAL_INT(0, *set_iterator_data(set_find(&v, 0)));
+    }
 
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                set_erase(&v, 0);
-        }
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        set_erase(&v, 0);
+    }
 
-        TEST_ASSERT_EQUAL_INT(0, set_iterator_valid(set_find(&v, 0)));
-        TEST_ASSERT_EQUAL_INT(0, set_size(&v));
+    TEST_ASSERT_EQUAL_INT(0, set_iterator_valid(set_find(&v, 0)));
+    TEST_ASSERT_EQUAL_INT(0, set_size(&v));
 
-        set_free(&v);
+    set_free(&v);
 }
 
-void test_set_copy(void)
-{
-        set v;
-        set_init(&v);
+void test_set_copy(void) {
+    set v;
+    set_init(&v);
 
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                set_insert(&v, i);
-        }
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        set_insert(&v, i);
+    }
 
-        set v_cp;
-        set_copy(&v_cp, &v);
+    set v_cp;
+    set_copy(&v_cp, &v);
 
-        TEST_ASSERT_EQUAL_INT(1, set_equal(&v_cp, &v));
+    TEST_ASSERT_EQUAL_INT(1, set_equal(&v_cp, &v));
 
-        set_free(&v);
-        set_free(&v_cp);
+    set_free(&v);
+    set_free(&v_cp);
 }
 
-struct alocated_element
-{
-        int *el;
+struct alocated_element {
+    int* el;
 };
 
 typedef struct alocated_element al;
 
 size_t allocation_count = 0;
 
-void al_copy(al *dst, const al *const src)
-{
-        ++allocation_count;
-        dst->el = (int *)malloc(sizeof(int));
-        *dst->el = *src->el;
+void al_copy(al* dst, const al* const src) {
+    ++allocation_count;
+    dst->el = (int*)malloc(sizeof(int));
+    *dst->el = *src->el;
 }
 
-void al_free(al *a)
-{
-        --allocation_count;
-        free(a->el);
+void al_free(al* a) {
+    --allocation_count;
+    free(a->el);
 }
 
-int al_equal(const al *const first, const al *const second)
-{
-        return *first->el == *second->el;
+int al_equal(const al* const first, const al* const second) {
+    return *first->el == *second->el;
 }
 
-int al_compare(const al *const first, const al *const second)
-{
-        return *first->el - *second->el;
+int al_compare(const al* const first, const al* const second) {
+    return *first->el - *second->el;
 }
 
-size_t al_hash(const al *const a)
-{
-        return *a->el;
+size_t al_hash(const al* const a) {
+    return *a->el;
 }
 
-SGC_INIT_UNORDERED_SET(al, aset);
+SGC_INIT_UNORDERED_SET(al, aset)
 
-void test_aset(void)
-{
-        aset v;
-        aset_init(&v);
+void test_aset(void) {
+    aset v;
+    aset_init(&v);
 
-        int x = 0;
-        al tmp = {&x};
+    int x = 0;
+    al tmp = {&x};
 
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                *tmp.el = i;
-                aset_insert(&v, tmp);
-        }
-
-        x = TEST_ELEMENTS_NUM / 2;
-        aset_erase(&v, tmp);
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        *tmp.el = i;
         aset_insert(&v, tmp);
-        aset_insert(&v, tmp);
-        aset_insert(&v, tmp);
+    }
 
-        aset_set_share(&v, 1);
-        ++allocation_count;
-        int *new_el = (int *)malloc(sizeof(int));
-        *new_el = TEST_ELEMENTS_NUM + 2;
-        tmp.el = new_el;
-        aset_insert(&v, tmp);
-        aset_set_share(&v, 0);
+    x = TEST_ELEMENTS_NUM / 2;
+    aset_erase(&v, tmp);
+    aset_insert(&v, tmp);
+    aset_insert(&v, tmp);
+    aset_insert(&v, tmp);
 
-        aset_free(&v);
+    aset_set_share(&v, 1);
+    ++allocation_count;
+    int* new_el = (int*)malloc(sizeof(int));
+    *new_el = TEST_ELEMENTS_NUM + 2;
+    tmp.el = new_el;
+    aset_insert(&v, tmp);
+    aset_set_share(&v, 0);
 
-        TEST_ASSERT_EQUAL_INT(0, allocation_count);
-        // no memory should be left dealocated
+    aset_free(&v);
+
+    TEST_ASSERT_EQUAL_INT(0, allocation_count);
+    // no memory should be left dealocated
 }
 
-size_t set_hash(const set *const s)
-{
-        return set_size(s);
+size_t set_hash(const set* const s) {
+    return set_size(s);
 }
 
-SGC_INIT_UNORDERED_SET(set, vset);
+SGC_INIT_UNORDERED_SET(set, vset)
 
-void test_set_set(void)
-{
-        vset v;
-        vset_init(&v);
+void test_set_set(void) {
+    vset v;
+    vset_init(&v);
 
-        set tmp;
-        set_init(&tmp);
+    set tmp;
+    set_init(&tmp);
 
-        set_insert(&tmp, 0);
-        // {0}
+    set_insert(&tmp, 0);
+    // {0}
 
-        vset_insert(&v, tmp);
-        // pushed set into vset, it will make a copy
+    vset_insert(&v, tmp);
+    // pushed set into vset, it will make a copy
 
-        set_insert(&tmp, 1);
-        // {0, 1}
+    set_insert(&tmp, 1);
+    // {0, 1}
 
-        vset_insert(&v, tmp);
+    vset_insert(&v, tmp);
 
-        set_insert(&tmp, 2);
-        // {0, 1, 2}
+    set_insert(&tmp, 2);
+    // {0, 1, 2}
 
-        vset_set_share(&v, 1);
-        vset_insert(&v, tmp);
-        vset_set_share(&v, 0);
-        // pushed set into vset, it will use the original
+    vset_set_share(&v, 1);
+    vset_insert(&v, tmp);
+    vset_set_share(&v, 0);
+    // pushed set into vset, it will use the original
 
-        // {{0}, {0, 1}, {0, 1, 2}}
+    // {{0}, {0, 1}, {0, 1, 2}}
 
-        TEST_ASSERT_EQUAL_INT(
-            0, *set_iterator_data(
-                   set_find(vset_iterator_data(vset_find(&v, tmp)), 0)));
+    TEST_ASSERT_EQUAL_INT(0,
+                          *set_iterator_data(
+                              set_find(vset_iterator_data(vset_find(&v, tmp)),
+                                       0)));
 
-        vset_free(&v);
-        // no memory should be left dealocated
+    vset_free(&v);
+    // no memory should be left dealocated
 }
 
-void test_set_iterator(void)
-{
-        set v;
-        set_init(&v);
+void test_set_iterator(void) {
+    set v;
+    set_init(&v);
 
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                set_insert(&v, i);
-        }
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        set_insert(&v, i);
+    }
 
-        size_t i = 0;
+    size_t i = 0;
 
-        for(struct set_iterator it = set_begin(&v);
-            !set_iterator_equal(it, set_end(&v)); set_iterator_next(&it))
-        {
-                TEST_ASSERT_EQUAL_INT(*set_iterator_data(it), i);
-                ++i;
-        }
+    for (struct set_iterator it = set_begin(&v);
+         !set_iterator_equal(it, set_end(&v)); set_iterator_next(&it)) {
+        TEST_ASSERT_EQUAL_INT(*set_iterator_data(it), i);
+        ++i;
+    }
 
-        TEST_ASSERT_EQUAL_INT(*set_iterator_data(set_end(&v)),
-                              TEST_ELEMENTS_NUM - 1);
+    TEST_ASSERT_EQUAL_INT(*set_iterator_data(set_end(&v)),
+                          TEST_ELEMENTS_NUM - 1);
 
-        for(struct set_iterator it = set_end(&v);
-            !set_iterator_equal(it, set_begin(&v)); set_iterator_prev(&it))
-        {
-                TEST_ASSERT_EQUAL_INT(*set_iterator_data(it), i);
-                --i;
-        }
+    for (struct set_iterator it = set_end(&v);
+         !set_iterator_equal(it, set_begin(&v)); set_iterator_prev(&it)) {
+        TEST_ASSERT_EQUAL_INT(*set_iterator_data(it), i);
+        --i;
+    }
 
-        TEST_ASSERT_EQUAL_INT(*set_iterator_data(set_begin(&v)), 0);
+    TEST_ASSERT_EQUAL_INT(*set_iterator_data(set_begin(&v)), 0);
 
-        set_free(&v);
+    set_free(&v);
 }
 
-int main(void)
-{
-        UNITY_BEGIN();
-        RUN_TEST(test_set_insert_erase);
-        RUN_TEST(test_set_insert_multiple);
-        RUN_TEST(test_set_copy);
-        RUN_TEST(test_aset);
-        RUN_TEST(test_set_set);
-        RUN_TEST(test_set_iterator);
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_set_insert_erase);
+    RUN_TEST(test_set_insert_multiple);
+    RUN_TEST(test_set_copy);
+    RUN_TEST(test_aset);
+    RUN_TEST(test_set_set);
+    RUN_TEST(test_set_iterator);
 
-        return UNITY_END();
+    return UNITY_END();
 }
