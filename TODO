@@ -7,3 +7,4 @@ implement reserve
 remove map copy and free stack usage
 make set and map erase not allocate anything new, relink nodes
 make deque copy use memcpy
+add github ci
