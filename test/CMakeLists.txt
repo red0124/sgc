@@ -47,4 +47,5 @@ foreach(name IN ITEMS test_algorithm test_deque test_forward_list test_list
   add_executable("${name}" "${name}.c")
   target_link_libraries("${name}" PRIVATE sgc::sgc unity)
   target_compile_definitions("${name}" PRIVATE CMAKE_GITHUB_CI)
+  add_test("${name}" "${name}" "./${name}")
 endforeach()
