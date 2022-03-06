@@ -52,7 +52,6 @@ jobs:
         run: |
           apt-get update
           apt-get install -y git
-          script/ci_install_deps.sh
 
       - name: Configure
         run: cmake -S test -B build -D CMAKE_BUILD_TYPE=Debug
