@@ -27,62 +27,11 @@ void test_list_erase(void) {
 }
 
 void test_list_insert_sorted(void) {
-    list l;
-    list_init(&l);
-
-    ASSERT_EQUAL(1, list_insert_sorted(&l, 2, int_compare));
-    ASSERT_EQUAL(1, list_insert_sorted(&l, 4, int_compare));
-    ASSERT_EQUAL(1, list_insert_sorted(&l, 3, int_compare));
-    ASSERT_EQUAL(1, list_insert_sorted(&l, 0, int_compare));
-    ASSERT_EQUAL(1, list_insert_sorted(&l, 1, int_compare));
-    ASSERT_EQUAL(1, list_insert_sorted(&l, 5, int_compare));
-
-    ASSERT_EQUAL(0, *list_at(&l, 0));
-    ASSERT_EQUAL(1, *list_at(&l, 1));
-    ASSERT_EQUAL(2, *list_at(&l, 2));
-    ASSERT_EQUAL(3, *list_at(&l, 3));
-    ASSERT_EQUAL(4, *list_at(&l, 4));
-    ASSERT_EQUAL(5, *list_at(&l, 5));
-
-    list_free(&l);
+    TEST_INSERT_SORTED(list);
 }
 
 void test_list_sort(void) {
-    list l;
-    list_init(&l);
-
-    list l_sorted;
-    list_init(&l_sorted);
-
-    srand(time(NULL));
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        int el = rand() % (2 * TEST_ELEMENTS_NUM);
-        list_push_back(&l, el);
-        list_insert_sorted(&l_sorted, el, int_compare);
-    }
-
-    list_push_back(&l, 10);
-    list_push_back(&l, 30);
-    list_push_back(&l, 20);
-
-    list_insert_sorted(&l_sorted, 10, int_compare);
-    list_insert_sorted(&l_sorted, 30, int_compare);
-    list_insert_sorted(&l_sorted, 20, int_compare);
-
-    list_sort(&l, int_void_compare);
-
-    for (size_t i = 0; i < list_size(&l) - 1; ++i) {
-        TEST_ASSERT_EQUAL_INT(1, *list_at(&l, i) <= *list_at(&l, i + 1));
-
-        TEST_ASSERT_EQUAL_INT(1, *list_at(&l_sorted, i) <=
-                                     *list_at(&l_sorted, i + 1));
-    }
-
-    TEST_ASSERT_EQUAL_INT(1, list_equal(&l, &l_sorted));
-
-    list_free(&l);
-    list_free(&l_sorted);
+    TEST_LIST_SORT(list);
 }
 
 SGC_INIT_STATIC_LIST(al, LIST_MAX, alist)

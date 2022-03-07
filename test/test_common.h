@@ -398,3 +398,50 @@ inline size_t al_hash(const al* const a) {
     ASSERT_EQUAL(*N##_iterator_data(it0), *N##_at(&ds, 0));                    \
                                                                                \
     N##_free(&ds);
+
+// LIST, STATIC LIST, FORWARD LIST, STATIC FORWARD LIST
+#define TEST_INSERT_SORTED(N)                                                  \
+    N ds;                                                                      \
+    N##_init(&ds);                                                             \
+                                                                               \
+    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 2, int_compare));                   \
+    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 4, int_compare));                   \
+    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 3, int_compare));                   \
+    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 0, int_compare));                   \
+    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 1, int_compare));                   \
+    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 5, int_compare));                   \
+                                                                               \
+    ASSERT_EQUAL(0, *N##_at(&ds, 0));                                          \
+    ASSERT_EQUAL(1, *N##_at(&ds, 1));                                          \
+    ASSERT_EQUAL(2, *N##_at(&ds, 2));                                          \
+    ASSERT_EQUAL(3, *N##_at(&ds, 3));                                          \
+    ASSERT_EQUAL(4, *N##_at(&ds, 4));                                          \
+    ASSERT_EQUAL(5, *N##_at(&ds, 5));                                          \
+                                                                               \
+    N##_free(&ds);
+
+// LIST, STATIC LIST, FORWARD LIST, STATIC FORWARD LIST
+#define TEST_LIST_SORT(N)                                                      \
+    N ds;                                                                      \
+    N##_init(&ds);                                                             \
+                                                                               \
+    N ds_sorted;                                                               \
+    N##_init(&ds_sorted);                                                      \
+                                                                               \
+    for (size_t i = 0; i < 100; ++i) {                                         \
+        int el = i % 10;                                                       \
+        N##_push_back(&ds, el);                                                \
+        N##_insert_sorted(&ds_sorted, el, int_compare);                        \
+    }                                                                          \
+                                                                               \
+    N##_sort(&ds, int_void_compare);                                           \
+                                                                               \
+    for (size_t i = 0; i < N##_size(&ds) - 1; ++i) {                           \
+        ASSERT_EQUAL(1, *N##_at(&ds, i) <= *N##_at(&ds, i + 1));               \
+        ASSERT_EQUAL(1, *N##_at(&ds_sorted, i) <= *N##_at(&ds_sorted, i + 1)); \
+    }                                                                          \
+                                                                               \
+    ASSERT_EQUAL(1, N##_equal(&ds, &ds_sorted));                               \
+                                                                               \
+    N##_free(&ds);                                                             \
+    N##_free(&ds_sorted);
