@@ -1,12 +1,11 @@
 unity_proj = subproject('unity')
 unity_dep = unity_proj.get_variable('unity_dep')
 
-test_deps = [unity_dep, sgc_dep]
-
 tests = [
   ['ALGORITHM', 'algorithm'],
   ['DEQUE', 'deque'],
   ['FORWARD LIST', 'forward_list'],
+  ['LIST', 'list'],
   ['MAP', 'map'],
   ['PRIORITY QUEUE', 'priority_queue'],
   ['QUEUE', 'queue'],
@@ -22,6 +21,7 @@ tests = [
   ['STATIC MAP', 'static_map'],
   ['STATIC PRIORITY QUEUE', 'static_priority_queue'],
   ['STATIC QUEUE', 'static_queue'],
+  #['STATIC SET', 'static_set'],
   ['STATIC STACK', 'static_stack'],
   ['STATIC UNORDERED MAP', 'static_unordered_map'],
   ['STATIC UNORDERED SET', 'static_unordered_set'],

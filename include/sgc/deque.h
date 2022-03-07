@@ -204,7 +204,9 @@
                                                                                \
     void N##_push_back(struct N* d, T el) {                                    \
         N##_resize(d);                                                         \
-        N##_move(&d->_back, d->_max);                                          \
+        if (d->_size != 0) {                                                   \
+            N##_move(&d->_back, d->_max);                                      \
+        }                                                                      \
         SGC_COPY(T##_copy, d->_data[d->_back], el, d->_shared);                \
         ++d->_size;                                                            \
     }                                                                          \
@@ -267,8 +269,12 @@
             if (!d->_shared) {                                                 \
                 T##_free(el);                                                  \
             }                                                                  \
-            N##_move_back(&d->_back, d->_max);                                 \
             --d->_size;                                                        \
+            if (d->_size == 0) {                                               \
+                d->_back = 0;                                                  \
+            } else {                                                           \
+                N##_move_back(&d->_back, d->_max);                             \
+            }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \

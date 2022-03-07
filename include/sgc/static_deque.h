@@ -179,9 +179,8 @@
                                                                                \
     void N##_push_back(struct N* d, T el) {                                    \
         if (d->_size < S) {                                                    \
-            N##_move(&d->_back);                                               \
-            if (d->_size == 0) {                                               \
-                --d->_back;                                                    \
+            if (d->_size != 0) {                                               \
+                N##_move(&d->_back);                                           \
             }                                                                  \
             SGC_COPY(T##_copy, d->_data[d->_back], el, d->_shared);            \
             ++d->_size;                                                        \
@@ -240,12 +239,16 @@
                                                                                \
     void N##_pop_back(struct N* d) {                                           \
         if (d->_size) {                                                        \
-            T* el = &d->_data[d->_back];                                       \
             if (!d->_shared) {                                                 \
+                T* el = &d->_data[d->_back];                                   \
                 T##_free(el);                                                  \
             }                                                                  \
-            N##_move_back(&d->_back);                                          \
             --d->_size;                                                        \
+            if (d->_size == 0) {                                               \
+                d->_back = 0;                                                  \
+            } else {                                                           \
+                N##_move_back(&d->_back);                                      \
+            }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \

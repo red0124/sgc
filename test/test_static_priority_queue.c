@@ -41,33 +41,6 @@ void test_pqueue_copy(void) {
     pqueue_free(&v_cp);
 }
 
-struct alocated_element {
-    int* el;
-};
-
-typedef struct alocated_element al;
-
-size_t allocation_count = 0;
-
-void al_copy(al* dst, const al* const src) {
-    ++allocation_count;
-    dst->el = (int*)malloc(sizeof(int));
-    *dst->el = *src->el;
-}
-
-void al_free(al* a) {
-    --allocation_count;
-    free(a->el);
-}
-
-int al_equal(const al* const first, const al* const second) {
-    return *first->el == *second->el;
-}
-
-int al_compare(const al* const first, const al* const second) {
-    return *first->el - *second->el;
-}
-
 SGC_INIT_STATIC_PRIORITY_QUEUE(al, PQUEUE_MAX, apqueue)
 
 void test_apqueue(void) {

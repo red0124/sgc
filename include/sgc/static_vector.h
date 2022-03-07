@@ -147,6 +147,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
+    /* TODO make this not insert anything if out of range */                   \
     void N##_insert(struct N* v, const size_t at, T el) {                      \
         if (v->_size == S) {                                                   \
             return;                                                            \
@@ -155,6 +156,7 @@
             memmove(v->_data + at + 1, v->_data + at,                          \
                     (v->_size - at) * sizeof(T));                              \
             SGC_COPY(T##_copy, v->_data[at], el, v->_shared);                  \
+            v->_size++;                                                        \
         } else {                                                               \
             N##_push_back(v, el);                                              \
         }                                                                      \

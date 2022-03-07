@@ -177,7 +177,7 @@
         } else if (erase) {                                                    \
             struct N##_node* curr = l->_head;                                  \
             struct N##_node* prev = curr;                                      \
-            for (size_t i = 0; i < at - 1; ++i) {                              \
+            for (size_t i = 0; i < at; ++i) {                                  \
                 prev = curr;                                                   \
                 curr = curr->_next;                                            \
             }                                                                  \

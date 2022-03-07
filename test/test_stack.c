@@ -40,29 +40,6 @@ void test_stack_front_back(void) {
     stack_free(&v);
 }
 
-struct alocated_element {
-    int* el;
-};
-
-typedef struct alocated_element al;
-
-size_t allocation_count = 0;
-
-void al_copy(al* dst, const al* const src) {
-    ++allocation_count;
-    dst->el = (int*)malloc(sizeof(int));
-    *dst->el = *src->el;
-}
-
-void al_free(al* a) {
-    --allocation_count;
-    free(a->el);
-}
-
-int al_equal(const al* const first, const al* const second) {
-    return *first->el == *second->el;
-}
-
 SGC_INIT_STACK(al, astack)
 
 void test_astack(void) {

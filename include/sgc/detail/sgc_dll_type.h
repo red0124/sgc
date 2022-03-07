@@ -183,6 +183,7 @@
         return erase;                                                          \
     }                                                                          \
                                                                                \
+    /* TODO make this return void */                                           \
     int N##_erase_at(struct N* l, size_t at) {                                 \
         int erase = (at - 1 < l->_size || at == 0);                            \
         if (at == 0) {                                                         \
@@ -205,6 +206,9 @@
             }                                                                  \
             if (curr == l->_tail) {                                            \
                 l->_tail = l->_tail->_prev;                                    \
+            }                                                                  \
+            if (!l->_shared) {                                                 \
+                T##_free(&curr->_data);                                        \
             }                                                                  \
             N##_node_erase(l, curr);                                           \
             l->_size--;                                                        \

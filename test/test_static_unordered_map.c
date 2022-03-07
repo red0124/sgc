@@ -45,45 +45,6 @@ void test_map_copy(void) {
     map_free(&v_cp);
 }
 
-struct alocated_element {
-    int* el;
-};
-
-typedef struct alocated_element al;
-
-size_t allocation_count = 0;
-
-void al_copy(al* dst, const al* const src) {
-    if (src->el) {
-        dst->el = (int*)malloc(sizeof(int));
-        *dst->el = *src->el;
-    } else {
-        dst->el = NULL;
-    }
-    ++allocation_count;
-}
-
-void al_free(al* a) {
-    --allocation_count;
-    free(a->el);
-}
-
-int al_equal(const al* const first, const al* const second) {
-    return *first->el == *second->el;
-}
-
-int al_compare(const al* const first, const al* const second) {
-    return *first->el - *second->el;
-}
-
-void al_init(al* a) {
-    a->el = NULL;
-}
-
-size_t al_hash(const al* const a) {
-    return *a->el;
-}
-
 SGC_INIT_STATIC_UNORDERED_MAP(al, al, MAP_MAX, amap)
 
 void test_amap(void) {
