@@ -84,8 +84,7 @@ inline size_t al_hash(const al* const a) {
         }                                                                      \
     }
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, STATIC LIST, FORWARD LIST,
-// STATIC FORWARD LIST
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
 #define TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(N)                         \
     N ds;                                                                      \
     const size_t size = 100;                                                   \
@@ -145,8 +144,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, STATIC LIST, FORWARD LIST,
-// STATIC FORWARD LIST
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
 #define TEST_PUSH_BACK_COPY_EQUAL(N)                                           \
     N ds;                                                                      \
     const size_t size = 100;                                                   \
@@ -171,8 +169,7 @@ inline size_t al_hash(const al* const a) {
     N##_free(&ds);                                                             \
     N##_free(&ds_copy);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, STATIC LIST, FORWARD LIST,
-// STATIC FORWARD LIST
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
 #define TEST_AT_INSERT(N)                                                      \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -199,8 +196,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, STATIC LIST, FORWARD LIST,
-// STATIC FORWARD LIST
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
 #define TEST_PUSH_BACK_AT_ERASE_AT(N)                                          \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -234,8 +230,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, STATIC LIST, FORWARD LIST,
-// STATIC FORWARD LIST
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
 #define TEST_PUSH_BACK_AT_SET_SET_AT_SET_FRONT_SET_BACK(N)                     \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -277,8 +272,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, STATIC LIST, FORWARD LIST,
-// STATIC FORWARD LIST
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
 #define TEST_PUSH_BACK_ERASE_AT_ALLOCATIONS(N)                                 \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -308,8 +302,7 @@ inline size_t al_hash(const al* const a) {
 
 #define MATRIX_AT(NN, N, DS, P, Q) N##_at(NN##_at(&DS, P), Q)
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, STATIC LIST, FORWARD LIST,
-// STATIC FORWARD LIST
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
 #define TEST_ARRAY_OF_ARRAYS_PUSH_BACK_AT_SHARE(NN, N)                         \
     NN ds;                                                                     \
     NN##_init(&ds);                                                            \
@@ -351,8 +344,7 @@ inline size_t al_hash(const al* const a) {
     /* no memory should be left dealocated */                                  \
     NN##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, STATIC LIST, FORWARD LIST,
-// STATIC FORWARD LIST
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
 #define TEST_PUSH_BACK_ITERATOR(N)                                             \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -399,7 +391,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// LIST, STATIC LIST, FORWARD LIST, STATIC FORWARD LIST
+// LIST, FORWARD LIST
 #define TEST_INSERT_SORTED(N)                                                  \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -420,7 +412,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// LIST, STATIC LIST, FORWARD LIST, STATIC FORWARD LIST
+// LIST, FORWARD LIST
 #define TEST_LIST_SORT(N)                                                      \
     N ds;                                                                      \
     N##_init(&ds);                                                             \

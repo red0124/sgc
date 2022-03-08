@@ -410,12 +410,12 @@
                                                                                \
     static void N##_rotate_left(struct N* s, struct N##_node* parent,          \
                                 struct N##_node* gparent) {                    \
-        struct N##_node* left = parent->left_;                                \
+        struct N##_node* left = parent->left_;                                 \
         if (gparent) {                                                         \
-            gparent->right_ = left;                                           \
+            gparent->right_ = left;                                            \
         }                                                                      \
-        if (left != SGC_MAP_LEAF) {                                           \
-            left->parent_ = gparent;                                          \
+        if (left != SGC_MAP_LEAF) {                                            \
+            left->parent_ = gparent;                                           \
         }                                                                      \
         if (gparent == s->root_) {                                             \
             s->root_ = parent;                                                 \
