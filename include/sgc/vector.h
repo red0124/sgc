@@ -13,10 +13,10 @@
 #define SGC_INIT_HEADERS_VECTOR(T, N)                                          \
                                                                                \
     struct N {                                                                 \
-        size_t _size;                                                          \
-        size_t _max;                                                           \
-        size_t _shared;                                                        \
-        T* _data;                                                              \
+        size_t size_;                                                          \
+        size_t max_;                                                           \
+        size_t shared_;                                                        \
+        T* data_;                                                              \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
@@ -46,7 +46,7 @@
     T* N##_array(struct N* d);                                                 \
                                                                                \
     struct N##_iterator {                                                      \
-        T* _curr;                                                              \
+        T* curr_;                                                              \
         T* _end;                                                               \
         T* _begin;                                                             \
     };                                                                         \
@@ -83,36 +83,36 @@
     SGC_INIT_ARRAY_TYPE_FUNCTIONS(T, 0, N)                                     \
                                                                                \
     void N##_set_share(N* v, int is_shared) {                                  \
-        v->_shared = is_shared;                                                \
+        v->shared_ = is_shared;                                                \
     }                                                                          \
                                                                                \
     void N##_init(struct N* v) {                                               \
-        v->_size = v->_max = 0;                                                \
-        v->_data = NULL;                                                       \
-        v->_shared = 0;                                                        \
+        v->size_ = v->max_ = 0;                                                \
+        v->data_ = NULL;                                                       \
+        v->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
     size_t N##_size(const struct N* v) {                                       \
-        return v->_size;                                                       \
+        return v->size_;                                                       \
     }                                                                          \
                                                                                \
     void N##_free(struct N* v) {                                               \
-        if (v->_data) {                                                        \
-            if (!v->_shared) {                                                 \
-                for (size_t i = 0; i < v->_size; ++i) {                        \
-                    T##_free(&v->_data[i]);                                    \
+        if (v->data_) {                                                        \
+            if (!v->shared_) {                                                 \
+                for (size_t i = 0; i < v->size_; ++i) {                        \
+                    T##_free(&v->data_[i]);                                    \
                 }                                                              \
             }                                                                  \
-            sgc_free(v->_data);                                                \
+            sgc_free(v->data_);                                                \
         }                                                                      \
     }                                                                          \
                                                                                \
     int N##_equal(const struct N* const first, const struct N* const second) { \
         int equal = (first == second);                                         \
-        if (equal == 0 && first->_size == second->_size) {                     \
+        if (equal == 0 && first->size_ == second->size_) {                     \
             equal = 1;                                                         \
-            for (size_t i = 0; i < first->_size; ++i) {                        \
-                if (!T##_equal(&first->_data[i], &second->_data[i])) {         \
+            for (size_t i = 0; i < first->size_; ++i) {                        \
+                if (!T##_equal(&first->data_[i], &second->data_[i])) {         \
                     equal = 0;                                                 \
                     break;                                                     \
                 }                                                              \
@@ -123,16 +123,16 @@
                                                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
-        if (src->_size != 0) {                                                 \
-            dst->_size = src->_size;                                           \
-            dst->_max = src->_size;                                            \
-            dst->_data = (T*)sgc_malloc(dst->_max * sizeof(T));                \
-            dst->_shared = src->_shared;                                       \
-            if (!dst->_shared) {                                               \
-                memcpy(dst->_data, src->_data, src->_size * sizeof(T));        \
+        if (src->size_ != 0) {                                                 \
+            dst->size_ = src->size_;                                           \
+            dst->max_ = src->size_;                                            \
+            dst->data_ = (T*)sgc_malloc(dst->max_ * sizeof(T));                \
+            dst->shared_ = src->shared_;                                       \
+            if (!dst->shared_) {                                               \
+                memcpy(dst->data_, src->data_, src->size_ * sizeof(T));        \
             } else {                                                           \
-                for (size_t i = 0; i < dst->_size; ++i) {                      \
-                    T##_copy(&dst->_data[i], &src->_data[i]);                  \
+                for (size_t i = 0; i < dst->size_; ++i) {                      \
+                    T##_copy(&dst->data_[i], &src->data_[i]);                  \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -140,56 +140,56 @@
                                                                                \
     void N##_from_array(struct N* v, const T* const arr, const size_t size) {  \
         if (size) {                                                            \
-            v->_max = v->_size = size;                                         \
-            v->_data = (T*)sgc_malloc(sizeof(T) * size);                       \
-            v->_shared = 0;                                                    \
-            for (size_t i = 0; i < v->_size; ++i) {                            \
-                T##_copy(&v->_data[i], &arr[i]);                               \
+            v->max_ = v->size_ = size;                                         \
+            v->data_ = (T*)sgc_malloc(sizeof(T) * size);                       \
+            v->shared_ = 0;                                                    \
+            for (size_t i = 0; i < v->size_; ++i) {                            \
+                T##_copy(&v->data_[i], &arr[i]);                               \
             }                                                                  \
         } else {                                                               \
-            v->_max = v->_size = 0;                                            \
-            v->_data = NULL;                                                   \
+            v->max_ = v->size_ = 0;                                            \
+            v->data_ = NULL;                                                   \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_shrink(struct N* v) {                                             \
-        if (!v->_shared) {                                                     \
-            for (size_t i = v->_size; i < v->_max; ++i) {                      \
-                T##_free(&v->_data[i]);                                        \
+        if (!v->shared_) {                                                     \
+            for (size_t i = v->size_; i < v->max_; ++i) {                      \
+                T##_free(&v->data_[i]);                                        \
             }                                                                  \
         }                                                                      \
-        v->_data = (T*)sgc_realloc(v->_data, sizeof(T) * v->_size);            \
+        v->data_ = (T*)sgc_realloc(v->data_, sizeof(T) * v->size_);            \
     }                                                                          \
                                                                                \
     static void N##_resize(struct N* v) {                                      \
-        if (v->_size == v->_max) {                                             \
-            v->_max = (v->_max == 0) ? 1 : v->_max * 2;                        \
-            v->_data = (T*)sgc_realloc(v->_data, sizeof(T) * v->_max);         \
+        if (v->size_ == v->max_) {                                             \
+            v->max_ = (v->max_ == 0) ? 1 : v->max_ * 2;                        \
+            v->data_ = (T*)sgc_realloc(v->data_, sizeof(T) * v->max_);         \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_push_back(struct N* v, T el) {                                    \
         N##_resize(v);                                                         \
-        SGC_COPY(T##_copy, v->_data[v->_size], el, v->_shared);                \
-        ++v->_size;                                                            \
+        SGC_COPY(T##_copy, v->data_[v->size_], el, v->shared_);                \
+        ++v->size_;                                                            \
     }                                                                          \
                                                                                \
     void N##_pop_back(struct N* v) {                                           \
-        if (v->_size) {                                                        \
-            T* el = &v->_data[--v->_size];                                     \
-            if (!v->_shared) {                                                 \
+        if (v->size_) {                                                        \
+            T* el = &v->data_[--v->size_];                                     \
+            if (!v->shared_) {                                                 \
                 T##_free(el);                                                  \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_insert(struct N* v, const size_t at, T el) {                      \
-        if (at < v->_size) {                                                   \
+        if (at < v->size_) {                                                   \
             N##_resize(v);                                                     \
-            memmove(v->_data + at + 1, v->_data + at,                          \
-                    (v->_size - at) * sizeof(T));                              \
-            SGC_COPY(T##_copy, v->_data[at], el, v->_shared);                  \
-            ++v->_size;                                                        \
+            memmove(v->data_ + at + 1, v->data_ + at,                          \
+                    (v->size_ - at) * sizeof(T));                              \
+            SGC_COPY(T##_copy, v->data_[at], el, v->shared_);                  \
+            ++v->size_;                                                        \
         } else {                                                               \
             N##_push_back(v, el);                                              \
         }                                                                      \
@@ -200,21 +200,21 @@
     }                                                                          \
                                                                                \
     T* N##_at(struct N* v, size_t at) {                                        \
-        return v->_data + at;                                                  \
+        return v->data_ + at;                                                  \
     }                                                                          \
                                                                                \
     void N##_set_at(struct N* v, size_t at, T new_el) {                        \
-        if (at < v->_size) {                                                   \
-            SGC_REPLACE(T##_copy, T##_free, v->_data[at], new_el, v->_shared); \
+        if (at < v->size_) {                                                   \
+            SGC_REPLACE(T##_copy, T##_free, v->data_[at], new_el, v->shared_); \
         }                                                                      \
     }                                                                          \
                                                                                \
     T* N##_back(struct N* v) {                                                 \
-        return N##_at(v, v->_size - 1);                                        \
+        return N##_at(v, v->size_ - 1);                                        \
     }                                                                          \
                                                                                \
     void N##_set_back(struct N* v, T new_el) {                                 \
-        N##_set_at(v, v->_size - 1, new_el);                                   \
+        N##_set_at(v, v->size_ - 1, new_el);                                   \
     }                                                                          \
                                                                                \
     T* N##_front(struct N* v) {                                                \
@@ -226,24 +226,24 @@
     }                                                                          \
                                                                                \
     void N##_erase_at(struct N* v, const size_t at) {                          \
-        if (at < v->_size) {                                                   \
-            if (!v->_shared) {                                                 \
-                T##_free(&v->_data[at]);                                       \
+        if (at < v->size_) {                                                   \
+            if (!v->shared_) {                                                 \
+                T##_free(&v->data_[at]);                                       \
             }                                                                  \
-            memmove(v->_data + at, v->_data + at + 1,                          \
-                    (v->_size - at) * sizeof(T));                              \
-            --v->_size;                                                        \
+            memmove(v->data_ + at, v->data_ + at + 1,                          \
+                    (v->size_ - at) * sizeof(T));                              \
+            --v->size_;                                                        \
         }                                                                      \
     }                                                                          \
                                                                                \
     int N##_empty(const struct N* const d) {                                   \
-        return d->_size == 0;                                                  \
+        return d->size_ == 0;                                                  \
     }                                                                          \
                                                                                \
     T* N##_array(struct N* d) {                                                \
         T* ret = NULL;                                                         \
-        if (d->_size) {                                                        \
-            ret = d->_data;                                                    \
+        if (d->size_) {                                                        \
+            ret = d->data_;                                                    \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
@@ -253,32 +253,32 @@
     /* ================= */                                                    \
                                                                                \
     T* N##_iterator_data(struct N##_iterator i) {                              \
-        return i._curr;                                                        \
+        return i.curr_;                                                        \
     }                                                                          \
                                                                                \
     const T* N##_iterator_cdata(const struct N##_iterator i) {                 \
-        return i._curr;                                                        \
+        return i.curr_;                                                        \
     }                                                                          \
                                                                                \
     void N##_iterator_next(struct N##_iterator* i) {                           \
-        ++i->_curr;                                                            \
+        ++i->curr_;                                                            \
     }                                                                          \
                                                                                \
     void N##_iterator_prev(struct N##_iterator* i) {                           \
-        --i->_curr;                                                            \
+        --i->curr_;                                                            \
     }                                                                          \
                                                                                \
     void N##_iterator_begin(struct N* v, struct N##_iterator* i) {             \
-        i->_curr = v->_data;                                                   \
-        i->_begin = v->_data;                                                  \
-        i->_end = v->_data + v->_size - 1;                                     \
+        i->curr_ = v->data_;                                                   \
+        i->_begin = v->data_;                                                  \
+        i->_end = v->data_ + v->size_ - 1;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_cbegin(const struct N* const v,                          \
                              struct N##_iterator* i) {                         \
-        i->_curr = v->_data;                                                   \
-        i->_begin = v->_data;                                                  \
-        i->_end = v->_data + v->_size - 1;                                     \
+        i->curr_ = v->data_;                                                   \
+        i->_begin = v->data_;                                                  \
+        i->_end = v->data_ + v->size_ - 1;                                     \
     }                                                                          \
                                                                                \
     struct N##_iterator N##_begin(struct N* v) {                               \
@@ -294,15 +294,15 @@
     }                                                                          \
                                                                                \
     void N##_iterator_end(struct N* v, struct N##_iterator* i) {               \
-        i->_curr = v->_data + v->_size - 1;                                    \
-        i->_begin = v->_data;                                                  \
-        i->_end = v->_data + v->_size - 1;                                     \
+        i->curr_ = v->data_ + v->size_ - 1;                                    \
+        i->_begin = v->data_;                                                  \
+        i->_end = v->data_ + v->size_ - 1;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_cend(const struct N* const v, struct N##_iterator* i) {  \
-        i->_curr = v->_data + v->_size - 1;                                    \
-        i->_begin = v->_data;                                                  \
-        i->_end = v->_data + v->_size - 1;                                     \
+        i->curr_ = v->data_ + v->size_ - 1;                                    \
+        i->_begin = v->data_;                                                  \
+        i->_end = v->data_ + v->size_ - 1;                                     \
     }                                                                          \
                                                                                \
     struct N##_iterator N##_end(struct N* v) {                                 \
@@ -318,16 +318,16 @@
     }                                                                          \
                                                                                \
     void N##_iterator_from(struct N* v, struct N##_iterator* i, size_t at) {   \
-        i->_curr = v->_data + at;                                              \
-        i->_begin = v->_data;                                                  \
-        i->_end = v->_data + v->_size - 1;                                     \
+        i->curr_ = v->data_ + at;                                              \
+        i->_begin = v->data_;                                                  \
+        i->_end = v->data_ + v->size_ - 1;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_cfrom(const struct N* const v, struct N##_iterator* i,   \
                             size_t at) {                                       \
-        i->_curr = v->_data + at;                                              \
-        i->_begin = v->_data;                                                  \
-        i->_end = v->_data + v->_size - 1;                                     \
+        i->curr_ = v->data_ + at;                                              \
+        i->_begin = v->data_;                                                  \
+        i->_end = v->data_ + v->size_ - 1;                                     \
     }                                                                          \
                                                                                \
     struct N##_iterator N##_from(struct N* v, size_t at) {                     \
@@ -343,19 +343,19 @@
     }                                                                          \
                                                                                \
     void N##_iterator_jump(struct N##_iterator* i, ssize_t range) {            \
-        i->_curr = i->_curr + range;                                           \
+        i->curr_ = i->curr_ + range;                                           \
     }                                                                          \
                                                                                \
     int N##_iterator_equal(const struct N##_iterator first,                    \
                            const struct N##_iterator second) {                 \
-        return first._curr == second._curr;                                    \
+        return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \
     ssize_t N##_iterator_range(const struct N##_iterator first,                \
                                const struct N##_iterator second) {             \
-        return second._curr - first._curr;                                     \
+        return second.curr_ - first.curr_;                                     \
     }                                                                          \
                                                                                \
     int N##_iterator_valid(const struct N##_iterator i) {                      \
-        return i._begin != NULL && i._curr <= i._end && i._curr >= i._begin;   \
+        return i._begin != NULL && i.curr_ <= i._end && i.curr_ >= i._begin;   \
     }

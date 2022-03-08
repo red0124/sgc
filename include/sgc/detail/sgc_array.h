@@ -7,10 +7,10 @@
 #define SGC_INIT_COMMON_ARRAY_TYPE_FUNCTIONS(T, S, N)                          \
     int N##_equal(const struct N* const first, const struct N* const second) { \
         int equal = (first == second);                                         \
-        if (equal == 0 && first->_size == second->_size) {                     \
+        if (equal == 0 && first->size_ == second->size_) {                     \
             equal = 1;                                                         \
-            for (size_t i = 0; i < first->_size; ++i) {                        \
-                if (!T##_equal(&first->_data[i], &second->_data[i])) {         \
+            for (size_t i = 0; i < first->size_; ++i) {                        \
+                if (!T##_equal(&first->data_[i], &second->data_[i])) {         \
                     equal = 0;                                                 \
                     break;                                                     \
                 }                                                              \
@@ -20,28 +20,28 @@
     }                                                                          \
                                                                                \
     void N##_free(struct N* a) {                                               \
-        if (a->_data) {                                                        \
-            if (!a->_shared) {                                                 \
-                for (size_t i = 0; i < a->_size; ++i) {                        \
-                    T##_free(&a->_data[i]);                                    \
+        if (a->data_) {                                                        \
+            if (!a->shared_) {                                                 \
+                for (size_t i = 0; i < a->size_; ++i) {                        \
+                    T##_free(&a->data_[i]);                                    \
                 }                                                              \
             }                                                                  \
-            sgc_free((void*)a->_data);                                         \
+            sgc_free((void*)a->data_);                                         \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
-        if (src->_size != 0) {                                                 \
-            dst->_size = src->_size;                                           \
-            dst->_max = src->_size;                                            \
-            dst->_data = (T*)sgc_malloc(dst->_max * sizeof(T));                \
-            dst->_shared = src->_shared;                                       \
-            if (!dst->_shared) {                                               \
-                memcpy(dst->_data, src->_data, src->_size * sizeof(T));        \
+        if (src->size_ != 0) {                                                 \
+            dst->size_ = src->size_;                                           \
+            dst->max_ = src->size_;                                            \
+            dst->data_ = (T*)sgc_malloc(dst->max_ * sizeof(T));                \
+            dst->shared_ = src->shared_;                                       \
+            if (!dst->shared_) {                                               \
+                memcpy(dst->data_, src->data_, src->size_ * sizeof(T));        \
             } else {                                                           \
-                for (size_t i = 0; i < dst->_size; ++i) {                      \
-                    T##_copy(&dst->_data[i], &src->_data[i]);                  \
+                for (size_t i = 0; i < dst->size_; ++i) {                      \
+                    T##_copy(&dst->data_[i], &src->data_[i]);                  \
                 }                                                              \
             }                                                                  \
         }                                                                      \

@@ -41,28 +41,28 @@
 #define SGC_INIT_HEADERS_SET(V, N)                                             \
                                                                                \
     struct N##_node {                                                          \
-        struct N##_node* _parent;                                              \
-        struct N##_node* _left;                                                \
-        struct N##_node* _right;                                               \
+        struct N##_node* parent_;                                              \
+        struct N##_node* left_;                                                \
+        struct N##_node* right_;                                               \
         V _value;                                                              \
-        enum sgc_map_color _color;                                             \
+        enum sgc_map_color color_;                                             \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
     typedef V N##_type;                                                        \
                                                                                \
     struct N {                                                                 \
-        size_t _size;                                                          \
-        size_t _shared;                                                        \
-        struct N##_node* _root;                                                \
+        size_t size_;                                                          \
+        size_t shared_;                                                        \
+        struct N##_node* root_;                                                \
     };                                                                         \
                                                                                \
     void N##_set_share(N* s, int is_shared);                                   \
                                                                                \
     struct N##_iterator {                                                      \
-        struct N##_node* _curr;                                                \
-        struct N##_node* _next;                                                \
-        int _is_valid;                                                         \
+        struct N##_node* curr_;                                                \
+        struct N##_node* next_;                                                \
+        int is_valid_;                                                         \
     };                                                                         \
                                                                                \
     typedef struct N##_iterator N##_iterator;                                  \
@@ -103,19 +103,19 @@
     /* ================ */                                                     \
                                                                                \
     void N##_set_share(N* s, int is_shared) {                                  \
-        s->_shared = is_shared;                                                \
+        s->shared_ = is_shared;                                                \
     }                                                                          \
                                                                                \
     static struct N##_node* N##_node_begin(struct N##_node* n) {               \
-        while (n->_left) {                                                     \
-            n = n->_left;                                                      \
+        while (n->left_) {                                                     \
+            n = n->left_;                                                      \
         }                                                                      \
         return n;                                                              \
     }                                                                          \
                                                                                \
     static struct N##_node* N##_node_end(struct N##_node* n) {                 \
-        while (n->_right) {                                                    \
-            n = n->_right;                                                     \
+        while (n->right_) {                                                    \
+            n = n->right_;                                                     \
         }                                                                      \
         return n;                                                              \
     }                                                                          \
@@ -124,8 +124,8 @@
         struct N##_node* n =                                                   \
             (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
         SGC_COPY(V##_copy, n->_value, *v, is_shared);                          \
-        n->_left = n->_right = SGC_MAP_LEAF;                                   \
-        n->_color = SGC_MAP_RED;                                               \
+        n->left_ = n->right_ = SGC_MAP_LEAF;                                   \
+        n->color_ = SGC_MAP_RED;                                               \
         return n;                                                              \
     }                                                                          \
                                                                                \
@@ -134,78 +134,78 @@
     /* ========== */                                                           \
                                                                                \
     V* N##_iterator_data(struct N##_iterator i) {                              \
-        return &i._curr->_value;                                               \
+        return &i.curr_->_value;                                               \
     }                                                                          \
                                                                                \
     const V* N##_iterator_cdata(struct N##_iterator i) {                       \
-        return &i._curr->_value;                                               \
+        return &i.curr_->_value;                                               \
     }                                                                          \
                                                                                \
     void N##_iterator_next(struct N##_iterator* i) {                           \
-        if (!i->_next) {                                                       \
-            i->_is_valid = 0;                                                  \
+        if (!i->next_) {                                                       \
+            i->is_valid_ = 0;                                                  \
             return;                                                            \
         }                                                                      \
-        i->_curr = i->_next;                                                   \
-        if (i->_next->_right) {                                                \
-            i->_next = N##_node_begin(i->_next->_right);                       \
+        i->curr_ = i->next_;                                                   \
+        if (i->next_->right_) {                                                \
+            i->next_ = N##_node_begin(i->next_->right_);                       \
         } else {                                                               \
-            struct N##_node* parent = i->_next->_parent;                       \
-            while (parent && parent->_right == i->_next) {                     \
-                i->_next = parent;                                             \
-                parent = parent->_parent;                                      \
+            struct N##_node* parent = i->next_->parent_;                       \
+            while (parent && parent->right_ == i->next_) {                     \
+                i->next_ = parent;                                             \
+                parent = parent->parent_;                                      \
             }                                                                  \
-            if (i->_next->_right != parent) {                                  \
-                i->_next = parent;                                             \
+            if (i->next_->right_ != parent) {                                  \
+                i->next_ = parent;                                             \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_iterator_begin(struct N* s, struct N##_iterator* i) {             \
-        i->_curr = SGC_MAP_LEAF;                                               \
-        i->_next = (s->_root) ? N##_node_begin(s->_root) : SGC_MAP_LEAF;       \
-        i->_is_valid = 1;                                                      \
+        i->curr_ = SGC_MAP_LEAF;                                               \
+        i->next_ = (s->root_) ? N##_node_begin(s->root_) : SGC_MAP_LEAF;       \
+        i->is_valid_ = 1;                                                      \
         N##_iterator_next(i);                                                  \
     }                                                                          \
                                                                                \
     void N##_iterator_cbegin(const struct N* const s,                          \
                              struct N##_iterator* i) {                         \
-        i->_curr = SGC_MAP_LEAF;                                               \
-        i->_next = (s->_root) ? N##_node_begin(s->_root) : SGC_MAP_LEAF;       \
-        i->_is_valid = 1;                                                      \
+        i->curr_ = SGC_MAP_LEAF;                                               \
+        i->next_ = (s->root_) ? N##_node_begin(s->root_) : SGC_MAP_LEAF;       \
+        i->is_valid_ = 1;                                                      \
         N##_iterator_next(i);                                                  \
     }                                                                          \
                                                                                \
     void N##_iterator_prev(struct N##_iterator* i) {                           \
-        if (!i->_curr) {                                                       \
-            i->_is_valid = 0;                                                  \
+        if (!i->curr_) {                                                       \
+            i->is_valid_ = 0;                                                  \
             return;                                                            \
         }                                                                      \
-        i->_next = i->_curr;                                                   \
-        if (i->_curr->_left) {                                                 \
-            i->_curr = N##_node_end(i->_curr->_left);                          \
+        i->next_ = i->curr_;                                                   \
+        if (i->curr_->left_) {                                                 \
+            i->curr_ = N##_node_end(i->curr_->left_);                          \
         } else {                                                               \
-            struct N##_node* parent = i->_curr->_parent;                       \
-            while (parent && parent->_left == i->_curr) {                      \
-                i->_curr = parent;                                             \
-                parent = parent->_parent;                                      \
+            struct N##_node* parent = i->curr_->parent_;                       \
+            while (parent && parent->left_ == i->curr_) {                      \
+                i->curr_ = parent;                                             \
+                parent = parent->parent_;                                      \
             }                                                                  \
-            if (i->_curr->_right != parent) {                                  \
-                i->_curr = parent;                                             \
+            if (i->curr_->right_ != parent) {                                  \
+                i->curr_ = parent;                                             \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_iterator_end(struct N* s, struct N##_iterator* i) {               \
-        i->_curr = (s->_root) ? N##_node_end(s->_root) : SGC_MAP_LEAF;         \
-        i->_next = SGC_MAP_LEAF;                                               \
-        i->_is_valid = (i->_curr) ? 1 : 0;                                     \
+        i->curr_ = (s->root_) ? N##_node_end(s->root_) : SGC_MAP_LEAF;         \
+        i->next_ = SGC_MAP_LEAF;                                               \
+        i->is_valid_ = (i->curr_) ? 1 : 0;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_cend(const struct N* const s, struct N##_iterator* i) {  \
-        i->_curr = (s->_root) ? N##_node_end(s->_root) : SGC_MAP_LEAF;         \
-        i->_next = SGC_MAP_LEAF;                                               \
-        i->_is_valid = (i->_curr) ? 1 : 0;                                     \
+        i->curr_ = (s->root_) ? N##_node_end(s->root_) : SGC_MAP_LEAF;         \
+        i->next_ = SGC_MAP_LEAF;                                               \
+        i->is_valid_ = (i->curr_) ? 1 : 0;                                     \
     }                                                                          \
                                                                                \
     struct N##_iterator N##_begin(struct N* m) {                               \
@@ -234,11 +234,11 @@
                                                                                \
     int N##_iterator_equal(const struct N##_iterator first,                    \
                            const struct N##_iterator second) {                 \
-        return first._curr == second._curr;                                    \
+        return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \
     int N##_iterator_valid(const struct N##_iterator i) {                      \
-        return i._is_valid;                                                    \
+        return i.is_valid_;                                                    \
     }                                                                          \
                                                                                \
     /* =============== */                                                      \
@@ -251,51 +251,51 @@
     }                                                                          \
                                                                                \
     size_t N##_size(const struct N* const s) {                                 \
-        return s->_size;                                                       \
+        return s->size_;                                                       \
     }                                                                          \
                                                                                \
     void N##_init(struct N* s) {                                               \
-        s->_size = 0;                                                          \
-        s->_root = SGC_MAP_LEAF;                                               \
-        s->_shared = 0;                                                        \
+        s->size_ = 0;                                                          \
+        s->root_ = SGC_MAP_LEAF;                                               \
+        s->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
     void N##_free(struct N* s) {                                               \
-        if (!s->_size) {                                                       \
+        if (!s->size_) {                                                       \
             return;                                                            \
         }                                                                      \
         struct N##_node** stack =                                              \
-            (struct N##_node**)sgc_malloc(N##_stack_size(s->_size));           \
+            (struct N##_node**)sgc_malloc(N##_stack_size(s->size_));           \
                                                                                \
-        struct N##_node* curr = s->_root;                                      \
+        struct N##_node* curr = s->root_;                                      \
         struct N##_node* tmp = NULL;                                           \
                                                                                \
         size_t stack_size = 0;                                                 \
         while (1) {                                                            \
             if (curr != SGC_MAP_LEAF) {                                        \
                 stack[stack_size++] = curr;                                    \
-                curr = curr->_left;                                            \
+                curr = curr->left_;                                            \
             } else {                                                           \
                 if (stack_size == 0) {                                         \
                     break;                                                     \
                 }                                                              \
                 curr = stack[--stack_size];                                    \
                 tmp = curr;                                                    \
-                curr = curr->_right;                                           \
-                if (!s->_shared) {                                             \
+                curr = curr->right_;                                           \
+                if (!s->shared_) {                                             \
                     V##_free(&tmp->_value);                                    \
                 }                                                              \
                 sgc_free(tmp);                                                 \
             }                                                                  \
         }                                                                      \
         sgc_free(stack);                                                       \
-        s->_root = SGC_MAP_LEAF;                                               \
-        s->_size = 0;                                                          \
+        s->root_ = SGC_MAP_LEAF;                                               \
+        s->size_ = 0;                                                          \
     }                                                                          \
                                                                                \
     int N##_equal(const struct N* const first, const struct N* const second) { \
         int equal = (first == second);                                         \
-        if (equal == 0 && first->_size == second->_size) {                     \
+        if (equal == 0 && first->size_ == second->size_) {                     \
             equal = 1;                                                         \
             struct N##_iterator it_first;                                      \
             N##_iterator_cbegin(first, &it_first);                             \
@@ -303,9 +303,9 @@
             struct N##_iterator it_second;                                     \
             N##_iterator_cbegin(second, &it_second);                           \
                                                                                \
-            for (size_t i = 0; i < first->_size; ++i) {                        \
-                if (!V##_equal(&it_first._curr->_value,                        \
-                               &it_second._curr->_value)) {                    \
+            for (size_t i = 0; i < first->size_; ++i) {                        \
+                if (!V##_equal(&it_first.curr_->_value,                        \
+                               &it_second.curr_->_value)) {                    \
                     equal = 0;                                                 \
                     break;                                                     \
                 }                                                              \
@@ -318,68 +318,68 @@
                                                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
-        dst->_size = src->_size;                                               \
-        dst->_root = SGC_MAP_LEAF;                                             \
-        dst->_shared = src->_shared;                                           \
+        dst->size_ = src->size_;                                               \
+        dst->root_ = SGC_MAP_LEAF;                                             \
+        dst->shared_ = src->shared_;                                           \
                                                                                \
-        if (src->_size != 0) {                                                 \
-            dst->_root =                                                       \
+        if (src->size_ != 0) {                                                 \
+            dst->root_ =                                                       \
                 (struct N##_node*)sgc_malloc(sizeof(struct N##_node));         \
                                                                                \
-            SGC_COPY(V##_copy, dst->_root->_value, src->_root->_value,         \
-                     dst->_shared);                                            \
-            dst->_root->_color = src->_root->_color;                           \
-            dst->_root->_left = dst->_root->_right = dst->_root->_parent =     \
+            SGC_COPY(V##_copy, dst->root_->_value, src->root_->_value,         \
+                     dst->shared_);                                            \
+            dst->root_->color_ = src->root_->color_;                           \
+            dst->root_->left_ = dst->root_->right_ = dst->root_->parent_ =     \
                 SGC_MAP_LEAF;                                                  \
                                                                                \
             struct N##_node** stack_src =                                      \
-                (struct N##_node**)sgc_malloc(N##_stack_size(src->_size));     \
+                (struct N##_node**)sgc_malloc(N##_stack_size(src->size_));     \
                                                                                \
-            struct N##_node* curr_src = src->_root;                            \
+            struct N##_node* curr_src = src->root_;                            \
                                                                                \
             struct N##_node** stack_dst =                                      \
-                (struct N##_node**)sgc_malloc(N##_stack_size(dst->_size));     \
+                (struct N##_node**)sgc_malloc(N##_stack_size(dst->size_));     \
                                                                                \
-            struct N##_node* curr_dst = dst->_root;                            \
+            struct N##_node* curr_dst = dst->root_;                            \
             struct N##_node* tmp = SGC_MAP_LEAF;                               \
                                                                                \
             stack_src[0] = SGC_MAP_LEAF;                                       \
             stack_dst[0] = SGC_MAP_LEAF;                                       \
                                                                                \
-            stack_src[1] = src->_root;                                         \
-            stack_dst[1] = dst->_root;                                         \
+            stack_src[1] = src->root_;                                         \
+            stack_dst[1] = dst->root_;                                         \
             size_t stack_size = 2;                                             \
                                                                                \
             while (stack_size > 0) {                                           \
-                if (!((curr_src->_left != SGC_MAP_LEAF &&                      \
-                       curr_dst->_left == SGC_MAP_LEAF) ||                     \
-                      (curr_src->_right != SGC_MAP_LEAF &&                     \
-                       curr_dst->_right == SGC_MAP_LEAF))) {                   \
+                if (!((curr_src->left_ != SGC_MAP_LEAF &&                      \
+                       curr_dst->left_ == SGC_MAP_LEAF) ||                     \
+                      (curr_src->right_ != SGC_MAP_LEAF &&                     \
+                       curr_dst->right_ == SGC_MAP_LEAF))) {                   \
                     --stack_size;                                              \
                     curr_src = stack_src[stack_size];                          \
                     curr_dst = stack_dst[stack_size];                          \
                     continue;                                                  \
                 }                                                              \
                                                                                \
-                if (curr_src->_left != SGC_MAP_LEAF &&                         \
-                    curr_dst->_left == SGC_MAP_LEAF) {                         \
-                    curr_dst->_left =                                          \
+                if (curr_src->left_ != SGC_MAP_LEAF &&                         \
+                    curr_dst->left_ == SGC_MAP_LEAF) {                         \
+                    curr_dst->left_ =                                          \
                         (struct N##_node*)sgc_malloc(sizeof(struct N##_node)); \
-                    tmp = curr_dst->_left;                                     \
-                    tmp->_parent = curr_dst;                                   \
-                    curr_src = curr_src->_left;                                \
+                    tmp = curr_dst->left_;                                     \
+                    tmp->parent_ = curr_dst;                                   \
+                    curr_src = curr_src->left_;                                \
                 } else {                                                       \
-                    curr_dst->_right =                                         \
+                    curr_dst->right_ =                                         \
                         (struct N##_node*)sgc_malloc(sizeof(struct N##_node)); \
-                    tmp = curr_dst->_right;                                    \
-                    tmp->_parent = curr_dst;                                   \
-                    curr_src = curr_src->_right;                               \
+                    tmp = curr_dst->right_;                                    \
+                    tmp->parent_ = curr_dst;                                   \
+                    curr_src = curr_src->right_;                               \
                 }                                                              \
-                tmp->_left = tmp->_right = SGC_MAP_LEAF;                       \
+                tmp->left_ = tmp->right_ = SGC_MAP_LEAF;                       \
                 curr_dst = tmp;                                                \
                 SGC_COPY(V##_copy, curr_dst->_value, curr_src->_value,         \
-                         dst->_shared);                                        \
-                curr_dst->_color = curr_src->_color;                           \
+                         dst->shared_);                                        \
+                curr_dst->color_ = curr_src->color_;                           \
                 stack_src[stack_size] = curr_src;                              \
                 stack_dst[stack_size] = curr_dst;                              \
                 ++stack_size;                                                  \
@@ -394,7 +394,7 @@
                                  const struct N##_node* const parent) {        \
         int ret = 0;                                                           \
         if (parent) {                                                          \
-            ret = (n == parent->_left);                                        \
+            ret = (n == parent->left_);                                        \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
@@ -403,61 +403,61 @@
                                         const struct N##_node* const parent) { \
         struct N##_node* sibling = NULL;                                       \
         if (parent != SGC_MAP_LEAF) {                                          \
-            sibling = (n == parent->_left) ? parent->_right : parent->_left;   \
+            sibling = (n == parent->left_) ? parent->right_ : parent->left_;   \
         }                                                                      \
         return sibling;                                                        \
     }                                                                          \
                                                                                \
     static void N##_rotate_left(struct N* s, struct N##_node* parent,          \
                                 struct N##_node* gparent) {                    \
-        struct N##_node* _left = parent->_left;                                \
+        struct N##_node* left = parent->left_;                                \
         if (gparent) {                                                         \
-            gparent->_right = _left;                                           \
+            gparent->right_ = left;                                           \
         }                                                                      \
-        if (_left != SGC_MAP_LEAF) {                                           \
-            _left->_parent = gparent;                                          \
+        if (left != SGC_MAP_LEAF) {                                           \
+            left->parent_ = gparent;                                          \
         }                                                                      \
-        if (gparent == s->_root) {                                             \
-            s->_root = parent;                                                 \
-            parent->_parent = SGC_MAP_LEAF;                                    \
+        if (gparent == s->root_) {                                             \
+            s->root_ = parent;                                                 \
+            parent->parent_ = SGC_MAP_LEAF;                                    \
         } else {                                                               \
-            struct N##_node* ggparent = gparent->_parent;                      \
-            parent->_parent = ggparent;                                        \
+            struct N##_node* ggparent = gparent->parent_;                      \
+            parent->parent_ = ggparent;                                        \
             if (N##_is_left_child(gparent, ggparent)) {                        \
-                ggparent->_left = parent;                                      \
+                ggparent->left_ = parent;                                      \
             } else {                                                           \
-                ggparent->_right = parent;                                     \
+                ggparent->right_ = parent;                                     \
             }                                                                  \
         }                                                                      \
-        parent->_left = gparent;                                               \
-        gparent->_parent = parent;                                             \
-        parent->_color = SGC_MAP_BLACK;                                        \
-        gparent->_color = SGC_MAP_RED;                                         \
+        parent->left_ = gparent;                                               \
+        gparent->parent_ = parent;                                             \
+        parent->color_ = SGC_MAP_BLACK;                                        \
+        gparent->color_ = SGC_MAP_RED;                                         \
     }                                                                          \
                                                                                \
     static void N##_rotate_right(struct N* s, struct N##_node* parent,         \
                                  struct N##_node* gparent) {                   \
-        struct N##_node* right = parent->_right;                               \
-        gparent->_left = right;                                                \
+        struct N##_node* right = parent->right_;                               \
+        gparent->left_ = right;                                                \
         if (right != SGC_MAP_LEAF) {                                           \
-            right->_parent = gparent;                                          \
+            right->parent_ = gparent;                                          \
         }                                                                      \
-        if (gparent == s->_root) {                                             \
-            s->_root = parent;                                                 \
-            parent->_parent = SGC_MAP_LEAF;                                    \
+        if (gparent == s->root_) {                                             \
+            s->root_ = parent;                                                 \
+            parent->parent_ = SGC_MAP_LEAF;                                    \
         } else {                                                               \
-            struct N##_node* ggparent = gparent->_parent;                      \
-            parent->_parent = ggparent;                                        \
+            struct N##_node* ggparent = gparent->parent_;                      \
+            parent->parent_ = ggparent;                                        \
             if (N##_is_left_child(gparent, ggparent)) {                        \
-                ggparent->_left = parent;                                      \
+                ggparent->left_ = parent;                                      \
             } else {                                                           \
-                ggparent->_right = parent;                                     \
+                ggparent->right_ = parent;                                     \
             }                                                                  \
         }                                                                      \
-        parent->_right = gparent;                                              \
-        gparent->_parent = parent;                                             \
-        parent->_color = SGC_MAP_BLACK;                                        \
-        gparent->_color = SGC_MAP_RED;                                         \
+        parent->right_ = gparent;                                              \
+        gparent->parent_ = parent;                                             \
+        parent->color_ = SGC_MAP_BLACK;                                        \
+        gparent->color_ = SGC_MAP_RED;                                         \
     }                                                                          \
                                                                                \
     static void N##_rotate_left_right(struct N* s, struct N##_node* n,         \
@@ -480,32 +480,32 @@
         if (N##_is_left_child(n, parent)) {                                    \
             if (N##_is_left_child(parent, gparent)) {                          \
                 N##_rotate_right(s, parent, gparent);                          \
-                n->_color = SGC_MAP_RED;                                       \
-                parent->_color = SGC_MAP_BLACK;                                \
-                struct N##_node* sibling = parent->_right;                     \
+                n->color_ = SGC_MAP_RED;                                       \
+                parent->color_ = SGC_MAP_BLACK;                                \
+                struct N##_node* sibling = parent->right_;                     \
                 if (sibling != SGC_MAP_LEAF) {                                 \
-                    sibling->_color = SGC_MAP_RED;                             \
+                    sibling->color_ = SGC_MAP_RED;                             \
                 }                                                              \
             } else {                                                           \
                 N##_rotate_right_left(s, n, parent, gparent);                  \
-                n->_color = SGC_MAP_BLACK;                                     \
-                n->_right->_color = SGC_MAP_RED;                               \
-                n->_left->_color = SGC_MAP_RED;                                \
+                n->color_ = SGC_MAP_BLACK;                                     \
+                n->right_->color_ = SGC_MAP_RED;                               \
+                n->left_->color_ = SGC_MAP_RED;                                \
             }                                                                  \
         } else {                                                               \
             if (!N##_is_left_child(parent, gparent)) {                         \
                 N##_rotate_left(s, parent, gparent);                           \
-                n->_color = SGC_MAP_RED;                                       \
-                parent->_color = SGC_MAP_BLACK;                                \
-                struct N##_node* sibling = parent->_right;                     \
+                n->color_ = SGC_MAP_RED;                                       \
+                parent->color_ = SGC_MAP_BLACK;                                \
+                struct N##_node* sibling = parent->right_;                     \
                 if (sibling != SGC_MAP_LEAF) {                                 \
-                    sibling->_color = SGC_MAP_RED;                             \
+                    sibling->color_ = SGC_MAP_RED;                             \
                 }                                                              \
             } else {                                                           \
                 N##_rotate_left_right(s, n, parent, gparent);                  \
-                n->_color = SGC_MAP_BLACK;                                     \
-                n->_right->_color = SGC_MAP_RED;                               \
-                n->_left->_color = SGC_MAP_RED;                                \
+                n->color_ = SGC_MAP_BLACK;                                     \
+                n->right_->color_ = SGC_MAP_RED;                               \
+                n->left_->color_ = SGC_MAP_RED;                                \
             }                                                                  \
         }                                                                      \
     }                                                                          \
@@ -513,23 +513,23 @@
     static void N##_corect_tree(struct N* s, struct N##_node* n,               \
                                 struct N##_node* p, struct N##_node* gp) {     \
         struct N##_node* u = N##_sibling(p, gp);                               \
-        if (u == SGC_MAP_LEAF || u->_color == SGC_MAP_BLACK) {                 \
+        if (u == SGC_MAP_LEAF || u->color_ == SGC_MAP_BLACK) {                 \
             N##_rotate(s, n, p, gp);                                           \
         } else {                                                               \
-            u->_color = SGC_MAP_BLACK;                                         \
-            p->_color = SGC_MAP_BLACK;                                         \
-            gp->_color = SGC_MAP_RED;                                          \
+            u->color_ = SGC_MAP_BLACK;                                         \
+            p->color_ = SGC_MAP_BLACK;                                         \
+            gp->color_ = SGC_MAP_RED;                                          \
         }                                                                      \
     }                                                                          \
                                                                                \
     static void N##_check_color(struct N* s, struct N##_node* n) {             \
-        if (n == s->_root) {                                                   \
-            s->_root->_color = SGC_MAP_BLACK;                                  \
+        if (n == s->root_) {                                                   \
+            s->root_->color_ = SGC_MAP_BLACK;                                  \
             return;                                                            \
         }                                                                      \
-        struct N##_node* p = n->_parent;                                       \
-        struct N##_node* gp = p->_parent;                                      \
-        if (p->_color == SGC_MAP_RED && n->_color == SGC_MAP_RED) {            \
+        struct N##_node* p = n->parent_;                                       \
+        struct N##_node* gp = p->parent_;                                      \
+        if (p->color_ == SGC_MAP_RED && n->color_ == SGC_MAP_RED) {            \
             N##_corect_tree(s, n, p, gp);                                      \
         }                                                                      \
         if (gp) {                                                              \
@@ -538,86 +538,86 @@
     }                                                                          \
                                                                                \
     static void N##_insert_node(struct N* s, V* v) {                           \
-        struct N##_node* parent = s->_root;                                    \
+        struct N##_node* parent = s->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
         for (;;) {                                                             \
             int compare = (V##_compare(&parent->_value, v));                   \
                                                                                \
             if (compare > 0) {                                                 \
-                if (parent->_left == SGC_MAP_LEAF) {                           \
-                    new_node = N##_node_new(v, s->_shared);                    \
-                    parent->_left = new_node;                                  \
-                    s->_size++;                                                \
+                if (parent->left_ == SGC_MAP_LEAF) {                           \
+                    new_node = N##_node_new(v, s->shared_);                    \
+                    parent->left_ = new_node;                                  \
+                    s->size_++;                                                \
                     break;                                                     \
                 }                                                              \
-                parent = parent->_left;                                        \
+                parent = parent->left_;                                        \
             } else if (compare < 0) {                                          \
-                if (parent->_right == SGC_MAP_LEAF) {                          \
-                    new_node = N##_node_new(v, s->_shared);                    \
-                    parent->_right = new_node;                                 \
-                    s->_size++;                                                \
+                if (parent->right_ == SGC_MAP_LEAF) {                          \
+                    new_node = N##_node_new(v, s->shared_);                    \
+                    parent->right_ = new_node;                                 \
+                    s->size_++;                                                \
                     break;                                                     \
                 }                                                              \
-                parent = parent->_right;                                       \
+                parent = parent->right_;                                       \
             } else if (!V##_equal(&parent->_value, v)) {                       \
                 SGC_REPLACE(V##_copy, V##_free, parent->_value, *v,            \
-                            s->_shared);                                       \
+                            s->shared_);                                       \
                 return;                                                        \
             } else {                                                           \
                 return;                                                        \
             }                                                                  \
         }                                                                      \
-        new_node->_parent = parent;                                            \
+        new_node->parent_ = parent;                                            \
         N##_check_color(s, new_node);                                          \
     }                                                                          \
                                                                                \
     void N##_insert(struct N* s, V v) {                                        \
-        if (s->_root == SGC_MAP_LEAF) {                                        \
-            struct N##_node* new_node = N##_node_new(&v, s->_shared);          \
-            new_node->_color = SGC_MAP_BLACK;                                  \
-            new_node->_parent = SGC_MAP_LEAF;                                  \
-            s->_root = new_node;                                               \
-            s->_size = 1;                                                      \
+        if (s->root_ == SGC_MAP_LEAF) {                                        \
+            struct N##_node* new_node = N##_node_new(&v, s->shared_);          \
+            new_node->color_ = SGC_MAP_BLACK;                                  \
+            new_node->parent_ = SGC_MAP_LEAF;                                  \
+            s->root_ = new_node;                                               \
+            s->size_ = 1;                                                      \
         } else {                                                               \
             N##_insert_node(s, &v);                                            \
         }                                                                      \
     }                                                                          \
                                                                                \
     static void N##_insert_multiple_node(struct N* s, V* v) {                  \
-        struct N##_node* parent = s->_root;                                    \
+        struct N##_node* parent = s->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
         for (;;) {                                                             \
             int compare = (V##_compare(&parent->_value, v));                   \
                                                                                \
             if (compare > 0) {                                                 \
-                if (parent->_left == SGC_MAP_LEAF) {                           \
-                    new_node = N##_node_new(v, s->_shared);                    \
-                    parent->_left = new_node;                                  \
-                    s->_size++;                                                \
+                if (parent->left_ == SGC_MAP_LEAF) {                           \
+                    new_node = N##_node_new(v, s->shared_);                    \
+                    parent->left_ = new_node;                                  \
+                    s->size_++;                                                \
                     break;                                                     \
                 }                                                              \
-                parent = parent->_left;                                        \
+                parent = parent->left_;                                        \
             } else {                                                           \
-                if (parent->_right == SGC_MAP_LEAF) {                          \
-                    new_node = N##_node_new(v, s->_shared);                    \
-                    parent->_right = new_node;                                 \
-                    s->_size++;                                                \
+                if (parent->right_ == SGC_MAP_LEAF) {                          \
+                    new_node = N##_node_new(v, s->shared_);                    \
+                    parent->right_ = new_node;                                 \
+                    s->size_++;                                                \
                     break;                                                     \
                 }                                                              \
-                parent = parent->_right;                                       \
+                parent = parent->right_;                                       \
             }                                                                  \
         }                                                                      \
-        new_node->_parent = parent;                                            \
+        new_node->parent_ = parent;                                            \
         N##_check_color(s, new_node);                                          \
     }                                                                          \
                                                                                \
     void N##_insert_multiple(struct N* s, V v) {                               \
-        if (s->_root == SGC_MAP_LEAF) {                                        \
-            struct N##_node* new_node = N##_node_new(&v, s->_shared);          \
-            new_node->_color = SGC_MAP_BLACK;                                  \
-            new_node->_parent = SGC_MAP_LEAF;                                  \
-            s->_root = new_node;                                               \
-            s->_size = 1;                                                      \
+        if (s->root_ == SGC_MAP_LEAF) {                                        \
+            struct N##_node* new_node = N##_node_new(&v, s->shared_);          \
+            new_node->color_ = SGC_MAP_BLACK;                                  \
+            new_node->parent_ = SGC_MAP_LEAF;                                  \
+            s->root_ = new_node;                                               \
+            s->size_ = 1;                                                      \
         } else {                                                               \
             N##_insert_multiple_node(s, &v);                                   \
         }                                                                      \
@@ -626,20 +626,20 @@
     struct N##_iterator N##_find(struct N* s, V v) {                           \
         struct N##_iterator ret = {SGC_MAP_LEAF, SGC_MAP_LEAF, 0};             \
         struct N##_node* prev;                                                 \
-        if (s->_root) {                                                        \
-            struct N##_node* curr = s->_root;                                  \
+        if (s->root_) {                                                        \
+            struct N##_node* curr = s->root_;                                  \
             while (curr) {                                                     \
                 prev = curr;                                                   \
                 int compare = (V##_compare(&curr->_value, &v));                \
                                                                                \
                 if (compare > 0) {                                             \
-                    curr = curr->_left;                                        \
+                    curr = curr->left_;                                        \
                 } else if (compare < 0) {                                      \
-                    curr = curr->_right;                                       \
+                    curr = curr->right_;                                       \
                 } else {                                                       \
-                    ret._next = curr;                                          \
-                    ret._curr = prev;                                          \
-                    ret._is_valid = 1;                                         \
+                    ret.next_ = curr;                                          \
+                    ret.curr_ = prev;                                          \
+                    ret.is_valid_ = 1;                                         \
                     N##_iterator_next(&ret);                                   \
                     break;                                                     \
                 }                                                              \
@@ -650,7 +650,7 @@
                                                                                \
     static struct N##_node* N##_find_node(struct N* s, V v) {                  \
         struct N##_iterator i = N##_find(s, v);                                \
-        return i._curr;                                                        \
+        return i.curr_;                                                        \
     }                                                                          \
                                                                                \
     static void N##_erase_rebalanse(struct N* m, struct N##_node* n,           \
@@ -658,61 +658,61 @@
         if (p) {                                                               \
             struct N##_node* s;                                                \
             struct N##_node* r;                                                \
-            if (p->_left == n && p->_right) {                                  \
-                s = p->_right;                                                 \
-                if (s->_color == SGC_MAP_RED) {                                \
+            if (p->left_ == n && p->right_) {                                  \
+                s = p->right_;                                                 \
+                if (s->color_ == SGC_MAP_RED) {                                \
                     N##_rotate_left(m, s, p);                                  \
-                    s->_color = SGC_MAP_BLACK;                                 \
-                    p->_color = SGC_MAP_BLACK;                                 \
-                    if (p->_right) {                                           \
-                        p->_right->_color = SGC_MAP_RED;                       \
+                    s->color_ = SGC_MAP_BLACK;                                 \
+                    p->color_ = SGC_MAP_BLACK;                                 \
+                    if (p->right_) {                                           \
+                        p->right_->color_ = SGC_MAP_RED;                       \
                     }                                                          \
-                } else if ((!s->_right ||                                      \
-                            s->_right->_color == SGC_MAP_BLACK) &&             \
-                           (!s->_left || s->_left->_color == SGC_MAP_BLACK)) { \
-                    s->_color = SGC_MAP_RED;                                   \
-                    if (p->_color == SGC_MAP_RED) {                            \
-                        p->_color = SGC_MAP_BLACK;                             \
+                } else if ((!s->right_ ||                                      \
+                            s->right_->color_ == SGC_MAP_BLACK) &&             \
+                           (!s->left_ || s->left_->color_ == SGC_MAP_BLACK)) { \
+                    s->color_ = SGC_MAP_RED;                                   \
+                    if (p->color_ == SGC_MAP_RED) {                            \
+                        p->color_ = SGC_MAP_BLACK;                             \
                     } else {                                                   \
-                        N##_erase_rebalanse(m, p, p->_parent);                 \
+                        N##_erase_rebalanse(m, p, p->parent_);                 \
                     }                                                          \
-                } else if (s->_right && s->_right->_color == SGC_MAP_RED) {    \
-                    r = s->_right;                                             \
-                    r->_color = SGC_MAP_BLACK;                                 \
+                } else if (s->right_ && s->right_->color_ == SGC_MAP_RED) {    \
+                    r = s->right_;                                             \
+                    r->color_ = SGC_MAP_BLACK;                                 \
                     N##_rotate_left(m, s, p);                                  \
-                } else if (s->_left && s->_left->_color == SGC_MAP_RED) {      \
-                    r = s->_left;                                              \
+                } else if (s->left_ && s->left_->color_ == SGC_MAP_RED) {      \
+                    r = s->left_;                                              \
                     N##_rotate_right_left(m, r, s, p);                         \
                 }                                                              \
             } else {                                                           \
-                s = p->_left;                                                  \
+                s = p->left_;                                                  \
                 if (!s) {                                                      \
                     return;                                                    \
                 }                                                              \
-                if (s->_color == SGC_MAP_RED) {                                \
+                if (s->color_ == SGC_MAP_RED) {                                \
                     N##_rotate_right(m, s, p);                                 \
-                    s->_color = SGC_MAP_BLACK;                                 \
-                    p->_color = SGC_MAP_BLACK;                                 \
-                    if (p->_left) {                                            \
-                        p->_left->_color = SGC_MAP_RED;                        \
+                    s->color_ = SGC_MAP_BLACK;                                 \
+                    p->color_ = SGC_MAP_BLACK;                                 \
+                    if (p->left_) {                                            \
+                        p->left_->color_ = SGC_MAP_RED;                        \
                     }                                                          \
-                } else if ((!s->_right ||                                      \
-                            s->_right->_color == SGC_MAP_BLACK) &&             \
-                           (!s->_left || s->_left->_color == SGC_MAP_BLACK)) { \
-                    s->_color = SGC_MAP_RED;                                   \
-                    if (p->_color == SGC_MAP_RED) {                            \
-                        p->_color = SGC_MAP_BLACK;                             \
+                } else if ((!s->right_ ||                                      \
+                            s->right_->color_ == SGC_MAP_BLACK) &&             \
+                           (!s->left_ || s->left_->color_ == SGC_MAP_BLACK)) { \
+                    s->color_ = SGC_MAP_RED;                                   \
+                    if (p->color_ == SGC_MAP_RED) {                            \
+                        p->color_ = SGC_MAP_BLACK;                             \
                     } else {                                                   \
-                        N##_erase_rebalanse(m, p, p->_parent);                 \
+                        N##_erase_rebalanse(m, p, p->parent_);                 \
                     }                                                          \
-                } else if (s->_left && s->_left->_color == SGC_MAP_RED) {      \
-                    r = s->_left;                                              \
+                } else if (s->left_ && s->left_->color_ == SGC_MAP_RED) {      \
+                    r = s->left_;                                              \
                     if (r) {                                                   \
-                        r->_color = SGC_MAP_BLACK;                             \
+                        r->color_ = SGC_MAP_BLACK;                             \
                     }                                                          \
                     N##_rotate_right(m, s, p);                                 \
-                } else if (s->_right && s->_right->_color == SGC_MAP_RED) {    \
-                    r = s->_right;                                             \
+                } else if (s->right_ && s->right_->color_ == SGC_MAP_RED) {    \
+                    r = s->right_;                                             \
                     N##_rotate_left_right(m, r, s, p);                         \
                 }                                                              \
             }                                                                  \
@@ -723,56 +723,56 @@
         struct N##_node* succ;                                                 \
         struct N##_node* succ_p;                                               \
         struct N##_node* succ_c = SGC_MAP_LEAF;                                \
-        if (!n->_left || !n->_right) {                                         \
+        if (!n->left_ || !n->right_) {                                         \
             succ = n;                                                          \
         } else {                                                               \
-            succ = n->_right;                                                  \
+            succ = n->right_;                                                  \
             if (succ) {                                                        \
-                while (succ->_left) {                                          \
-                    succ = succ->_left;                                        \
+                while (succ->left_) {                                          \
+                    succ = succ->left_;                                        \
                 }                                                              \
             } else {                                                           \
-                succ = n->_left;                                               \
+                succ = n->left_;                                               \
             }                                                                  \
         }                                                                      \
         if (succ != n) {                                                       \
             V##_copy(&n->_value, &succ->_value);                               \
-            if (!m->_shared) {                                                 \
+            if (!m->shared_) {                                                 \
                 V##_free(&succ->_value);                                       \
             }                                                                  \
             /* relinking nodes would be better */                              \
         }                                                                      \
                                                                                \
-        succ_p = succ->_parent;                                                \
-        if (succ->_left) {                                                     \
-            succ_c = succ->_left;                                              \
-            succ_c->_parent = succ_p;                                          \
-        } else if (succ->_right) {                                             \
-            succ_c = succ->_right;                                             \
-            succ_c->_parent = succ_p;                                          \
+        succ_p = succ->parent_;                                                \
+        if (succ->left_) {                                                     \
+            succ_c = succ->left_;                                              \
+            succ_c->parent_ = succ_p;                                          \
+        } else if (succ->right_) {                                             \
+            succ_c = succ->right_;                                             \
+            succ_c->parent_ = succ_p;                                          \
         }                                                                      \
         if (succ_p) {                                                          \
-            if (succ_p->_left == succ) {                                       \
-                succ_p->_left = succ_c;                                        \
+            if (succ_p->left_ == succ) {                                       \
+                succ_p->left_ = succ_c;                                        \
             } else {                                                           \
-                succ_p->_right = succ_c;                                       \
+                succ_p->right_ = succ_c;                                       \
             }                                                                  \
         } else {                                                               \
-            m->_root = (m->_root->_left) ? m->_root->_left : m->_root->_right; \
+            m->root_ = (m->root_->left_) ? m->root_->left_ : m->root_->right_; \
         }                                                                      \
                                                                                \
-        if ((succ_c && succ_c->_color == SGC_MAP_RED) ||                       \
-            succ->_color == SGC_MAP_RED) {                                     \
+        if ((succ_c && succ_c->color_ == SGC_MAP_RED) ||                       \
+            succ->color_ == SGC_MAP_RED) {                                     \
             if (succ_c) {                                                      \
-                succ_c->_color = SGC_MAP_BLACK;                                \
+                succ_c->color_ = SGC_MAP_BLACK;                                \
             }                                                                  \
         } else {                                                               \
             N##_erase_rebalanse(m, succ_c, succ_p);                            \
         }                                                                      \
-        if (m->_root) {                                                        \
-            m->_root->_color = SGC_MAP_BLACK;                                  \
+        if (m->root_) {                                                        \
+            m->root_->color_ = SGC_MAP_BLACK;                                  \
         }                                                                      \
-        --m->_size;                                                            \
+        --m->size_;                                                            \
         return succ;                                                           \
     }                                                                          \
                                                                                \
@@ -780,7 +780,7 @@
         struct N##_node* n = N##_find_node(m, value);                          \
         int ret = (n) ? 1 : 0;                                                 \
         if (ret) {                                                             \
-            if (!m->_shared) {                                                 \
+            if (!m->shared_) {                                                 \
                 V##_free(&n->_value);                                          \
             }                                                                  \
             sgc_free(N##_erase_node(m, n));                                    \
@@ -789,21 +789,21 @@
     }                                                                          \
                                                                                \
     int N##_iterator_erase(struct N* m, struct N##_iterator* i) {              \
-        struct N##_iterator tmp = {i->_curr, i->_next, i->_is_valid};          \
+        struct N##_iterator tmp = {i->curr_, i->next_, i->is_valid_};          \
         N##_iterator_next(&tmp);                                               \
-        int ret = i->_is_valid;                                                \
+        int ret = i->is_valid_;                                                \
         if (ret) {                                                             \
-            if (!m->_shared) {                                                 \
-                V##_free(&i->_curr->_value);                                   \
+            if (!m->shared_) {                                                 \
+                V##_free(&i->curr_->_value);                                   \
             }                                                                  \
-            sgc_free(N##_erase_node(m, i->_curr));                             \
+            sgc_free(N##_erase_node(m, i->curr_));                             \
         }                                                                      \
-        i->_curr = tmp._curr;                                                  \
-        i->_next = tmp._next;                                                  \
-        i->_is_valid = tmp._is_valid;                                          \
+        i->curr_ = tmp.curr_;                                                  \
+        i->next_ = tmp.next_;                                                  \
+        i->is_valid_ = tmp.is_valid_;                                          \
         return ret;                                                            \
     }                                                                          \
                                                                                \
     int N##_empty(const struct N* const m) {                                   \
-        return m->_size == 0;                                                  \
+        return m->size_ == 0;                                                  \
     }

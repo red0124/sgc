@@ -27,16 +27,16 @@
 #define SGC_INIT_HEADERS_STATIC_LIST(T, S, N)                                  \
                                                                                \
     struct N##_node {                                                          \
-        T _data;                                                               \
-        struct N##_node* _next;                                                \
-        struct N##_node* _prev;                                                \
+        T data_;                                                               \
+        struct N##_node* next_;                                                \
+        struct N##_node* prev_;                                                \
     };                                                                         \
                                                                                \
     struct N {                                                                 \
-        size_t _size;                                                          \
-        size_t _shared;                                                        \
-        struct N##_node* _head;                                                \
-        struct N##_node* _tail;                                                \
+        size_t size_;                                                          \
+        size_t shared_;                                                        \
+        struct N##_node* head_;                                                \
+        struct N##_node* tail_;                                                \
         struct N##_node _pool[S];                                              \
         struct N##_node* _node_free_list;                                      \
     };                                                                         \
@@ -71,7 +71,7 @@
     void N##_sort(struct N* l, int (*comp)(const void*, const void*));         \
                                                                                \
     struct N##_iterator {                                                      \
-        struct N##_node* _curr;                                                \
+        struct N##_node* curr_;                                                \
     };                                                                         \
                                                                                \
     typedef struct N##_iterator N##_iterator;                                  \

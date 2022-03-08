@@ -31,16 +31,16 @@
     };                                                                         \
                                                                                \
     struct N##_node {                                                          \
-        struct N##_pair _data;                                                 \
-        struct N##_node* _next;                                                \
+        struct N##_pair data_;                                                 \
+        struct N##_node* next_;                                                \
     };                                                                         \
                                                                                \
     struct N {                                                                 \
-        size_t _size;                                                          \
-        size_t _max;                                                           \
-        size_t _shared;                                                        \
-        size_t _shared_key;                                                    \
-        struct N##_node** _data;                                               \
+        size_t size_;                                                          \
+        size_t max_;                                                           \
+        size_t shared_;                                                        \
+        size_t shared_key_;                                                    \
+        struct N##_node** data_;                                               \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
@@ -55,11 +55,11 @@
     size_t N##_buckets_used(const struct N* const u);                          \
                                                                                \
     struct N##_iterator {                                                      \
-        struct N##_node** _data;                                               \
-        struct N##_node* _curr;                                                \
-        size_t _curr_bucket;                                                   \
-        size_t _max;                                                           \
-        int _is_valid;                                                         \
+        struct N##_node** data_;                                               \
+        struct N##_node* curr_;                                                \
+        size_t curr_bucket_;                                                   \
+        size_t max_;                                                           \
+        int is_valid_;                                                         \
     };                                                                         \
                                                                                \
     typedef struct N##_iterator N##_iterator;                                  \
@@ -107,9 +107,9 @@
                                   size_t is_shared_key, size_t is_shared) {    \
         struct N##_node* new_node =                                            \
             (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
-        SGC_COPY(K##_copy, new_node->_data.key, *key, is_shared_key);          \
-        SGC_COPY(V##_copy, new_node->_data.value, *value, is_shared);          \
-        new_node->_next = NULL;                                                \
+        SGC_COPY(K##_copy, new_node->data_.key, *key, is_shared_key);          \
+        SGC_COPY(V##_copy, new_node->data_.value, *value, is_shared);          \
+        new_node->next_ = NULL;                                                \
         return new_node;                                                       \
     }                                                                          \
                                                                                \
@@ -120,12 +120,12 @@
             struct N##_node* next = bucket;                                    \
             while (next) {                                                     \
                 curr = next;                                                   \
-                next = curr->_next;                                            \
+                next = curr->next_;                                            \
                 if (!is_shared_key) {                                          \
-                    K##_free(&curr->_data.key);                                \
+                    K##_free(&curr->data_.key);                                \
                 }                                                              \
                 if (!is_shared) {                                              \
-                    V##_free(&curr->_data.value);                              \
+                    V##_free(&curr->data_.value);                              \
                 }                                                              \
                 sgc_free(curr);                                                \
                 curr = NULL;                                                   \
@@ -139,9 +139,9 @@
         struct N##_node* next = curr;                                          \
         while (next) {                                                         \
             curr = next;                                                       \
-            next = curr->_next;                                                \
+            next = curr->next_;                                                \
         }                                                                      \
-        curr->_next = new_node;                                                \
+        curr->next_ = new_node;                                                \
     }                                                                          \
                                                                                \
     static size_t N##_bucket_node_size(struct N##_node* bucket) {              \
@@ -150,7 +150,7 @@
             struct N##_node* curr = bucket;                                    \
             while (curr) {                                                     \
                 ++size;                                                        \
-                curr = curr->_next;                                            \
+                curr = curr->next_;                                            \
             }                                                                  \
         }                                                                      \
         return size;                                                           \
@@ -165,23 +165,23 @@
         struct N##_node* tmp = bucket;                                         \
         struct N##_node* prev = bucket;                                        \
         while (tmp) {                                                          \
-            if (K##_equal(&tmp->_data.key, key)) {                             \
+            if (K##_equal(&tmp->data_.key, key)) {                             \
                 if (tmp == bucket) {                                           \
-                    ret = tmp->_next;                                          \
+                    ret = tmp->next_;                                          \
                 }                                                              \
-                prev->_next = tmp->_next;                                      \
+                prev->next_ = tmp->next_;                                      \
                 if (!is_shared_key) {                                          \
-                    K##_free(&tmp->_data.key);                                 \
+                    K##_free(&tmp->data_.key);                                 \
                 }                                                              \
                 if (!is_shared) {                                              \
-                    V##_free(&tmp->_data.value);                               \
+                    V##_free(&tmp->data_.value);                               \
                 }                                                              \
                 sgc_free(tmp);                                                 \
                 --*size;                                                       \
                 break;                                                         \
             }                                                                  \
             prev = tmp;                                                        \
-            tmp = tmp->_next;                                                  \
+            tmp = tmp->next_;                                                  \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
@@ -191,27 +191,27 @@
         struct N##_node* next = bucket;                                        \
         while (next) {                                                         \
             curr = next;                                                       \
-            next = curr->_next;                                                \
+            next = curr->next_;                                                \
         }                                                                      \
         return curr;                                                           \
     }                                                                          \
                                                                                \
     size_t N##_bucket_count(const struct N* const u) {                         \
-        return u->_max;                                                        \
+        return u->max_;                                                        \
     }                                                                          \
                                                                                \
     size_t N##_bucket_size(const struct N* const u, size_t n) {                \
         size_t ret = 0;                                                        \
-        if (u->_data) {                                                        \
-            ret = N##_bucket_node_size(u->_data[n]);                           \
+        if (u->data_) {                                                        \
+            ret = N##_bucket_node_size(u->data_[n]);                           \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
                                                                                \
     size_t N##_buckets_used(const struct N* const u) {                         \
         size_t ret = 0;                                                        \
-        for (size_t i = 0; i < u->_max; ++i) {                                 \
-            ret += (u->_data[i] == NULL) ? 0 : 1;                              \
+        for (size_t i = 0; i < u->max_; ++i) {                                 \
+            ret += (u->data_[i] == NULL) ? 0 : 1;                              \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
@@ -221,44 +221,44 @@
     /* ========== */                                                           \
                                                                                \
     struct N##_pair* N##_iterator_data(struct N##_iterator i) {                \
-        return &i._curr->_data;                                                \
+        return &i.curr_->data_;                                                \
     }                                                                          \
                                                                                \
     const struct N##_pair* N##_iterator_cdata(struct N##_iterator i) {         \
-        return &i._curr->_data;                                                \
+        return &i.curr_->data_;                                                \
     }                                                                          \
                                                                                \
     void N##_iterator_next(struct N##_iterator* i) {                           \
-        if (i->_curr && i->_curr->_next) {                                     \
-            i->_curr = i->_curr->_next;                                        \
+        if (i->curr_ && i->curr_->next_) {                                     \
+            i->curr_ = i->curr_->next_;                                        \
         } else {                                                               \
-            struct N##_node* tmp = i->_curr;                                   \
-            ++i->_curr_bucket;                                                 \
-            i->_is_valid = (i->_curr_bucket != i->_max);                       \
-            while (i->_curr_bucket < i->_max) {                                \
-                i->_curr = i->_data[i->_curr_bucket];                          \
-                if (i->_curr) {                                                \
+            struct N##_node* tmp = i->curr_;                                   \
+            ++i->curr_bucket_;                                                 \
+            i->is_valid_ = (i->curr_bucket_ != i->max_);                       \
+            while (i->curr_bucket_ < i->max_) {                                \
+                i->curr_ = i->data_[i->curr_bucket_];                          \
+                if (i->curr_) {                                                \
                     break;                                                     \
                 }                                                              \
-                ++i->_curr_bucket;                                             \
+                ++i->curr_bucket_;                                             \
             }                                                                  \
-            if (!i->_curr) {                                                   \
-                i->_is_valid = 0;                                              \
-                i->_curr = tmp;                                                \
+            if (!i->curr_) {                                                   \
+                i->is_valid_ = 0;                                              \
+                i->curr_ = tmp;                                                \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_iterator_begin(struct N* m, struct N##_iterator* i) {             \
-        if (m->_data) {                                                        \
-            i->_data = m->_data;                                               \
-            i->_curr = m->_data[0];                                            \
-            i->_curr_bucket = 0;                                               \
-            i->_max = m->_max;                                                 \
-            if (!i->_curr) {                                                   \
+        if (m->data_) {                                                        \
+            i->data_ = m->data_;                                               \
+            i->curr_ = m->data_[0];                                            \
+            i->curr_bucket_ = 0;                                               \
+            i->max_ = m->max_;                                                 \
+            if (!i->curr_) {                                                   \
                 N##_iterator_next(i);                                          \
             }                                                                  \
-            i->_is_valid = 1;                                                  \
+            i->is_valid_ = 1;                                                  \
         } else {                                                               \
             *i = (struct N##_iterator){NULL, NULL, 0, 0, 0};                   \
         }                                                                      \
@@ -266,75 +266,75 @@
                                                                                \
     void N##_iterator_cbegin(const struct N* const m,                          \
                              struct N##_iterator* i) {                         \
-        if (m->_data) {                                                        \
-            i->_data = m->_data;                                               \
-            i->_curr = m->_data[0];                                            \
-            i->_curr_bucket = 0;                                               \
-            i->_max = m->_max;                                                 \
-            if (!i->_curr) {                                                   \
+        if (m->data_) {                                                        \
+            i->data_ = m->data_;                                               \
+            i->curr_ = m->data_[0];                                            \
+            i->curr_bucket_ = 0;                                               \
+            i->max_ = m->max_;                                                 \
+            if (!i->curr_) {                                                   \
                 N##_iterator_next(i);                                          \
             }                                                                  \
-            i->_is_valid = 1;                                                  \
+            i->is_valid_ = 1;                                                  \
         } else {                                                               \
             *i = (struct N##_iterator){NULL, NULL, 0, 0, 0};                   \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_iterator_prev(struct N##_iterator* i) {                           \
-        if (i->_curr && i->_data[i->_curr_bucket] != i->_curr) {               \
-            struct N##_node* curr = i->_data[i->_curr_bucket];                 \
-            struct N##_node* next = curr->_next;                               \
-            while (next != i->_curr) {                                         \
+        if (i->curr_ && i->data_[i->curr_bucket_] != i->curr_) {               \
+            struct N##_node* curr = i->data_[i->curr_bucket_];                 \
+            struct N##_node* next = curr->next_;                               \
+            while (next != i->curr_) {                                         \
                 curr = next;                                                   \
-                next = curr->_next;                                            \
+                next = curr->next_;                                            \
             }                                                                  \
-            i->_curr = curr;                                                   \
+            i->curr_ = curr;                                                   \
         } else {                                                               \
-            struct N##_node* tmp = i->_curr;                                   \
-            --i->_curr_bucket;                                                 \
+            struct N##_node* tmp = i->curr_;                                   \
+            --i->curr_bucket_;                                                 \
             while (1) {                                                        \
-                i->_curr = i->_data[i->_curr_bucket];                          \
-                if (i->_curr) {                                                \
+                i->curr_ = i->data_[i->curr_bucket_];                          \
+                if (i->curr_) {                                                \
                     break;                                                     \
                 }                                                              \
-                --i->_curr_bucket;                                             \
+                --i->curr_bucket_;                                             \
             }                                                                  \
-            if (!i->_curr) {                                                   \
-                i->_is_valid = 0;                                              \
-                i->_curr = tmp;                                                \
+            if (!i->curr_) {                                                   \
+                i->is_valid_ = 0;                                              \
+                i->curr_ = tmp;                                                \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_iterator_end(struct N* m, struct N##_iterator* i) {               \
-        if (m->_data) {                                                        \
-            i->_data = m->_data;                                               \
-            i->_curr = m->_data[m->_max - 1];                                  \
-            i->_max = m->_max;                                                 \
-            i->_curr_bucket = m->_max - 1;                                     \
-            if (i->_curr) {                                                    \
-                i->_curr = N##_bucket_end(i->_curr);                           \
+        if (m->data_) {                                                        \
+            i->data_ = m->data_;                                               \
+            i->curr_ = m->data_[m->max_ - 1];                                  \
+            i->max_ = m->max_;                                                 \
+            i->curr_bucket_ = m->max_ - 1;                                     \
+            if (i->curr_) {                                                    \
+                i->curr_ = N##_bucket_end(i->curr_);                           \
             } else {                                                           \
                 N##_iterator_prev(i);                                          \
             }                                                                  \
-            i->_is_valid = 1;                                                  \
+            i->is_valid_ = 1;                                                  \
         } else {                                                               \
             *i = (struct N##_iterator){NULL, NULL, 0, 0, 0};                   \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_iterator_cend(const struct N* const m, struct N##_iterator* i) {  \
-        if (m->_data) {                                                        \
-            i->_data = m->_data;                                               \
-            i->_curr = m->_data[m->_max - 1];                                  \
-            i->_max = m->_max;                                                 \
-            i->_curr_bucket = m->_max - 1;                                     \
-            if (i->_curr) {                                                    \
-                i->_curr = N##_bucket_end(i->_curr);                           \
+        if (m->data_) {                                                        \
+            i->data_ = m->data_;                                               \
+            i->curr_ = m->data_[m->max_ - 1];                                  \
+            i->max_ = m->max_;                                                 \
+            i->curr_bucket_ = m->max_ - 1;                                     \
+            if (i->curr_) {                                                    \
+                i->curr_ = N##_bucket_end(i->curr_);                           \
             } else {                                                           \
                 N##_iterator_prev(i);                                          \
             }                                                                  \
-            i->_is_valid = 1;                                                  \
+            i->is_valid_ = 1;                                                  \
         } else {                                                               \
             *i = (struct N##_iterator){NULL, NULL, 0, 0, 0};                   \
         }                                                                      \
@@ -366,11 +366,11 @@
                                                                                \
     int N##_iterator_equal(const struct N##_iterator first,                    \
                            const struct N##_iterator second) {                 \
-        return first._curr == second._curr;                                    \
+        return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \
     int N##_iterator_valid(const struct N##_iterator i) {                      \
-        return i._is_valid;                                                    \
+        return i.is_valid_;                                                    \
     }                                                                          \
                                                                                \
     /* =============== */                                                      \
@@ -378,33 +378,33 @@
     /* =============== */                                                      \
                                                                                \
     void N##_set_share(N* u, int is_shared) {                                  \
-        u->_shared = is_shared;                                                \
+        u->shared_ = is_shared;                                                \
     }                                                                          \
                                                                                \
     void N##_set_share_key(N* u, int is_shared_key) {                          \
-        u->_shared_key = is_shared_key;                                        \
+        u->shared_key_ = is_shared_key;                                        \
     }                                                                          \
                                                                                \
     size_t N##_size(const struct N* const u) {                                 \
-        return u->_size;                                                       \
+        return u->size_;                                                       \
     }                                                                          \
                                                                                \
     void N##_init(struct N* u) {                                               \
-        u->_size = u->_max = 0;                                                \
-        u->_data = NULL;                                                       \
-        u->_shared = u->_shared_key = 0;                                       \
+        u->size_ = u->max_ = 0;                                                \
+        u->data_ = NULL;                                                       \
+        u->shared_ = u->shared_key_ = 0;                                       \
     }                                                                          \
                                                                                \
     int N##_equal(const N* const first, const N* const second) {               \
         int equal = (first == second);                                         \
-        if (equal == 0 && first->_size == second->_size) {                     \
+        if (equal == 0 && first->size_ == second->size_) {                     \
             struct N##_iterator it_first = N##_cbegin(first);                  \
             struct N##_iterator it_second = N##_cbegin(second);                \
             while (N##_iterator_valid(it_first)) {                             \
-                if (!K##_equal(&it_first._curr->_data.key,                     \
-                               &it_second._curr->_data.key) ||                 \
-                    !V##_equal(&it_first._curr->_data.value,                   \
-                               &it_second._curr->_data.value)) {               \
+                if (!K##_equal(&it_first.curr_->data_.key,                     \
+                               &it_second.curr_->data_.key) ||                 \
+                    !V##_equal(&it_first.curr_->data_.value,                   \
+                               &it_second.curr_->data_.value)) {               \
                     equal = 0;                                                 \
                     break;                                                     \
                 }                                                              \
@@ -417,75 +417,75 @@
     }                                                                          \
                                                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
-        if (!src->_data) {                                                     \
-            dst->_data = NULL;                                                 \
-            dst->_size = dst->_max = 0;                                        \
+        if (!src->data_) {                                                     \
+            dst->data_ = NULL;                                                 \
+            dst->size_ = dst->max_ = 0;                                        \
             return;                                                            \
         }                                                                      \
-        dst->_size = src->_size;                                               \
-        dst->_max = src->_max;                                                 \
-        dst->_data = (struct N##_node**)sgc_malloc(sizeof(struct N##_node*) *  \
-                                                   dst->_max);                 \
-        dst->_shared = src->_shared;                                           \
-        dst->_shared_key = src->_shared_key;                                   \
-        for (size_t i = 0; i < src->_max; ++i) {                               \
-            if (src->_data[i]) {                                               \
-                dst->_data[i] =                                                \
+        dst->size_ = src->size_;                                               \
+        dst->max_ = src->max_;                                                 \
+        dst->data_ = (struct N##_node**)sgc_malloc(sizeof(struct N##_node*) *  \
+                                                   dst->max_);                 \
+        dst->shared_ = src->shared_;                                           \
+        dst->shared_key_ = src->shared_key_;                                   \
+        for (size_t i = 0; i < src->max_; ++i) {                               \
+            if (src->data_[i]) {                                               \
+                dst->data_[i] =                                                \
                     (struct N##_node*)sgc_malloc(sizeof(struct N##_node));     \
-                SGC_COPY(K##_copy, dst->_data[i]->_data.key,                   \
-                         src->_data[i]->_data.key, src->_shared_key);          \
-                SGC_COPY(V##_copy, dst->_data[i]->_data.value,                 \
-                         src->_data[i]->_data.value, src->_shared);            \
-                struct N##_node* curr_src = src->_data[i];                     \
-                struct N##_node* curr_dst = dst->_data[i];                     \
+                SGC_COPY(K##_copy, dst->data_[i]->data_.key,                   \
+                         src->data_[i]->data_.key, src->shared_key_);          \
+                SGC_COPY(V##_copy, dst->data_[i]->data_.value,                 \
+                         src->data_[i]->data_.value, src->shared_);            \
+                struct N##_node* curr_src = src->data_[i];                     \
+                struct N##_node* curr_dst = dst->data_[i];                     \
                 struct N##_node* tmp_src = NULL;                               \
                 struct N##_node* tmp_dst = NULL;                               \
                 while (curr_src) {                                             \
-                    tmp_src = curr_src->_next;                                 \
+                    tmp_src = curr_src->next_;                                 \
                     if (!tmp_src) {                                            \
                         break;                                                 \
                     }                                                          \
                     tmp_dst =                                                  \
                         (struct N##_node*)sgc_malloc(sizeof(struct N##_node)); \
-                    SGC_COPY(K##_copy, tmp_dst->_data.key, tmp_src->_data.key, \
-                             src->_shared_key);                                \
-                    SGC_COPY(V##_copy, tmp_dst->_data.value,                   \
-                             tmp_src->_data.value, src->_shared);              \
-                    curr_dst->_next = tmp_dst;                                 \
+                    SGC_COPY(K##_copy, tmp_dst->data_.key, tmp_src->data_.key, \
+                             src->shared_key_);                                \
+                    SGC_COPY(V##_copy, tmp_dst->data_.value,                   \
+                             tmp_src->data_.value, src->shared_);              \
+                    curr_dst->next_ = tmp_dst;                                 \
                     curr_dst = tmp_dst;                                        \
                     curr_src = tmp_src;                                        \
                 }                                                              \
-                curr_dst->_next = NULL;                                        \
+                curr_dst->next_ = NULL;                                        \
             } else {                                                           \
-                dst->_data[i] = NULL;                                          \
+                dst->data_[i] = NULL;                                          \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_free(struct N* u) {                                               \
-        if (u->_size) {                                                        \
-            for (size_t i = 0; i < u->_max; ++i) {                             \
-                N##_bucket_sgc_free(u->_data[i], u->_shared_key, u->_shared);  \
+        if (u->size_) {                                                        \
+            for (size_t i = 0; i < u->max_; ++i) {                             \
+                N##_bucket_sgc_free(u->data_[i], u->shared_key_, u->shared_);  \
             }                                                                  \
         }                                                                      \
-        if (u->_data) {                                                        \
-            sgc_free(u->_data);                                                \
+        if (u->data_) {                                                        \
+            sgc_free(u->data_);                                                \
         }                                                                      \
     }                                                                          \
                                                                                \
     static struct N##_iterator N##_find_by_hash(struct N* u, const K* const k, \
                                                 size_t hash) {                 \
         struct N##_iterator ret = {NULL, NULL, 0, 0, 0};                       \
-        if (u->_max) {                                                         \
-            size_t position = hash % u->_max;                                  \
-            struct N##_node* tmp = u->_data[position];                         \
+        if (u->max_) {                                                         \
+            size_t position = hash % u->max_;                                  \
+            struct N##_node* tmp = u->data_[position];                         \
             while (tmp) {                                                      \
-                if (K##_equal(&tmp->_data.key, k)) {                           \
-                    ret = (struct N##_iterator){u->_data, tmp, position,       \
-                                                u->_max, 1};                   \
+                if (K##_equal(&tmp->data_.key, k)) {                           \
+                    ret = (struct N##_iterator){u->data_, tmp, position,       \
+                                                u->max_, 1};                   \
                     break;                                                     \
                 }                                                              \
-                tmp = tmp->_next;                                              \
+                tmp = tmp->next_;                                              \
             }                                                                  \
         }                                                                      \
         return ret;                                                            \
@@ -498,9 +498,9 @@
                                                                                \
     static void N##_rehash_size(const struct N* const u, size_t* max,          \
                                 size_t* new_max) {                             \
-        *max = u->_max;                                                        \
-        if (u->_size == *max) {                                                \
-            *new_max = sgc_next_prime(2 * u->_max + 1);                        \
+        *max = u->max_;                                                        \
+        if (u->size_ == *max) {                                                \
+            *new_max = sgc_next_prime(2 * u->max_ + 1);                        \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -515,31 +515,31 @@
         size_t position;                                                       \
         struct N##_iterator tmp = N##_begin(u);                                \
         struct N##_node* next;                                                 \
-        for (size_t i = 0; i < u->_size; ++i) {                                \
-            key = &tmp._curr->_data.key;                                       \
+        for (size_t i = 0; i < u->size_; ++i) {                                \
+            key = &tmp.curr_->data_.key;                                       \
             position = K##_hash(key) % new_max;                                \
-            next = tmp._curr->_next;                                           \
-            tmp._curr->_next = NULL;                                           \
+            next = tmp.curr_->next_;                                           \
+            tmp.curr_->next_ = NULL;                                           \
             if (new_data[position]) {                                          \
-                N##_bucket_insert(new_data[position], tmp._curr);              \
+                N##_bucket_insert(new_data[position], tmp.curr_);              \
             } else {                                                           \
-                new_data[position] = tmp._curr;                                \
+                new_data[position] = tmp.curr_;                                \
             }                                                                  \
             if (next) {                                                        \
-                tmp._curr = next;                                              \
+                tmp.curr_ = next;                                              \
             } else {                                                           \
                 N##_iterator_next(&tmp);                                       \
             }                                                                  \
         }                                                                      \
-        sgc_free(u->_data);                                                    \
-        u->_data = new_data;                                                   \
-        u->_max = new_max;                                                     \
+        sgc_free(u->data_);                                                    \
+        u->data_ = new_data;                                                   \
+        u->max_ = new_max;                                                     \
     }                                                                          \
                                                                                \
     static void N##_resize(struct N* u) {                                      \
         size_t max, new_max;                                                   \
         N##_rehash_size(u, &max, &new_max);                                    \
-        if (u->_size == max) {                                                 \
+        if (u->size_ == max) {                                                 \
             struct N##_node** new_data = (struct N##_node**)sgc_malloc(        \
                 sizeof(struct N##_node*) * new_max);                           \
             for (size_t i = 0; i < new_max; ++i) {                             \
@@ -550,44 +550,44 @@
             size_t position;                                                   \
             struct N##_iterator tmp = N##_begin(u);                            \
             struct N##_node* next;                                             \
-            for (size_t i = 0; i < u->_size; ++i) {                            \
-                key = &tmp._curr->_data.key;                                   \
+            for (size_t i = 0; i < u->size_; ++i) {                            \
+                key = &tmp.curr_->data_.key;                                   \
                 position = K##_hash(key) % new_max;                            \
-                next = tmp._curr->_next;                                       \
-                tmp._curr->_next = NULL;                                       \
+                next = tmp.curr_->next_;                                       \
+                tmp.curr_->next_ = NULL;                                       \
                 if (new_data[position]) {                                      \
-                    N##_bucket_insert(new_data[position], tmp._curr);          \
+                    N##_bucket_insert(new_data[position], tmp.curr_);          \
                 } else {                                                       \
-                    new_data[position] = tmp._curr;                            \
+                    new_data[position] = tmp.curr_;                            \
                 }                                                              \
                 if (next) {                                                    \
-                    tmp._curr = next;                                          \
+                    tmp.curr_ = next;                                          \
                 } else {                                                       \
                     N##_iterator_next(&tmp);                                   \
                 }                                                              \
             }                                                                  \
-            sgc_free(u->_data);                                                \
-            u->_data = new_data;                                               \
-            u->_max = new_max;                                                 \
+            sgc_free(u->data_);                                                \
+            u->data_ = new_data;                                               \
+            u->max_ = new_max;                                                 \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_set_at(struct N* u, const K k, const V v) {                       \
         size_t hash = K##_hash(&k);                                            \
         struct N##_iterator i = N##_find_by_hash(u, &k, hash);                 \
-        if (i._curr) {                                                         \
-            SGC_REPLACE(V##_copy, V##_free, i._curr->_data.value, v, i._curr); \
+        if (i.curr_) {                                                         \
+            SGC_REPLACE(V##_copy, V##_free, i.curr_->data_.value, v, i.curr_); \
         } else {                                                               \
             N##_resize(u);                                                     \
             struct N##_node* new_node =                                        \
-                N##_node_new(&k, &v, u->_shared_key, u->_shared);              \
-            size_t position = hash % u->_max;                                  \
-            if (u->_data[position]) {                                          \
-                N##_bucket_insert(u->_data[position], new_node);               \
+                N##_node_new(&k, &v, u->shared_key_, u->shared_);              \
+            size_t position = hash % u->max_;                                  \
+            if (u->data_[position]) {                                          \
+                N##_bucket_insert(u->data_[position], new_node);               \
             } else {                                                           \
-                u->_data[position] = new_node;                                 \
+                u->data_[position] = new_node;                                 \
             }                                                                  \
-            ++u->_size;                                                        \
+            ++u->size_;                                                        \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -595,44 +595,44 @@
         size_t hash = K##_hash(&k);                                            \
         struct N##_iterator i = N##_find_by_hash(u, &k, hash);                 \
         V* ret;                                                                \
-        if (i._curr) {                                                         \
-            ret = &i._curr->_data.value;                                       \
+        if (i.curr_) {                                                         \
+            ret = &i.curr_->data_.value;                                       \
         } else {                                                               \
             V v;                                                               \
             N##_resize(u);                                                     \
             V##_init(&v);                                                      \
             struct N##_node* new_node =                                        \
-                N##_node_new(&k, &v, u->_shared_key, u->_shared);              \
-            size_t position = hash % u->_max;                                  \
-            if (u->_data[position]) {                                          \
-                N##_bucket_insert(u->_data[position], new_node);               \
+                N##_node_new(&k, &v, u->shared_key_, u->shared_);              \
+            size_t position = hash % u->max_;                                  \
+            if (u->data_[position]) {                                          \
+                N##_bucket_insert(u->data_[position], new_node);               \
             } else {                                                           \
-                u->_data[position] = new_node;                                 \
+                u->data_[position] = new_node;                                 \
             }                                                                  \
-            ++u->_size;                                                        \
-            ret = &new_node->_data.value;                                      \
+            ++u->size_;                                                        \
+            ret = &new_node->data_.value;                                      \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
                                                                                \
     void N##_erase(struct N* u, const K k) {                                   \
-        if (u->_data) {                                                        \
+        if (u->data_) {                                                        \
             size_t hash = K##_hash(&k);                                        \
-            size_t position = hash % u->_max;                                  \
-            u->_data[position] =                                               \
-                N##_bucket_remove(u->_data[position], &k, &u->_size,           \
-                                  u->_shared_key, u->_shared);                 \
+            size_t position = hash % u->max_;                                  \
+            u->data_[position] =                                               \
+                N##_bucket_remove(u->data_[position], &k, &u->size_,           \
+                                  u->shared_key_, u->shared_);                 \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_iterator_erase(struct N* u, struct N##_iterator* i) {             \
         if (N##_iterator_valid(*i)) {                                          \
-            K key = i->_curr->_data.key;                                       \
+            K key = i->curr_->data_.key;                                       \
             N##_iterator_next(i);                                              \
             N##_erase(u, key);                                                 \
         }                                                                      \
     }                                                                          \
                                                                                \
     int N##_empty(const struct N* const u) {                                   \
-        return u->_size == 0;                                                  \
+        return u->size_ == 0;                                                  \
     }

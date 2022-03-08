@@ -6,9 +6,9 @@
 #define SGC_INIT_HEADERS_STATIC_STACK(T, S, N)                                 \
                                                                                \
     struct N {                                                                 \
-        size_t _size;                                                          \
-        size_t _shared;                                                        \
-        T _data[S];                                                            \
+        size_t size_;                                                          \
+        size_t shared_;                                                        \
+        T data_[S];                                                            \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
@@ -40,23 +40,23 @@
     /* ======================== */                                             \
                                                                                \
     void N##_set_share(N* s, int is_shared) {                                  \
-        s->_shared = is_shared;                                                \
+        s->shared_ = is_shared;                                                \
     }                                                                          \
                                                                                \
     void N##_init(struct N* s) {                                               \
-        s->_size = 0;                                                          \
-        s->_shared = 0;                                                        \
+        s->size_ = 0;                                                          \
+        s->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
     size_t N##_size(const struct N* s) {                                       \
-        return s->_size;                                                       \
+        return s->size_;                                                       \
     }                                                                          \
                                                                                \
     void N##_free(struct N* s) {                                               \
-        if (s->_size) {                                                        \
-            if (!s->_shared) {                                                 \
-                for (size_t i = 0; i < s->_size; ++i) {                        \
-                    T##_free(&s->_data[i]);                                    \
+        if (s->size_) {                                                        \
+            if (!s->shared_) {                                                 \
+                for (size_t i = 0; i < s->size_; ++i) {                        \
+                    T##_free(&s->data_[i]);                                    \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -64,10 +64,10 @@
                                                                                \
     int N##_equal(const struct N* first, const struct N* second) {             \
         int equal = (first == second);                                         \
-        if (equal == 0 && first->_size == second->_size) {                     \
+        if (equal == 0 && first->size_ == second->size_) {                     \
             equal = 1;                                                         \
-            for (size_t i = 0; i < first->_size; ++i) {                        \
-                if (!T##_equal(&first->_data[i], &second->_data[i])) {         \
+            for (size_t i = 0; i < first->size_; ++i) {                        \
+                if (!T##_equal(&first->data_[i], &second->data_[i])) {         \
                     equal = 0;                                                 \
                     break;                                                     \
                 }                                                              \
@@ -78,51 +78,51 @@
                                                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
-        if (src->_size != 0) {                                                 \
-            dst->_size = src->_size;                                           \
-            dst->_shared = src->_shared;                                       \
-            if (dst->_shared) {                                                \
-                memcpy(dst->_data, src->_data, src->_size * sizeof(T));        \
+        if (src->size_ != 0) {                                                 \
+            dst->size_ = src->size_;                                           \
+            dst->shared_ = src->shared_;                                       \
+            if (dst->shared_) {                                                \
+                memcpy(dst->data_, src->data_, src->size_ * sizeof(T));        \
             } else {                                                           \
-                for (size_t i = 0; i < dst->_size; ++i) {                      \
-                    T##_copy(&dst->_data[i], &src->_data[i]);                  \
+                for (size_t i = 0; i < dst->size_; ++i) {                      \
+                    T##_copy(&dst->data_[i], &src->data_[i]);                  \
                 }                                                              \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_push(struct N* s, T el) {                                         \
-        if (s->_size < S) {                                                    \
-            SGC_COPY(T##_copy, s->_data[s->_size], el, s->_shared);            \
-            ++s->_size;                                                        \
+        if (s->size_ < S) {                                                    \
+            SGC_COPY(T##_copy, s->data_[s->size_], el, s->shared_);            \
+            ++s->size_;                                                        \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_pop(struct N* s) {                                                \
-        if (s->_size) {                                                        \
-            T* el = &s->_data[s->_size - 1];                                   \
-            if (!s->_shared) {                                                 \
+        if (s->size_) {                                                        \
+            T* el = &s->data_[s->size_ - 1];                                   \
+            if (!s->shared_) {                                                 \
                 T##_free(el);                                                  \
             }                                                                  \
-            --s->_size;                                                        \
+            --s->size_;                                                        \
         }                                                                      \
     }                                                                          \
                                                                                \
     T* N##_top(struct N* s) {                                                  \
         T* ret = NULL;                                                         \
-        if (s->_size) {                                                        \
-            ret = &s->_data[s->_size - 1];                                     \
+        if (s->size_) {                                                        \
+            ret = &s->data_[s->size_ - 1];                                     \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
                                                                                \
     void N##_set_top(struct N* s, T new_el) {                                  \
-        if (s->_size) {                                                        \
-            SGC_REPLACE(T##_copy, T##_free, s->_data[s->_size - 1], new_el,    \
-                        s->_shared);                                           \
+        if (s->size_) {                                                        \
+            SGC_REPLACE(T##_copy, T##_free, s->data_[s->size_ - 1], new_el,    \
+                        s->shared_);                                           \
         }                                                                      \
     }                                                                          \
                                                                                \
     int N##_empty(struct N* s) {                                               \
-        return s->_size == 0;                                                  \
+        return s->size_ == 0;                                                  \
     }

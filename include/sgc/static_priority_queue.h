@@ -11,9 +11,9 @@
 #define SGC_INIT_HEADERS_STATIC_PRIORITY_QUEUE(T, S, N)                        \
                                                                                \
     struct N {                                                                 \
-        size_t _size;                                                          \
-        size_t _shared;                                                        \
-        T _data[S];                                                            \
+        size_t size_;                                                          \
+        size_t shared_;                                                        \
+        T data_[S];                                                            \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
@@ -47,23 +47,23 @@
     /* ==========================*/                                            \
                                                                                \
     void N##_set_share(N* p, int is_shared) {                                  \
-        p->_shared = is_shared;                                                \
+        p->shared_ = is_shared;                                                \
     }                                                                          \
                                                                                \
     void N##_init(struct N* p) {                                               \
-        p->_size = 0;                                                          \
-        p->_shared = 0;                                                        \
+        p->size_ = 0;                                                          \
+        p->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
     size_t N##_size(const struct N* p) {                                       \
-        return p->_size;                                                       \
+        return p->size_;                                                       \
     }                                                                          \
                                                                                \
     void N##_free(struct N* p) {                                               \
-        if (p->_data) {                                                        \
-            if (!p->_shared) {                                                 \
-                for (size_t i = 0; i < p->_size; ++i) {                        \
-                    T##_free(&p->_data[i]);                                    \
+        if (p->data_) {                                                        \
+            if (!p->shared_) {                                                 \
+                for (size_t i = 0; i < p->size_; ++i) {                        \
+                    T##_free(&p->data_[i]);                                    \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -71,10 +71,10 @@
                                                                                \
     int N##_equal(const struct N* const first, const struct N* const second) { \
         int equal = (first == second);                                         \
-        if (equal == 0 && first->_size == second->_size) {                     \
+        if (equal == 0 && first->size_ == second->size_) {                     \
             equal = 1;                                                         \
-            for (size_t i = 0; i < first->_size; ++i) {                        \
-                if (!T##_equal(&first->_data[i], &second->_data[i])) {         \
+            for (size_t i = 0; i < first->size_; ++i) {                        \
+                if (!T##_equal(&first->data_[i], &second->data_[i])) {         \
                     equal = 0;                                                 \
                     break;                                                     \
                 }                                                              \
@@ -86,16 +86,16 @@
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
         N##_init(dst);                                                         \
-        if (src->_size == 0) {                                                 \
+        if (src->size_ == 0) {                                                 \
             return;                                                            \
         }                                                                      \
-        dst->_size = src->_size;                                               \
-        dst->_shared = src->_shared;                                           \
-        if (src->_shared) {                                                    \
-            memcpy(dst->_data, src->_data, src->_size * sizeof(T));            \
+        dst->size_ = src->size_;                                               \
+        dst->shared_ = src->shared_;                                           \
+        if (src->shared_) {                                                    \
+            memcpy(dst->data_, src->data_, src->size_ * sizeof(T));            \
         } else {                                                               \
-            for (size_t i = 0; i < dst->_size; ++i) {                          \
-                T##_copy(&dst->_data[i], &src->_data[i]);                      \
+            for (size_t i = 0; i < dst->size_; ++i) {                          \
+                T##_copy(&dst->data_[i], &src->data_[i]);                      \
             }                                                                  \
         }                                                                      \
     }                                                                          \
@@ -109,11 +109,11 @@
     }                                                                          \
                                                                                \
     static void N##_fix_insert(struct N* p) {                                  \
-        size_t curr = p->_size;                                                \
+        size_t curr = p->size_;                                                \
         while (curr) {                                                         \
             size_t parent = (curr - 1) / 2;                                    \
-            if (T##_compare(&p->_data[parent], &p->_data[curr]) < 0) {         \
-                N##_memswp(&p->_data[parent], &p->_data[curr]);                \
+            if (T##_compare(&p->data_[parent], &p->data_[curr]) < 0) {         \
+                N##_memswp(&p->data_[parent], &p->data_[curr]);                \
                 curr = parent;                                                 \
             } else {                                                           \
                 break;                                                         \
@@ -122,25 +122,25 @@
     }                                                                          \
                                                                                \
     void N##_push(struct N* p, T el) {                                         \
-        if (p->_size != S) {                                                   \
-            SGC_COPY(T##_copy, p->_data[p->_size], el, p->_shared);            \
+        if (p->size_ != S) {                                                   \
+            SGC_COPY(T##_copy, p->data_[p->size_], el, p->shared_);            \
             N##_fix_insert(p);                                                 \
-            ++p->_size;                                                        \
+            ++p->size_;                                                        \
         }                                                                      \
     }                                                                          \
                                                                                \
     static void N##_fix_erase(struct N* p) {                                   \
         size_t curr = 0;                                                       \
-        while ((curr + 1) * 2 <= p->_size) {                                   \
+        while ((curr + 1) * 2 <= p->size_) {                                   \
             size_t right = (curr + 1) * 2;                                     \
             size_t left = right - 1;                                           \
             size_t tmp = right;                                                \
-            if (right == p->_size ||                                           \
-                T##_compare(&p->_data[left], &p->_data[right]) > 0) {          \
+            if (right == p->size_ ||                                           \
+                T##_compare(&p->data_[left], &p->data_[right]) > 0) {          \
                 tmp = left;                                                    \
             }                                                                  \
-            if (T##_compare(&p->_data[tmp], &p->_data[curr]) > 0) {            \
-                N##_memswp(&p->_data[curr], &p->_data[tmp]);                   \
+            if (T##_compare(&p->data_[tmp], &p->data_[curr]) > 0) {            \
+                N##_memswp(&p->data_[curr], &p->data_[tmp]);                   \
                 curr = tmp;                                                    \
             } else {                                                           \
                 break;                                                         \
@@ -149,10 +149,10 @@
     }                                                                          \
                                                                                \
     void N##_pop(struct N* p) {                                                \
-        if (p->_size) {                                                        \
-            N##_memswp(&p->_data[0], &p->_data[--p->_size]);                   \
-            if (!p->_shared) {                                                 \
-                T##_free(&p->_data[p->_size]);                                 \
+        if (p->size_) {                                                        \
+            N##_memswp(&p->data_[0], &p->data_[--p->size_]);                   \
+            if (!p->shared_) {                                                 \
+                T##_free(&p->data_[p->size_]);                                 \
             }                                                                  \
             N##_fix_erase(p);                                                  \
         }                                                                      \
@@ -160,31 +160,31 @@
                                                                                \
     T* N##_top(struct N* p) {                                                  \
         T* ret = NULL;                                                         \
-        if (p->_size) {                                                        \
-            ret = &p->_data[0];                                                \
+        if (p->size_) {                                                        \
+            ret = &p->data_[0];                                                \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
                                                                                \
     int N##_empty(const struct N* const d) {                                   \
-        return d->_size == 0;                                                  \
+        return d->size_ == 0;                                                  \
     }                                                                          \
                                                                                \
     T* N##_array(struct N* d) {                                                \
         T* ret = NULL;                                                         \
-        if (d->_size) {                                                        \
-            ret = d->_data;                                                    \
+        if (d->size_) {                                                        \
+            ret = d->data_;                                                    \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
                                                                                \
     void N##_from_array(struct N* p, const T* const arr, const size_t size) {  \
         if (size) {                                                            \
-            p->_size = 0;                                                      \
+            p->size_ = 0;                                                      \
             for (size_t i = 0; i < size; ++i) {                                \
                 N##_push(p, arr[i]);                                           \
             }                                                                  \
         } else {                                                               \
-            p->_size = 0;                                                      \
+            p->size_ = 0;                                                      \
         }                                                                      \
     }

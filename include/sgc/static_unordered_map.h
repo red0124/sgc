@@ -15,15 +15,15 @@
     };                                                                         \
                                                                                \
     struct N##_node {                                                          \
-        struct N##_pair _data;                                                 \
+        struct N##_pair data_;                                                 \
         char _state;                                                           \
     };                                                                         \
                                                                                \
     struct N {                                                                 \
-        size_t _size;                                                          \
-        size_t _shared;                                                        \
-        size_t _shared_key;                                                    \
-        struct N##_node _data[S];                                              \
+        size_t size_;                                                          \
+        size_t shared_;                                                        \
+        size_t shared_key_;                                                    \
+        struct N##_node data_[S];                                              \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
@@ -34,9 +34,9 @@
     size_t N##_max(void);                                                      \
                                                                                \
     struct N##_iterator {                                                      \
-        size_t _curr;                                                          \
-        struct N##_node* _data;                                                \
-        int _is_valid;                                                         \
+        size_t curr_;                                                          \
+        struct N##_node* data_;                                                \
+        int is_valid_;                                                         \
     };                                                                         \
                                                                                \
     typedef struct N##_iterator N##_iterator;                                  \
@@ -84,79 +84,79 @@
     /* ========== */                                                           \
                                                                                \
     const struct N##_pair* N##_iterator_cdata(struct N##_iterator i) {         \
-        return &i._data[i._curr]._data;                                        \
+        return &i.data_[i.curr_].data_;                                        \
     }                                                                          \
                                                                                \
     struct N##_pair* N##_iterator_data(struct N##_iterator i) {                \
-        return &i._data[i._curr]._data;                                        \
+        return &i.data_[i.curr_].data_;                                        \
     }                                                                          \
                                                                                \
     void N##_iterator_next(struct N##_iterator* i) {                           \
-        size_t curr = i->_curr;                                                \
-        while (i->_curr < S - 1 &&                                             \
-               i->_data[i->_curr + 1]._state != SGC_NODE_STATE_USED) {         \
-            ++i->_curr;                                                        \
+        size_t curr = i->curr_;                                                \
+        while (i->curr_ < S - 1 &&                                             \
+               i->data_[i->curr_ + 1]._state != SGC_NODE_STATE_USED) {         \
+            ++i->curr_;                                                        \
         }                                                                      \
-        ++i->_curr;                                                            \
-        if (i->_curr == S) {                                                   \
-            i->_curr = curr;                                                   \
-            i->_is_valid = 0;                                                  \
+        ++i->curr_;                                                            \
+        if (i->curr_ == S) {                                                   \
+            i->curr_ = curr;                                                   \
+            i->is_valid_ = 0;                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_iterator_begin(struct N* m, struct N##_iterator* i) {             \
-        i->_curr = 0;                                                          \
-        i->_data = (struct N##_node*)(m->_data);                               \
-        if (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) {                \
+        i->curr_ = 0;                                                          \
+        i->data_ = (struct N##_node*)(m->data_);                               \
+        if (i->data_[i->curr_]._state != SGC_NODE_STATE_USED) {                \
             N##_iterator_next(i);                                              \
         }                                                                      \
-        i->_is_valid =                                                         \
-            (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) ? 0 : 1;        \
+        i->is_valid_ =                                                         \
+            (i->data_[i->curr_]._state != SGC_NODE_STATE_USED) ? 0 : 1;        \
     }                                                                          \
                                                                                \
     void N##_iterator_cbegin(const struct N* const m,                          \
                              struct N##_iterator* i) {                         \
-        i->_curr = 0;                                                          \
-        i->_data = (struct N##_node*)(m->_data);                               \
-        if (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) {                \
+        i->curr_ = 0;                                                          \
+        i->data_ = (struct N##_node*)(m->data_);                               \
+        if (i->data_[i->curr_]._state != SGC_NODE_STATE_USED) {                \
             N##_iterator_next(i);                                              \
         }                                                                      \
-        i->_is_valid =                                                         \
-            (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) ? 0 : 1;        \
+        i->is_valid_ =                                                         \
+            (i->data_[i->curr_]._state != SGC_NODE_STATE_USED) ? 0 : 1;        \
     }                                                                          \
                                                                                \
     void N##_iterator_prev(struct N##_iterator* i) {                           \
-        size_t curr = i->_curr;                                                \
-        while (i->_curr > 1 &&                                                 \
-               i->_data[i->_curr - 1]._state != SGC_NODE_STATE_USED) {         \
-            --i->_curr;                                                        \
+        size_t curr = i->curr_;                                                \
+        while (i->curr_ > 1 &&                                                 \
+               i->data_[i->curr_ - 1]._state != SGC_NODE_STATE_USED) {         \
+            --i->curr_;                                                        \
         }                                                                      \
-        --i->_curr;                                                            \
-        if (i->_curr == 0 &&                                                   \
-            i->_data[i->_curr]._state != SGC_NODE_STATE_USED) {                \
-            i->_curr = curr;                                                   \
-            i->_is_valid = 0;                                                  \
+        --i->curr_;                                                            \
+        if (i->curr_ == 0 &&                                                   \
+            i->data_[i->curr_]._state != SGC_NODE_STATE_USED) {                \
+            i->curr_ = curr;                                                   \
+            i->is_valid_ = 0;                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_iterator_end(struct N* m, struct N##_iterator* i) {               \
-        i->_curr = S - 1;                                                      \
-        i->_data = (struct N##_node*)(m->_data);                               \
-        if (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) {                \
+        i->curr_ = S - 1;                                                      \
+        i->data_ = (struct N##_node*)(m->data_);                               \
+        if (i->data_[i->curr_]._state != SGC_NODE_STATE_USED) {                \
             N##_iterator_prev(i);                                              \
         }                                                                      \
-        i->_is_valid =                                                         \
-            (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) ? 0 : 1;        \
+        i->is_valid_ =                                                         \
+            (i->data_[i->curr_]._state != SGC_NODE_STATE_USED) ? 0 : 1;        \
     }                                                                          \
                                                                                \
     void N##_iterator_cend(const struct N* const m, struct N##_iterator* i) {  \
-        i->_curr = S - 1;                                                      \
-        i->_data = (struct N##_node*)(m->_data);                               \
-        if (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) {                \
+        i->curr_ = S - 1;                                                      \
+        i->data_ = (struct N##_node*)(m->data_);                               \
+        if (i->data_[i->curr_]._state != SGC_NODE_STATE_USED) {                \
             N##_iterator_prev(i);                                              \
         }                                                                      \
-        i->_is_valid =                                                         \
-            (i->_data[i->_curr]._state != SGC_NODE_STATE_USED) ? 0 : 1;        \
+        i->is_valid_ =                                                         \
+            (i->data_[i->curr_]._state != SGC_NODE_STATE_USED) ? 0 : 1;        \
     }                                                                          \
                                                                                \
     struct N##_iterator N##_begin(struct N* m) {                               \
@@ -185,11 +185,11 @@
                                                                                \
     int N##_iterator_equal(const struct N##_iterator first,                    \
                            const struct N##_iterator second) {                 \
-        return first._curr == second._curr;                                    \
+        return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \
     int N##_iterator_valid(const struct N##_iterator i) {                      \
-        return i._is_valid;                                                    \
+        return i.is_valid_;                                                    \
     }                                                                          \
                                                                                \
     /* =============== */                                                      \
@@ -197,28 +197,28 @@
     /* =============== */                                                      \
                                                                                \
     void N##_set_share(N* u, int is_shared) {                                  \
-        u->_shared = is_shared;                                                \
+        u->shared_ = is_shared;                                                \
     }                                                                          \
                                                                                \
     void N##_set_share_key(N* u, int is_shared) {                              \
-        u->_shared_key = is_shared;                                            \
+        u->shared_key_ = is_shared;                                            \
     }                                                                          \
                                                                                \
     size_t N##_size(const struct N* const u) {                                 \
-        return u->_size;                                                       \
+        return u->size_;                                                       \
     }                                                                          \
                                                                                \
     void N##_init(struct N* u) {                                               \
-        u->_size = 0;                                                          \
-        u->_shared = u->_shared_key = 0;                                       \
+        u->size_ = 0;                                                          \
+        u->shared_ = u->shared_key_ = 0;                                       \
         for (size_t i = 0; i < S; ++i) {                                       \
-            u->_data[i]._state = SGC_NODE_STATE_OPEN;                          \
+            u->data_[i]._state = SGC_NODE_STATE_OPEN;                          \
         }                                                                      \
     }                                                                          \
                                                                                \
     int N##_equal(const N* const first, const N* const second) {               \
         int equal = (first == second);                                         \
-        if (equal == 0 && first->_size == second->_size) {                     \
+        if (equal == 0 && first->size_ == second->size_) {                     \
             struct N##_iterator it_first = N##_cbegin(first);                  \
             struct N##_iterator it_second = N##_cbegin(second);                \
             while (N##_iterator_valid(it_first)) {                             \
@@ -238,47 +238,47 @@
     }                                                                          \
                                                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
-        dst->_size = src->_size;                                               \
-        dst->_shared = src->_shared;                                           \
-        dst->_shared_key = src->_shared_key;                                   \
+        dst->size_ = src->size_;                                               \
+        dst->shared_ = src->shared_;                                           \
+        dst->shared_key_ = src->shared_key_;                                   \
         for (size_t i = 0; i < S; ++i) {                                       \
-            if (src->_data[i]._state == SGC_NODE_STATE_USED) {                 \
-                SGC_COPY(K##_copy, dst->_data[i]._data.key,                    \
-                         src->_data[i]._data.key, src->_shared_key);           \
-                SGC_COPY(V##_copy, dst->_data[i]._data.value,                  \
-                         src->_data[i]._data.value, src->_shared);             \
+            if (src->data_[i]._state == SGC_NODE_STATE_USED) {                 \
+                SGC_COPY(K##_copy, dst->data_[i].data_.key,                    \
+                         src->data_[i].data_.key, src->shared_key_);           \
+                SGC_COPY(V##_copy, dst->data_[i].data_.value,                  \
+                         src->data_[i].data_.value, src->shared_);             \
             }                                                                  \
-            dst->_data[i]._state = src->_data[i]._state;                       \
+            dst->data_[i]._state = src->data_[i]._state;                       \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_free(struct N* u) {                                               \
-        if (u->_size) {                                                        \
+        if (u->size_) {                                                        \
             for (size_t i = 0; i < S; ++i) {                                   \
-                if (u->_data[i]._state == SGC_NODE_STATE_USED) {               \
-                    if (!u->_shared_key) {                                     \
-                        K##_free(&u->_data[i]._data.key);                      \
+                if (u->data_[i]._state == SGC_NODE_STATE_USED) {               \
+                    if (!u->shared_key_) {                                     \
+                        K##_free(&u->data_[i].data_.key);                      \
                     }                                                          \
-                    if (!u->_shared) {                                         \
-                        V##_free(&u->_data[i]._data.value);                    \
+                    if (!u->shared_) {                                         \
+                        V##_free(&u->data_[i].data_.value);                    \
                     }                                                          \
                 }                                                              \
             }                                                                  \
-            u->_size = 0;                                                      \
+            u->size_ = 0;                                                      \
         }                                                                      \
     }                                                                          \
                                                                                \
     static struct N##_iterator N##_find_by_hash(struct N* u, const K* const k, \
                                                 size_t hash) {                 \
         struct N##_iterator ret = {0, NULL, 0};                                \
-        if (u->_size) {                                                        \
+        if (u->size_) {                                                        \
             size_t position = hash % S;                                        \
-            while (u->_data[position]._state != SGC_NODE_STATE_OPEN) {         \
-                if (u->_data[position]._state == SGC_NODE_STATE_USED &&        \
-                    K##_equal(&u->_data[position]._data.key, k)) {             \
+            while (u->data_[position]._state != SGC_NODE_STATE_OPEN) {         \
+                if (u->data_[position]._state == SGC_NODE_STATE_USED &&        \
+                    K##_equal(&u->data_[position].data_.key, k)) {             \
                     ret =                                                      \
                         (struct N##_iterator){position,                        \
-                                              (struct N##_node*)u->_data, 1};  \
+                                              (struct N##_node*)u->data_, 1};  \
                     break;                                                     \
                 }                                                              \
                 if (position == S - 1) {                                       \
@@ -299,23 +299,23 @@
     void N##_set_at(struct N* u, const K k, const V v) {                       \
         size_t hash = K##_hash(&k);                                            \
         struct N##_iterator i = N##_find_by_hash(u, &k, hash);                 \
-        if (i._is_valid) {                                                     \
-            SGC_REPLACE(V##_copy, V##_free, i._data[i._curr]._data.value, v,   \
-                        u->_shared);                                           \
-        } else if (u->_size < S - 1) {                                         \
+        if (i.is_valid_) {                                                     \
+            SGC_REPLACE(V##_copy, V##_free, i.data_[i.curr_].data_.value, v,   \
+                        u->shared_);                                           \
+        } else if (u->size_ < S - 1) {                                         \
             size_t position = hash % S;                                        \
-            while (u->_data[position]._state == SGC_NODE_STATE_USED) {         \
+            while (u->data_[position]._state == SGC_NODE_STATE_USED) {         \
                 if (position == S - 1) {                                       \
                     position = 0;                                              \
                 } else {                                                       \
                     ++position;                                                \
                 }                                                              \
             }                                                                  \
-            SGC_COPY(K##_copy, u->_data[position]._data.key, k,                \
-                     u->_shared_key);                                          \
-            SGC_COPY(V##_copy, u->_data[position]._data.value, v, u->_shared); \
-            u->_data[position]._state = SGC_NODE_STATE_USED;                   \
-            ++u->_size;                                                        \
+            SGC_COPY(K##_copy, u->data_[position].data_.key, k,                \
+                     u->shared_key_);                                          \
+            SGC_COPY(V##_copy, u->data_[position].data_.value, v, u->shared_); \
+            u->data_[position]._state = SGC_NODE_STATE_USED;                   \
+            ++u->size_;                                                        \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -323,25 +323,25 @@
         size_t hash = K##_hash(&k);                                            \
         struct N##_iterator i = N##_find_by_hash(u, &k, hash);                 \
         V* ret = NULL;                                                         \
-        if (i._is_valid) {                                                     \
-            ret = &i._data[i._curr]._data.value;                               \
-        } else if (u->_size < S - 1) {                                         \
+        if (i.is_valid_) {                                                     \
+            ret = &i.data_[i.curr_].data_.value;                               \
+        } else if (u->size_ < S - 1) {                                         \
             V v;                                                               \
             V##_init(&v);                                                      \
             size_t position = hash % S;                                        \
-            while (u->_data[position]._state == SGC_NODE_STATE_USED) {         \
+            while (u->data_[position]._state == SGC_NODE_STATE_USED) {         \
                 if (position == S - 1) {                                       \
                     position = 0;                                              \
                 } else {                                                       \
                     ++position;                                                \
                 }                                                              \
             }                                                                  \
-            SGC_COPY(K##_copy, u->_data[position]._data.key, k,                \
-                     u->_shared_key);                                          \
-            SGC_COPY(V##_copy, u->_data[position]._data.value, v, u->_shared); \
-            u->_data[position]._state = SGC_NODE_STATE_USED;                   \
-            ++u->_size;                                                        \
-            ret = &u->_data[position]._data.value;                             \
+            SGC_COPY(K##_copy, u->data_[position].data_.key, k,                \
+                     u->shared_key_);                                          \
+            SGC_COPY(V##_copy, u->data_[position].data_.value, v, u->shared_); \
+            u->data_[position]._state = SGC_NODE_STATE_USED;                   \
+            ++u->size_;                                                        \
+            ret = &u->data_[position].data_.value;                             \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
@@ -350,25 +350,25 @@
         if (N##_iterator_valid(*i)) {                                          \
             K* key = &N##_iterator_data(*i)->key;                              \
             V* value = &N##_iterator_data(*i)->value;                          \
-            i->_data[i->_curr]._state = SGC_NODE_STATE_ERASED;                 \
+            i->data_[i->curr_]._state = SGC_NODE_STATE_ERASED;                 \
             N##_iterator_next(i);                                              \
-            if (!u->_shared_key) {                                             \
+            if (!u->shared_key_) {                                             \
                 K##_free(key);                                                 \
             }                                                                  \
-            if (!u->_shared) {                                                 \
+            if (!u->shared_) {                                                 \
                 V##_free(value);                                               \
             }                                                                  \
-            --u->_size;                                                        \
+            --u->size_;                                                        \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_erase(struct N* u, const K k) {                                   \
         struct N##_iterator i = N##_find(u, k);                                \
-        if (i._is_valid) {                                                     \
+        if (i.is_valid_) {                                                     \
             N##_iterator_erase(u, &i);                                         \
         }                                                                      \
     }                                                                          \
                                                                                \
     int N##_empty(const struct N* const u) {                                   \
-        return u->_size == 0;                                                  \
+        return u->size_ == 0;                                                  \
     }
