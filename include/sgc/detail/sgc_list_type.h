@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #define SGC_INIT_COMMON_LIST_TYPE_FUNCTIONS(T, S, N)                           \
-                                                                               \
     void N##_free(struct N* l) {                                               \
         struct N##_node* curr = l->head_;                                      \
         struct N##_node* tmp;                                                  \
@@ -16,24 +15,6 @@
         }                                                                      \
         l->head_ = l->tail_ = NULL;                                            \
         l->size_ = 0;                                                          \
-    }                                                                          \
-                                                                               \
-    int N##_equal(const struct N* const first, const struct N* const second) { \
-        int equal = (first == second);                                         \
-        if (equal == 0 && first->size_ == second->size_) {                     \
-            struct N##_node* curr_first = first->head_;                        \
-            struct N##_node* curr_second = second->head_;                      \
-            equal = 1;                                                         \
-            while (curr_first) {                                               \
-                if (!T##_equal(&curr_first->data_, &curr_second->data_)) {     \
-                    equal = 0;                                                 \
-                    break;                                                     \
-                }                                                              \
-                curr_first = curr_first->next_;                                \
-                curr_second = curr_second->next_;                              \
-            }                                                                  \
-        }                                                                      \
-        return equal;                                                          \
     }                                                                          \
                                                                                \
     T* N##_back(struct N* l) {                                                 \
@@ -68,37 +49,6 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    void N##_set_at(struct N* l, const size_t at, T new_el) {                  \
-        T* el = N##_at(l, at);                                                 \
-        if (el) {                                                              \
-            SGC_REPLACE(T##_copy, T##_free, *el, new_el, l->shared_);          \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_insert(struct N* l, const size_t at, const T el) {                \
-        if (S > 0 && l->size_ == S) {                                          \
-            return;                                                            \
-        }                                                                      \
-        if (at == 0) {                                                         \
-            N##_push_front(l, el);                                             \
-        } else if (at >= l->size_) {                                           \
-            N##_push_back(l, el);                                              \
-        } else {                                                               \
-            struct N##_node* new_node = N##_node_alloc(l);                     \
-            if (!l->shared_) {                                                 \
-                T##_copy(&new_node->data_, &el);                               \
-            } else {                                                           \
-                new_node->data_ = el;                                          \
-            }                                                                  \
-            struct N##_node* curr = l->head_;                                  \
-            for (size_t i = 0; i < at - 1; ++i) {                              \
-                curr = curr->next_;                                            \
-            }                                                                  \
-            N##_insert_node(curr, new_node);                                   \
-            l->size_++;                                                        \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
     static void N##_memswp(char* i, char* j) {                                 \
         char tmp[sizeof(struct N##_node*)];                                    \
                                                                                \
@@ -107,8 +57,8 @@
         memcpy(j, tmp, sizeof(struct N##_node*));                              \
     }                                                                          \
                                                                                \
-    static inline int N##_compare_node(const void* first, const void* second,  \
-                                       int comp(const void*, const void*)) {   \
+    static inline bool N##_compare_node(const void* first, const void* second, \
+                                        int comp(const void*, const void*)) {  \
         struct N##_node* first_ = *(struct N##_node**)first;                   \
         struct N##_node* second_ = *(struct N##_node**)second;                 \
         return comp(&first_->data_, &second_->data_);                          \
@@ -212,12 +162,12 @@
         i->curr_ = i->curr_->next_;                                            \
     }                                                                          \
                                                                                \
-    int N##_iterator_equal(const struct N##_iterator first,                    \
-                           const struct N##_iterator second) {                 \
+    bool N##_iterator_equal(const struct N##_iterator first,                   \
+                            const struct N##_iterator second) {                \
         return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \
-    int N##_iterator_valid(const struct N##_iterator i) {                      \
+    bool N##_iterator_valid(const struct N##_iterator i) {                     \
         return i.curr_ != NULL;                                                \
     }                                                                          \
                                                                                \

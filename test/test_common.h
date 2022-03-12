@@ -84,7 +84,7 @@ inline size_t al_hash(const al* const a) {
         }                                                                      \
     }
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(N)                         \
     N ds;                                                                      \
     const size_t size = 100;                                                   \
@@ -144,7 +144,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_COPY_EQUAL(N)                                           \
     N ds;                                                                      \
     const size_t size = 100;                                                   \
@@ -164,12 +164,10 @@ inline size_t al_hash(const al* const a) {
         ASSERT_EQUAL(i, *N##_at(&ds_copy, i));                                 \
     }                                                                          \
                                                                                \
-    ASSERT_EQUAL(1, N##_equal(&ds, &ds_copy));                                 \
-                                                                               \
     N##_free(&ds);                                                             \
     N##_free(&ds_copy);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_AT_INSERT(N)                                                      \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -196,7 +194,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_AT_ERASE_AT(N)                                          \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -230,7 +228,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_AT_SET_SET_AT_SET_FRONT_SET_BACK(N)                     \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -251,15 +249,15 @@ inline size_t al_hash(const al* const a) {
     ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 40});                                    \
                                                                                \
     /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set_at(&ds, 4, 44);                                                    \
+    N##_set(&ds, 4, 44);                                                       \
     ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 44});                                    \
                                                                                \
     /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set_at(&ds, 0, 11);                                                    \
+    N##_set(&ds, 0, 11);                                                       \
     ASSERT_ARRAY(N, ds, {11, 10, 2, 3, 44});                                   \
                                                                                \
     /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set_at(&ds, 2, 22);                                                    \
+    N##_set(&ds, 2, 22);                                                       \
     ASSERT_ARRAY(N, ds, {11, 10, 22, 3, 44});                                  \
                                                                                \
     /* {0, 10, 2, 3, 4} */                                                     \
@@ -272,7 +270,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_ERASE_AT_ALLOCATIONS(N)                                 \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -302,7 +300,7 @@ inline size_t al_hash(const al* const a) {
 
 #define MATRIX_AT(NN, N, DS, P, Q) N##_at(NN##_at(&DS, P), Q)
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_ARRAY_OF_ARRAYS_PUSH_BACK_AT_SHARE(NN, N)                         \
     NN ds;                                                                     \
     NN##_init(&ds);                                                            \
@@ -344,7 +342,7 @@ inline size_t al_hash(const al* const a) {
     /* no memory should be left dealocated */                                  \
     NN##_free(&ds);
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE, LIST, FORWARD LIST,
+// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_ITERATOR(N)                                             \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -391,49 +389,22 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// LIST, FORWARD LIST
-#define TEST_INSERT_SORTED(N)                                                  \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 2, int_compare));                   \
-    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 4, int_compare));                   \
-    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 3, int_compare));                   \
-    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 0, int_compare));                   \
-    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 1, int_compare));                   \
-    ASSERT_EQUAL(1, N##_insert_sorted(&ds, 5, int_compare));                   \
-                                                                               \
-    ASSERT_EQUAL(0, *N##_at(&ds, 0));                                          \
-    ASSERT_EQUAL(1, *N##_at(&ds, 1));                                          \
-    ASSERT_EQUAL(2, *N##_at(&ds, 2));                                          \
-    ASSERT_EQUAL(3, *N##_at(&ds, 3));                                          \
-    ASSERT_EQUAL(4, *N##_at(&ds, 4));                                          \
-    ASSERT_EQUAL(5, *N##_at(&ds, 5));                                          \
-                                                                               \
-    N##_free(&ds);
-
-// LIST, FORWARD LIST
+// TODO update this LIST, FORWARD LIST
 #define TEST_LIST_SORT(N)                                                      \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
                                                                                \
-    N ds_sorted;                                                               \
-    N##_init(&ds_sorted);                                                      \
-                                                                               \
     for (size_t i = 0; i < 100; ++i) {                                         \
         int el = i % 10;                                                       \
         N##_push_back(&ds, el);                                                \
-        N##_insert_sorted(&ds_sorted, el, int_compare);                        \
     }                                                                          \
                                                                                \
     N##_sort(&ds, int_void_compare);                                           \
                                                                                \
     for (size_t i = 0; i < N##_size(&ds) - 1; ++i) {                           \
         ASSERT_EQUAL(1, *N##_at(&ds, i) <= *N##_at(&ds, i + 1));               \
-        ASSERT_EQUAL(1, *N##_at(&ds_sorted, i) <= *N##_at(&ds_sorted, i + 1)); \
     }                                                                          \
                                                                                \
     ASSERT_EQUAL(1, N##_equal(&ds, &ds_sorted));                               \
                                                                                \
-    N##_free(&ds);                                                             \
-    N##_free(&ds_sorted);
+    N##_free(&ds);
