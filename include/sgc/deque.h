@@ -41,7 +41,7 @@
     void N##_insert(struct N* d, const size_t at, T el);                       \
     void N##_erase_at(struct N* d, const size_t at);                           \
     T* N##_at(struct N* d, size_t at);                                         \
-    void N##_set(struct N* d, size_t at, T new_el);                         \
+    void N##_set(struct N* d, size_t at, T new_el);                            \
     int N##_empty(const struct N* const d);                                    \
     T* N##_array(struct N* d);                                                 \
                                                                                \
@@ -388,7 +388,7 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    void N##_set(struct N* d, size_t at, T new_el) {                        \
+    void N##_set(struct N* d, size_t at, T new_el) {                           \
         if (at < d->size_) {                                                   \
             T* el = &d->data_[(d->_front + at) % d->max_];                     \
             SGC_REPLACE(T##_copy, T##_free, *el, new_el, d->shared_);          \
