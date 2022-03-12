@@ -3,8 +3,7 @@
 #include "detail/sgc_allocator.h"
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
-#include "detail/sgc_dll_type.h"
-#include "detail/sgc_list_type.h"
+#include "detail/sgc_list_common.h"
 #include "detail/sgc_sort_stack.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>

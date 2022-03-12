@@ -1,10 +1,9 @@
 #pragma once
 #include "detail/sgc_allocator.h"
-#include "detail/sgc_array.h"
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_utils.h"
-#include "detail/sgc_vector_type.h"
+#include "detail/sgc_vector_common.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>

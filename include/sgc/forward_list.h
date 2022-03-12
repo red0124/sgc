@@ -3,8 +3,7 @@
 #include "detail/sgc_allocator.h"
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
-#include "detail/sgc_list_type.h"
-#include "detail/sgc_sll_type.h"
+#include "detail/sgc_list_common.h"
 #include "detail/sgc_sort_stack.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
@@ -39,10 +38,6 @@
                                                                                \
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
-                                                                               \
-    /* ================ */                                                     \
-    /*  LIST FUNCTIONS  */                                                     \
-    /* ================ */                                                     \
                                                                                \
     void N##_set_share(N* l, int is_shared);                                   \
     size_t N##_size(const struct N* const l);                                  \

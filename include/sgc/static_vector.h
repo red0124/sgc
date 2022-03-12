@@ -3,7 +3,7 @@
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_utils.h"
-#include "detail/sgc_vector_type.h"
+#include "detail/sgc_vector_common.h"
 #include <stdbool.h>
 
 #define _SGC_INIT_PRIVATE_FUNCION_DECLARATIONS_STATIC_VECTOR(T, N)             \
