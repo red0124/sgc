@@ -50,7 +50,8 @@
     static void N##_copy_base_data(struct N* __restrict__ dst,                 \
                                    const struct N* __restrict__ const src);    \
     static void N##_copy_nodes(struct N* __restrict__ dst,                     \
-                               const struct N* __restrict__ const src);
+                               const struct N* __restrict__ const src);        \
+    static void N##_free_node(const struct N* const m, struct N##_node* n);
 
 #define SGC_INIT_HEADERS_SET(V, N)                                             \
     struct N##_node {                                                          \
@@ -124,43 +125,10 @@
         return &i.curr_->_value;                                               \
     }                                                                          \
                                                                                \
-    void N##_free(struct N* s) {                                               \
-        if (!s->size_) {                                                       \
-            return;                                                            \
-        }                                                                      \
-        struct N##_node** stack =                                              \
-            (struct N##_node**)sgc_malloc(N##_stack_size(s->size_));           \
-                                                                               \
-        struct N##_node* curr = s->root_;                                      \
-        struct N##_node* tmp = NULL;                                           \
-                                                                               \
-        size_t stack_size = 0;                                                 \
-        while (true) {                                                         \
-            if (curr != SGC_MAP_LEAF) {                                        \
-                stack[stack_size++] = curr;                                    \
-                curr = curr->left_;                                            \
-            } else {                                                           \
-                if (stack_size == 0) {                                         \
-                    break;                                                     \
-                }                                                              \
-                curr = stack[--stack_size];                                    \
-                tmp = curr;                                                    \
-                curr = curr->right_;                                           \
-                if (!s->shared_) {                                             \
-                    V##_free(&tmp->_value);                                    \
-                }                                                              \
-                sgc_free(tmp);                                                 \
-            }                                                                  \
-        }                                                                      \
-        sgc_free(stack);                                                       \
-        s->root_ = SGC_MAP_LEAF;                                               \
-        s->size_ = 0;                                                          \
-    }                                                                          \
-                                                                               \
     static void N##_insert_node(struct N* s, V* v) {                           \
         struct N##_node* parent = s->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
-        for (;;) {                                                             \
+        while (true) {                                                         \
             int compare = (V##_compare(&parent->_value, v));                   \
                                                                                \
             if (compare > 0) {                                                 \
@@ -206,7 +174,7 @@
     static void N##_insert_multiple_node(struct N* s, V* v) {                  \
         struct N##_node* parent = s->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
-        for (;;) {                                                             \
+        while (true) {                                                         \
             int compare = (V##_compare(&parent->_value, v));                   \
                                                                                \
             if (compare > 0) {                                                 \
@@ -323,6 +291,10 @@
         dst->size_ = src->size_;                                               \
         dst->root_ = SGC_MAP_LEAF;                                             \
         dst->shared_ = src->shared_;                                           \
+    }                                                                          \
+                                                                               \
+    static void N##_free_node(const struct N* const m, struct N##_node* n) {   \
+        SGC_FREE(V##_free, n->_value, m->shared_);                             \
     }
 
 #define SGC_INIT_SET(V, N)                                                     \

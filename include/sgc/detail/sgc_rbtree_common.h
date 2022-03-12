@@ -461,7 +461,7 @@ enum sgc_map_color {
             sgc_free(stack_dst);                                               \
         }                                                                      \
     }                                                                          \
-    \
+                                                                               \
     static struct N##_node*                                                    \
         N##_duplicate_node(const struct N* const m,                            \
                            const struct N##_node* const n) {                   \
@@ -472,4 +472,35 @@ enum sgc_map_color {
                                                                                \
         N##_copy_node_values(m, new_node, n);                                  \
         return new_node;                                                       \
+    }                                                                          \
+                                                                               \
+    void N##_free(struct N* m) {                                               \
+        if (!m->size_) {                                                       \
+            return;                                                            \
+        }                                                                      \
+        struct N##_node** stack =                                              \
+            (struct N##_node**)sgc_malloc(N##_stack_size(m->size_));           \
+                                                                               \
+        struct N##_node* curr = m->root_;                                      \
+        struct N##_node* tmp = NULL;                                           \
+                                                                               \
+        size_t stack_size = 0;                                                 \
+        while (true) {                                                         \
+            if (curr != SGC_MAP_LEAF) {                                        \
+                stack[stack_size++] = curr;                                    \
+                curr = curr->left_;                                            \
+            } else {                                                           \
+                if (stack_size == 0) {                                         \
+                    break;                                                     \
+                }                                                              \
+                curr = stack[--stack_size];                                    \
+                tmp = curr;                                                    \
+                curr = curr->right_;                                           \
+                N##_free_node(m, tmp);                                         \
+                sgc_free(tmp);                                                 \
+            }                                                                  \
+        }                                                                      \
+        sgc_free(stack);                                                       \
+        m->root_ = SGC_MAP_LEAF;                                               \
+        m->size_ = 0;                                                          \
     }

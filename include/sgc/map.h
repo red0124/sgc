@@ -141,41 +141,10 @@
         m->shared_key_ = is_shared;                                            \
     }                                                                          \
                                                                                \
-    void N##_free(struct N* m) {                                               \
-        if (!m->size_) {                                                       \
-            return;                                                            \
-        }                                                                      \
-        struct N##_node** stack =                                              \
-            (struct N##_node**)sgc_malloc(N##_stack_size(m->size_));           \
-                                                                               \
-        struct N##_node* curr = m->root_;                                      \
-        struct N##_node* tmp = NULL;                                           \
-                                                                               \
-        size_t stack_size = 0;                                                 \
-        while (true) {                                                         \
-            if (curr != SGC_MAP_LEAF) {                                        \
-                stack[stack_size++] = curr;                                    \
-                curr = curr->left_;                                            \
-            } else {                                                           \
-                if (stack_size == 0) {                                         \
-                    break;                                                     \
-                }                                                              \
-                curr = stack[--stack_size];                                    \
-                tmp = curr;                                                    \
-                curr = curr->right_;                                           \
-                N##_free_node(m, tmp);                                         \
-                sgc_free(tmp);                                                 \
-            }                                                                  \
-        }                                                                      \
-        sgc_free(stack);                                                       \
-        m->root_ = SGC_MAP_LEAF;                                               \
-        m->size_ = 0;                                                          \
-    }                                                                          \
-                                                                               \
     static void N##_insert_node(struct N* m, K* k, V* v) {                     \
         struct N##_node* parent = m->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
-        for (;;) {                                                             \
+        while (true) {                                                         \
             int compare = (K##_compare(&parent->data_.key, k));                \
                                                                                \
             if (compare > 0) {                                                 \
@@ -220,12 +189,13 @@
         }                                                                      \
     }                                                                          \
                                                                                \
+    /* TODO implement insert multiple */                                       \
     static V* N##_insert_or_get_node(struct N* m, K* k) {                      \
         V new_el;                                                              \
         V* v = &new_el;                                                        \
         struct N##_node* parent = m->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
-        for (;;) {                                                             \
+        while (true) {                                                         \
             int compare = (K##_compare(&parent->data_.key, k));                \
                                                                                \
             if (compare > 0) {                                                 \
