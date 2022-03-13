@@ -1,5 +1,6 @@
 #pragma once
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define _SGC_INIT_COMMON_FUNCTIONS(T, N)                                       \
     void N##_set_share(N* c, int is_shared) {                                  \

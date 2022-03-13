@@ -207,7 +207,6 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    /* TODO implement insert multiple */                                       \
     static V* _m_##N##_node_insert_or_get(struct N* m, K* k) {                 \
         V new_el;                                                              \
         V* v = &new_el;                                                        \
