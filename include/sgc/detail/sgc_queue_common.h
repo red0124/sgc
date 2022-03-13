@@ -11,17 +11,18 @@
                                                                                \
     void N##_push(struct N* q, T el) {                                         \
         _m_##N##_resize(q);                                                    \
-        N##_move(&q->_back, _m_##N##_max(q));                                  \
+        if (!N##_empty(q)) {                                                   \
+            N##_move(&q->_back, _m_##N##_max(q));                              \
+        }                                                                      \
         SGC_COPY(T##_copy, q->data_[q->_back], el, q->shared_);                \
         ++q->size_;                                                            \
     }                                                                          \
                                                                                \
     T* N##_front(struct N* q) {                                                \
-        T* ret = NULL;                                                         \
-        if (q->size_) {                                                        \
-            ret = &q->data_[q->_front];                                        \
+        if (N##_empty(q)) {                                                    \
+            return NULL;                                                       \
         }                                                                      \
-        return ret;                                                            \
+        return &q->data_[q->_front];                                           \
     }                                                                          \
                                                                                \
     void N##_set_front(struct N* q, T new_el) {                                \
