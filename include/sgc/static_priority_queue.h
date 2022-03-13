@@ -77,17 +77,6 @@
                 T##_copy(&dst->data_[i], &src->data_[i]);                      \
             }                                                                  \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_from_array(struct N* p, const T* const arr, const size_t size) {  \
-        if (size) {                                                            \
-            p->size_ = 0;                                                      \
-            for (size_t i = 0; i < size; ++i) {                                \
-                N##_push(p, arr[i]);                                           \
-            }                                                                  \
-        } else {                                                               \
-            p->size_ = 0;                                                      \
-        }                                                                      \
     }
 
 #define SGC_INIT_STATIC_PRIORITY_QUEUE(T, S, N)                                \

@@ -88,21 +88,7 @@
             }                                                                  \
         }                                                                      \
         p->data_ = (T*)sgc_realloc(p->data_, sizeof(T) * p->size_);            \
-    }                                                                          \
-                                                                               \
-    void N##_from_array(struct N* p, const T* const arr, const size_t size) {  \
-        if (size) {                                                            \
-            p->max_ = size;                                                    \
-            p->data_ = (T*)sgc_malloc(sizeof(T) * p->max_);                    \
-            p->size_ = 0;                                                      \
-            for (size_t i = 0; i < size; ++i) {                                \
-                N##_push(p, arr[i]);                                           \
-            }                                                                  \
-        } else {                                                               \
-            p->max_ = p->size_ = 0;                                            \
-            p->data_ = NULL;                                                   \
-        }                                                                      \
-    }
+    } 
 
 #define SGC_INIT_PRIORITY_QUEUE(T, N)                                          \
     SGC_INIT_HEADERS_PRIORITY_QUEUE(T, N)                                      \
