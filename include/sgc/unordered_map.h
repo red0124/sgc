@@ -14,11 +14,9 @@
     static void N##_bucket_insert(struct N##_node* bucket,                     \
                                   struct N##_node* new_node);                  \
     static size_t N##_bucket_node_size(struct N##_node* bucket);               \
-    static struct N##_node* N##_bucket_remove(struct N##_node* bucket,         \
-                                              const K* const key,              \
-                                              size_t* size,                    \
-                                              size_t is_shared_key,            \
-                                              size_t is_shared);               \
+    static struct N##_node* N##_bucket_remove(struct N* u,                     \
+                                              struct N##_node* bucket,         \
+                                              const K* const key);             \
     static struct N##_node* N##_bucket_end(struct N##_node* bucket);           \
     static struct N##_iterator N##_find_by_hash(struct N* u, const K* const k, \
                                                 size_t hash);                  \
@@ -32,7 +30,10 @@
     static void N##_node_free(const struct N* const m, struct N##_node* n);    \
     static void N##_node_copy_values(const struct N* const m,                  \
                                      struct N##_node* dst,                     \
-                                     const struct N##_node* const src);
+                                     const struct N##_node* const src);        \
+    static size_t N##_node_hash_value(const struct N##_node* n);               \
+    static bool N##_node_equal_key(const struct N##_node* const n,             \
+                                   const K* const key);
 
 #define SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                \
                                                                                \
@@ -168,82 +169,6 @@
         return N##_find_by_hash(u, &k, hash);                                  \
     }                                                                          \
                                                                                \
-    static void N##_rehash_size(const struct N* const u, size_t* max,          \
-                                size_t* new_max) {                             \
-        *max = u->max_;                                                        \
-        if (u->size_ == *max) {                                                \
-            *new_max = sgc_next_prime(2 * u->max_ + 1);                        \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_rehash(struct N* u, size_t new_max) {                             \
-        struct N##_node** new_data =                                           \
-            (struct N##_node**)sgc_malloc(sizeof(struct N##_node*) * new_max); \
-        for (size_t i = 0; i < new_max; ++i) {                                 \
-            new_data[i] = NULL;                                                \
-        }                                                                      \
-                                                                               \
-        K* key;                                                                \
-        size_t position;                                                       \
-        struct N##_iterator tmp = N##_begin(u);                                \
-        struct N##_node* next;                                                 \
-        for (size_t i = 0; i < u->size_; ++i) {                                \
-            key = &tmp.curr_->data_.key;                                       \
-            position = K##_hash(key) % new_max;                                \
-            next = tmp.curr_->next_;                                           \
-            tmp.curr_->next_ = NULL;                                           \
-            if (new_data[position]) {                                          \
-                N##_bucket_insert(new_data[position], tmp.curr_);              \
-            } else {                                                           \
-                new_data[position] = tmp.curr_;                                \
-            }                                                                  \
-            if (next) {                                                        \
-                tmp.curr_ = next;                                              \
-            } else {                                                           \
-                N##_iterator_next(&tmp);                                       \
-            }                                                                  \
-        }                                                                      \
-        sgc_free(u->data_);                                                    \
-        u->data_ = new_data;                                                   \
-        u->max_ = new_max;                                                     \
-    }                                                                          \
-                                                                               \
-    static void N##_resize(struct N* u) {                                      \
-        size_t max, new_max;                                                   \
-        N##_rehash_size(u, &max, &new_max);                                    \
-        if (u->size_ == max) {                                                 \
-            struct N##_node** new_data = (struct N##_node**)sgc_malloc(        \
-                sizeof(struct N##_node*) * new_max);                           \
-            for (size_t i = 0; i < new_max; ++i) {                             \
-                new_data[i] = NULL;                                            \
-            }                                                                  \
-                                                                               \
-            K* key;                                                            \
-            size_t position;                                                   \
-            struct N##_iterator tmp = N##_begin(u);                            \
-            struct N##_node* next;                                             \
-            for (size_t i = 0; i < u->size_; ++i) {                            \
-                key = &tmp.curr_->data_.key;                                   \
-                position = K##_hash(key) % new_max;                            \
-                next = tmp.curr_->next_;                                       \
-                tmp.curr_->next_ = NULL;                                       \
-                if (new_data[position]) {                                      \
-                    N##_bucket_insert(new_data[position], tmp.curr_);          \
-                } else {                                                       \
-                    new_data[position] = tmp.curr_;                            \
-                }                                                              \
-                if (next) {                                                    \
-                    tmp.curr_ = next;                                          \
-                } else {                                                       \
-                    N##_iterator_next(&tmp);                                   \
-                }                                                              \
-            }                                                                  \
-            sgc_free(u->data_);                                                \
-            u->data_ = new_data;                                               \
-            u->max_ = new_max;                                                 \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
     void N##_set_at(struct N* u, const K k, const V v) {                       \
         size_t hash = K##_hash(&k);                                            \
         struct N##_iterator i = N##_find_by_hash(u, &k, hash);                 \
@@ -287,16 +212,6 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    void N##_erase(struct N* u, const K k) {                                   \
-        if (u->data_) {                                                        \
-            size_t hash = K##_hash(&k);                                        \
-            size_t position = hash % u->max_;                                  \
-            u->data_[position] =                                               \
-                N##_bucket_remove(u->data_[position], &k, &u->size_,           \
-                                  u->shared_key_, u->shared_);                 \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
     void N##_iterator_erase(struct N* u, struct N##_iterator* i) {             \
         if (N##_iterator_valid(*i)) {                                          \
             K key = i->curr_->data_.key;                                       \
@@ -320,38 +235,18 @@
         dst->shared_ = src->shared_;                                           \
     }                                                                          \
                                                                                \
-    static void N##_node_free(const struct N* const m, struct N##_node* n) {   \
-        SGC_FREE(V##_free, n->data_.value, m->shared_);                        \
-        SGC_FREE(K##_free, n->data_.key, m->shared_key_);                      \
+    static void N##_node_free(const struct N* const u, struct N##_node* n) {   \
+        SGC_FREE(V##_free, n->data_.value, u->shared_);                        \
+        SGC_FREE(K##_free, n->data_.key, u->shared_key_);                      \
     }                                                                          \
                                                                                \
-    static struct N##_node* N##_bucket_remove(struct N##_node* bucket,         \
-                                              const K* const key,              \
-                                              size_t* size, size_t is_shared,  \
-                                              size_t is_shared_key) {          \
-        struct N##_node* ret = bucket;                                         \
-        struct N##_node* tmp = bucket;                                         \
-        struct N##_node* prev = bucket;                                        \
-        while (tmp) {                                                          \
-            if (K##_equal(&tmp->data_.key, key)) {                             \
-                if (tmp == bucket) {                                           \
-                    ret = tmp->next_;                                          \
-                }                                                              \
-                prev->next_ = tmp->next_;                                      \
-                if (!is_shared) {                                              \
-                    V##_free(&tmp->data_.value);                               \
-                }                                                              \
-                if (!is_shared_key) {                                          \
-                    K##_free(&tmp->data_.key);                                 \
-                }                                                              \
-                sgc_free(tmp);                                                 \
-                --*size;                                                       \
-                break;                                                         \
-            }                                                                  \
-            prev = tmp;                                                        \
-            tmp = tmp->next_;                                                  \
-        }                                                                      \
-        return ret;                                                            \
+    static size_t N##_node_hash_value(const struct N##_node* const n) {        \
+        return K##_hash(&n->data_.key);                                        \
+    }                                                                          \
+                                                                               \
+    static bool N##_node_equal_key(const struct N##_node* const n,             \
+                                   const K* const key) {                       \
+        return K##_equal(&n->data_.key, key);                                  \
     }
 
 #define SGC_INIT_UNORDERED_MAP(K, V, N)                                        \
