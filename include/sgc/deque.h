@@ -211,6 +211,6 @@
 #define SGC_INIT_DEQUE(T, N)                                                   \
     SGC_INIT_HEADER_DEQUE(T, N)                                                \
     SGC_INIT_STATIC_FUNCTIONS_DEQUE(T, N)                                      \
-    _SGC_INIT_COMMON_FUNCTIONS(T, N)                                           \
+    _SGC_INIT_COMMON_FUNCTIONS(N)                                              \
     _SGC_INIT_UNIQUE_DEQUE_FUNCTIONS(T, N)                                     \
     _SGC_INIT_DEQUE_TYPE_FUNCTIONS(T, N)

@@ -1,8 +1,11 @@
 #pragma once
 
 #include "detail/sgc_basic_types.h"
+#include "detail/sgc_common.h"
 #include "detail/sgc_hash_node_state.h"
+#include "detail/sgc_static_hash_map_common.h"
 #include "detail/sgc_utils.h"
+#include <stdbool.h>
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_UNORDERED_MAP(K, V, S, N)             \
     static struct N##_iterator N##_find_by_hash(struct N* u, const K* const k, \
@@ -53,15 +56,14 @@
     struct N##_iterator N##_cbegin(const struct N* const m);                   \
     struct N##_iterator N##_end(struct N* m);                                  \
     struct N##_iterator N##_cend(const struct N* const m);                     \
-    int N##_iterator_equal(const struct N##_iterator first,                    \
-                           const struct N##_iterator second);                  \
-    int N##_iterator_valid(const struct N##_iterator i);                       \
+    bool N##_iterator_equal(const struct N##_iterator first,                   \
+                            const struct N##_iterator second);                 \
+    bool N##_iterator_valid(const struct N##_iterator i);                      \
                                                                                \
     void N##_set_share(N* u, int is_shared);                                   \
     void N##_set_share_key(N* u, int is_shared);                               \
     size_t N##_size(const struct N* const u);                                  \
     void N##_init(struct N* u);                                                \
-    int N##_equal(const N* const first, const N* const second);                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
     void N##_free(struct N* u);                                                \
     struct N##_iterator N##_find(struct N* u, const K k);                      \
@@ -69,19 +71,12 @@
     V* N##_at(struct N* u, K k);                                               \
     void N##_iterator_erase(struct N* u, struct N##_iterator* i);              \
     void N##_erase(struct N* u, const K k);                                    \
-    int N##_empty(const struct N* const u);
+    bool N##_empty(const struct N* const u);
 
-#define SGC_INIT_STATIC_UNORDERED_MAP(K, V, S, N)                              \
-    SGC_INIT_HEADERS_STATIC_UNORDERED_MAP(K, V, S, N)                          \
-    SGC_INIT_STATIC_FUNCTIONS_STATIC_UNORDERED_MAP(K, V, S, N)                 \
-                                                                               \
+#define _SGC_INIT_UNIQUE_STATIC_UNORDERED_MAP_FUNCTIONS(K, V, S, N)            \
     size_t N##_max(void) {                                                     \
         return S;                                                              \
     }                                                                          \
-                                                                               \
-    /* ========== */                                                           \
-    /*  ITERATOR  */                                                           \
-    /* ========== */                                                           \
                                                                                \
     const struct N##_pair* N##_iterator_cdata(struct N##_iterator i) {         \
         return &i.data_[i.curr_].data_;                                        \
@@ -183,29 +178,17 @@
         return i;                                                              \
     }                                                                          \
                                                                                \
-    int N##_iterator_equal(const struct N##_iterator first,                    \
-                           const struct N##_iterator second) {                 \
+    bool N##_iterator_equal(const struct N##_iterator first,                   \
+                            const struct N##_iterator second) {                \
         return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \
-    int N##_iterator_valid(const struct N##_iterator i) {                      \
+    bool N##_iterator_valid(const struct N##_iterator i) {                     \
         return i.is_valid_;                                                    \
-    }                                                                          \
-                                                                               \
-    /* =============== */                                                      \
-    /*  MAP FUNCTIONS  */                                                      \
-    /* =============== */                                                      \
-                                                                               \
-    void N##_set_share(N* u, int is_shared) {                                  \
-        u->shared_ = is_shared;                                                \
     }                                                                          \
                                                                                \
     void N##_set_share_key(N* u, int is_shared) {                              \
         u->shared_key_ = is_shared;                                            \
-    }                                                                          \
-                                                                               \
-    size_t N##_size(const struct N* const u) {                                 \
-        return u->size_;                                                       \
     }                                                                          \
                                                                                \
     void N##_init(struct N* u) {                                               \
@@ -214,27 +197,6 @@
         for (size_t i = 0; i < S; ++i) {                                       \
             u->data_[i]._state = SGC_NODE_STATE_OPEN;                          \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    int N##_equal(const N* const first, const N* const second) {               \
-        int equal = (first == second);                                         \
-        if (equal == 0 && first->size_ == second->size_) {                     \
-            struct N##_iterator it_first = N##_cbegin(first);                  \
-            struct N##_iterator it_second = N##_cbegin(second);                \
-            while (N##_iterator_valid(it_first)) {                             \
-                if (!K##_equal(&N##_iterator_cdata(it_first)->key,             \
-                               &N##_iterator_cdata(it_second)->key) ||         \
-                    !V##_equal(&N##_iterator_cdata(it_first)->value,           \
-                               &N##_iterator_cdata(it_second)->value)) {       \
-                    equal = 0;                                                 \
-                    break;                                                     \
-                }                                                              \
-                N##_iterator_next(&it_first);                                  \
-                N##_iterator_next(&it_second);                                 \
-            }                                                                  \
-            equal = 1;                                                         \
-        }                                                                      \
-        return equal;                                                          \
     }                                                                          \
                                                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
@@ -367,8 +329,11 @@
         if (i.is_valid_) {                                                     \
             N##_iterator_erase(u, &i);                                         \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    int N##_empty(const struct N* const u) {                                   \
-        return u->size_ == 0;                                                  \
     }
+
+#define SGC_INIT_STATIC_UNORDERED_MAP(K, V, S, N)                              \
+    SGC_INIT_HEADERS_STATIC_UNORDERED_MAP(K, V, S, N)                          \
+    SGC_INIT_STATIC_FUNCTIONS_STATIC_UNORDERED_MAP(K, V, S, N)                 \
+    _SGC_INIT_UNIQUE_STATIC_UNORDERED_MAP_FUNCTIONS(K, V, S, N)                \
+    _SGC_INIT_STATIC_HASH_MAP_TYPE_FUNCTIONS(K, S, N)                          \
+    _SGC_INIT_COMMON_FUNCTIONS(N)

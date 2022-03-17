@@ -145,6 +145,6 @@
 #define SGC_INIT_VECTOR(T, N)                                                  \
     SGC_INIT_HEADERS_VECTOR(T, N)                                              \
     _SGC_INIT_PRIVATE_FUNCION_DECLARATIONS_VECTOR(T, N)                        \
-    _SGC_INIT_COMMON_FUNCTIONS(T, N)                                           \
+    _SGC_INIT_COMMON_FUNCTIONS(N)                                           \
     _SGC_INIT_VECTOR_TYPE_FUNCTIONS(T, N)                                      \
     _SGC_INIT_UNIQUE_FUNCTIONS_VECTOR(T, N)

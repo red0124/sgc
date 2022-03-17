@@ -322,4 +322,4 @@
     _SGC_INIT_PRIVATE_SET_FUNCTION_DECLARATIONS(V, N)                          \
     _SGC_INIT_UNIQUE_SET_FUNCTIONS(V, N)                                       \
     _SGC_INIT_RBTREE_TYPE_FUNCTIONS(V, N)                                      \
-    _SGC_INIT_COMMON_FUNCTIONS(V, N)
+    _SGC_INIT_COMMON_FUNCTIONS(N)

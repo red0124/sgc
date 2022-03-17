@@ -254,4 +254,4 @@
     SGC_INIT_STATIC_FUNCTIONS_UNORDERED_MAP(K, V, N)                           \
     _SGC_INIT_UNIQUE_UNORDERED_MAP_FUNCTIONS(K, V, N)                          \
     _SGC_INIT_HASH_MAP_TYPE_FUNCTIONS(K, N)                                    \
-    _SGC_INIT_COMMON_FUNCTIONS(K, N)
+    _SGC_INIT_COMMON_FUNCTIONS(N)

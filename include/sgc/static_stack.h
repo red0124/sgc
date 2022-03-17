@@ -77,4 +77,4 @@
     SGC_INIT_UNIQUE_FUNCTIONS_STATIC_STACK(T, S, N)                            \
     SGC_INIT_STATIC_FUNCTIONS_STACK(T, N)                                      \
     _SGC_INIT_STACK_TYPE_FUNCTIONS(T, N)                                       \
-    _SGC_INIT_COMMON_FUNCTIONS(T, N)
+    _SGC_INIT_COMMON_FUNCTIONS(N)

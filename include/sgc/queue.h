@@ -123,5 +123,5 @@
     SGC_INIT_HEADERS_QUEUE(T, N)                                               \
     SGC_INIT_STATIC_FUNCTIONS_QUEUE(T, N)                                      \
     _SGC_INIT_QUEUE_TYPE_FUNCTIONS(T, N)                                       \
-    _SGC_INIT_COMMON_FUNCTIONS(T, N)                                           \
+    _SGC_INIT_COMMON_FUNCTIONS(N)                                           \
     _SGC_INIT_UNIQUE_QUEUE_FUNCTIONS(T, N)

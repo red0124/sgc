@@ -115,6 +115,6 @@
 #define SGC_INIT_STATIC_VECTOR(T, S, N)                                        \
     SGC_INIT_HEADER_STATIC_VECTOR(T, S, N)                                     \
     _SGC_INIT_PRIVATE_FUNCION_DECLARATIONS_STATIC_VECTOR(T, N)                 \
-    _SGC_INIT_COMMON_FUNCTIONS(T, N)                                           \
+    _SGC_INIT_COMMON_FUNCTIONS(N)                                           \
     _SGC_INIT_VECTOR_TYPE_FUNCTIONS(T, N)                                      \
     _SGC_INIT_UNIQUE_FUNCTIONS_STATIC_VECTOR(T, S, N)

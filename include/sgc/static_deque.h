@@ -190,5 +190,5 @@
     SGC_INIT_HEADERS_STATIC_DEQUE(T, S, N)                                     \
     SGC_INIT_STATIC_FUNCTIONS_STATIC_DEQUE(T, S, N)                            \
     _SGC_INIT_UNIQUE_STATIC_DEQUE_FUNCTIONS(T, S, N)                           \
-    _SGC_INIT_COMMON_FUNCTIONS(T, N)                                           \
+    _SGC_INIT_COMMON_FUNCTIONS(N)                                              \
     _SGC_INIT_DEQUE_TYPE_FUNCTIONS(T, N)

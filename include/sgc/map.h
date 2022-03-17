@@ -372,4 +372,4 @@
     _SGC_INIT_PRIVATE_MAP_FUNCTION_DECLARATIONS(K, V, N)                       \
     _SGC_INIT_UNIQUE_MAP_FUNCTIONS(K, V, N)                                    \
     _SGC_INIT_RBTREE_TYPE_FUNCTIONS(K, N)                                      \
-    _SGC_INIT_COMMON_FUNCTIONS(K, N)
+    _SGC_INIT_COMMON_FUNCTIONS(N)

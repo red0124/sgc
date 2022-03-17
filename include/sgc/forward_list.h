@@ -265,4 +265,4 @@
     _SGC_INIT_PRIVATE_FORWARD_LIST_FUNCTION_DECLARATIONS(T, N)                 \
     _SGC_INIT_COMMON_LIST_TYPE_FUNCTIONS(T, N)                                 \
     _SGC_INIT_UNIQUE_FORWARD_LIST_FUNCTIONS(T, N)                              \
-    _SGC_INIT_COMMON_FUNCTIONS(T, N)
+    _SGC_INIT_COMMON_FUNCTIONS(N)
