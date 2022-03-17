@@ -9,8 +9,8 @@
 
 #define SGC_INIT_STATIC_FUNCTIONS_QUEUE(T, N)                                  \
     static void N##_move(size_t* flag, size_t max);                            \
-    static void _m_##N##_resize(struct N* q);                                  \
-    static size_t _m_##N##_max(const struct N* const q);
+    static void N##_resize(struct N* q);                                  \
+    static size_t N##_max(const struct N* const q);
 
 #define SGC_INIT_HEADERS_QUEUE(T, N)                                           \
                                                                                \
@@ -41,7 +41,7 @@
     bool N##_empty(const struct N* const q);
 
 #define _SGC_INIT_UNIQUE_QUEUE_FUNCTIONS(T, N)                                 \
-    static size_t _m_##N##_max(const struct N* const q) {                        \
+    static size_t N##_max(const struct N* const q) {                        \
         return q->max_;                                                        \
     }                                                                          \
                                                                                \
@@ -96,7 +96,7 @@
         dst->_front = 0;                                                       \
     }                                                                          \
                                                                                \
-    static void _m_##N##_resize(struct N* q) {                                 \
+    static void N##_resize(struct N* q) {                                 \
         if (q->size_ == q->max_) {                                             \
             size_t max = q->max_;                                              \
             q->max_ = (q->max_ == 0) ? 1 : q->max_ * 2;                        \

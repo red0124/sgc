@@ -10,9 +10,9 @@
     }                                                                          \
                                                                                \
     void N##_push(struct N* q, T el) {                                         \
-        _m_##N##_resize(q);                                                    \
+        N##_resize(q);                                                    \
         if (!N##_empty(q)) {                                                   \
-            N##_move(&q->_back, _m_##N##_max(q));                              \
+            N##_move(&q->_back, N##_max(q));                              \
         }                                                                      \
         SGC_COPY(T##_copy, q->data_[q->_back], el, q->shared_);                \
         ++q->size_;                                                            \
@@ -53,7 +53,7 @@
             if (!q->shared_) {                                                 \
                 T##_free(el);                                                  \
             }                                                                  \
-            N##_move(&q->_front, _m_##N##_max(q));                             \
+            N##_move(&q->_front, N##_max(q));                             \
             --q->size_;                                                        \
         }                                                                      \
     }

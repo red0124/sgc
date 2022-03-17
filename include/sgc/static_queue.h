@@ -8,8 +8,8 @@
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_QUEUE(T, S, N)                        \
     static void N##_move(size_t* flag, size_t max);                            \
-    static void _m_##N##_resize(const struct N* const q);                      \
-    static size_t _m_##N##_max(const struct N* const q);
+    static void N##_resize(const struct N* const q);                           \
+    static size_t N##_max(const struct N* const q);
 
 #define SGC_INIT_HEADERS_STATIC_QUEUE(T, S, N)                                 \
     struct N {                                                                 \
@@ -23,7 +23,7 @@
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
                                                                                \
-    size_t N##_max(void);                                                      \
+    size_t N##_xmax(void);                                                     \
     void N##_set_share(N* q, int is_shared);                                   \
     size_t N##_size(const struct N* const q);                                  \
     void N##_init(struct N* q);                                                \
@@ -39,17 +39,17 @@
     bool N##_empty(const struct N* const q);
 
 #define _SGC_INIT_UNIQUE_STATIC_QUEUE_FUNCTIONS(T, S, N)                       \
-    static void _m_##N##_resize(const struct N* const v) {                     \
+    static void N##_resize(const struct N* const v) {                          \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
                                                                                \
-    static size_t _m_##N##_max(const struct N* const v) {                      \
+    static size_t N##_max(const struct N* const v) {                           \
         (void)(v);                                                             \
         return S;                                                              \
     }                                                                          \
                                                                                \
-    size_t N##_max(void) {                                                     \
+    size_t N##_xmax(void) {                                                    \
         return S;                                                              \
     }                                                                          \
                                                                                \
@@ -107,5 +107,5 @@
     SGC_INIT_HEADERS_STATIC_QUEUE(T, S, N)                                     \
     SGC_INIT_STATIC_FUNCTIONS_STATIC_QUEUE(T, S, N)                            \
     _SGC_INIT_QUEUE_TYPE_FUNCTIONS(T, N)                                       \
-    _SGC_INIT_COMMON_FUNCTIONS(N)                                           \
+    _SGC_INIT_COMMON_FUNCTIONS(N)                                              \
     _SGC_INIT_UNIQUE_STATIC_QUEUE_FUNCTIONS(T, S, N)

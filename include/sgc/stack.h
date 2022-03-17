@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 #define SGC_INIT_STATIC_FUNCTIONS_STACK(T, N)                                  \
-    static void _m_##N##_resize(struct N* s);
+    static void N##_resize(struct N* s);
 
 #define SGC_INIT_HEADERS_STACK(T, N)                                           \
     struct N {                                                                 \
@@ -68,7 +68,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _m_##N##_resize(struct N* s) {                                 \
+    static void N##_resize(struct N* s) {                                 \
         if (s->size_ == s->max_) {                                             \
             s->max_ = (s->max_ == 0) ? 1 : s->max_ * 2;                        \
             s->data_ = (T*)sgc_realloc(s->data_, sizeof(T) * s->max_);         \

@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PRIVATE_FUNCION_DECLARATIONS_STATIC_VECTOR(T, N)             \
-    static void _m_##N##_resize(const struct N* const v);
+    static void N##_resize(const struct N* const v);
 
 #define SGC_INIT_HEADER_STATIC_VECTOR(T, S, N)                                 \
     struct N {                                                                 \
@@ -73,12 +73,12 @@
     bool N##_iterator_valid(const struct N##_iterator i);
 
 #define _SGC_INIT_UNIQUE_FUNCTIONS_STATIC_VECTOR(T, S, N)                      \
-    static void _m_##N##_resize(const struct N* const v) {                     \
+    static void N##_resize(const struct N* const v) {                     \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
                                                                                \
-    size_t N##_max(void) {                                                     \
+    size_t N##_xmax(void) {                                                     \
         return S;                                                              \
     }                                                                          \
                                                                                \

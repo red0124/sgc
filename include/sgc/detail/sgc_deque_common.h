@@ -8,7 +8,7 @@
             if (!d->shared_) {                                                 \
                 T##_free(&d->data_[at]);                                       \
             }                                                                  \
-            size_t _at = (at + d->_front) % _m_##N##_max(d);                   \
+            size_t _at = (at + d->_front) % N##_max(d);                   \
             size_t shift_back = 0;                                             \
             size_t shift_end = 0;                                              \
             size_t shift_begin = 0;                                            \
@@ -18,30 +18,30 @@
                 if (_at <= d->_back) {                                         \
                     shift_begin = d->_back - _at;                              \
                 } else {                                                       \
-                    shift_begin = _m_##N##_max(d) - _at - 1;                   \
+                    shift_begin = N##_max(d) - _at - 1;                   \
                     shift_back = 1;                                            \
                     shift_end = d->_back;                                      \
                 }                                                              \
                 memmove(d->data_ + _at, d->data_ + _at + 1,                    \
                         shift_begin * sizeof(T));                              \
-                memmove(d->data_ + _m_##N##_max(d) - 1, d->data_,              \
+                memmove(d->data_ + N##_max(d) - 1, d->data_,              \
                         shift_back * sizeof(T));                               \
                 memmove(d->data_, d->data_ + 1, shift_end * sizeof(T));        \
-                N##_move_back(&d->_back, _m_##N##_max(d));                     \
+                N##_move_back(&d->_back, N##_max(d));                     \
             } else {                                                           \
                 if (_at >= d->_front) {                                        \
                     shift_end = _at - d->_front;                               \
                 } else {                                                       \
-                    shift_end = _m_##N##_max(d) - d->_front - 1;               \
+                    shift_end = N##_max(d) - d->_front - 1;               \
                     shift_begin = _at;                                         \
                     shift_back = 1;                                            \
                 }                                                              \
                 memmove(d->data_ + 1, d->data_, shift_begin * sizeof(T));      \
-                memmove(d->data_, d->data_ + _m_##N##_max(d) - 1,              \
+                memmove(d->data_, d->data_ + N##_max(d) - 1,              \
                         shift_back * sizeof(T));                               \
                 memmove(d->data_ + d->_front + 1, d->data_ + d->_front,        \
                         shift_end * sizeof(T));                                \
-                N##_move(&d->_front, _m_##N##_max(d));                         \
+                N##_move(&d->_front, N##_max(d));                         \
             }                                                                  \
             --d->size_;                                                        \
         }                                                                      \
@@ -54,7 +54,7 @@
                 ret = d->data_ + d->_front;                                    \
             } else {                                                           \
                 memcpy(d->data_ + d->_back + 1, d->data_ + d->_front,          \
-                       (_m_##N##_max(d) - d->_front) * sizeof(T));             \
+                       (N##_max(d) - d->_front) * sizeof(T));             \
                 d->_front = 0;                                                 \
                 d->_back = d->size_ - 1;                                       \
                 ret = d->data_;                                                \
@@ -73,7 +73,7 @@
             if (d->size_ == 0) {                                               \
                 d->_back = 0;                                                  \
             } else {                                                           \
-                N##_move_back(&d->_back, _m_##N##_max(d));                     \
+                N##_move_back(&d->_back, N##_max(d));                     \
             }                                                                  \
         }                                                                      \
     }                                                                          \
@@ -95,18 +95,18 @@
     }                                                                          \
                                                                                \
     void N##_push_back(struct N* d, T el) {                                    \
-        _m_##N##_resize(d);                                                    \
+        N##_resize(d);                                                    \
         if (d->size_ != 0) {                                                   \
-            N##_move(&d->_back, _m_##N##_max(d));                              \
+            N##_move(&d->_back, N##_max(d));                              \
         }                                                                      \
         SGC_COPY(T##_copy, d->data_[d->_back], el, d->shared_);                \
         ++d->size_;                                                            \
     }                                                                          \
                                                                                \
     void N##_push_front(struct N* d, T el) {                                   \
-        _m_##N##_resize(d);                                                    \
+        N##_resize(d);                                                    \
         if (d->size_ != 0) {                                                   \
-            N##_move_back(&d->_front, _m_##N##_max(d));                        \
+            N##_move_back(&d->_front, N##_max(d));                        \
         }                                                                      \
         SGC_COPY(T##_copy, d->data_[d->_front], el, d->shared_);               \
         ++d->size_;                                                            \
@@ -148,7 +148,7 @@
             if (!d->shared_) {                                                 \
                 T##_free(el);                                                  \
             }                                                                  \
-            N##_move(&d->_front, _m_##N##_max(d));                             \
+            N##_move(&d->_front, N##_max(d));                             \
             --d->size_;                                                        \
         }                                                                      \
     }                                                                          \
@@ -159,8 +159,8 @@
         } else if (at >= d->size_) {                                           \
             N##_push_back(d, el);                                              \
         } else {                                                               \
-            _m_##N##_resize(d);                                                \
-            size_t _at = (at + d->_front) % _m_##N##_max(d);                   \
+            N##_resize(d);                                                \
+            size_t _at = (at + d->_front) % N##_max(d);                   \
             size_t shift_front = 0;                                            \
             size_t shift_back = 0;                                             \
             size_t shift_end = 0;                                              \
@@ -168,21 +168,21 @@
             if (2 * at > d->size_) {                                           \
                 if (_at <= d->_back) {                                         \
                     shift_end = d->_back + 1 - _at;                            \
-                    if (d->_back + 1 == _m_##N##_max(d)) {                     \
+                    if (d->_back + 1 == N##_max(d)) {                     \
                         --shift_end;                                           \
                         shift_back = 1;                                        \
                     }                                                          \
                 } else {                                                       \
-                    shift_end = _m_##N##_max(d) - _at - 1;                     \
+                    shift_end = N##_max(d) - _at - 1;                     \
                     shift_back = 1;                                            \
                     shift_begin = d->_back + 1;                                \
                 }                                                              \
                 memmove(d->data_ + 1, d->data_, shift_begin * sizeof(T));      \
-                memmove(d->data_, d->data_ + _m_##N##_max(d) - 1,              \
+                memmove(d->data_, d->data_ + N##_max(d) - 1,              \
                         shift_back * sizeof(T));                               \
                 memmove(d->data_ + _at + 1, d->data_ + _at,                    \
                         shift_end * sizeof(T));                                \
-                N##_move(&d->_back, _m_##N##_max(d));                          \
+                N##_move(&d->_back, N##_max(d));                          \
             } else {                                                           \
                 if (_at >= d->_front) {                                        \
                     shift_end = _at - d->_front;                               \
@@ -191,22 +191,22 @@
                         shift_front = 1;                                       \
                     }                                                          \
                 } else {                                                       \
-                    shift_end = _m_##N##_max(d) - d->_front;                   \
+                    shift_end = N##_max(d) - d->_front;                   \
                     shift_begin = _at;                                         \
                     shift_back = 1;                                            \
                 }                                                              \
-                memmove(d->data_ + _m_##N##_max(d) - 1, d->data_ + d->_front,  \
+                memmove(d->data_ + N##_max(d) - 1, d->data_ + d->_front,  \
                         shift_front * sizeof(T));                              \
                 memmove(d->data_ + d->_front - 1 + shift_front,                \
                         d->data_ + d->_front + shift_front,                    \
                         shift_end * sizeof(T));                                \
-                memmove(d->data_ + _m_##N##_max(d) - 1, d->data_,              \
+                memmove(d->data_ + N##_max(d) - 1, d->data_,              \
                         shift_back * sizeof(T));                               \
                 memmove(d->data_, d->data_ + 1, shift_begin * sizeof(T));      \
-                N##_move_back(&d->_front, _m_##N##_max(d));                    \
+                N##_move_back(&d->_front, N##_max(d));                    \
             }                                                                  \
             ++d->size_;                                                        \
-            SGC_COPY(T##_copy, d->data_[(at + d->_front) % _m_##N##_max(d)],   \
+            SGC_COPY(T##_copy, d->data_[(at + d->_front) % N##_max(d)],   \
                      el, d->shared_);                                          \
         }                                                                      \
     }                                                                          \
@@ -214,14 +214,14 @@
     T* N##_at(struct N* d, size_t at) {                                        \
         T* ret = NULL;                                                         \
         if (at < d->size_) {                                                   \
-            ret = &d->data_[(d->_front + at) % _m_##N##_max(d)];               \
+            ret = &d->data_[(d->_front + at) % N##_max(d)];               \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
                                                                                \
     void N##_set(struct N* d, size_t at, T new_el) {                           \
         if (at < d->size_) {                                                   \
-            T* el = &d->data_[(d->_front + at) % _m_##N##_max(d)];             \
+            T* el = &d->data_[(d->_front + at) % N##_max(d)];             \
             SGC_REPLACE(T##_copy, T##_free, *el, new_el, d->shared_);          \
         }                                                                      \
     }                                                                          \
@@ -235,7 +235,7 @@
     }                                                                          \
                                                                                \
     void N##_iterator_next(struct N##_iterator* i) {                           \
-        if (i->curr_ + 1 == _m_##N##_iterator_max(i)) {                        \
+        if (i->curr_ + 1 == N##_iterator_max(i)) {                        \
             i->curr_ = 0;                                                      \
         } else {                                                               \
             ++i->curr_;                                                        \
@@ -244,7 +244,7 @@
                                                                                \
     void N##_iterator_prev(struct N##_iterator* i) {                           \
         if (i->curr_ == 0) {                                                   \
-            i->curr_ = _m_##N##_iterator_max(i) - 1;                           \
+            i->curr_ = N##_iterator_max(i) - 1;                           \
         } else {                                                               \
             --i->curr_;                                                        \
         }                                                                      \
@@ -287,8 +287,8 @@
     }                                                                          \
                                                                                \
     void N##_iterator_jump(struct N##_iterator* i, ssize_t range) {            \
-        i->curr_ = (_m_##N##_iterator_max(i) + i->curr_ + range) %             \
-                   _m_##N##_iterator_max(i);                                   \
+        i->curr_ = (N##_iterator_max(i) + i->curr_ + range) %             \
+                   N##_iterator_max(i);                                   \
     }                                                                          \
                                                                                \
     bool N##_iterator_equal(const struct N##_iterator first,                   \

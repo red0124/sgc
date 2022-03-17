@@ -7,9 +7,9 @@
 #include <stdbool.h>
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_DEQUE(T, S, N)                        \
-    static void _m_##N##_resize(const struct N* const q);                      \
-    static size_t _m_##N##_max(const struct N* const q);                       \
-    static size_t _m_##N##_iterator_max(const struct N##_iterator* const i);   \
+    static void N##_resize(const struct N* const q);                      \
+    static size_t N##_max(const struct N* const q);                       \
+    static size_t N##_iterator_max(const struct N##_iterator* const i);   \
     static void N##_move(size_t* flag, size_t max);                            \
     static void N##_move_back(size_t* flag, size_t max);
 
@@ -26,7 +26,7 @@
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
                                                                                \
-    size_t N##_max(void);                                                      \
+    size_t N##_xmax(void);                                                      \
     void N##_set_share(N* d, int is_shared);                                   \
     size_t N##_size(const struct N* const d);                                  \
     void N##_init(struct N* d);                                                \
@@ -81,22 +81,22 @@
     bool N##_iterator_valid(const struct N##_iterator it);
 
 #define _SGC_INIT_UNIQUE_STATIC_DEQUE_FUNCTIONS(T, S, N)                       \
-    static void _m_##N##_resize(const struct N* const v) {                     \
+    static void N##_resize(const struct N* const v) {                     \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
                                                                                \
-    static size_t _m_##N##_max(const struct N* const v) {                      \
+    static size_t N##_max(const struct N* const v) {                      \
         (void)(v);                                                             \
         return S;                                                              \
     }                                                                          \
                                                                                \
-    static size_t _m_##N##_iterator_max(const struct N##_iterator* const i) {  \
+    static size_t N##_iterator_max(const struct N##_iterator* const i) {  \
         (void)(i);                                                             \
         return S;                                                              \
     }                                                                          \
                                                                                \
-    size_t N##_max(void) {                                                     \
+    size_t N##_xmax(void) {                                                     \
         return S;                                                              \
     }                                                                          \
                                                                                \
@@ -111,7 +111,7 @@
                 size_t i;                                                      \
                 for (i = d->_front; i != d->_back;) {                          \
                     T##_free(&d->data_[i]);                                    \
-                    N##_move(&i, _m_##N##_max(d));                             \
+                    N##_move(&i, N##_max(d));                             \
                 }                                                              \
                 T##_free(&d->data_[i]);                                        \
             }                                                                  \
@@ -138,7 +138,7 @@
                 size_t i = src->_front;                                        \
                 for (size_t j = 0; j < src->size_; ++j) {                      \
                     T##_copy(&dst->data_[j], &src->data_[i]);                  \
-                    N##_move(&i, _m_##N##_max(src));                           \
+                    N##_move(&i, N##_max(src));                           \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -175,14 +175,14 @@
                                                                                \
     void N##_iterator_from(struct N* d, struct N##_iterator* i, size_t at) {   \
         i->data_ = (T*)d->data_;                                               \
-        i->curr_ = (d->_front + at) % _m_##N##_max(d);                         \
+        i->curr_ = (d->_front + at) % N##_max(d);                         \
         i->is_valid_ = (d->size_ > at) ? 1 : 0;                                \
     }                                                                          \
                                                                                \
     void N##_iterator_cfrom(const struct N* const d, struct N##_iterator* i,   \
                             size_t at) {                                       \
         i->data_ = (T*)d->data_;                                               \
-        i->curr_ = (d->_front + at) % _m_##N##_max(d);                         \
+        i->curr_ = (d->_front + at) % N##_max(d);                         \
         i->is_valid_ = (d->size_ > at) ? 1 : 0;                                \
     }
 
