@@ -3,6 +3,7 @@
 #include "detail/sgc_allocator.h"
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
+#include "detail/sgc_dictionary_ocmmon.h"
 #include "detail/sgc_hash_map_common.h"
 #include "detail/sgc_prime.h"
 #include "detail/sgc_utils.h"
@@ -107,14 +108,6 @@
     bool N##_empty(const struct N* const u);
 
 #define _SGC_INIT_UNIQUE_UNORDERED_MAP_FUNCTIONS(K, V, N)                      \
-    struct N##_pair* N##_iterator_data(struct N##_iterator i) {                \
-        return &i.curr_->data_;                                                \
-    }                                                                          \
-                                                                               \
-    const struct N##_pair* N##_iterator_cdata(struct N##_iterator i) {         \
-        return &i.curr_->data_;                                                \
-    }                                                                          \
-                                                                               \
     struct N##_node* N##_node_new(const K* key, const V* const value,          \
                                   size_t is_shared_key, size_t is_shared) {    \
         struct N##_node* new_node =                                            \
@@ -123,10 +116,6 @@
         SGC_COPY(V##_copy, new_node->data_.value, *value, is_shared);          \
         new_node->next_ = NULL;                                                \
         return new_node;                                                       \
-    }                                                                          \
-                                                                               \
-    void N##_set_share_key(N* u, int is_shared_key) {                          \
-        u->shared_key_ = is_shared_key;                                        \
     }                                                                          \
                                                                                \
     void N##_init(struct N* u) {                                               \
@@ -220,38 +209,18 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void N##_node_copy_values(const struct N* const m,                  \
-                                     struct N##_node* dst,                     \
-                                     const struct N##_node* const src) {       \
-        SGC_COPY(K##_copy, dst->data_.key, src->data_.key, m->shared_key_);    \
-        SGC_COPY(V##_copy, dst->data_.value, src->data_.value, m->shared_);    \
-    }                                                                          \
-                                                                               \
     static void N##_copy_base_data(struct N* __restrict__ dst,                 \
                                    const struct N* __restrict__ const src) {   \
         dst->size_ = src->size_;                                               \
         dst->max_ = src->max_;                                                 \
         dst->shared_key_ = src->shared_key_;                                   \
         dst->shared_ = src->shared_;                                           \
-    }                                                                          \
-                                                                               \
-    static void N##_node_free(const struct N* const u, struct N##_node* n) {   \
-        SGC_FREE(V##_free, n->data_.value, u->shared_);                        \
-        SGC_FREE(K##_free, n->data_.key, u->shared_key_);                      \
-    }                                                                          \
-                                                                               \
-    static size_t N##_node_hash_value(const struct N##_node* const n) {        \
-        return K##_hash(&n->data_.key);                                        \
-    }                                                                          \
-                                                                               \
-    static bool N##_node_equal_key(const struct N##_node* const n,             \
-                                   const K* const key) {                       \
-        return K##_equal(&n->data_.key, key);                                  \
     }
 
 #define SGC_INIT_UNORDERED_MAP(K, V, N)                                        \
     SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                    \
     SGC_INIT_STATIC_FUNCTIONS_UNORDERED_MAP(K, V, N)                           \
     _SGC_INIT_UNIQUE_UNORDERED_MAP_FUNCTIONS(K, V, N)                          \
+    _SGC_INIT_COMMON_DICTIONARY_PAIR_FUNCTIONS(K, V, N)                        \
     _SGC_INIT_HASH_MAP_TYPE_FUNCTIONS(K, N)                                    \
     _SGC_INIT_COMMON_FUNCTIONS(N)

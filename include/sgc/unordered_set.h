@@ -3,6 +3,7 @@
 #include "detail/sgc_allocator.h"
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
+#include "detail/sgc_dictionary_ocmmon.h"
 #include "detail/sgc_hash_map_common.h"
 #include "detail/sgc_prime.h"
 #include "detail/sgc_utils.h"
@@ -96,13 +97,6 @@
     bool N##_empty(const struct N* const u);
 
 #define _SGC_INIT_UNIQUE_UNORDERED_SET_FUNCTIONS(KV, N)                        \
-    KV* N##_iterator_data(struct N##_iterator i) {                             \
-        return &i.curr_->_value;                                               \
-    }                                                                          \
-                                                                               \
-    const KV* N##_iterator_cdata(struct N##_iterator i) {                      \
-        return &i.curr_->_value;                                               \
-    }                                                                          \
     struct N##_node* N##_node_new(const KV* const value, size_t is_shared) {   \
         struct N##_node* new_node =                                            \
             (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
@@ -188,35 +182,17 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void N##_node_copy_values(const struct N* const m,                  \
-                                     struct N##_node* dst,                     \
-                                     const struct N##_node* const src) {       \
-        SGC_COPY(KV##_copy, dst->_value, src->_value, m->shared_);             \
-    }                                                                          \
-                                                                               \
     static void N##_copy_base_data(struct N* __restrict__ dst,                 \
                                    const struct N* __restrict__ const src) {   \
         dst->size_ = src->size_;                                               \
         dst->max_ = src->max_;                                                 \
         dst->shared_ = src->shared_;                                           \
-    }                                                                          \
-                                                                               \
-    static void N##_node_free(const struct N* const m, struct N##_node* n) {   \
-        SGC_FREE(KV##_free, n->_value, m->shared_);                            \
-    }                                                                          \
-                                                                               \
-    static size_t N##_node_hash_value(const struct N##_node* const n) {        \
-        return KV##_hash(&n->_value);                                          \
-    }                                                                          \
-                                                                               \
-    static bool N##_node_equal_key(const struct N##_node* const n,             \
-                                   const KV* const key) {                      \
-        return KV##_equal(&n->_value, key);                                    \
     }
 
-#define SGC_INIT_UNORDERED_SET(V, N)                                           \
-    SGC_INIT_HEADERS_UNORDERED_SET(V, N)                                       \
-    SGC_INIT_STATIC_FUNCTIONS_UNORDERED_SET(V, N)                              \
-    _SGC_INIT_COMMON_FUNCTIONS(N)                                           \
-    _SGC_INIT_UNIQUE_UNORDERED_SET_FUNCTIONS(V, N)                             \
-    _SGC_INIT_HASH_MAP_TYPE_FUNCTIONS(V, N)
+#define SGC_INIT_UNORDERED_SET(KV, N)                                          \
+    SGC_INIT_HEADERS_UNORDERED_SET(KV, N)                                      \
+    SGC_INIT_STATIC_FUNCTIONS_UNORDERED_SET(KV, N)                             \
+    _SGC_INIT_UNIQUE_UNORDERED_SET_FUNCTIONS(KV, N)                            \
+    _SGC_INIT_COMMON_DICTIONARY_NONE_PAIR_FUNCTIONS(KV, N)                     \
+    _SGC_INIT_COMMON_FUNCTIONS(N)                                              \
+    _SGC_INIT_HASH_MAP_TYPE_FUNCTIONS(KV, N)

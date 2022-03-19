@@ -26,7 +26,7 @@
         return K##_compare(&n->data_.key, key);                                \
     }                                                                          \
                                                                                \
-    static inline size_t N##_node_hash(const struct N##_node* const n) {       \
+    static inline size_t N##_node_hash_value(const struct N##_node* const n) { \
         return K##_hash(&n->data_.key);                                        \
     }                                                                          \
                                                                                \
@@ -64,7 +64,7 @@
         return KV##_compare(&n->_value, key);                                  \
     }                                                                          \
                                                                                \
-    static inline size_t N##_node_hash(const struct N##_node* const n) {       \
+    static inline size_t N##_node_hash_value(const struct N##_node* const n) { \
         return KV##_hash(&n->_value);                                          \
     }                                                                          \
                                                                                \
