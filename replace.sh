@@ -4,7 +4,7 @@ set -x
 
 for MEMBER in "shared_key" "size" "max" "data" "shared" "next" "prev" "head" \
     "tail" "parent" "left" "right" "color" "root" "is_valid" "curr_bucket" \
-    "curr" "back" "front" "value"; do
+    "curr" "back" "front" "value" "state"; do
     SUB0="s|\Q _${MEMBER} \E| ${MEMBER} |g"
     SUB1="s|\Q._${MEMBER}\E|.${MEMBER}_|g"
     SUB2="s|\Q->_${MEMBER}\E|->${MEMBER}_|g"
