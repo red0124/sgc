@@ -6,6 +6,10 @@
 
 SGC_INIT_STATIC_UNORDERED_SET(int, SET_MAX, set)
 
+void test_set_xxx(void) {
+    TEST_TS(set);
+}
+
 void test_set_insert_erase(void) {
     set v;
     set_init(&v);
@@ -104,7 +108,7 @@ size_t set_hash(const set* const s) {
     return set_size(s);
 }
 
-/* TODO update 
+/* TODO update
 SGC_INIT_STATIC_UNORDERED_SET(set, SET_MAX, vset)
 
 void test_set_set(void) {
@@ -177,6 +181,7 @@ void test_set_iterator(void) {
 
 int main(void) {
     UNITY_BEGIN();
+    RUN_TEST(test_set_xxx);
     RUN_TEST(test_set_insert_erase);
     RUN_TEST(test_set_insert_multiple);
     RUN_TEST(test_set_copy);

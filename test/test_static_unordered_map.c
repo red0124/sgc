@@ -6,6 +6,10 @@
 
 SGC_INIT_STATIC_UNORDERED_MAP(int, int, MAP_MAX, map)
 
+void test_map_xxx(void) {
+    TEST_TM(map);
+}
+
 void test_map_insert_erase(void) {
     map v;
     map_init(&v);
@@ -81,43 +85,43 @@ size_t map_hash(const map* const first) {
     return map_size(first);
 }
 
-    /* TODO update
+/* TODO update
 SGC_INIT_STATIC_UNORDERED_MAP(map, map, MAP_MAX, vmap)
 
 void test_map_map(void) {
-    vmap v;
-    vmap_init(&v);
+vmap v;
+vmap_init(&v);
 
-    map tmp;
-    map_init(&tmp);
+map tmp;
+map_init(&tmp);
 
-    map_set_at(&tmp, 0, 0);
-    // {(0, 0)}
+map_set_at(&tmp, 0, 0);
+// {(0, 0)}
 
-    vmap_set_at(&v, tmp, tmp);
-    // pushed map into vmap, it will make a copy
+vmap_set_at(&v, tmp, tmp);
+// pushed map into vmap, it will make a copy
 
-    map_set_at(&tmp, 1, 1);
-    // {(0, 0) (1, 1)}
+map_set_at(&tmp, 1, 1);
+// {(0, 0) (1, 1)}
 
-    vmap_set_at(&v, tmp, tmp);
+vmap_set_at(&v, tmp, tmp);
 
-    map_set_at(&tmp, 2, 2);
-    // {(0, 0), (1, 1), (2, 2)}
+map_set_at(&tmp, 2, 2);
+// {(0, 0), (1, 1), (2, 2)}
 
-    vmap_set_share(&v, 1);
-    vmap_set_at(&v, tmp, tmp);
-    vmap_set_share(&v, 0);
-    // pushed map into vmap, it will use the original
+vmap_set_share(&v, 1);
+vmap_set_at(&v, tmp, tmp);
+vmap_set_share(&v, 0);
+// pushed map into vmap, it will use the original
 
-    // {{(0, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 1), (2, 2)}}
+// {{(0, 0)}, {(0, 0), (1, 1)}, {(0, 0), (1, 1), (2, 2)}}
 
-    TEST_ASSERT_EQUAL_INT(0, *map_at(vmap_at(&v, tmp), 0));
-    TEST_ASSERT_EQUAL_INT(1, *map_at(vmap_at(&v, tmp), 1));
-    TEST_ASSERT_EQUAL_INT(2, *map_at(vmap_at(&v, tmp), 2));
+TEST_ASSERT_EQUAL_INT(0, *map_at(vmap_at(&v, tmp), 0));
+TEST_ASSERT_EQUAL_INT(1, *map_at(vmap_at(&v, tmp), 1));
+TEST_ASSERT_EQUAL_INT(2, *map_at(vmap_at(&v, tmp), 2));
 
-    vmap_free(&v);
-    // no memory should be left dealocated
+vmap_free(&v);
+// no memory should be left dealocated
 } */
 
 void test_map_iterator(void) {
@@ -152,6 +156,7 @@ void test_map_iterator(void) {
 
 int main(void) {
     UNITY_BEGIN();
+    RUN_TEST(test_map_xxx);
     RUN_TEST(test_map_insert_erase);
     RUN_TEST(test_map_copy);
     RUN_TEST(test_amap);

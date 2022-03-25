@@ -9,30 +9,30 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PRIVATE_LIST_FUNCTION_DECLARATIONS(T, N)                     \
-    static void N##_memswp(char* i, char* j);                             \
-    static bool N##_compare_node(const void* const first,                 \
-                                      const void* const second,                \
-                                      int comp(const void*, const void*));     \
-    static void N##_qsort(void* array, size_t array_size,                 \
-                               int (*comp)(const void*, const void*));         \
-    static void N##_ptr_array_to_list(struct N##_node** nodes_ptr,   \
-                                           struct N* l);                       \
-    static struct N##_node* N##_node_alloc(struct N* l);             \
+    static void N##_memswp(char* i, char* j);                                  \
+    static bool N##_compare_node(const void* const first,                      \
+                                 const void* const second,                     \
+                                 int comp(const void*, const void*));          \
+    static void N##_qsort(void* array, size_t array_size,                      \
+                          int (*comp)(const void*, const void*));              \
+    static void N##_ptr_array_to_list(struct N##_node** nodes_ptr,             \
+                                      struct N* l);                            \
+    static struct N##_node* N##_node_alloc(struct N* l);                       \
     static void N##_node_free(struct N* l, struct N##_node* n);
 
 #define SGC_INIT_HEADERS_LIST(T, N)                                            \
                                                                                \
-    struct N##_node {                                                     \
+    struct N##_node {                                                          \
         T data_;                                                               \
-        struct N##_node* next_;                                           \
-        struct N##_node* prev_;                                           \
+        struct N##_node* next_;                                                \
+        struct N##_node* prev_;                                                \
     };                                                                         \
                                                                                \
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t shared_;                                                        \
-        struct N##_node* head_;                                           \
-        struct N##_node* tail_;                                           \
+        struct N##_node* head_;                                                \
+        struct N##_node* tail_;                                                \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
@@ -57,7 +57,7 @@
     void N##_sort(struct N* l, int (*comp)(const void*, const void*));         \
                                                                                \
     struct N##_iterator {                                                      \
-        struct N##_node* curr_;                                           \
+        struct N##_node* curr_;                                                \
     };                                                                         \
                                                                                \
     typedef struct N##_iterator N##_iterator;                                  \
@@ -79,8 +79,8 @@
     bool N##_iterator_valid(const struct N##_iterator i);
 
 #define _SGC_INIT_UNIQUE_LIST_FUNCTIONS(T, N)                                  \
-    static void N##_ptr_array_to_list(struct N##_node** nodes_ptr,   \
-                                           struct N* l) {                      \
+    static void N##_ptr_array_to_list(struct N##_node** nodes_ptr,             \
+                                      struct N* l) {                           \
         if (!l->size_) {                                                       \
             return;                                                            \
         }                                                                      \
@@ -107,19 +107,19 @@
         dst->shared_ = src->shared_;                                           \
         N##_init(dst);                                                         \
         if (src->size_ != 0) {                                                 \
-            dst->head_ = N##_node_alloc(dst);                             \
+            dst->head_ = N##_node_alloc(dst);                                  \
             SGC_COPY(T##_copy, dst->head_->data_, src->head_->data_,           \
                      src->shared_);                                            \
-            struct N##_node* curr_src = src->head_;                       \
-            struct N##_node* curr_dst = dst->head_;                       \
-            struct N##_node* tmp_src = NULL;                              \
-            struct N##_node* tmp_dst = NULL;                              \
+            struct N##_node* curr_src = src->head_;                            \
+            struct N##_node* curr_dst = dst->head_;                            \
+            struct N##_node* tmp_src = NULL;                                   \
+            struct N##_node* tmp_dst = NULL;                                   \
             while (curr_src) {                                                 \
                 tmp_src = curr_src->next_;                                     \
                 if (!tmp_src) {                                                \
                     break;                                                     \
                 }                                                              \
-                tmp_dst = N##_node_alloc(dst);                            \
+                tmp_dst = N##_node_alloc(dst);                                 \
                 SGC_COPY(T##_copy, tmp_dst->data_, tmp_src->data_,             \
                          src->shared_);                                        \
                 tmp_dst->prev_ = curr_dst;                                     \
@@ -136,7 +136,7 @@
     }                                                                          \
                                                                                \
     void N##_push_back(struct N* l, T el) {                                    \
-        struct N##_node* new_el = N##_node_alloc(l);                 \
+        struct N##_node* new_el = N##_node_alloc(l);                           \
         if (!l->shared_) {                                                     \
             T##_copy(&new_el->data_, &el);                                     \
         } else {                                                               \
@@ -164,21 +164,24 @@
                                                                                \
     void N##_pop_back(struct N* l) {                                           \
         if (l->size_) {                                                        \
-            struct N##_node* tmp = l->tail_;                              \
+            struct N##_node* tmp = l->tail_;                                   \
             l->tail_ = l->tail_->prev_;                                        \
             if (!l->shared_) {                                                 \
                 T##_free(&tmp->data_);                                         \
             }                                                                  \
-            N##_node_free(l, tmp);                                        \
+            N##_node_free(l, tmp);                                             \
             if (l->tail_) {                                                    \
                 l->tail_->next_ = NULL;                                        \
             }                                                                  \
             --l->size_;                                                        \
+            if (l->size_ == 0) {                                               \
+                l->head_ = l->tail_ = NULL;                                   \
+            }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_push_front(struct N* l, const T el) {                             \
-        struct N##_node* new_el = N##_node_alloc(l);                 \
+        struct N##_node* new_el = N##_node_alloc(l);                           \
         SGC_COPY(T##_copy, new_el->data_, el, l->shared_);                     \
         new_el->prev_ = NULL;                                                  \
         switch (l->size_) {                                                    \
@@ -202,23 +205,25 @@
                                                                                \
     void N##_pop_front(struct N* l) {                                          \
         if (l->size_) {                                                        \
-            struct N##_node* tmp = l->head_;                              \
+            struct N##_node* tmp = l->head_;                                   \
             l->head_ = l->head_->next_;                                        \
             if (!l->shared_) {                                                 \
                 T##_free(&tmp->data_);                                         \
             }                                                                  \
-            N##_node_free(l, tmp);                                        \
+            N##_node_free(l, tmp);                                             \
             if (l->head_) {                                                    \
                 l->head_->prev_ = NULL;                                        \
             }                                                                  \
             --l->size_;                                                        \
+            if (l->size_ == 0) {                                               \
+                l->head_ = l->tail_ = NULL;                                   \
+            }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
     /* TODO create erase by iterator */                                        \
-    __attribute__((                                                            \
-        unused)) static void N##_node_erase(struct N* l,                  \
-                                                 struct N##_node* n) {    \
+    __attribute__((unused)) static void N##_node_erase(struct N* l,            \
+                                                       struct N##_node* n) {   \
         if (n->next_) {                                                        \
             n->next_->prev_ = n->prev_;                                        \
         }                                                                      \
@@ -228,15 +233,15 @@
         if (l->shared_) {                                                      \
             T##_free(&n->data_);                                               \
         }                                                                      \
-        N##_node_free(l, n);                                              \
+        N##_node_free(l, n);                                                   \
         n = NULL;                                                              \
     }                                                                          \
                                                                                \
     /* TODO create insert by iterator */                                       \
     __attribute__((unused)) static void                                        \
-        N##_insert_node(struct N##_node* __restrict__ curr,               \
-                        struct N##_node* __restrict__ const node_new) {   \
-        struct N##_node* tmp = curr->next_;                               \
+        N##_insert_node(struct N##_node* __restrict__ curr,                    \
+                        struct N##_node* __restrict__ const node_new) {        \
+        struct N##_node* tmp = curr->next_;                                    \
         node_new->prev_ = curr;                                                \
         node_new->next_ = tmp;                                                 \
         tmp->prev_ = node_new;                                                 \

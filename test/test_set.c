@@ -5,6 +5,10 @@
 
 SGC_INIT_SET(int, set)
 
+void test_set_xxx(void) {
+    TEST_TS(set);
+}
+
 void test_set_insert_erase(void) {
     set v;
     set_init(&v);
@@ -175,6 +179,7 @@ void test_set_iterator(void) {
 
 int main(void) {
     UNITY_BEGIN();
+    RUN_TEST(test_set_xxx);
     RUN_TEST(test_set_insert_erase);
     RUN_TEST(test_set_insert_multiple);
     // TODO update RUN_TEST(test_set_copy);

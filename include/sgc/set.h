@@ -263,8 +263,8 @@
     }                                                                          \
                                                                                \
     void N##_init(struct N* s) {                                               \
-        s->size_ = 0;                                                          \
         s->root_ = SGC_MAP_LEAF;                                               \
+        s->size_ = 0;                                                          \
         s->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \

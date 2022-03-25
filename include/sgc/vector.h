@@ -26,7 +26,6 @@
     void N##_init(struct N* v);                                                \
     size_t N##_size(const struct N* v);                                        \
     void N##_free(struct N* v);                                                \
-    bool N##_equal(const struct N* const first, const struct N* const second); \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src);                     \
     void N##_from_array(struct N* v, const T* const arr, const size_t size);   \

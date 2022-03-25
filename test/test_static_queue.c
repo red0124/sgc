@@ -6,6 +6,10 @@
 
 SGC_INIT_STATIC_QUEUE(int, QUEUE_MAX, queue)
 
+void test_queue_xxx(void) {
+    TEST_TQ(queue);
+}
+
 void test_queue_copy(void) {
     queue v;
     queue_init(&v);
@@ -127,6 +131,7 @@ void test_queue_queue(void) {
 
 int main(void) {
     UNITY_BEGIN();
+    RUN_TEST(test_queue_xxx);
     RUN_TEST(test_queue_copy);
     RUN_TEST(test_queue_front_back);
     RUN_TEST(test_aqueue);

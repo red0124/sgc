@@ -10,9 +10,9 @@
     }                                                                          \
                                                                                \
     void N##_push(struct N* q, T el) {                                         \
-        N##_resize(q);                                                    \
+        N##_resize(q);                                                         \
         if (!N##_empty(q)) {                                                   \
-            N##_move(&q->_back, N##_max(q));                              \
+            N##_move(&q->_back, N##_max(q));                                   \
         }                                                                      \
         SGC_COPY(T##_copy, q->data_[q->_back], el, q->shared_);                \
         ++q->size_;                                                            \
@@ -49,11 +49,10 @@
                                                                                \
     void N##_pop(struct N* q) {                                                \
         if (q->size_) {                                                        \
-            T* el = &q->data_[q->_front];                                      \
-            if (!q->shared_) {                                                 \
-                T##_free(el);                                                  \
-            }                                                                  \
-            N##_move(&q->_front, N##_max(q));                             \
+            SGC_FREE(T##_free, q->data_[q->_front], q->shared_);               \
             --q->size_;                                                        \
+            if (q->size_ > 0) {                                                \
+                N##_move(&q->_front, N##_max(q));                              \
+            }                                                                  \
         }                                                                      \
     }

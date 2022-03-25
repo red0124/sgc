@@ -6,7 +6,8 @@
 SGC_INIT_STATIC_DEQUE(int, DEQUE_MAX, deque)
 
 void test_static_deque_push_pop_front_back(void) {
-    TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(deque);
+    // TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(deque);
+    TEST_TA(deque);
 }
 
 void test_static_deque_copy(void) {

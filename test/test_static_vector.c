@@ -5,8 +5,13 @@
 
 SGC_INIT_STATIC_VECTOR(int, VECTOR_MAX, vector)
 
+void vector_pop_front(vector* v) {
+    vector_erase_at(v, 0);
+}
+
 void test_static_vector_push_pop_front_back(void) {
-    TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(vector);
+    // TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(vector);
+    TEST_TA(vector);
 }
 
 void test_static_vector_copy(void) {
