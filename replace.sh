@@ -4,7 +4,7 @@ set -x
 
 for MEMBER in "shared_key" "size" "max" "data" "shared" "next" "prev" "head" \
     "tail" "parent" "left" "right" "color" "root" "is_valid" "curr_bucket" \
-    "curr"; do
+    "curr" "back" "front" "value"; do
     SUB0="s|\Q _${MEMBER} \E| ${MEMBER} |g"
     SUB1="s|\Q._${MEMBER}\E|.${MEMBER}_|g"
     SUB2="s|\Q->_${MEMBER}\E|->${MEMBER}_|g"
@@ -15,7 +15,7 @@ for MEMBER in "shared_key" "size" "max" "data" "shared" "next" "prev" "head" \
     echo $SUB2
     echo $SUB3
 
-    for i in $(find -type f); do
+    for i in $(find -type f -name "*.h"); do
         perl -pe "${SUB0}" -i ${i}
         perl -pe "${SUB1}" -i ${i}
         perl -pe "${SUB2}" -i ${i}

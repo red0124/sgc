@@ -46,32 +46,32 @@
     static inline void                                                         \
         N##_node_copy_values(const struct N* const ds, struct N##_node* dst,   \
                              const struct N##_node* const src) {               \
-        SGC_COPY(KV##_copy, dst->_value, src->_value, ds->shared_);            \
+        SGC_COPY(KV##_copy, dst->value_, src->value_, ds->shared_);            \
     }                                                                          \
                                                                                \
     static inline void N##_node_free(const struct N* const ds,                 \
                                      struct N##_node* n) {                     \
-        SGC_FREE(KV##_free, n->_value, ds->shared_);                           \
+        SGC_FREE(KV##_free, n->value_, ds->shared_);                           \
     }                                                                          \
                                                                                \
     static inline bool N##_node_equal_key(const struct N##_node* const n,      \
                                           const KV* const key) {               \
-        return KV##_equal(&n->_value, key);                                    \
+        return KV##_equal(&n->value_, key);                                    \
     }                                                                          \
                                                                                \
     static inline int N##_node_compare(const struct N##_node* const n,         \
                                        const KV* const key) {                  \
-        return KV##_compare(&n->_value, key);                                  \
+        return KV##_compare(&n->value_, key);                                  \
     }                                                                          \
                                                                                \
     static inline size_t N##_node_hash_value(const struct N##_node* const n) { \
-        return KV##_hash(&n->_value);                                          \
+        return KV##_hash(&n->value_);                                          \
     }                                                                          \
                                                                                \
     KV* N##_iterator_data(struct N##_iterator i) {                             \
-        return &i.curr_->_value;                                               \
+        return &i.curr_->value_;                                               \
     }                                                                          \
                                                                                \
     const KV* N##_iterator_cdata(struct N##_iterator i) {                      \
-        return &i.curr_->_value;                                               \
+        return &i.curr_->value_;                                               \
     }

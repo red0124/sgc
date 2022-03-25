@@ -17,8 +17,8 @@
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t max_;                                                           \
-        size_t _back;                                                          \
-        size_t _front;                                                         \
+        size_t back_;                                                          \
+        size_t front_;                                                         \
         size_t shared_;                                                        \
         T* data_;                                                              \
     };                                                                         \
@@ -46,7 +46,7 @@
     }                                                                          \
                                                                                \
     void N##_init(struct N* q) {                                               \
-        q->size_ = q->max_ = q->_front = q->_back = 0;                         \
+        q->size_ = q->max_ = q->front_ = q->back_ = 0;                         \
         q->data_ = NULL;                                                       \
         q->shared_ = 0;                                                        \
     }                                                                          \
@@ -55,7 +55,7 @@
         if (q->data_) {                                                        \
             if (!q->shared_) {                                                 \
                 size_t i;                                                      \
-                for (i = q->_front; i != q->_back;) {                          \
+                for (i = q->front_; i != q->back_;) {                          \
                     T##_free(&q->data_[i]);                                    \
                     N##_move(&i, q->max_);                                     \
                 }                                                              \
@@ -71,19 +71,19 @@
         if (src->size_ != 0) {                                                 \
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
             if (src->shared_) {                                                \
-                if (src->_front < src->_back) {                                \
-                    memcpy(dst->data_, src->data_ + src->_front,               \
+                if (src->front_ < src->back_) {                                \
+                    memcpy(dst->data_, src->data_ + src->front_,               \
                            src->size_ * sizeof(T));                            \
                 } else {                                                       \
-                    size_t first_part = src->_back;                            \
-                    size_t second_part = src->max_ - src->_front;              \
-                    memcpy(dst->data_, src->data_ + src->_front,               \
+                    size_t first_part = src->back_;                            \
+                    size_t second_part = src->max_ - src->front_;              \
+                    memcpy(dst->data_, src->data_ + src->front_,               \
                            second_part * sizeof(T));                           \
                     memcpy(dst->data_ + second_part, src->data_,               \
                            (1 + first_part) * sizeof(T));                      \
                 }                                                              \
             } else {                                                           \
-                size_t i = src->_front;                                        \
+                size_t i = src->front_;                                        \
                 for (size_t j = 0; j < src->size_; ++j) {                      \
                     T##_copy(&dst->data_[j], &src->data_[i]);                  \
                     N##_move(&i, src->max_);                                   \
@@ -92,8 +92,8 @@
         }                                                                      \
                                                                                \
         dst->size_ = dst->max_ = src->size_;                                   \
-        dst->_back = src->size_ - 1;                                           \
-        dst->_front = 0;                                                       \
+        dst->back_ = src->size_ - 1;                                           \
+        dst->front_ = 0;                                                       \
     }                                                                          \
                                                                                \
     static void N##_resize(struct N* q) {                                 \
@@ -103,17 +103,17 @@
                                                                                \
             q->data_ = (T*)sgc_realloc(q->data_, sizeof(T) * q->max_);         \
                                                                                \
-            if (q->_front > q->_back) {                                        \
-                size_t first_part = q->_back;                                  \
-                size_t second_part = max - q->_front;                          \
+            if (q->front_ > q->back_) {                                        \
+                size_t first_part = q->back_;                                  \
+                size_t second_part = max - q->front_;                          \
                 if (first_part > second_part) {                                \
                     memcpy(q->data_ + (q->max_ - second_part),                 \
-                           q->data_ + q->_front, second_part * sizeof(T));     \
-                    q->_front = q->_front + max;                               \
+                           q->data_ + q->front_, second_part * sizeof(T));     \
+                    q->front_ = q->front_ + max;                               \
                 } else {                                                       \
                     memcpy(q->data_ + max, q->data_,                           \
                            (1 + first_part) * sizeof(T));                      \
-                    q->_back = q->_back + max;                                 \
+                    q->back_ = q->back_ + max;                                 \
                 }                                                              \
             }                                                                  \
         }                                                                      \

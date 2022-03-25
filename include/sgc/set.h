@@ -59,7 +59,7 @@
         struct N##_node* parent_;                                              \
         struct N##_node* left_;                                                \
         struct N##_node* right_;                                               \
-        KV _value;                                                             \
+        KV value_;                                                             \
         enum sgc_map_color color_;                                             \
     };                                                                         \
                                                                                \
@@ -113,7 +113,7 @@
                                          size_t is_shared) {                   \
         struct N##_node* n =                                                   \
             (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
-        SGC_COPY(KV##_copy, n->_value, *v, is_shared);                         \
+        SGC_COPY(KV##_copy, n->value_, *v, is_shared);                         \
         n->left_ = n->right_ = SGC_MAP_LEAF;                                   \
         n->color_ = SGC_MAP_RED;                                               \
         return n;                                                              \
@@ -123,7 +123,7 @@
         struct N##_node* parent = s->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
         while (true) {                                                         \
-            int compare = (KV##_compare(&parent->_value, v));                  \
+            int compare = (KV##_compare(&parent->value_, v));                  \
                                                                                \
             if (compare > 0) {                                                 \
                 if (parent->left_ == SGC_MAP_LEAF) {                           \
@@ -141,8 +141,8 @@
                     break;                                                     \
                 }                                                              \
                 parent = parent->right_;                                       \
-            } else if (!KV##_equal(&parent->_value, v)) {                      \
-                SGC_REPLACE(KV##_copy, KV##_free, parent->_value, *v,          \
+            } else if (!KV##_equal(&parent->value_, v)) {                      \
+                SGC_REPLACE(KV##_copy, KV##_free, parent->value_, *v,          \
                             s->shared_);                                       \
                 return;                                                        \
             } else {                                                           \
@@ -169,7 +169,7 @@
         struct N##_node* parent = s->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
         while (true) {                                                         \
-            int compare = (KV##_compare(&parent->_value, v));                  \
+            int compare = (KV##_compare(&parent->value_, v));                  \
                                                                                \
             if (compare > 0) {                                                 \
                 if (parent->left_ == SGC_MAP_LEAF) {                           \
@@ -222,9 +222,9 @@
             }                                                                  \
         }                                                                      \
         if (succ != n) {                                                       \
-            KV##_copy(&n->_value, &succ->_value);                              \
+            KV##_copy(&n->value_, &succ->value_);                              \
             if (!m->shared_) {                                                 \
-                KV##_free(&succ->_value);                                      \
+                KV##_free(&succ->value_);                                      \
             }                                                                  \
             /* relinking nodes would be better */                              \
         }                                                                      \

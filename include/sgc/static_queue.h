@@ -14,8 +14,8 @@
 #define SGC_INIT_HEADERS_STATIC_QUEUE(T, S, N)                                 \
     struct N {                                                                 \
         size_t size_;                                                          \
-        size_t _back;                                                          \
-        size_t _front;                                                         \
+        size_t back_;                                                          \
+        size_t front_;                                                         \
         size_t shared_;                                                        \
         T data_[S];                                                            \
     };                                                                         \
@@ -54,7 +54,7 @@
     }                                                                          \
                                                                                \
     void N##_init(struct N* q) {                                               \
-        q->size_ = q->_front = q->_back = 0;                                   \
+        q->size_ = q->front_ = q->back_ = 0;                                   \
         q->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
@@ -62,7 +62,7 @@
         if (q->data_) {                                                        \
             if (!q->shared_) {                                                 \
                 size_t i;                                                      \
-                for (i = q->_front; i != q->_back;) {                          \
+                for (i = q->front_; i != q->back_;) {                          \
                     T##_free(&q->data_[i]);                                    \
                     N##_move(&i, S);                                           \
                 }                                                              \
@@ -76,19 +76,19 @@
         if (src->size_ != 0) {                                                 \
             dst->shared_ = src->shared_;                                       \
             if (dst->shared_) {                                                \
-                if (src->_front < src->_back) {                                \
-                    memcpy(dst->data_, src->data_ + src->_front,               \
+                if (src->front_ < src->back_) {                                \
+                    memcpy(dst->data_, src->data_ + src->front_,               \
                            src->size_ * sizeof(T));                            \
                 } else {                                                       \
-                    size_t first_part = src->_back;                            \
-                    size_t second_part = S - src->_front;                      \
-                    memcpy(dst->data_, src->data_ + src->_front,               \
+                    size_t first_part = src->back_;                            \
+                    size_t second_part = S - src->front_;                      \
+                    memcpy(dst->data_, src->data_ + src->front_,               \
                            second_part * sizeof(T));                           \
                     memcpy(dst->data_ + second_part, src->data_,               \
                            (1 + first_part) * sizeof(T));                      \
                 }                                                              \
             } else {                                                           \
-                size_t i = src->_front;                                        \
+                size_t i = src->front_;                                        \
                 for (size_t j = 0; j < src->size_; ++j) {                      \
                     /* TODO memcpy would be better */                          \
                     SGC_COPY(T##_copy, dst->data_[j], src->data_[i],           \
@@ -99,8 +99,8 @@
         }                                                                      \
                                                                                \
         dst->size_ = src->size_;                                               \
-        dst->_back = src->size_ - 1;                                           \
-        dst->_front = 0;                                                       \
+        dst->back_ = src->size_ - 1;                                           \
+        dst->front_ = 0;                                                       \
     }
 
 #define SGC_INIT_STATIC_QUEUE(T, S, N)                                         \

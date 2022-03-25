@@ -145,7 +145,7 @@ void test_set_set(void) {
 
     vset_free(&v);
     // no memory should be left dealocated
-} */ 
+} */
 
 void test_set_iterator(void) {
     set v;

@@ -39,7 +39,7 @@
 
 #define SGC_INIT_HEADERS_UNORDERED_SET(KV, N)                                  \
     struct N##_node {                                                          \
-        KV _value;                                                             \
+        KV value_;                                                             \
         struct N##_node* next_;                                                \
     };                                                                         \
                                                                                \
@@ -100,7 +100,7 @@
     struct N##_node* N##_node_new(const KV* const value, size_t is_shared) {   \
         struct N##_node* new_node =                                            \
             (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
-        SGC_COPY(KV##_copy, new_node->_value, *value, is_shared);              \
+        SGC_COPY(KV##_copy, new_node->value_, *value, is_shared);              \
         new_node->next_ = NULL;                                                \
         return new_node;                                                       \
     }                                                                          \
@@ -130,7 +130,7 @@
             size_t position = hash % u->max_;                                  \
             struct N##_node* tmp = u->data_[position];                         \
             while (tmp) {                                                      \
-                if (KV##_equal(&tmp->_value, v)) {                             \
+                if (KV##_equal(&tmp->value_, v)) {                             \
                     ret = (struct N##_iterator){u->data_, tmp, position,       \
                                                 u->max_, 1};                   \
                 }                                                              \
@@ -176,7 +176,7 @@
                                                                                \
     void N##_iterator_erase(struct N* u, struct N##_iterator* i) {             \
         if (N##_iterator_valid(*i)) {                                          \
-            KV value = i->curr_->_value;                                       \
+            KV value = i->curr_->value_;                                       \
             N##_iterator_next(i);                                              \
             N##_erase(u, value);                                               \
         }                                                                      \

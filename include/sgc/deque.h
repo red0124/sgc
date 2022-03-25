@@ -18,8 +18,8 @@
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t max_;                                                           \
-        size_t _back;                                                          \
-        size_t _front;                                                         \
+        size_t back_;                                                          \
+        size_t front_;                                                         \
         size_t shared_;                                                        \
         T* data_;                                                              \
     };                                                                         \
@@ -91,7 +91,7 @@
     }                                                                          \
                                                                                \
     void N##_init(struct N* d) {                                               \
-        d->size_ = d->max_ = d->_front = d->_back = 0;                         \
+        d->size_ = d->max_ = d->front_ = d->back_ = 0;                         \
         d->data_ = NULL;                                                       \
         d->shared_ = 0;                                                        \
     }                                                                          \
@@ -100,7 +100,7 @@
         if (d->data_) {                                                        \
             if (!d->shared_) {                                                 \
                 size_t i;                                                      \
-                for (i = d->_front; i != d->_back;) {                          \
+                for (i = d->front_; i != d->back_;) {                          \
                     T##_free(&d->data_[i]);                                    \
                     N##_move(&i, d->max_);                                     \
                 }                                                              \
@@ -116,19 +116,19 @@
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
             dst->shared_ = src->shared_;                                       \
             if (dst->shared_) {                                                \
-                if (src->_front < src->_back) {                                \
-                    memcpy(dst->data_, src->data_ + src->_front,               \
+                if (src->front_ < src->back_) {                                \
+                    memcpy(dst->data_, src->data_ + src->front_,               \
                            src->size_ * sizeof(T));                            \
                 } else {                                                       \
-                    size_t first_part = src->_back;                            \
-                    size_t second_part = src->max_ - src->_front;              \
-                    memcpy(dst->data_, src->data_ + src->_front,               \
+                    size_t first_part = src->back_;                            \
+                    size_t second_part = src->max_ - src->front_;              \
+                    memcpy(dst->data_, src->data_ + src->front_,               \
                            second_part * sizeof(T));                           \
                     memcpy(dst->data_ + second_part, src->data_,               \
                            (1 + first_part) * sizeof(T));                      \
                 }                                                              \
             } else {                                                           \
-                size_t i = src->_front;                                        \
+                size_t i = src->front_;                                        \
                 for (size_t j = 0; j < src->size_; ++j) {                      \
                     T##_copy(&dst->data_[j], &src->data_[i]);                  \
                     N##_move(&i, src->max_);                                   \
@@ -137,8 +137,8 @@
         }                                                                      \
                                                                                \
         dst->size_ = dst->max_ = src->size_;                                   \
-        dst->_back = src->size_ - 1;                                           \
-        dst->_front = 0;                                                       \
+        dst->back_ = src->size_ - 1;                                           \
+        dst->front_ = 0;                                                       \
     }                                                                          \
                                                                                \
     static void N##_resize(struct N* d) {                                 \
@@ -148,17 +148,17 @@
                                                                                \
             d->data_ = (T*)sgc_realloc(d->data_, sizeof(T) * d->max_);         \
                                                                                \
-            if (d->_front > d->_back) {                                        \
-                size_t first_part = d->_back;                                  \
-                size_t second_part = max - d->_front;                          \
+            if (d->front_ > d->back_) {                                        \
+                size_t first_part = d->back_;                                  \
+                size_t second_part = max - d->front_;                          \
                 if (first_part > second_part) {                                \
                     memcpy(d->data_ + (d->max_ - second_part),                 \
-                           d->data_ + d->_front, second_part * sizeof(T));     \
-                    d->_front = d->_front + max;                               \
+                           d->data_ + d->front_, second_part * sizeof(T));     \
+                    d->front_ = d->front_ + max;                               \
                 } else {                                                       \
                     memcpy(d->data_ + max, d->data_,                           \
                            (1 + first_part) * sizeof(T));                      \
-                    d->_back = d->_back + max;                                 \
+                    d->back_ = d->back_ + max;                                 \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -167,7 +167,7 @@
     void N##_iterator_begin(struct N* d, struct N##_iterator* i) {             \
         i->data_ = d->data_;                                                   \
         i->max_ = N##_max(d);                                             \
-        i->curr_ = d->_front;                                                  \
+        i->curr_ = d->front_;                                                  \
         i->is_valid_ = (d->size_) ? 1 : 0;                                     \
     }                                                                          \
                                                                                \
@@ -175,28 +175,28 @@
                              struct N##_iterator* i) {                         \
         i->data_ = d->data_;                                                   \
         i->max_ = N##_max(d);                                             \
-        i->curr_ = d->_front;                                                  \
+        i->curr_ = d->front_;                                                  \
         i->is_valid_ = (d->size_) ? 1 : 0;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_end(struct N* d, struct N##_iterator* i) {               \
         i->data_ = d->data_;                                                   \
         i->max_ = N##_max(d);                                             \
-        i->curr_ = d->_back;                                                   \
+        i->curr_ = d->back_;                                                   \
         i->is_valid_ = (d->size_) ? 1 : 0;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_cend(const struct N* const d, struct N##_iterator* i) {  \
         i->data_ = d->data_;                                                   \
         i->max_ = N##_max(d);                                             \
-        i->curr_ = d->_back;                                                   \
+        i->curr_ = d->back_;                                                   \
         i->is_valid_ = (d->size_) ? 1 : 0;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_from(struct N* d, struct N##_iterator* i, size_t at) {   \
         i->data_ = d->data_;                                                   \
         i->max_ = N##_max(d);                                             \
-        i->curr_ = (d->_front + at) % N##_max(d);                         \
+        i->curr_ = (d->front_ + at) % N##_max(d);                         \
         i->is_valid_ = (d->size_ > at) ? 1 : 0;                                \
     }                                                                          \
                                                                                \
@@ -204,7 +204,7 @@
                             size_t at) {                                       \
         i->data_ = d->data_;                                                   \
         i->max_ = N##_max(d);                                             \
-        i->curr_ = (d->_front + at) % N##_max(d);                         \
+        i->curr_ = (d->front_ + at) % N##_max(d);                         \
         i->is_valid_ = (d->size_ > at) ? 1 : 0;                                \
     }
 

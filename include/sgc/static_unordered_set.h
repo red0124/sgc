@@ -24,7 +24,7 @@
 
 #define SGC_INIT_HEADERS_STATIC_UNORDERED_SET(V, S, N)                         \
     struct N##_node {                                                          \
-        V _value;                                                              \
+        V value_;                                                              \
         char _state;                                                           \
     };                                                                         \
                                                                                \
@@ -101,7 +101,7 @@
                     ++position;                                                \
                 }                                                              \
             }                                                                  \
-            SGC_COPY(V##_copy, u->data_[position]._value, v, u->shared_);      \
+            SGC_COPY(V##_copy, u->data_[position].value_, v, u->shared_);      \
             u->data_[position]._state = SGC_NODE_STATE_USED;                   \
             ++u->size_;                                                        \
         }                                                                      \
@@ -117,7 +117,7 @@
                     ++position;                                                \
                 }                                                              \
             }                                                                  \
-            SGC_COPY(V##_copy, u->data_[position]._value, v, u->shared_);      \
+            SGC_COPY(V##_copy, u->data_[position].value_, v, u->shared_);      \
             u->data_[position]._state = SGC_NODE_STATE_USED;                   \
             ++u->size_;                                                        \
         }                                                                      \

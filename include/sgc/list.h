@@ -175,7 +175,7 @@
             }                                                                  \
             --l->size_;                                                        \
             if (l->size_ == 0) {                                               \
-                l->head_ = l->tail_ = NULL;                                   \
+                l->head_ = l->tail_ = NULL;                                    \
             }                                                                  \
         }                                                                      \
     }                                                                          \
@@ -216,7 +216,7 @@
             }                                                                  \
             --l->size_;                                                        \
             if (l->size_ == 0) {                                               \
-                l->head_ = l->tail_ = NULL;                                   \
+                l->head_ = l->tail_ = NULL;                                    \
             }                                                                  \
         }                                                                      \
     }                                                                          \
