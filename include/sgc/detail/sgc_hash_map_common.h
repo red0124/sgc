@@ -88,7 +88,7 @@
             i->max_ = m->max_;                                                 \
             i->curr_bucket_ = m->max_ - 1;                                     \
             if (i->curr_) {                                                    \
-                i->curr_ = N##_bucket_end(i->curr_);                           \
+                i->curr_ = _m_##N##_bucket_end(i->curr_);                      \
             } else {                                                           \
                 N##_iterator_prev(i);                                          \
             }                                                                  \
@@ -105,7 +105,7 @@
             i->max_ = m->max_;                                                 \
             i->curr_bucket_ = m->max_ - 1;                                     \
             if (i->curr_) {                                                    \
-                i->curr_ = N##_bucket_end(i->curr_);                           \
+                i->curr_ = _m_##N##_bucket_end(i->curr_);                      \
             } else {                                                           \
                 N##_iterator_prev(i);                                          \
             }                                                                  \
@@ -148,22 +148,22 @@
         return i.is_valid_;                                                    \
     }                                                                          \
                                                                                \
-    static void N##_bucket_sgc_free(const struct N* const u,                   \
-                                    struct N##_node* bucket) {                 \
+    static void _m_##N##_bucket_sgc_free(const struct N* const u,              \
+                                         struct N##_node* bucket) {            \
         if (bucket) {                                                          \
             struct N##_node* curr = bucket;                                    \
             struct N##_node* next = bucket;                                    \
             while (next) {                                                     \
                 curr = next;                                                   \
                 next = curr->next_;                                            \
-                N##_node_free(u, curr);                                        \
+                _m_##N##_node_free(u, curr);                                   \
                 sgc_free(curr);                                                \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void N##_bucket_insert(struct N##_node* bucket,                     \
-                                  struct N##_node* new_node) {                 \
+    static void _m_##N##_bucket_insert(struct N##_node* bucket,                \
+                                       struct N##_node* new_node) {            \
         struct N##_node* curr = bucket;                                        \
         struct N##_node* next = curr;                                          \
         while (next) {                                                         \
@@ -173,7 +173,7 @@
         curr->next_ = new_node;                                                \
     }                                                                          \
                                                                                \
-    static size_t N##_bucket_node_size(struct N##_node* bucket) {              \
+    static size_t _m_##N##_bucket_node_size(struct N##_node* bucket) {         \
         size_t size = 0;                                                       \
         if (bucket) {                                                          \
             struct N##_node* curr = bucket;                                    \
@@ -185,7 +185,7 @@
         return size;                                                           \
     }                                                                          \
                                                                                \
-    static struct N##_node* N##_bucket_end(struct N##_node* bucket) {          \
+    static struct N##_node* _m_##N##_bucket_end(struct N##_node* bucket) {     \
         struct N##_node* curr = bucket;                                        \
         struct N##_node* next = bucket;                                        \
         while (next) {                                                         \
@@ -202,7 +202,7 @@
     size_t N##_bucket_size(const struct N* const u, size_t n) {                \
         size_t ret = 0;                                                        \
         if (u->data_) {                                                        \
-            ret = N##_bucket_node_size(u->data_[n]);                           \
+            ret = _m_##N##_bucket_node_size(u->data_[n]);                      \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
@@ -216,13 +216,13 @@
     }                                                                          \
                                                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
-        N##_copy_base_data(dst, src);                                          \
-        N##_copy_nodes(dst, src);                                              \
+        _m_##N##_copy_base_data(dst, src);                                     \
+        _m_##N##_copy_nodes(dst, src);                                         \
     }                                                                          \
                                                                                \
-    static void N##_resize(struct N* u) {                                      \
+    static void _m_##N##_resize(struct N* u) {                                 \
         size_t max, new_max;                                                   \
-        N##_rehash_size(u, &max, &new_max);                                    \
+        _m_##N##_rehash_size(u, &max, &new_max);                               \
         if (u->size_ == max) {                                                 \
             struct N##_node** new_data = (struct N##_node**)sgc_malloc(        \
                 sizeof(struct N##_node*) * new_max);                           \
@@ -234,11 +234,11 @@
             struct N##_iterator tmp = N##_begin(u);                            \
             struct N##_node* next;                                             \
             for (size_t i = 0; i < u->size_; ++i) {                            \
-                position = N##_node_hash_value(tmp.curr_) % new_max;           \
+                position = _m_##N##_node_hash_value(tmp.curr_) % new_max;      \
                 next = tmp.curr_->next_;                                       \
                 tmp.curr_->next_ = NULL;                                       \
                 if (new_data[position]) {                                      \
-                    N##_bucket_insert(new_data[position], tmp.curr_);          \
+                    _m_##N##_bucket_insert(new_data[position], tmp.curr_);     \
                 } else {                                                       \
                     new_data[position] = tmp.curr_;                            \
                 }                                                              \
@@ -254,15 +254,15 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void N##_copy_nodes(struct N* __restrict__ dst,                     \
-                               const struct N* __restrict__ const src) {       \
+    static void _m_##N##_copy_nodes(struct N* __restrict__ dst,                \
+                                    const struct N* __restrict__ const src) {  \
         dst->data_ = (struct N##_node**)sgc_malloc(sizeof(struct N##_node*) *  \
                                                    dst->max_);                 \
         for (size_t i = 0; i < src->max_; ++i) {                               \
             if (src->data_[i]) {                                               \
                 dst->data_[i] =                                                \
                     (struct N##_node*)sgc_malloc(sizeof(struct N##_node));     \
-                N##_node_copy_values(src, dst->data_[i], src->data_[i]);       \
+                _m_##N##_node_copy_values(src, dst->data_[i], src->data_[i]);  \
                 struct N##_node* curr_src = src->data_[i];                     \
                 struct N##_node* curr_dst = dst->data_[i];                     \
                 struct N##_node* tmp_src = NULL;                               \
@@ -274,7 +274,7 @@
                     }                                                          \
                     tmp_dst =                                                  \
                         (struct N##_node*)sgc_malloc(sizeof(struct N##_node)); \
-                    N##_node_copy_values(src, tmp_dst, tmp_src);               \
+                    _m_##N##_node_copy_values(src, tmp_dst, tmp_src);          \
                     curr_dst->next_ = tmp_dst;                                 \
                     curr_dst = tmp_dst;                                        \
                     curr_src = tmp_src;                                        \
@@ -286,8 +286,8 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void N##_rehash_size(const struct N* const u, size_t* max,          \
-                                size_t* new_max) {                             \
+    static void _m_##N##_rehash_size(const struct N* const u, size_t* max,     \
+                                     size_t* new_max) {                        \
         *max = u->max_;                                                        \
         if (u->size_ == *max) {                                                \
             *new_max = sgc_next_prime(2 * u->max_ + 1);                        \
@@ -305,12 +305,12 @@
         struct N##_iterator tmp = N##_begin(u);                                \
         struct N##_node* next;                                                 \
         for (size_t i = 0; i < u->size_; ++i) {                                \
-            position = N##_node_hash_value(tmp.curr_) % new_max;               \
+            position = _m_##N##_node_hash_value(tmp.curr_) % new_max;          \
             position = 0;                                                      \
             next = tmp.curr_->next_;                                           \
             tmp.curr_->next_ = NULL;                                           \
             if (new_data[position]) {                                          \
-                N##_bucket_insert(new_data[position], tmp.curr_);              \
+                _m_##N##_bucket_insert(new_data[position], tmp.curr_);         \
             } else {                                                           \
                 new_data[position] = tmp.curr_;                                \
             }                                                                  \
@@ -325,19 +325,19 @@
         u->max_ = new_max;                                                     \
     }                                                                          \
                                                                                \
-    static struct N##_node* N##_bucket_remove(struct N* u,                     \
-                                              struct N##_node* bucket,         \
-                                              const T* const key) {            \
+    static struct N##_node* _m_##N##_bucket_remove(struct N* u,                \
+                                                   struct N##_node* bucket,    \
+                                                   const T* const key) {       \
         struct N##_node* ret = bucket;                                         \
         struct N##_node* tmp = bucket;                                         \
         struct N##_node* prev = bucket;                                        \
         while (tmp) {                                                          \
-            if (N##_node_equal_key(tmp, key)) {                                \
+            if (_m_##N##_node_equal_key(tmp, key)) {                           \
                 if (tmp == bucket) {                                           \
                     ret = tmp->next_;                                          \
                 }                                                              \
                 prev->next_ = tmp->next_;                                      \
-                N##_node_free(u, tmp);                                         \
+                _m_##N##_node_free(u, tmp);                                    \
                 sgc_free(tmp);                                                 \
                 --u->size_;                                                    \
                 break;                                                         \
@@ -352,6 +352,7 @@
         if (u->data_) {                                                        \
             size_t hash = T##_hash(&v);                                        \
             size_t position = hash % u->max_;                                  \
-            u->data_[position] = N##_bucket_remove(u, u->data_[position], &v); \
+            u->data_[position] =                                               \
+                _m_##N##_bucket_remove(u, u->data_[position], &v);             \
         }                                                                      \
     }

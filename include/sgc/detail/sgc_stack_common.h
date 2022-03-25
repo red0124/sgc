@@ -4,7 +4,7 @@
 
 #define _SGC_INIT_STACK_TYPE_FUNCTIONS(T, N)                                   \
     void N##_push(struct N* s, T el) {                                         \
-        N##_resize(s);                                                    \
+        _m_##N##_resize(s);                                                    \
         SGC_COPY(T##_copy, s->data_[s->size_], el, s->shared_);                \
         ++s->size_;                                                            \
     }                                                                          \

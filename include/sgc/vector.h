@@ -9,7 +9,7 @@
 #include <string.h>
 
 #define _SGC_INIT_PRIVATE_FUNCION_DECLARATIONS_VECTOR(T, N)                    \
-    static void N##_resize(struct N* v);
+    static void _m_##N##_resize(struct N* v);
 
 #define SGC_INIT_HEADERS_VECTOR(T, N)                                          \
     struct N {                                                                 \
@@ -77,7 +77,7 @@
     bool N##_iterator_valid(const struct N##_iterator i);
 
 #define _SGC_INIT_UNIQUE_FUNCTIONS_VECTOR(T, N)                                \
-    static void N##_resize(struct N* v) {                                 \
+    static void _m_##N##_resize(struct N* v) {                                 \
         if (v->size_ == v->max_) {                                             \
             v->max_ = (v->max_ == 0) ? 1 : v->max_ * 2;                        \
             v->data_ = (T*)sgc_realloc(v->data_, sizeof(T) * v->max_);         \
@@ -144,6 +144,6 @@
 #define SGC_INIT_VECTOR(T, N)                                                  \
     SGC_INIT_HEADERS_VECTOR(T, N)                                              \
     _SGC_INIT_PRIVATE_FUNCION_DECLARATIONS_VECTOR(T, N)                        \
-    _SGC_INIT_COMMON_FUNCTIONS(N)                                           \
+    _SGC_INIT_COMMON_FUNCTIONS(N)                                              \
     _SGC_INIT_VECTOR_TYPE_FUNCTIONS(T, N)                                      \
     _SGC_INIT_UNIQUE_FUNCTIONS_VECTOR(T, N)

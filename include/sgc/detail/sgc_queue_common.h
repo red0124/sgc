@@ -3,16 +3,16 @@
 #include <stdlib.h>
 
 #define _SGC_INIT_QUEUE_TYPE_FUNCTIONS(T, N)                                   \
-    static void N##_move(size_t* flag, size_t max) {                           \
+    static void _m_##N##_go_forward(size_t* flag, size_t max) {                \
         if ((++*flag) == max) {                                                \
             *flag = 0;                                                         \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_push(struct N* q, T el) {                                         \
-        N##_resize(q);                                                         \
+        _m_##N##_resize(q);                                                    \
         if (!N##_empty(q)) {                                                   \
-            N##_move(&q->back_, N##_max(q));                                   \
+            _m_##N##_go_forward(&q->back_, N##_max(q));                        \
         }                                                                      \
         SGC_COPY(T##_copy, q->data_[q->back_], el, q->shared_);                \
         ++q->size_;                                                            \
@@ -52,7 +52,7 @@
             SGC_FREE(T##_free, q->data_[q->front_], q->shared_);               \
             --q->size_;                                                        \
             if (q->size_ > 0) {                                                \
-                N##_move(&q->front_, N##_max(q));                              \
+                _m_##N##_go_forward(&q->front_, N##_max(q));                   \
             }                                                                  \
         }                                                                      \
     }

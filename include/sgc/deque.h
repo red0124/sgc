@@ -8,11 +8,11 @@
 #include <string.h>
 
 #define SGC_INIT_STATIC_FUNCTIONS_DEQUE(T, N)                                  \
-    static void N##_move(size_t* flag, size_t max);                            \
-    static void N##_move_back(size_t* flag, size_t max);                       \
-    static void N##_resize(struct N* d);                                  \
-    static size_t N##_max(const struct N* const q);                       \
-    static size_t N##_iterator_max(const struct N##_iterator* const i);
+    static void _m_##N##_go_forward(size_t* flag, size_t max);                 \
+    static void _m_##N##_go_back(size_t* flag, size_t max);                    \
+    static void _m_##N##_resize(struct N* d);                                  \
+    static size_t N##_max(const struct N* const q);                            \
+    static size_t _m_##N##_iterator_max(const struct N##_iterator* const i);
 
 #define SGC_INIT_HEADER_DEQUE(T, N)                                            \
     struct N {                                                                 \
@@ -82,11 +82,11 @@
     bool N##_iterator_valid(const struct N##_iterator it);
 
 #define _SGC_INIT_UNIQUE_DEQUE_FUNCTIONS(T, N)                                 \
-    static size_t N##_max(const struct N* const q) {                      \
+    static size_t N##_max(const struct N* const q) {                           \
         return q->max_;                                                        \
     }                                                                          \
                                                                                \
-    static size_t N##_iterator_max(const struct N##_iterator* const i) {  \
+    static size_t _m_##N##_iterator_max(const struct N##_iterator* const i) {  \
         return i->max_;                                                        \
     }                                                                          \
                                                                                \
@@ -102,7 +102,7 @@
                 size_t i;                                                      \
                 for (i = d->front_; i != d->back_;) {                          \
                     T##_free(&d->data_[i]);                                    \
-                    N##_move(&i, d->max_);                                     \
+                    _m_##N##_go_forward(&i, d->max_);                          \
                 }                                                              \
                 T##_free(&d->data_[i]);                                        \
             }                                                                  \
@@ -131,7 +131,7 @@
                 size_t i = src->front_;                                        \
                 for (size_t j = 0; j < src->size_; ++j) {                      \
                     T##_copy(&dst->data_[j], &src->data_[i]);                  \
-                    N##_move(&i, src->max_);                                   \
+                    _m_##N##_go_forward(&i, src->max_);                        \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -141,7 +141,7 @@
         dst->front_ = 0;                                                       \
     }                                                                          \
                                                                                \
-    static void N##_resize(struct N* d) {                                 \
+    static void _m_##N##_resize(struct N* d) {                                 \
         if (d->size_ == d->max_) {                                             \
             size_t max = d->max_;                                              \
             d->max_ = (d->max_ == 0) ? 1 : d->max_ * 2;                        \
@@ -166,7 +166,7 @@
                                                                                \
     void N##_iterator_begin(struct N* d, struct N##_iterator* i) {             \
         i->data_ = d->data_;                                                   \
-        i->max_ = N##_max(d);                                             \
+        i->max_ = N##_max(d);                                                  \
         i->curr_ = d->front_;                                                  \
         i->is_valid_ = (d->size_) ? 1 : 0;                                     \
     }                                                                          \
@@ -174,37 +174,37 @@
     void N##_iterator_cbegin(const struct N* const d,                          \
                              struct N##_iterator* i) {                         \
         i->data_ = d->data_;                                                   \
-        i->max_ = N##_max(d);                                             \
+        i->max_ = N##_max(d);                                                  \
         i->curr_ = d->front_;                                                  \
         i->is_valid_ = (d->size_) ? 1 : 0;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_end(struct N* d, struct N##_iterator* i) {               \
         i->data_ = d->data_;                                                   \
-        i->max_ = N##_max(d);                                             \
+        i->max_ = N##_max(d);                                                  \
         i->curr_ = d->back_;                                                   \
         i->is_valid_ = (d->size_) ? 1 : 0;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_cend(const struct N* const d, struct N##_iterator* i) {  \
         i->data_ = d->data_;                                                   \
-        i->max_ = N##_max(d);                                             \
+        i->max_ = N##_max(d);                                                  \
         i->curr_ = d->back_;                                                   \
         i->is_valid_ = (d->size_) ? 1 : 0;                                     \
     }                                                                          \
                                                                                \
     void N##_iterator_from(struct N* d, struct N##_iterator* i, size_t at) {   \
         i->data_ = d->data_;                                                   \
-        i->max_ = N##_max(d);                                             \
-        i->curr_ = (d->front_ + at) % N##_max(d);                         \
+        i->max_ = N##_max(d);                                                  \
+        i->curr_ = (d->front_ + at) % N##_max(d);                              \
         i->is_valid_ = (d->size_ > at) ? 1 : 0;                                \
     }                                                                          \
                                                                                \
     void N##_iterator_cfrom(const struct N* const d, struct N##_iterator* i,   \
                             size_t at) {                                       \
         i->data_ = d->data_;                                                   \
-        i->max_ = N##_max(d);                                             \
-        i->curr_ = (d->front_ + at) % N##_max(d);                         \
+        i->max_ = N##_max(d);                                                  \
+        i->curr_ = (d->front_ + at) % N##_max(d);                              \
         i->is_valid_ = (d->size_ > at) ? 1 : 0;                                \
     }
 

@@ -78,9 +78,9 @@
                                   FILE* file);
 
 #define SGC_INIT_STATIC_FUNCTIONS_QSORT(T, N)                                  \
-    static void N##_memswp(char* i, char* j);                                  \
-    static void N##_qsort(void* array, size_t array_size,                      \
-                          int (*comp)(const void*, const void*));
+    static void _m_##N##_memswp(char* i, char* j);                             \
+    static void _m_##N##_qsort(void* array, size_t array_size,                 \
+                               int (*comp)(const void*, const void*));
 
 #define SGC_INIT_HEADERS_QSORT(T, N)                                           \
     void N##_sort(N* c, int (*comp)(const void*, const void*));
@@ -456,7 +456,7 @@
 #define SGC_INIT_QSORT(T, N)                                                   \
     SGC_INIT_HEADERS_QSORT(T, N)                                               \
     SGC_INIT_STATIC_FUNCTIONS_QSORT(T, N)                                      \
-    static void N##_memswp(char* i, char* j) {                                 \
+    static void _m_##N##_memswp(char* i, char* j) {                            \
         N##_type tmp;                                                          \
                                                                                \
         memcpy(&tmp, i, sizeof(N##_type));                                     \
@@ -464,8 +464,8 @@
         memcpy(j, &tmp, sizeof(N##_type));                                     \
     }                                                                          \
                                                                                \
-    static void N##_qsort(void* array, size_t array_size,                      \
-                          int (*comp)(const void*, const void*)) {             \
+    static void _m_##N##_qsort(void* array, size_t array_size,                 \
+                               int (*comp)(const void*, const void*)) {        \
         char *i, *j;                                                           \
         size_t thresh = SGC_STACK_THRESH * sizeof(N##_type);                   \
         char* array_ = (char*)array;                                           \
@@ -476,18 +476,19 @@
             if ((size_t)(limit - array_) > thresh) {                           \
                 i = array_ + sizeof(N##_type);                                 \
                 j = limit - sizeof(N##_type);                                  \
-                N##_memswp(((((size_t)(limit - array_)) / sizeof(N##_type)) /  \
-                            2) * sizeof(N##_type) +                            \
-                               array_,                                         \
-                           array_);                                            \
+                _m_##N##_memswp(((((size_t)(limit - array_)) /                 \
+                                  sizeof(N##_type)) /                          \
+                                 2) * sizeof(N##_type) +                       \
+                                    array_,                                    \
+                                array_);                                       \
                 if (comp(i, j) > 0) {                                          \
-                    N##_memswp(i, j);                                          \
+                    _m_##N##_memswp(i, j);                                     \
                 }                                                              \
                 if (comp(array_, j) > 0) {                                     \
-                    N##_memswp(array_, j);                                     \
+                    _m_##N##_memswp(array_, j);                                \
                 }                                                              \
                 if (comp(i, array_) > 0) {                                     \
-                    N##_memswp(i, array_);                                     \
+                    _m_##N##_memswp(i, array_);                                \
                 }                                                              \
                 while (1) {                                                    \
                     do {                                                       \
@@ -499,9 +500,9 @@
                     if (i > j) {                                               \
                         break;                                                 \
                     }                                                          \
-                    N##_memswp(i, j);                                          \
+                    _m_##N##_memswp(i, j);                                     \
                 }                                                              \
-                N##_memswp(array_, j);                                         \
+                _m_##N##_memswp(array_, j);                                    \
                 if (j - array_ > limit - i) {                                  \
                     SGC_STACK_PUSH(array_, j);                                 \
                     array_ = i;                                                \
@@ -514,7 +515,7 @@
                      j = i, i += sizeof(N##_type)) {                           \
                     for (; comp(j, j + sizeof(N##_type)) > 0;                  \
                          j -= sizeof(N##_type)) {                              \
-                        N##_memswp(j, j + sizeof(N##_type));                   \
+                        _m_##N##_memswp(j, j + sizeof(N##_type));              \
                         if (j == array_) {                                     \
                             break;                                             \
                         }                                                      \
@@ -532,5 +533,5 @@
         if (comp == NULL) {                                                    \
             comp = T##_void_compare;                                           \
         }                                                                      \
-        N##_qsort(N##_array(c), N##_size(c), comp);                            \
+        _m_##N##_qsort(N##_array(c), N##_size(c), comp);                       \
     }

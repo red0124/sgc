@@ -9,16 +9,17 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PRIVATE_LIST_FUNCTION_DECLARATIONS(T, N)                     \
-    static void N##_memswp(char* i, char* j);                                  \
-    static bool N##_compare_node(const void* const first,                      \
-                                 const void* const second,                     \
-                                 int comp(const void*, const void*));          \
-    static void N##_qsort(void* array, size_t array_size,                      \
-                          int (*comp)(const void*, const void*));              \
-    static void N##_ptr_array_to_list(struct N##_node** nodes_ptr,             \
-                                      struct N* l);                            \
-    static struct N##_node* N##_node_alloc(struct N* l);                       \
-    static void N##_node_free(struct N* l, struct N##_node* n);
+    static void _m_##N##_memswp(char* i, char* j);                             \
+    static bool _m_##_m_##N##_node_compare(const void* const first,            \
+                                           const void* const second,           \
+                                           int comp(const void*,               \
+                                                    const void*));             \
+    static void _m_##N##_qsort(void* array, size_t array_size,                 \
+                               int (*comp)(const void*, const void*));         \
+    static void _m_##N##_ptr_array_to_list(struct N##_node** nodes_ptr,        \
+                                           struct N* l);                       \
+    static struct N##_node* _m_##N##_node_alloc(struct N* l);                  \
+    static void _m_##N##_node_free(struct N* l, struct N##_node* n);
 
 #define SGC_INIT_HEADERS_LIST(T, N)                                            \
                                                                                \
@@ -79,8 +80,8 @@
     bool N##_iterator_valid(const struct N##_iterator i);
 
 #define _SGC_INIT_UNIQUE_LIST_FUNCTIONS(T, N)                                  \
-    static void N##_ptr_array_to_list(struct N##_node** nodes_ptr,             \
-                                      struct N* l) {                           \
+    static void _m_##N##_ptr_array_to_list(struct N##_node** nodes_ptr,        \
+                                           struct N* l) {                      \
         if (!l->size_) {                                                       \
             return;                                                            \
         }                                                                      \
@@ -107,7 +108,7 @@
         dst->shared_ = src->shared_;                                           \
         N##_init(dst);                                                         \
         if (src->size_ != 0) {                                                 \
-            dst->head_ = N##_node_alloc(dst);                                  \
+            dst->head_ = _m_##N##_node_alloc(dst);                             \
             SGC_COPY(T##_copy, dst->head_->data_, src->head_->data_,           \
                      src->shared_);                                            \
             struct N##_node* curr_src = src->head_;                            \
@@ -119,7 +120,7 @@
                 if (!tmp_src) {                                                \
                     break;                                                     \
                 }                                                              \
-                tmp_dst = N##_node_alloc(dst);                                 \
+                tmp_dst = _m_##N##_node_alloc(dst);                            \
                 SGC_COPY(T##_copy, tmp_dst->data_, tmp_src->data_,             \
                          src->shared_);                                        \
                 tmp_dst->prev_ = curr_dst;                                     \
@@ -136,7 +137,7 @@
     }                                                                          \
                                                                                \
     void N##_push_back(struct N* l, T el) {                                    \
-        struct N##_node* new_el = N##_node_alloc(l);                           \
+        struct N##_node* new_el = _m_##N##_node_alloc(l);                      \
         if (!l->shared_) {                                                     \
             T##_copy(&new_el->data_, &el);                                     \
         } else {                                                               \
@@ -169,7 +170,7 @@
             if (!l->shared_) {                                                 \
                 T##_free(&tmp->data_);                                         \
             }                                                                  \
-            N##_node_free(l, tmp);                                             \
+            _m_##N##_node_free(l, tmp);                                        \
             if (l->tail_) {                                                    \
                 l->tail_->next_ = NULL;                                        \
             }                                                                  \
@@ -181,7 +182,7 @@
     }                                                                          \
                                                                                \
     void N##_push_front(struct N* l, const T el) {                             \
-        struct N##_node* new_el = N##_node_alloc(l);                           \
+        struct N##_node* new_el = _m_##N##_node_alloc(l);                      \
         SGC_COPY(T##_copy, new_el->data_, el, l->shared_);                     \
         new_el->prev_ = NULL;                                                  \
         switch (l->size_) {                                                    \
@@ -210,7 +211,7 @@
             if (!l->shared_) {                                                 \
                 T##_free(&tmp->data_);                                         \
             }                                                                  \
-            N##_node_free(l, tmp);                                             \
+            _m_##N##_node_free(l, tmp);                                        \
             if (l->head_) {                                                    \
                 l->head_->prev_ = NULL;                                        \
             }                                                                  \
@@ -222,8 +223,9 @@
     }                                                                          \
                                                                                \
     /* TODO create erase by iterator */                                        \
-    __attribute__((unused)) static void N##_node_erase(struct N* l,            \
-                                                       struct N##_node* n) {   \
+    __attribute__(                                                             \
+        (unused)) static void _m_##N##_node_erase(struct N* l,                 \
+                                                  struct N##_node* n) {        \
         if (n->next_) {                                                        \
             n->next_->prev_ = n->prev_;                                        \
         }                                                                      \
@@ -233,7 +235,7 @@
         if (l->shared_) {                                                      \
             T##_free(&n->data_);                                               \
         }                                                                      \
-        N##_node_free(l, n);                                                   \
+        _m_##N##_node_free(l, n);                                              \
         n = NULL;                                                              \
     }                                                                          \
                                                                                \

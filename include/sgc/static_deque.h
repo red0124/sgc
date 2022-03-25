@@ -7,11 +7,11 @@
 #include <stdbool.h>
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_DEQUE(T, S, N)                        \
-    static void N##_resize(const struct N* const q);                           \
+    static void _m_##N##_resize(const struct N* const q);                      \
     static size_t N##_max(const struct N* const q);                            \
-    static size_t N##_iterator_max(const struct N##_iterator* const i);        \
-    static void N##_move(size_t* flag, size_t max);                            \
-    static void N##_move_back(size_t* flag, size_t max);
+    static size_t _m_##N##_iterator_max(const struct N##_iterator* const i);   \
+    static void _m_##N##_go_forward(size_t* flag, size_t max);                 \
+    static void _m_##N##_go_back(size_t* flag, size_t max);
 
 #define SGC_INIT_HEADERS_STATIC_DEQUE(T, S, N)                                 \
                                                                                \
@@ -81,7 +81,7 @@
     bool N##_iterator_valid(const struct N##_iterator it);
 
 #define _SGC_INIT_UNIQUE_STATIC_DEQUE_FUNCTIONS(T, S, N)                       \
-    static void N##_resize(const struct N* const v) {                          \
+    static void _m_##N##_resize(const struct N* const v) {                     \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
@@ -91,7 +91,7 @@
         return S;                                                              \
     }                                                                          \
                                                                                \
-    static size_t N##_iterator_max(const struct N##_iterator* const i) {       \
+    static size_t _m_##N##_iterator_max(const struct N##_iterator* const i) {  \
         (void)(i);                                                             \
         return S;                                                              \
     }                                                                          \
@@ -111,7 +111,7 @@
                 size_t i;                                                      \
                 for (i = d->front_; i != d->back_;) {                          \
                     T##_free(&d->data_[i]);                                    \
-                    N##_move(&i, N##_max(d));                                  \
+                    _m_##N##_go_forward(&i, N##_max(d));                       \
                 }                                                              \
                 T##_free(&d->data_[i]);                                        \
             }                                                                  \
@@ -138,7 +138,7 @@
                 size_t i = src->front_;                                        \
                 for (size_t j = 0; j < src->size_; ++j) {                      \
                     T##_copy(&dst->data_[j], &src->data_[i]);                  \
-                    N##_move(&i, N##_max(src));                                \
+                    _m_##N##_go_forward(&i, N##_max(src));                     \
                 }                                                              \
             }                                                                  \
         }                                                                      \

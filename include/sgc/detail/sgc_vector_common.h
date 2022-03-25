@@ -7,7 +7,7 @@
             return;                                                            \
         }                                                                      \
                                                                                \
-        N##_resize(v);                                                    \
+        _m_##N##_resize(v);                                                    \
         memmove(v->data_ + at + 1, v->data_ + at,                              \
                 (v->size_ - at) * sizeof(T));                                  \
         SGC_COPY(T##_copy, v->data_[at], el, v->shared_);                      \
@@ -16,7 +16,7 @@
                                                                                \
     void N##_push_back(struct N* v, T el) {                                    \
         /* TODO check if this is faster                                        \
-        N##_resize(v);                                                    \
+        _m_##N##_resize(v);                                                    \
         SGC_COPY(T##_copy, v->data_[v->size_], el, v->shared_);                \
         ++v->size_;                                                            \
         */                                                                     \

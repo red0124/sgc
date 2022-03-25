@@ -10,49 +10,55 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PRIKVATE_SET_FUNCTION_DECLARATIONS(KV, N)                    \
-    static int N##_node_compare(const struct N##_node* const n,                \
-                                const KV* const key);                          \
-    static struct N##_node* N##_node_begin(struct N##_node* n);                \
-    static struct N##_node* N##_node_end(struct N##_node* n);                  \
-    static struct N##_node* N##_node_new(const KV* const v, size_t is_shared); \
-    static size_t N##_stack_size(size_t size);                                 \
-    static bool N##_is_left_child(const struct N##_node* const n,              \
-                                  const struct N##_node* const parent);        \
-    static struct N##_node* N##_sibling(const struct N##_node* const n,        \
-                                        const struct N##_node* const parent);  \
-    static void N##_rotate_left(struct N* s, struct N##_node* parent,          \
-                                struct N##_node* gparent);                     \
-    static void N##_rotate_right(struct N* s, struct N##_node* parent,         \
-                                 struct N##_node* gparent);                    \
-    static void N##_rotate_left_right(struct N* s, struct N##_node* n,         \
-                                      struct N##_node* parent,                 \
-                                      struct N##_node* gparent);               \
-    static void N##_rotate_right_left(struct N* s, struct N##_node* n,         \
-                                      struct N##_node* parent,                 \
-                                      struct N##_node* gparent);               \
-    static void N##_rotate(struct N* s, struct N##_node* n,                    \
-                           struct N##_node* parent, struct N##_node* gparent); \
-    static void N##_correct_tree(struct N* s, struct N##_node* n,              \
-                                 struct N##_node* p, struct N##_node* gp);     \
-    static void N##_check_color(struct N* s, struct N##_node* n);              \
-    static void N##_node_insert(struct N* s, KV* v);                           \
-    static void N##_insert_multiple_node(struct N* s, KV* v);                  \
-    struct N##_iterator N##_find(struct N* s, KV v);                           \
-    static struct N##_node* N##_node_find(struct N* s, KV v);                  \
-    static void N##_erase_rebalanse(struct N* m, struct N##_node* n,           \
-                                    struct N##_node* p);                       \
-    static struct N##_node* N##_node_erase(struct N* m, struct N##_node* n);   \
-    static void N##_node_copy_values(const struct N* const m,                  \
-                                     struct N##_node* dst,                     \
-                                     const struct N##_node* const src);        \
+    static int _m_##N##_node_compare(const struct N##_node* const n,           \
+                                     const KV* const key);                     \
+    static struct N##_node* _m_##N##_node_begin(struct N##_node* n);           \
+    static struct N##_node* _m_##N##_node_end(struct N##_node* n);             \
+    static struct N##_node* _m_##N##_node_new(const KV* const v,               \
+                                              size_t is_shared);               \
+    static size_t _m_##N##_stack_size(size_t size);                            \
+    static bool _m_##N##_is_left_child(const struct N##_node* const n,         \
+                                       const struct N##_node* const parent);   \
     static struct N##_node*                                                    \
-        N##_node_duplicate(const struct N* const m,                            \
-                           const struct N##_node* const n);                    \
-    static void N##_copy_base_data(struct N* __restrict__ dst,                 \
-                                   const struct N* __restrict__ const src);    \
-    static void N##_copy_nodes(struct N* __restrict__ dst,                     \
-                               const struct N* __restrict__ const src);        \
-    static void N##_node_free(const struct N* const m, struct N##_node* n);
+        _m_##N##_sibling(const struct N##_node* const n,                       \
+                         const struct N##_node* const parent);                 \
+    static void _m_##N##_rotate_left(struct N* s, struct N##_node* parent,     \
+                                     struct N##_node* gparent);                \
+    static void _m_##N##_rotate_right(struct N* s, struct N##_node* parent,    \
+                                      struct N##_node* gparent);               \
+    static void _m_##N##_rotate_left_right(struct N* s, struct N##_node* n,    \
+                                           struct N##_node* parent,            \
+                                           struct N##_node* gparent);          \
+    static void _m_##N##_rotate_right_left(struct N* s, struct N##_node* n,    \
+                                           struct N##_node* parent,            \
+                                           struct N##_node* gparent);          \
+    static void _m_##N##_rotate(struct N* s, struct N##_node* n,               \
+                                struct N##_node* parent,                       \
+                                struct N##_node* gparent);                     \
+    static void _m_##N##_correct_tree(struct N* s, struct N##_node* n,         \
+                                      struct N##_node* p,                      \
+                                      struct N##_node* gp);                    \
+    static void _m_##N##_check_color(struct N* s, struct N##_node* n);         \
+    static void _m_##N##_node_insert(struct N* s, KV* v);                      \
+    static void _m_##N##_node_insert_multiple(struct N* s, KV* v);             \
+    struct N##_iterator N##_find(struct N* s, KV v);                           \
+    static struct N##_node* _m_##N##_node_find(struct N* s, KV v);             \
+    static void _m_##N##_erase_rebalanse(struct N* m, struct N##_node* n,      \
+                                         struct N##_node* p);                  \
+    static struct N##_node* _m_##N##_node_erase(struct N* m,                   \
+                                                struct N##_node* n);           \
+    static void _m_##N##_node_copy_values(const struct N* const m,             \
+                                          struct N##_node* dst,                \
+                                          const struct N##_node* const src);   \
+    static struct N##_node*                                                    \
+        _m_##N##_node_duplicate(const struct N* const m,                       \
+                                const struct N##_node* const n);               \
+    static void                                                                \
+        _m_##N##_copy_base_data(struct N* __restrict__ dst,                    \
+                                const struct N* __restrict__ const src);       \
+    static void _m_##N##_copy_nodes(struct N* __restrict__ dst,                \
+                                    const struct N* __restrict__ const src);   \
+    static void _m_##N##_node_free(const struct N* const m, struct N##_node* n);
 
 #define SGC_INIT_HEADERS_SET(KV, N)                                            \
     struct N##_node {                                                          \
@@ -109,8 +115,8 @@
     bool N##_empty(const struct N* const m);
 
 #define _SGC_INIT_UNIQUE_SET_FUNCTIONS(KV, N)                                  \
-    static struct N##_node* N##_node_new(const KV* const v,                    \
-                                         size_t is_shared) {                   \
+    static struct N##_node* _m_##N##_node_new(const KV* const v,               \
+                                              size_t is_shared) {              \
         struct N##_node* n =                                                   \
             (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
         SGC_COPY(KV##_copy, n->value_, *v, is_shared);                         \
@@ -119,7 +125,7 @@
         return n;                                                              \
     }                                                                          \
                                                                                \
-    static void N##_node_insert(struct N* s, KV* v) {                          \
+    static void _m_##N##_node_insert(struct N* s, KV* v) {                     \
         struct N##_node* parent = s->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
         while (true) {                                                         \
@@ -127,7 +133,7 @@
                                                                                \
             if (compare > 0) {                                                 \
                 if (parent->left_ == SGC_MAP_LEAF) {                           \
-                    new_node = N##_node_new(v, s->shared_);                    \
+                    new_node = _m_##N##_node_new(v, s->shared_);               \
                     parent->left_ = new_node;                                  \
                     s->size_++;                                                \
                     break;                                                     \
@@ -135,7 +141,7 @@
                 parent = parent->left_;                                        \
             } else if (compare < 0) {                                          \
                 if (parent->right_ == SGC_MAP_LEAF) {                          \
-                    new_node = N##_node_new(v, s->shared_);                    \
+                    new_node = _m_##N##_node_new(v, s->shared_);               \
                     parent->right_ = new_node;                                 \
                     s->size_++;                                                \
                     break;                                                     \
@@ -150,22 +156,22 @@
             }                                                                  \
         }                                                                      \
         new_node->parent_ = parent;                                            \
-        N##_check_color(s, new_node);                                          \
+        _m_##N##_check_color(s, new_node);                                     \
     }                                                                          \
                                                                                \
     void N##_insert(struct N* s, KV v) {                                       \
         if (s->root_ == SGC_MAP_LEAF) {                                        \
-            struct N##_node* new_node = N##_node_new(&v, s->shared_);          \
+            struct N##_node* new_node = _m_##N##_node_new(&v, s->shared_);     \
             new_node->color_ = SGC_MAP_BLACK;                                  \
             new_node->parent_ = SGC_MAP_LEAF;                                  \
             s->root_ = new_node;                                               \
             s->size_ = 1;                                                      \
         } else {                                                               \
-            N##_node_insert(s, &v);                                            \
+            _m_##N##_node_insert(s, &v);                                       \
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void N##_insert_multiple_node(struct N* s, KV* v) {                 \
+    static void _m_##N##_node_insert_multiple(struct N* s, KV* v) {            \
         struct N##_node* parent = s->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
         while (true) {                                                         \
@@ -173,7 +179,7 @@
                                                                                \
             if (compare > 0) {                                                 \
                 if (parent->left_ == SGC_MAP_LEAF) {                           \
-                    new_node = N##_node_new(v, s->shared_);                    \
+                    new_node = _m_##N##_node_new(v, s->shared_);               \
                     parent->left_ = new_node;                                  \
                     s->size_++;                                                \
                     break;                                                     \
@@ -181,7 +187,7 @@
                 parent = parent->left_;                                        \
             } else {                                                           \
                 if (parent->right_ == SGC_MAP_LEAF) {                          \
-                    new_node = N##_node_new(v, s->shared_);                    \
+                    new_node = _m_##N##_node_new(v, s->shared_);               \
                     parent->right_ = new_node;                                 \
                     s->size_++;                                                \
                     break;                                                     \
@@ -190,22 +196,23 @@
             }                                                                  \
         }                                                                      \
         new_node->parent_ = parent;                                            \
-        N##_check_color(s, new_node);                                          \
+        _m_##N##_check_color(s, new_node);                                     \
     }                                                                          \
                                                                                \
     void N##_insert_multiple(struct N* s, KV v) {                              \
         if (s->root_ == SGC_MAP_LEAF) {                                        \
-            struct N##_node* new_node = N##_node_new(&v, s->shared_);          \
+            struct N##_node* new_node = _m_##N##_node_new(&v, s->shared_);     \
             new_node->color_ = SGC_MAP_BLACK;                                  \
             new_node->parent_ = SGC_MAP_LEAF;                                  \
             s->root_ = new_node;                                               \
             s->size_ = 1;                                                      \
         } else {                                                               \
-            N##_insert_multiple_node(s, &v);                                   \
+            _m_##N##_node_insert_multiple(s, &v);                              \
         }                                                                      \
     }                                                                          \
                                                                                \
-    static struct N##_node* N##_node_erase(struct N* m, struct N##_node* n) {  \
+    static struct N##_node* _m_##N##_node_erase(struct N* m,                   \
+                                                struct N##_node* n) {          \
         struct N##_node* succ;                                                 \
         struct N##_node* succ_p;                                               \
         struct N##_node* succ_c = SGC_MAP_LEAF;                                \
@@ -253,7 +260,7 @@
                 succ_c->color_ = SGC_MAP_BLACK;                                \
             }                                                                  \
         } else {                                                               \
-            N##_erase_rebalanse(m, succ_c, succ_p);                            \
+            _m_##N##_erase_rebalanse(m, succ_c, succ_p);                       \
         }                                                                      \
         if (m->root_) {                                                        \
             m->root_->color_ = SGC_MAP_BLACK;                                  \
@@ -268,8 +275,9 @@
         s->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
-    static void N##_copy_base_data(struct N* __restrict__ dst,                 \
-                                   const struct N* __restrict__ const src) {   \
+    static void                                                                \
+        _m_##N##_copy_base_data(struct N* __restrict__ dst,                    \
+                                const struct N* __restrict__ const src) {      \
         dst->size_ = src->size_;                                               \
         dst->root_ = SGC_MAP_LEAF;                                             \
         dst->shared_ = src->shared_;                                           \

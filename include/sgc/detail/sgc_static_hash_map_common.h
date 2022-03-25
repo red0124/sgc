@@ -5,7 +5,7 @@
 #define _SGC_INIT_STATIC_HASH_MAP_TYPE_FUNCTIONS(T, S, N)                      \
     void N##_iterator_erase(struct N* ds, struct N##_iterator* it) {           \
         if (N##_iterator_valid(*it)) {                                         \
-            N##_node_free(ds, it->curr_);                                      \
+            _m_##N##_node_free(ds, it->curr_);                                 \
             it->curr_->_state = SGC_NODE_STATE_ERASED;                         \
             N##_iterator_next(it);                                             \
             --ds->size_;                                                       \
@@ -21,18 +21,18 @@
                                                                                \
     struct N##_iterator N##_find(struct N* ds, const T key) {                  \
         size_t hash = T##_hash(&key);                                          \
-        return N##_find_by_hash(ds, &key, hash);                               \
+        return _m_##N##_find_by_hash(ds, &key, hash);                          \
     }                                                                          \
                                                                                \
-    static struct N##_iterator N##_find_by_hash(struct N* ds,                  \
-                                                const T* const key,            \
-                                                size_t hash) {                 \
+    static struct N##_iterator _m_##N##_find_by_hash(struct N* ds,             \
+                                                     const T* const key,       \
+                                                     size_t hash) {            \
         if (ds->size_) {                                                       \
             size_t position = hash % S;                                        \
             struct N##_node* data = ds->data_;                                 \
             while (data[position]._state != SGC_NODE_STATE_OPEN) {             \
                 if (data[position]._state == SGC_NODE_STATE_USED &&            \
-                    N##_node_equal_key(&data[position], key)) {                \
+                    _m_##N##_node_equal_key(&data[position], key)) {           \
                     return N##_iterator_at(ds, position);                      \
                 }                                                              \
                 if (position == S - 1) {                                       \
@@ -50,7 +50,7 @@
         if (u->size_) {                                                        \
             for (size_t i = 0; i < S; ++i) {                                   \
                 if (u->data_[i]._state == SGC_NODE_STATE_USED) {               \
-                    N##_node_free(u, &u->data_[i]);                            \
+                    _m_##N##_node_free(u, &u->data_[i]);                       \
                 }                                                              \
             }                                                                  \
             u->size_ = 0;                                                      \

@@ -9,17 +9,19 @@
 #include <stdbool.h>
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_UNORDERED_MAP(K, V, S, N)             \
-    static struct N##_iterator N##_find_by_hash(struct N* u, const K* const k, \
-                                                size_t hash);                  \
+    static struct N##_iterator _m_##N##_find_by_hash(struct N* u,              \
+                                                     const K* const k,         \
+                                                     size_t hash);             \
     static struct N##_iterator N##_iterator_at(const struct N* const u,        \
                                                size_t at);                     \
-    static void N##_node_free(const struct N* const m, struct N##_node* n);    \
-    static void N##_node_copy_values(const struct N* const m,                  \
-                                     struct N##_node* dst,                     \
-                                     const struct N##_node* const src);        \
-    static size_t N##_node_hash_value(const struct N##_node* n);               \
-    static bool N##_node_equal_key(const struct N##_node* const n,             \
-                                   const K* const key);
+    static void _m_##N##_node_free(const struct N* const m,                    \
+                                   struct N##_node* n);                        \
+    static void _m_##N##_node_copy_values(const struct N* const m,             \
+                                          struct N##_node* dst,                \
+                                          const struct N##_node* const src);   \
+    static size_t _m_##N##_node_hash_value(const struct N##_node* n);          \
+    static bool _m_##N##_node_equal_key(const struct N##_node* const n,        \
+                                        const K* const key);
 
 #define SGC_INIT_HEADERS_STATIC_UNORDERED_MAP(K, V, S, N)                      \
     struct N##_pair {                                                          \
@@ -99,7 +101,7 @@
                                                                                \
     void N##_set_at(struct N* u, const K k, const V v) {                       \
         size_t hash = K##_hash(&k);                                            \
-        struct N##_iterator i = N##_find_by_hash(u, &k, hash);                 \
+        struct N##_iterator i = _m_##N##_find_by_hash(u, &k, hash);            \
         if (i.is_valid_) {                                                     \
             SGC_REPLACE(V##_copy, V##_free, i.curr_->data_.value, v,           \
                         u->shared_);                                           \
@@ -122,7 +124,7 @@
                                                                                \
     V* N##_at(struct N* u, K k) {                                              \
         size_t hash = K##_hash(&k);                                            \
-        struct N##_iterator i = N##_find_by_hash(u, &k, hash);                 \
+        struct N##_iterator i = _m_##N##_find_by_hash(u, &k, hash);            \
         V* ret = NULL;                                                         \
         if (i.is_valid_) {                                                     \
             ret = &i.curr_->data_.value;                                       \
@@ -153,7 +155,8 @@
         dst->shared_key_ = src->shared_key_;                                   \
         for (size_t i = 0; i < S; ++i) {                                       \
             if (src->data_[i]._state == SGC_NODE_STATE_USED) {                 \
-                N##_node_copy_values(src, &dst->data_[i], &src->data_[i]);     \
+                _m_##N##_node_copy_values(src, &dst->data_[i],                 \
+                                          &src->data_[i]);                     \
             }                                                                  \
             dst->data_[i]._state = src->data_[i]._state;                       \
         }                                                                      \

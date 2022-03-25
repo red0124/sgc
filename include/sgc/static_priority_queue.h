@@ -8,9 +8,9 @@
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_PRIORITY_QUEUE(T, S, N)               \
     static void N##_node(const struct N* const p);                             \
-    static void N##_stack_size(T* i, T* j);                                    \
-    static void N##_is_left_child(struct N* p);                                \
-    static void N##_resize(struct N* p);
+    static void _m_##N##_stack_size(T* i, T* j);                               \
+    static void _m_##N##_is_left_child(struct N* p);                           \
+    static void _m_##N##_resize(struct N* p);
 
 #define SGC_INIT_HEADERS_STATIC_PRIORITY_QUEUE(T, S, N)                        \
                                                                                \

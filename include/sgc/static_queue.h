@@ -7,8 +7,8 @@
 #include <stdbool.h>
 
 #define SGC_INIT_STATIC_FUNCTIONS_STATIC_QUEUE(T, S, N)                        \
-    static void N##_move(size_t* flag, size_t max);                            \
-    static void N##_resize(const struct N* const q);                           \
+    static void _m_##N##_go_forward(size_t* flag, size_t max);                 \
+    static void _m_##N##_resize(const struct N* const q);                      \
     static size_t N##_max(const struct N* const q);
 
 #define SGC_INIT_HEADERS_STATIC_QUEUE(T, S, N)                                 \
@@ -39,7 +39,7 @@
     bool N##_empty(const struct N* const q);
 
 #define _SGC_INIT_UNIQUE_STATIC_QUEUE_FUNCTIONS(T, S, N)                       \
-    static void N##_resize(const struct N* const v) {                          \
+    static void _m_##N##_resize(const struct N* const v) {                     \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
@@ -64,7 +64,7 @@
                 size_t i;                                                      \
                 for (i = q->front_; i != q->back_;) {                          \
                     T##_free(&q->data_[i]);                                    \
-                    N##_move(&i, S);                                           \
+                    _m_##N##_go_forward(&i, S);                                \
                 }                                                              \
                 T##_free(&q->data_[i]);                                        \
             }                                                                  \
@@ -93,7 +93,7 @@
                     /* TODO memcpy would be better */                          \
                     SGC_COPY(T##_copy, dst->data_[j], src->data_[i],           \
                              dst->shared_);                                    \
-                    N##_move(&i, S);                                           \
+                    _m_##N##_go_forward(&i, S);                                \
                 }                                                              \
             }                                                                  \
         }                                                                      \

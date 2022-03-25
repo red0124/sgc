@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 #define SGC_INIT_STATIC_FUNCTIONS_STACK(T, N)                                  \
-    static void N##_resize(const struct N* const s);
+    static void _m_##N##_resize(const struct N* const s);
 
 #define SGC_INIT_HEADERS_STATIC_STACK(T, S, N)                                 \
     struct N {                                                                 \
@@ -33,7 +33,7 @@
     bool N##_empty(const struct N* const s);
 
 #define SGC_INIT_UNIQUE_FUNCTIONS_STATIC_STACK(T, S, N)                        \
-    static void N##_resize(const struct N* const v) {                       \
+    static void _m_##N##_resize(const struct N* const v) {                     \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
