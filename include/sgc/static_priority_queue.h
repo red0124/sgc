@@ -6,13 +6,13 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_STATIC_FUNCTIONS_STATIC_PRIORITY_QUEUE(T, S, N)               \
+#define SGC_INIT_SFUNCTIONS_SPRIORITY_QUEUE(T, S, N)               \
     static void N##_node(const struct N* const p);                             \
-    static void _m_##N##_stack_size(T* i, T* j);                               \
-    static void _m_##N##_is_left_child(struct N* p);                           \
-    static void _m_##N##_resize(struct N* p);
+    static void _p_##N##_stack_size(T* i, T* j);                               \
+    static void _p_##N##_is_left_child(struct N* p);                           \
+    static void _p_##N##_resize(struct N* p);
 
-#define SGC_INIT_HEADERS_STATIC_PRIORITY_QUEUE(T, S, N)                        \
+#define SGC_INIT_HEADERS_SPRIORITY_QUEUE(T, S, N)                        \
                                                                                \
     struct N {                                                                 \
         size_t size_;                                                          \
@@ -24,7 +24,7 @@
     typedef T N##_type;                                                        \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_share(N* p, int is_shared);                                   \
+    void N##_set_share(N* p, int shared);                                   \
     void N##_init(struct N* p);                                                \
     size_t N##_size(const struct N* p);                                        \
     void N##_free(struct N* p);                                                \
@@ -37,7 +37,7 @@
     T* N##_array(struct N* d);                                                 \
     void N##_from_array(struct N* p, const T* const arr, const size_t size);
 
-#define _SGC_INIT_UNIQUE_STATIC_PRIORITY_QUEUE_FUNCTIONS(T, S, N)              \
+#define _SGC_INIT_UNIQUE_SPRIORITY_QUEUE_FUNCTIONS(T, S, N)              \
     static void N##_node(const struct N* const v) {                            \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
@@ -79,9 +79,9 @@
         }                                                                      \
     }
 
-#define SGC_INIT_STATIC_PRIORITY_QUEUE(T, S, N)                                \
-    SGC_INIT_HEADERS_STATIC_PRIORITY_QUEUE(T, S, N)                            \
-    SGC_INIT_STATIC_FUNCTIONS_STATIC_PRIORITY_QUEUE(T, S, N)                   \
-    _SGC_INIT_UNIQUE_STATIC_PRIORITY_QUEUE_FUNCTIONS(T, S, N)                  \
+#define SGC_INIT_SPRIORITY_QUEUE(T, S, N)                                \
+    SGC_INIT_HEADERS_SPRIORITY_QUEUE(T, S, N)                            \
+    SGC_INIT_SFUNCTIONS_SPRIORITY_QUEUE(T, S, N)                   \
+    _SGC_INIT_UNIQUE_SPRIORITY_QUEUE_FUNCTIONS(T, S, N)                  \
     _SGC_INIT_PRIORITY_QUEUE_TYPE_FUNCTIONS(T, N)                              \
-    _SGC_INIT_COMMON_FUNCTIONS(N)
+    _SGC_INIT_COMMON(N)

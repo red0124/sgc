@@ -7,11 +7,11 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_STATIC_FUNCTIONS_PRIORITY_QUEUE(T, N)                         \
+#define SGC_INIT_SFUNCTIONS_PRIORITY_QUEUE(T, N)                         \
     static void N##_node(struct N* p);                                         \
-    static void _m_##N##_stack_size(T* i, T* j);                               \
-    static void _m_##N##_is_left_child(struct N* p);                           \
-    static void _m_##N##_resize(struct N* p);
+    static void _p_##N##_stack_size(T* i, T* j);                               \
+    static void _p_##N##_is_left_child(struct N* p);                           \
+    static void _p_##N##_resize(struct N* p);
 
 #define SGC_INIT_HEADERS_PRIORITY_QUEUE(T, N)                                  \
     struct N {                                                                 \
@@ -24,7 +24,7 @@
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
                                                                                \
-    void N##_set_share(N* p, int is_shared);                                   \
+    void N##_set_share(N* p, int shared);                                   \
     void N##_init(struct N* p);                                                \
     size_t N##_size(const struct N* p);                                        \
     void N##_free(struct N* p);                                                \
@@ -92,7 +92,7 @@
 
 #define SGC_INIT_PRIORITY_QUEUE(T, N)                                          \
     SGC_INIT_HEADERS_PRIORITY_QUEUE(T, N)                                      \
-    SGC_INIT_STATIC_FUNCTIONS_PRIORITY_QUEUE(T, N)                             \
-    _SGC_INIT_COMMON_FUNCTIONS(N)                                              \
+    SGC_INIT_SFUNCTIONS_PRIORITY_QUEUE(T, N)                             \
+    _SGC_INIT_COMMON(N)                                              \
     _SGC_INIT_PRIORITY_QUEUE_TYPE_FUNCTIONS(T, N)                              \
     _SGC_INIT_UNIEUE_PRIORITY_QUEUE_FUNCTIONS(T, N)

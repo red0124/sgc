@@ -6,10 +6,10 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_STATIC_FUNCTIONS_STACK(T, N)                                  \
-    static void _m_##N##_resize(const struct N* const s);
+#define SGC_INIT_SFUNCTIONS_STACK(T, N)                                  \
+    static void _p_##N##_resize(const struct N* const s);
 
-#define SGC_INIT_HEADERS_STATIC_STACK(T, S, N)                                 \
+#define SGC_INIT_HEADERS_SSTACK(T, S, N)                                 \
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t shared_;                                                        \
@@ -20,7 +20,7 @@
     typedef T N##_type;                                                        \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_share(N* s, int is_shared);                                   \
+    void N##_set_share(N* s, int shared);                                   \
     void N##_init(struct N* s);                                                \
     size_t N##_size(const struct N* s);                                        \
     void N##_free(struct N* s);                                                \
@@ -32,8 +32,8 @@
     void N##_set_top(struct N* s, T new_el);                                   \
     bool N##_empty(const struct N* const s);
 
-#define SGC_INIT_UNIQUE_FUNCTIONS_STATIC_STACK(T, S, N)                        \
-    static void _m_##N##_resize(const struct N* const v) {                     \
+#define SGC_INIT_UNIQUE_VECTOR_SSTACK(T, S, N)                        \
+    static void _p_##N##_resize(const struct N* const v) {                     \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
@@ -72,9 +72,9 @@
         }                                                                      \
     }
 
-#define SGC_INIT_STATIC_STACK(T, S, N)                                         \
-    SGC_INIT_HEADERS_STATIC_STACK(T, S, N)                                     \
-    SGC_INIT_UNIQUE_FUNCTIONS_STATIC_STACK(T, S, N)                            \
-    SGC_INIT_STATIC_FUNCTIONS_STACK(T, N)                                      \
+#define SGC_INIT_SSTACK(T, S, N)                                         \
+    SGC_INIT_HEADERS_SSTACK(T, S, N)                                     \
+    SGC_INIT_UNIQUE_VECTOR_SSTACK(T, S, N)                            \
+    SGC_INIT_SFUNCTIONS_STACK(T, N)                                      \
     _SGC_INIT_STACK_TYPE_FUNCTIONS(T, N)                                       \
-    _SGC_INIT_COMMON_FUNCTIONS(N)
+    _SGC_INIT_COMMON(N)

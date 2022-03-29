@@ -6,14 +6,14 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_STATIC_FUNCTIONS_STATIC_DEQUE(T, S, N)                        \
-    static void _m_##N##_resize(const struct N* const q);                      \
+#define _SGC_INIT_PP_SDEQUE(T, S, N)                                           \
+    static void _p_##N##_resize(const struct N* const q);                      \
     static size_t N##_max(const struct N* const q);                            \
-    static size_t _m_##N##_iterator_max(const struct N##_iterator* const i);   \
-    static void _m_##N##_go_forward(size_t* flag, size_t max);                 \
-    static void _m_##N##_go_back(size_t* flag, size_t max);
+    static size_t _p_##N##_it_max(const struct N##_it* const i);               \
+    static void _p_##N##_go_next(size_t* flag, size_t max);                    \
+    static void _p_##N##_go_prev(size_t* flag, size_t max);
 
-#define SGC_INIT_HEADERS_STATIC_DEQUE(T, S, N)                                 \
+#define SGC_INIT_HEADERS_SDEQUE(T, S, N)                                       \
                                                                                \
     struct N {                                                                 \
         size_t size_;                                                          \
@@ -27,7 +27,7 @@
     typedef T N##_type;                                                        \
                                                                                \
     size_t N##_xmax(void);                                                     \
-    void N##_set_share(N* d, int is_shared);                                   \
+    void N##_set_share(N* d, bool shared);                                     \
     size_t N##_size(const struct N* const d);                                  \
     void N##_init(struct N* d);                                                \
     void N##_free(struct N* d);                                                \
@@ -35,53 +35,49 @@
                   const struct N* __restrict__ const src);                     \
     void N##_push_back(struct N* d, T el);                                     \
     void N##_push_front(struct N* d, T el);                                    \
-    T* N##_front(struct N* d);                                                 \
+    const T* N##_front(const struct N* const d);                               \
     void N##_set_front(struct N* d, T new_el);                                 \
-    T* N##_back(struct N* d);                                                  \
+    const T* N##_back(const struct N* const d);                                \
     void N##_set_back(struct N* d, T new_el);                                  \
     void N##_pop_front(struct N* d);                                           \
     void N##_pop_back(struct N* d);                                            \
     void N##_insert(struct N* d, const size_t at, T el);                       \
-    void N##_erase_at(struct N* d, const size_t at);                           \
-    T* N##_at(struct N* d, size_t at);                                         \
+    void N##_erase(struct N* d, const size_t at);                              \
+    const T* N##_at(const struct N* const d, size_t at);                       \
     void N##_set(struct N* d, size_t at, T new_el);                            \
     bool N##_empty(const struct N* const d);                                   \
     T* N##_array(struct N* d);                                                 \
                                                                                \
-    struct N##_iterator {                                                      \
+    struct N##_it {                                                            \
         size_t curr_;                                                          \
         T* data_;                                                              \
-        int is_valid_;                                                         \
+        bool valid_;                                                           \
     };                                                                         \
                                                                                \
-    typedef struct N##_iterator N##_iterator;                                  \
+    typedef struct N##_it N##_it;                                              \
                                                                                \
-    T* N##_iterator_data(struct N##_iterator i);                               \
-    const T* N##_iterator_cdata(const struct N##_iterator i);                  \
-    void N##_iterator_next(struct N##_iterator* i);                            \
-    void N##_iterator_prev(struct N##_iterator* i);                            \
-    void N##_iterator_begin(struct N* d, struct N##_iterator* i);              \
-    void N##_iterator_cbegin(const struct N* const d, struct N##_iterator* i); \
-    struct N##_iterator N##_begin(struct N* d);                                \
-    struct N##_iterator N##_cbegin(const struct N* const d);                   \
-    void N##_iterator_end(struct N* d, struct N##_iterator* i);                \
-    void N##_iterator_cend(const struct N* const d, struct N##_iterator* i);   \
-    struct N##_iterator N##_end(struct N* d);                                  \
-    struct N##_iterator N##_cend(const struct N* const d);                     \
-    void N##_iterator_from(struct N* d, struct N##_iterator* i, size_t at);    \
-    void N##_iterator_cfrom(const struct N* const d, struct N##_iterator* i,   \
-                            size_t at);                                        \
-    struct N##_iterator N##_from(struct N* d, size_t at);                      \
-    struct N##_iterator N##_cfrom(const struct N* const d, size_t at);         \
-    void N##_iterator_jump(struct N##_iterator* i, ssize_t range);             \
-    bool N##_iterator_equal(const struct N##_iterator first,                   \
-                            const struct N##_iterator second);                 \
-    ssize_t N##_iterator_range(const struct N##_iterator first,                \
-                               const struct N##_iterator second);              \
-    bool N##_iterator_valid(const struct N##_iterator it);
+    const T* N##_it_data(const struct N##_it i);                               \
+    void N##_it_go_next(struct N##_it* i);                                     \
+    void N##_it_go_prev(struct N##_it* i);                                     \
+    void N##_it_begin(struct N* d, struct N##_it* i);                          \
+    void N##_it_cbegin(const struct N* const d, struct N##_it* i);             \
+    struct N##_it N##_begin(struct N* d);                                      \
+    struct N##_it N##_cbegin(const struct N* const d);                         \
+    void N##_it_end(struct N* d, struct N##_it* i);                            \
+    void N##_it_cend(const struct N* const d, struct N##_it* i);               \
+    struct N##_it N##_end(struct N* d);                                        \
+    struct N##_it N##_cend(const struct N* const d);                           \
+    void N##_it_from(struct N* d, struct N##_it* i, size_t at);                \
+    void N##_it_cfrom(const struct N* const d, struct N##_it* i, size_t at);   \
+    struct N##_it N##_from(struct N* d, size_t at);                            \
+    struct N##_it N##_cfrom(const struct N* const d, size_t at);               \
+    void N##_it_jump(struct N##_it* i, int range);                             \
+    bool N##_it_equal(const struct N##_it first, const struct N##_it second);  \
+    int N##_it_diff(const struct N##_it first, const struct N##_it second);    \
+    bool N##_it_valid(const struct N##_it it);
 
-#define _SGC_INIT_UNIQUE_STATIC_DEQUE_FUNCTIONS(T, S, N)                       \
-    static void _m_##N##_resize(const struct N* const v) {                     \
+#define _SGC_INIT_UNIQUE_SDEQUE(T, S, N)                                       \
+    static void _p_##N##_resize(const struct N* const v) {                     \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
@@ -91,7 +87,7 @@
         return S;                                                              \
     }                                                                          \
                                                                                \
-    static size_t _m_##N##_iterator_max(const struct N##_iterator* const i) {  \
+    static size_t _p_##N##_it_max(const struct N##_it* const i) {              \
         (void)(i);                                                             \
         return S;                                                              \
     }                                                                          \
@@ -111,7 +107,7 @@
                 size_t i;                                                      \
                 for (i = d->front_; i != d->back_;) {                          \
                     T##_free(&d->data_[i]);                                    \
-                    _m_##N##_go_forward(&i, N##_max(d));                       \
+                    _p_##N##_go_next(&i, N##_max(d));                          \
                 }                                                              \
                 T##_free(&d->data_[i]);                                        \
             }                                                                  \
@@ -138,7 +134,7 @@
                 size_t i = src->front_;                                        \
                 for (size_t j = 0; j < src->size_; ++j) {                      \
                     T##_copy(&dst->data_[j], &src->data_[i]);                  \
-                    _m_##N##_go_forward(&i, N##_max(src));                     \
+                    _p_##N##_go_next(&i, N##_max(src));                        \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -148,47 +144,45 @@
         dst->front_ = 0;                                                       \
     }                                                                          \
                                                                                \
-    void N##_iterator_begin(struct N* d, struct N##_iterator* i) {             \
+    void N##_it_begin(struct N* d, struct N##_it* i) {                         \
         i->data_ = d->data_;                                                   \
         i->curr_ = d->front_;                                                  \
-        i->is_valid_ = (d->size_) ? 1 : 0;                                     \
+        i->valid_ = (d->size_) ? 1 : 0;                                        \
     }                                                                          \
                                                                                \
-    void N##_iterator_cbegin(const struct N* const d,                          \
-                             struct N##_iterator* i) {                         \
+    void N##_it_cbegin(const struct N* const d, struct N##_it* i) {            \
         i->data_ = (T*)d->data_;                                               \
         i->curr_ = d->front_;                                                  \
-        i->is_valid_ = (d->size_) ? 1 : 0;                                     \
+        i->valid_ = (d->size_) ? 1 : 0;                                        \
     }                                                                          \
                                                                                \
-    void N##_iterator_end(struct N* d, struct N##_iterator* i) {               \
+    void N##_it_end(struct N* d, struct N##_it* i) {                           \
         i->data_ = (T*)d->data_;                                               \
         i->curr_ = d->back_;                                                   \
-        i->is_valid_ = (d->size_) ? 1 : 0;                                     \
+        i->valid_ = (d->size_) ? 1 : 0;                                        \
     }                                                                          \
                                                                                \
-    void N##_iterator_cend(const struct N* const d, struct N##_iterator* i) {  \
+    void N##_it_cend(const struct N* const d, struct N##_it* i) {              \
         i->data_ = (T*)d->data_;                                               \
         i->curr_ = d->back_;                                                   \
-        i->is_valid_ = (d->size_) ? 1 : 0;                                     \
+        i->valid_ = (d->size_) ? 1 : 0;                                        \
     }                                                                          \
                                                                                \
-    void N##_iterator_from(struct N* d, struct N##_iterator* i, size_t at) {   \
+    void N##_it_from(struct N* d, struct N##_it* i, size_t at) {               \
         i->data_ = (T*)d->data_;                                               \
         i->curr_ = (d->front_ + at) % N##_max(d);                              \
-        i->is_valid_ = (d->size_ > at) ? 1 : 0;                                \
+        i->valid_ = (d->size_ > at) ? 1 : 0;                                   \
     }                                                                          \
                                                                                \
-    void N##_iterator_cfrom(const struct N* const d, struct N##_iterator* i,   \
-                            size_t at) {                                       \
+    void N##_it_cfrom(const struct N* const d, struct N##_it* i, size_t at) {  \
         i->data_ = (T*)d->data_;                                               \
         i->curr_ = (d->front_ + at) % N##_max(d);                              \
-        i->is_valid_ = (d->size_ > at) ? 1 : 0;                                \
+        i->valid_ = (d->size_ > at) ? 1 : 0;                                   \
     }
 
-#define SGC_INIT_STATIC_DEQUE(T, S, N)                                         \
-    SGC_INIT_HEADERS_STATIC_DEQUE(T, S, N)                                     \
-    SGC_INIT_STATIC_FUNCTIONS_STATIC_DEQUE(T, S, N)                            \
-    _SGC_INIT_UNIQUE_STATIC_DEQUE_FUNCTIONS(T, S, N)                           \
-    _SGC_INIT_COMMON_FUNCTIONS(N)                                              \
-    _SGC_INIT_DEQUE_TYPE_FUNCTIONS(T, N)
+#define SGC_INIT_SDEQUE(T, S, N)                                               \
+    SGC_INIT_HEADERS_SDEQUE(T, S, N)                                           \
+    _SGC_INIT_PP_SDEQUE(T, S, N)                                               \
+    _SGC_INIT_UNIQUE_SDEQUE(T, S, N)                                           \
+    _SGC_INIT_COMMON_DEQUE(T, N)                                               \
+    _SGC_INIT_COMMON(N)

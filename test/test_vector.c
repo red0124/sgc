@@ -1,14 +1,14 @@
 #include "test_common.h"
 #include <sgc/vector.h>
+#include <unistd.h>
 
 SGC_INIT_VECTOR(int, vector)
 
 void vector_pop_front(vector* v) {
-    vector_erase_at(v, 0);
+    vector_erase(v, 0);
 }
 
-void test_vector_push_pop_front_back(void) {
-    // TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(vector);
+void test_vector_xxx(void) {
     TEST_TA(vector);
 }
 
@@ -51,7 +51,7 @@ void test_vector_iterator_from(void) {
 int main(void) {
     UNITY_BEGIN();
 
-    RUN_TEST(test_vector_push_pop_front_back);
+    RUN_TEST(test_vector_xxx);
     RUN_TEST(test_vector_copy);
     RUN_TEST(test_vector_insert);
     RUN_TEST(test_vector_insert_set);

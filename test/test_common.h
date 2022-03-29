@@ -6,7 +6,7 @@
 #include <unity.h>
 
 #ifdef LOG
-#define log(...) printf(__VA_ARGS__)
+#define log(...) fprintf(stderr, __VA_ARGS__)
 #else
 #define log(...) (void)(NULL)
 #endif
@@ -214,27 +214,27 @@ inline size_t al_hash(const al* const a) {
     PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
                                                                                \
     /* {0, 2, 3, 4} */                                                         \
-    N##_erase_at(&ds, 1);                                                      \
+    N##_erase(&ds, 1);                                                         \
     ASSERT_EQUAL(4, N##_size(&ds));                                            \
     ASSERT_ARRAY(N, ds, {0, 2, 3, 4});                                         \
                                                                                \
     /* {0, 2, 3} */                                                            \
-    N##_erase_at(&ds, 3);                                                      \
+    N##_erase(&ds, 3);                                                         \
     ASSERT_EQUAL(3, N##_size(&ds));                                            \
     ASSERT_ARRAY(N, ds, {0, 2, 3});                                            \
                                                                                \
     /* {2, 3} */                                                               \
-    N##_erase_at(&ds, 0);                                                      \
+    N##_erase(&ds, 0);                                                         \
     ASSERT_EQUAL(2, N##_size(&ds));                                            \
     ASSERT_ARRAY(N, ds, {2, 3});                                               \
                                                                                \
     /* {2} */                                                                  \
-    N##_erase_at(&ds, 1);                                                      \
+    N##_erase(&ds, 1);                                                         \
     ASSERT_EQUAL(1, N##_size(&ds));                                            \
     ASSERT_ARRAY(N, ds, {2});                                                  \
                                                                                \
     /* {} */                                                                   \
-    N##_erase_at(&ds, 0);                                                      \
+    N##_erase(&ds, 0);                                                         \
     ASSERT_EQUAL(0, N##_size(&ds));                                            \
                                                                                \
     N##_free(&ds);
@@ -248,15 +248,15 @@ inline size_t al_hash(const al* const a) {
     PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
                                                                                \
     /* {0, 10, 2, 3, 4} */                                                     \
-    *N##_at(&ds, 1) = 10;                                                      \
+    N##_set(&ds, 1, 10);                                                       \
     ASSERT_ARRAY(N, ds, {0, 10, 2, 3, 4});                                     \
                                                                                \
     /* {0, 10, 2, 3, 4} */                                                     \
-    *N##_at(&ds, 0) = 1;                                                       \
+    N##_set(&ds, 0, 1);                                                        \
     ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 4});                                     \
                                                                                \
     /* {0, 10, 2, 3, 4} */                                                     \
-    *N##_at(&ds, 4) = 40;                                                      \
+    N##_set(&ds, 4, 40);                                                       \
     ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 40});                                    \
                                                                                \
     /* {0, 10, 2, 3, 4} */                                                     \
@@ -295,8 +295,8 @@ inline size_t al_hash(const al* const a) {
     }                                                                          \
                                                                                \
     N##_pop_back(&ds);                                                         \
-    N##_erase_at(&ds, N##_size(&ds) - 1);                                      \
-    N##_erase_at(&ds, 0);                                                      \
+    N##_erase(&ds, N##_size(&ds) - 1);                                         \
+    N##_erase(&ds, 0);                                                         \
                                                                                \
     /* make collection the owner of the next element, it will not be copied */ \
     /* in other words, move it */                                              \
@@ -363,21 +363,21 @@ inline size_t al_hash(const al* const a) {
     /* {0, 1, 2, 3, 4} */                                                      \
     PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
                                                                                \
-    for (struct N##_iterator it = N##_begin(&ds);                              \
-         !N##_iterator_equal(it, N##_end(&ds)); N##_iterator_next(&it)) {      \
-        ASSERT_EQUAL(*N##_iterator_data(it), *N##_at(&ds, i));                 \
+    for (struct N##_it it = N##_begin(&ds); !N##_it_equal(it, N##_end(&ds));   \
+         N##_it_go_next(&it)) {                                                \
+        ASSERT_EQUAL(*N##_it_data(it), *N##_at(&ds, i));                       \
         ++i;                                                                   \
     }                                                                          \
                                                                                \
-    ASSERT_EQUAL(*N##_iterator_data(N##_end(&ds)), *N##_at(&ds, i));           \
+    ASSERT_EQUAL(*N##_it_data(N##_end(&ds)), *N##_at(&ds, i));                 \
                                                                                \
-    for (struct N##_iterator it = N##_end(&ds);                                \
-         !N##_iterator_equal(it, N##_begin(&ds)); N##_iterator_prev(&it)) {    \
-        ASSERT_EQUAL(*N##_iterator_data(it), *N##_at(&ds, i));                 \
+    for (struct N##_it it = N##_end(&ds); !N##_it_equal(it, N##_begin(&ds));   \
+         N##_it_go_prev(&it)) {                                                \
+        ASSERT_EQUAL(*N##_it_data(it), *N##_at(&ds, i));                       \
         --i;                                                                   \
     }                                                                          \
                                                                                \
-    ASSERT_EQUAL(*N##_iterator_data(N##_begin(&ds)), *N##_at(&ds, i));         \
+    ASSERT_EQUAL(*N##_it_data(N##_begin(&ds)), *N##_at(&ds, i));               \
                                                                                \
     N##_free(&ds);
 
@@ -389,14 +389,14 @@ inline size_t al_hash(const al* const a) {
     /* {0, 1, 2, 3, 4} */                                                      \
     PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
                                                                                \
-    struct N##_iterator it4 = N##_from(&ds, 4);                                \
-    ASSERT_EQUAL(*N##_iterator_data(it4), *N##_at(&ds, 4));                    \
+    struct N##_it it4 = N##_from(&ds, 4);                                      \
+    ASSERT_EQUAL(*N##_it_data(it4), *N##_at(&ds, 4));                          \
                                                                                \
-    struct N##_iterator it2 = N##_from(&ds, 2);                                \
-    ASSERT_EQUAL(*N##_iterator_data(it2), *N##_at(&ds, 2));                    \
+    struct N##_it it2 = N##_from(&ds, 2);                                      \
+    ASSERT_EQUAL(*N##_it_data(it2), *N##_at(&ds, 2));                          \
                                                                                \
-    struct N##_iterator it0 = N##_from(&ds, 0);                                \
-    ASSERT_EQUAL(*N##_iterator_data(it0), *N##_at(&ds, 0));                    \
+    struct N##_it it0 = N##_from(&ds, 0);                                      \
+    ASSERT_EQUAL(*N##_it_data(it0), *N##_at(&ds, 0));                          \
                                                                                \
     N##_free(&ds);
 
@@ -453,7 +453,7 @@ void ta_insert(ta* ta, size_t at, int el) {
     ta->data[at] = el;
 }
 
-void ta_erase_at(ta* ta, size_t at) {
+void ta_erase(ta* ta, size_t at) {
     if (at >= ta->size) {
         return;
     }
@@ -534,44 +534,44 @@ void ta_sort(ta* ta) {
                     N##_insert(&ds, 0, i);                                     \
                     break;                                                     \
                 case (8):                                                      \
-                    log("pop_front %d\n", i);                                  \
-                    ta_erase_at(&ta, 0);                                       \
+                    log("pop_front\n");                                        \
+                    ta_erase(&ta, 0);                                          \
                     N##_pop_front(&ds);                                        \
                     break;                                                     \
                 case (9):                                                      \
                     log("pop_back \n");                                        \
-                    ta_erase_at(&ta, ta.size - 1);                             \
+                    ta_erase(&ta, ta.size - 1);                                \
                     N##_pop_back(&ds);                                         \
                     break;                                                     \
                 case (10):                                                     \
                     log("erase at 0 %d\n", i);                                 \
-                    ta_erase_at(&ta, 0);                                       \
-                    N##_erase_at(&ds, 0);                                      \
+                    ta_erase(&ta, 0);                                          \
+                    N##_erase(&ds, 0);                                         \
                     break;                                                     \
                 case (11):                                                     \
                     log("erase at 1 %d\n", i);                                 \
-                    ta_erase_at(&ta, 1);                                       \
-                    N##_erase_at(&ds, 1);                                      \
+                    ta_erase(&ta, 1);                                          \
+                    N##_erase(&ds, 1);                                         \
                     break;                                                     \
                 case (12):                                                     \
                     log("erase at 2 %d\n", i);                                 \
-                    ta_erase_at(&ta, 2);                                       \
-                    N##_erase_at(&ds, 2);                                      \
+                    ta_erase(&ta, 2);                                          \
+                    N##_erase(&ds, 2);                                         \
                     break;                                                     \
                 case (13):                                                     \
                     log("erase at 3 %d\n", i);                                 \
-                    ta_erase_at(&ta, 3);                                       \
-                    N##_erase_at(&ds, 3);                                      \
+                    ta_erase(&ta, 3);                                          \
+                    N##_erase(&ds, 3);                                         \
                     break;                                                     \
                 case (14):                                                     \
                     log("erase at 4 %d\n", i);                                 \
-                    ta_erase_at(&ta, 4);                                       \
-                    N##_erase_at(&ds, 4);                                      \
+                    ta_erase(&ta, 4);                                          \
+                    N##_erase(&ds, 4);                                         \
                     break;                                                     \
                 case (15):                                                     \
                     log("erase at 5 %d\n", i);                                 \
-                    ta_erase_at(&ta, 5);                                       \
-                    N##_erase_at(&ds, 5);                                      \
+                    ta_erase(&ta, 5);                                          \
+                    N##_erase(&ds, 5);                                         \
                     break;                                                     \
                 case (16):                                                     \
                     log("set at 0 %d\n", i);                                   \
@@ -716,32 +716,32 @@ void tm_print(tm* tm) {
                 case (0):                                                      \
                     log("set %d %d\n", i, i + 10);                             \
                     tm_set(&tm, i, i + 10);                                    \
-                    N##_set_at(&ds, i, i + 10);                                \
+                    N##_set(&ds, i, i + 10);                                \
                     break;                                                     \
                 case (1):                                                      \
                     log("set 0 %d\n", i + 10);                                 \
                     tm_set(&tm, 0, i + 10);                                    \
-                    N##_set_at(&ds, 0, i + 10);                                \
+                    N##_set(&ds, 0, i + 10);                                \
                     break;                                                     \
                 case (2):                                                      \
                     log("set 1 %d\n", i + 10);                                 \
                     tm_set(&tm, 1, i + 10);                                    \
-                    N##_set_at(&ds, 1, i + 10);                                \
+                    N##_set(&ds, 1, i + 10);                                \
                     break;                                                     \
                 case (3):                                                      \
                     log("set 2 %d\n", i + 10);                                 \
                     tm_set(&tm, 2, i + 10);                                    \
-                    N##_set_at(&ds, 2, i + 10);                                \
+                    N##_set(&ds, 2, i + 10);                                \
                     break;                                                     \
                 case (4):                                                      \
                     log("set 3 %d\n", i + 10);                                 \
                     tm_set(&tm, 3, i + 10);                                    \
-                    N##_set_at(&ds, 3, i + 10);                                \
+                    N##_set(&ds, 3, i + 10);                                \
                     break;                                                     \
                 case (5):                                                      \
                     log("set 4 %d\n", i + 10);                                 \
                     tm_set(&tm, 4, i + 10);                                    \
-                    N##_set_at(&ds, 4, i + 10);                                \
+                    N##_set(&ds, 4, i + 10);                                \
                     break;                                                     \
                 case (6):                                                      \
                     log("at %d %d\n", i, i + 10);                              \
@@ -811,12 +811,12 @@ void tm_print(tm* tm) {
                 tm_print(&tm);                                                 \
                 for (size_t j = 0; j < tm.size; ++j) {                         \
                     int* value = tm_find(&tm, j);                              \
-                    N##_iterator it = N##_find(&ds, j);                        \
+                    N##_it it = N##_find(&ds, j);                              \
                     if (!value) {                                              \
-                        ASSERT_EQUAL(N##_iterator_valid(it), false);           \
+                        ASSERT_EQUAL(N##_it_valid(it), false);                 \
                     } else {                                                   \
-                        ASSERT_EQUAL(N##_iterator_valid(it), true);            \
-                        ASSERT_EQUAL(*value, N##_iterator_data(it)->value);    \
+                        ASSERT_EQUAL(N##_it_valid(it), true);                  \
+                        ASSERT_EQUAL(*value, N##_it_data(it)->value);          \
                     }                                                          \
                 }                                                              \
                 comb_copy /= m;                                                \
@@ -1009,12 +1009,12 @@ void ts_print(ts* ts) {
                 ts_print(&ts);                                                 \
                 for (size_t j = 0; j < ts.size; ++j) {                         \
                     int* value = ts_find(&ts, j);                              \
-                    N##_iterator it = N##_find(&ds, j);                        \
+                    N##_it it = N##_find(&ds, j);                              \
                     if (!value) {                                              \
-                        ASSERT_EQUAL(N##_iterator_valid(it), false);           \
+                        ASSERT_EQUAL(N##_it_valid(it), false);                 \
                     } else {                                                   \
-                        ASSERT_EQUAL(N##_iterator_valid(it), true);            \
-                        ASSERT_EQUAL(*value, *N##_iterator_data(it));          \
+                        ASSERT_EQUAL(N##_it_valid(it), true);                  \
+                        ASSERT_EQUAL(*value, *N##_it_data(it));                \
                     }                                                          \
                 }                                                              \
                 comb_copy /= m;                                                \
@@ -1044,7 +1044,7 @@ void ts_print(ts* ts) {
                     break;                                                     \
                 case (1):                                                      \
                     log("pop\n");                                              \
-                    ta_erase_at(&ta, ta.size - 1);                             \
+                    ta_erase(&ta, ta.size - 1);                                \
                     N##_pop(&ds);                                              \
                     break;                                                     \
                 case (2):                                                      \
@@ -1092,7 +1092,7 @@ void ts_print(ts* ts) {
                     break;                                                     \
                 case (1):                                                      \
                     log("pop\n");                                              \
-                    ta_erase_at(&ta, 0);                                       \
+                    ta_erase(&ta, 0);                                          \
                     N##_pop(&ds);                                              \
                     break;                                                     \
                 case (2):                                                      \
@@ -1180,7 +1180,7 @@ void ts_print(ts* ts) {
                     break;                                                     \
                 case (6):                                                      \
                     log("pop\n");                                              \
-                    ta_erase_at(&ta, 0);                                       \
+                    ta_erase(&ta, 0);                                          \
                     ta_sort(&ta);                                              \
                     N##_pop(&ds);                                              \
                     break;                                                     \

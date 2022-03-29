@@ -3,10 +3,10 @@
 
 #define VECTOR_MAX 512
 
-SGC_INIT_STATIC_VECTOR(int, VECTOR_MAX, vector)
+SGC_INIT_SVECTOR(int, VECTOR_MAX, vector)
 
 void vector_pop_front(vector* v) {
-    vector_erase_at(v, 0);
+    vector_erase(v, 0);
 }
 
 void test_static_vector_push_pop_front_back(void) {
@@ -30,13 +30,13 @@ void test_static_vector_insert_set(void) {
     TEST_PUSH_BACK_AT_SET_SET_AT_SET_FRONT_SET_BACK(vector);
 }
 
-SGC_INIT_STATIC_VECTOR(al, VECTOR_MAX, avector)
+SGC_INIT_SVECTOR(al, VECTOR_MAX, avector)
 
 void test_astatic_vector(void) {
     TEST_PUSH_BACK_ERASE_AT_ALLOCATIONS(avector);
 }
 
-SGC_INIT_STATIC_VECTOR(vector, VECTOR_MAX, vvector)
+SGC_INIT_SVECTOR(vector, VECTOR_MAX, vvector)
 
 void test_static_vector_static_vector(void) {
     TEST_ARRAY_OF_ARRAYS_PUSH_BACK_AT_SHARE(vvector, vector);

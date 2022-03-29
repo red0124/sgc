@@ -46,15 +46,15 @@
         return (size_t)*el;                                                    \
     }
 
-#define SGC_INIT_HEADERS_STATIC_STRUCT(T, N)                                   \
+#define SGC_INIT_HEADERS_SSTRUCT(T, N)                                   \
     typedef T N;                                                               \
     void N##_init(T* el);                                                      \
     void N##_free(T* el);                                                      \
     void N##_copy(T* dst, const T* const src);                                 \
     int N##_equal(const T* const first, const T* const second);
 
-#define SGC_INIT_STATIC_STRUCT(T, N)                                           \
-    SGC_INIT_HEADERS_STATIC_STRUCT(T, N)                                       \
+#define SGC_INIT_SSTRUCT(T, N)                                           \
+    SGC_INIT_HEADERS_SSTRUCT(T, N)                                       \
     void N##_init(T* el) {                                                     \
         memset(el, 0, sizeof(T));                                              \
     }                                                                          \

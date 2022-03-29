@@ -6,12 +6,12 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_STATIC_FUNCTIONS_STATIC_QUEUE(T, S, N)                        \
-    static void _m_##N##_go_forward(size_t* flag, size_t max);                 \
-    static void _m_##N##_resize(const struct N* const q);                      \
+#define SGC_INIT_SFUNCTIONS_SQUEUE(T, S, N)                        \
+    static void _p_##N##_go_next(size_t* flag, size_t max);                 \
+    static void _p_##N##_resize(const struct N* const q);                      \
     static size_t N##_max(const struct N* const q);
 
-#define SGC_INIT_HEADERS_STATIC_QUEUE(T, S, N)                                 \
+#define SGC_INIT_HEADERS_SQUEUE(T, S, N)                                 \
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t back_;                                                          \
@@ -24,7 +24,7 @@
     typedef T N##_type;                                                        \
                                                                                \
     size_t N##_xmax(void);                                                     \
-    void N##_set_share(N* q, int is_shared);                                   \
+    void N##_set_share(N* q, int shared);                                   \
     size_t N##_size(const struct N* const q);                                  \
     void N##_init(struct N* q);                                                \
     void N##_free(struct N* q);                                                \
@@ -38,8 +38,8 @@
     void N##_pop(struct N* q);                                                 \
     bool N##_empty(const struct N* const q);
 
-#define _SGC_INIT_UNIQUE_STATIC_QUEUE_FUNCTIONS(T, S, N)                       \
-    static void _m_##N##_resize(const struct N* const v) {                     \
+#define _SGC_INIT_UNIQUE_SQUEUE_FUNCTIONS(T, S, N)                       \
+    static void _p_##N##_resize(const struct N* const v) {                     \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
@@ -64,7 +64,7 @@
                 size_t i;                                                      \
                 for (i = q->front_; i != q->back_;) {                          \
                     T##_free(&q->data_[i]);                                    \
-                    _m_##N##_go_forward(&i, S);                                \
+                    _p_##N##_go_next(&i, S);                                \
                 }                                                              \
                 T##_free(&q->data_[i]);                                        \
             }                                                                  \
@@ -93,7 +93,7 @@
                     /* TODO memcpy would be better */                          \
                     SGC_COPY(T##_copy, dst->data_[j], src->data_[i],           \
                              dst->shared_);                                    \
-                    _m_##N##_go_forward(&i, S);                                \
+                    _p_##N##_go_next(&i, S);                                \
                 }                                                              \
             }                                                                  \
         }                                                                      \
@@ -103,9 +103,9 @@
         dst->front_ = 0;                                                       \
     }
 
-#define SGC_INIT_STATIC_QUEUE(T, S, N)                                         \
-    SGC_INIT_HEADERS_STATIC_QUEUE(T, S, N)                                     \
-    SGC_INIT_STATIC_FUNCTIONS_STATIC_QUEUE(T, S, N)                            \
+#define SGC_INIT_SQUEUE(T, S, N)                                         \
+    SGC_INIT_HEADERS_SQUEUE(T, S, N)                                     \
+    SGC_INIT_SFUNCTIONS_SQUEUE(T, S, N)                            \
     _SGC_INIT_QUEUE_TYPE_FUNCTIONS(T, N)                                       \
-    _SGC_INIT_COMMON_FUNCTIONS(N)                                              \
-    _SGC_INIT_UNIQUE_STATIC_QUEUE_FUNCTIONS(T, S, N)
+    _SGC_INIT_COMMON(N)                                              \
+    _SGC_INIT_UNIQUE_SQUEUE_FUNCTIONS(T, S, N)
