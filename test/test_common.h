@@ -716,32 +716,32 @@ void tm_print(tm* tm) {
                 case (0):                                                      \
                     log("set %d %d\n", i, i + 10);                             \
                     tm_set(&tm, i, i + 10);                                    \
-                    N##_set(&ds, i, i + 10);                                \
+                    N##_set(&ds, i, i + 10);                                   \
                     break;                                                     \
                 case (1):                                                      \
                     log("set 0 %d\n", i + 10);                                 \
                     tm_set(&tm, 0, i + 10);                                    \
-                    N##_set(&ds, 0, i + 10);                                \
+                    N##_set(&ds, 0, i + 10);                                   \
                     break;                                                     \
                 case (2):                                                      \
                     log("set 1 %d\n", i + 10);                                 \
                     tm_set(&tm, 1, i + 10);                                    \
-                    N##_set(&ds, 1, i + 10);                                \
+                    N##_set(&ds, 1, i + 10);                                   \
                     break;                                                     \
                 case (3):                                                      \
                     log("set 2 %d\n", i + 10);                                 \
                     tm_set(&tm, 2, i + 10);                                    \
-                    N##_set(&ds, 2, i + 10);                                \
+                    N##_set(&ds, 2, i + 10);                                   \
                     break;                                                     \
                 case (4):                                                      \
                     log("set 3 %d\n", i + 10);                                 \
                     tm_set(&tm, 3, i + 10);                                    \
-                    N##_set(&ds, 3, i + 10);                                \
+                    N##_set(&ds, 3, i + 10);                                   \
                     break;                                                     \
                 case (5):                                                      \
                     log("set 4 %d\n", i + 10);                                 \
                     tm_set(&tm, 4, i + 10);                                    \
-                    N##_set(&ds, 4, i + 10);                                \
+                    N##_set(&ds, 4, i + 10);                                   \
                     break;                                                     \
                 case (6):                                                      \
                     log("at %d %d\n", i, i + 10);                              \
@@ -1099,14 +1099,14 @@ void ts_print(ts* ts) {
                     log("set front %d\n", i);                                  \
                     if (!N##_empty(&ds)) {                                     \
                         ta.data[0] = i;                                        \
-                        *N##_front(&ds) = i;                                   \
+                        N##_set_front(&ds, i);                                 \
                     }                                                          \
                     break;                                                     \
                 case (3):                                                      \
                     log("set back %d\n", i);                                   \
                     if (!N##_empty(&ds)) {                                     \
                         ta.data[ta.size - 1] = i;                              \
-                        *N##_back(&ds) = i;                                    \
+                        N##_set_back(&ds, i);                                  \
                     }                                                          \
                     break;                                                     \
                 default:                                                       \

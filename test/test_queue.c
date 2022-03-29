@@ -74,19 +74,19 @@ void test_aqueue(void) {
 
 SGC_INIT_QUEUE(queue, vqueue)
 
-int* vqueue_front_pair(vqueue* l) {
+const int* vqueue_front_pair(vqueue* l) {
     return queue_front(vqueue_front(l));
 }
 
-int* vqueue_back_pair(vqueue* l) {
+const int* vqueue_back_pair(vqueue* l) {
     return queue_back(vqueue_back(l));
 }
 
-int* vqueue_back_front_pair(vqueue* l) {
+const int* vqueue_back_front_pair(vqueue* l) {
     return queue_back(vqueue_front(l));
 }
 
-int* vqueue_front_back_pair(vqueue* l) {
+const int* vqueue_front_back_pair(vqueue* l) {
     return queue_front(vqueue_back(l));
 }
 

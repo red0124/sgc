@@ -7,10 +7,12 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_SFUNCTIONS_QUEUE(T, N)                                  \
-    static void _p_##N##_go_next(size_t* flag, size_t max);                 \
+#define _SGC_INIT_PP_QUEUE(T, N)                                               \
+    static void _p_##N##_go_next(size_t* flag, size_t max);                    \
     static void _p_##N##_resize(struct N* q);                                  \
-    static size_t N##_max(const struct N* const q);
+    static void _p_##N##_free_data(struct N* q);                               \
+    static void _p_##N##_copy_data(struct N* dst, const struct N* const src);  \
+    static size_t _p_##N##_max(const struct N* const q);
 
 #define SGC_INIT_HEADERS_QUEUE(T, N)                                           \
                                                                                \
@@ -19,29 +21,29 @@
         size_t max_;                                                           \
         size_t back_;                                                          \
         size_t front_;                                                         \
-        size_t shared_;                                                        \
+        bool shared_;                                                          \
         T* data_;                                                              \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
                                                                                \
-    void N##_set_share(N* q, int shared);                                   \
+    void N##_set_share(N* q, bool shared);                                     \
     size_t N##_size(const struct N* const q);                                  \
     void N##_init(struct N* q);                                                \
     void N##_free(struct N* q);                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src);                     \
     void N##_push(struct N* q, T el);                                          \
-    T* N##_front(struct N* q);                                                 \
+    const T* N##_front(const struct N* const q);                               \
     void N##_set_front(struct N* q, T new_el);                                 \
-    T* N##_back(struct N* q);                                                  \
+    const T* N##_back(const struct N* const q);                                \
     void N##_set_back(struct N* q, T new_el);                                  \
     void N##_pop(struct N* q);                                                 \
     bool N##_empty(const struct N* const q);
 
-#define _SGC_INIT_UNIQUE_QUEUE_FUNCTIONS(T, N)                                 \
-    static size_t N##_max(const struct N* const q) {                           \
+#define _SGC_INIT_UNIQUE_QUEUE(T, N)                                           \
+    static size_t _p_##N##_max(const struct N* const q) {                      \
         return q->max_;                                                        \
     }                                                                          \
                                                                                \
@@ -53,14 +55,7 @@
                                                                                \
     void N##_free(struct N* q) {                                               \
         if (q->data_) {                                                        \
-            if (!q->shared_) {                                                 \
-                size_t i;                                                      \
-                for (i = q->front_; i != q->back_;) {                          \
-                    T##_free(&q->data_[i]);                                    \
-                    _p_##N##_go_next(&i, q->max_);                          \
-                }                                                              \
-                T##_free(&q->data_[i]);                                        \
-            }                                                                  \
+            _p_##N##_free_data(q);                                             \
             sgc_free(q->data_);                                                \
         }                                                                      \
     }                                                                          \
@@ -70,25 +65,7 @@
         dst->shared_ = src->shared_;                                           \
         if (src->size_ != 0) {                                                 \
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
-            if (src->shared_) {                                                \
-                if (src->front_ < src->back_) {                                \
-                    memcpy(dst->data_, src->data_ + src->front_,               \
-                           src->size_ * sizeof(T));                            \
-                } else {                                                       \
-                    size_t first_part = src->back_;                            \
-                    size_t second_part = src->max_ - src->front_;              \
-                    memcpy(dst->data_, src->data_ + src->front_,               \
-                           second_part * sizeof(T));                           \
-                    memcpy(dst->data_ + second_part, src->data_,               \
-                           (1 + first_part) * sizeof(T));                      \
-                }                                                              \
-            } else {                                                           \
-                size_t i = src->front_;                                        \
-                for (size_t j = 0; j < src->size_; ++j) {                      \
-                    T##_copy(&dst->data_[j], &src->data_[i]);                  \
-                    _p_##N##_go_next(&i, src->max_);                        \
-                }                                                              \
-            }                                                                  \
+            _p_##N##_copy_data(dst, src);                                      \
         }                                                                      \
                                                                                \
         dst->size_ = dst->max_ = src->size_;                                   \
@@ -100,7 +77,6 @@
         if (q->size_ == q->max_) {                                             \
             size_t max = q->max_;                                              \
             q->max_ = (q->max_ == 0) ? 1 : q->max_ * 2;                        \
-                                                                               \
             q->data_ = (T*)sgc_realloc(q->data_, sizeof(T) * q->max_);         \
                                                                                \
             if (q->front_ > q->back_) {                                        \
@@ -121,7 +97,7 @@
 
 #define SGC_INIT_QUEUE(T, N)                                                   \
     SGC_INIT_HEADERS_QUEUE(T, N)                                               \
-    SGC_INIT_SFUNCTIONS_QUEUE(T, N)                                      \
-    _SGC_INIT_QUEUE_TYPE_FUNCTIONS(T, N)                                       \
-    _SGC_INIT_COMMON(N)                                              \
-    _SGC_INIT_UNIQUE_QUEUE_FUNCTIONS(T, N)
+    _SGC_INIT_PP_QUEUE(T, N)                                                   \
+    _SGC_INIT_UNIQUE_QUEUE(T, N)                                               \
+    _SGC_INIT_COMMON_QUEUE(T, N)                                               \
+    _SGC_INIT_COMMON(N)
