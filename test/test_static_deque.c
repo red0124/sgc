@@ -1,282 +1,63 @@
 #include "test_common.h"
 #include <sgc/static_deque.h>
 
-#define TEST_ELEMENTS_NUM 50
 #define DEQUE_MAX 512
 
 SGC_INIT_STATIC_DEQUE(int, DEQUE_MAX, deque)
 
-void test_deque_push_pop(void)
-{
-        deque v;
-        deque_init(&v);
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; i++)
-        {
-                deque_push_back(&v, i);
-        }
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; i++)
-        {
-                TEST_ASSERT_EQUAL_INT(i, *deque_at(&v, i));
-        }
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                deque_pop_back(&v);
-        }
-
-        TEST_ASSERT_EQUAL_INT(0, deque_size(&v));
-
-        deque_free(&v);
+void test_static_deque_push_pop_front_back(void) {
+    // TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(deque);
+    TEST_TA(deque);
 }
 
-void test_deque_copy(void)
-{
-        deque v;
-        deque_init(&v);
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                deque_push_back(&v, i);
-        }
-
-        deque v_cp;
-        deque_copy(&v_cp, &v);
-
-        TEST_ASSERT_EQUAL_INT(1, deque_equal(&v_cp, &v));
-
-        deque_free(&v);
-        deque_free(&v_cp);
+void test_static_deque_copy(void) {
+    TEST_PUSH_BACK_COPY_EQUAL(deque);
 }
 
-void test_deque_front_back(void)
-{
-        deque v;
-        deque_init(&v);
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                deque_push_back(&v, i);
-                TEST_ASSERT_EQUAL_INT(i, *deque_back(&v));
-                TEST_ASSERT_EQUAL_INT(0, *deque_front(&v));
-        }
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                TEST_ASSERT_EQUAL_INT(i, *deque_front(&v));
-                TEST_ASSERT_EQUAL_INT(TEST_ELEMENTS_NUM - 1, *deque_back(&v));
-                deque_erase_at(&v, 0);
-        }
-
-        deque_free(&v);
+void test_static_deque_insert(void) {
+    TEST_AT_INSERT(deque);
 }
 
-void test_deque_insert_set_at(void)
-{
-        deque v;
-        deque_init(&v);
-
-        deque_push_back(&v, 0);
-        deque_push_front(&v, 0);
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                deque_insert(&v, i, i);
-                TEST_ASSERT_EQUAL_INT(i, *deque_at(&v, i));
-        }
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                deque_set_at(&v, i, i * 2);
-                TEST_ASSERT_EQUAL_INT(i * 2, *deque_at(&v, i));
-        }
-
-        deque_free(&v);
+void test_static_deque_erase_at(void) {
+    TEST_PUSH_BACK_AT_ERASE_AT(deque);
 }
 
-void test_deque_erase_at(void)
-{
-        deque v;
-        deque_init(&v);
-
-        deque_push_back(&v, 0);
-        deque_push_back(&v, 1);
-        deque_push_back(&v, 2);
-        deque_push_back(&v, 3);
-        deque_push_back(&v, 4);
-        deque_push_back(&v, 5);
-
-        deque_erase_at(&v, 0);
-        TEST_ASSERT_EQUAL_INT(1, *deque_at(&v, 0));
-
-        deque_erase_at(&v, 1);
-        TEST_ASSERT_EQUAL_INT(3, *deque_at(&v, 1));
-
-        deque_erase_at(&v, 2);
-        TEST_ASSERT_EQUAL_INT(5, *deque_at(&v, 2));
-
-        deque_free(&v);
-}
-
-struct alocated_element
-{
-        int *el;
-};
-
-typedef struct alocated_element al;
-
-size_t allocation_count = 0;
-
-void al_copy(al *dst, const al *const src)
-{
-        ++allocation_count;
-        dst->el = (int *)malloc(sizeof(int));
-        *dst->el = *src->el;
-}
-
-void al_free(al *a)
-{
-        --allocation_count;
-        free(a->el);
-}
-
-int al_equal(const al *const first, const al *const second)
-{
-        return *first->el == *second->el;
+void test_static_deque_insert_set(void) {
+    TEST_PUSH_BACK_AT_SET_SET_AT_SET_FRONT_SET_BACK(deque);
 }
 
 SGC_INIT_STATIC_DEQUE(al, DEQUE_MAX, adeque)
 
-void test_adeque(void)
-{
-        adeque v;
-        adeque_init(&v);
-
-        int x = 0;
-        al tmp = {&x};
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                adeque_push_back(&v, tmp);
-        }
-
-        adeque_pop_back(&v);
-        adeque_erase_at(&v, adeque_size(&v) - 1);
-
-        adeque_set_share(&v, 1);
-        ++allocation_count;
-        adeque_push_back(&v, (al){(int *)malloc(sizeof(int))});
-        adeque_set_share(&v, 0);
-
-        adeque_free(&v);
-
-        TEST_ASSERT_EQUAL_INT(0, allocation_count);
-        // no memory should be left dealocated
+void test_astatic_deque(void) {
+    TEST_PUSH_BACK_ERASE_AT_ALLOCATIONS(adeque);
 }
 
-SGC_INIT_STATIC_DEQUE(deque, DEQUE_MAX, vdeque)
-int *vdeque_at_pair(vdeque *l, size_t m, size_t n)
-{
-        return deque_at(vdeque_at(l, m), n);
+SGC_INIT_STATIC_DEQUE(deque, DEQUE_MAX, ddeque)
+
+void test_static_deque_static_deque(void) {
+    TEST_ARRAY_OF_ARRAYS_PUSH_BACK_AT_SHARE(ddeque, deque);
 }
 
-void test_deque_deque(void)
-{
-        vdeque v;
-        vdeque_init(&v);
-
-        deque tmp;
-        deque_init(&tmp);
-
-        deque_push_back(&tmp, 0);
-        // {0}
-
-        vdeque_push_back(&v, tmp);
-        // pushed deque into vdeque, it will make a copy
-
-        deque_push_back(&tmp, 1);
-        // {0, 1}
-
-        vdeque_push_back(&v, tmp);
-
-        deque_push_back(&tmp, 2);
-        // {0, 1, 2}
-
-        vdeque_set_share(&v, 1);
-        vdeque_push_back(&v, tmp);
-        vdeque_set_share(&v, 0);
-        // pushed deque into vdeque, it will use the original
-
-        // {{0}, {0, 1}, {0, 1, 2}}
-
-        TEST_ASSERT_EQUAL_INT(0, *vdeque_at_pair(&v, 0, 0));
-
-        TEST_ASSERT_EQUAL_INT(0, *vdeque_at_pair(&v, 1, 0));
-        TEST_ASSERT_EQUAL_INT(1, *vdeque_at_pair(&v, 1, 1));
-
-        TEST_ASSERT_EQUAL_INT(0, *vdeque_at_pair(&v, 2, 0));
-        TEST_ASSERT_EQUAL_INT(1, *vdeque_at_pair(&v, 2, 1));
-        TEST_ASSERT_EQUAL_INT(2, *vdeque_at_pair(&v, 2, 2));
-
-        vdeque_free(&v);
-        // no memory should be left dealocated
+void test_static_deque_iterator(void) {
+    TEST_PUSH_BACK_ITERATOR(deque);
 }
 
-void test_deque_iterator(void)
-{
-        deque v;
-        deque_init(&v);
-
-        for(size_t i = 0; i < TEST_ELEMENTS_NUM; ++i)
-        {
-                deque_push_back(&v, i);
-        }
-
-        size_t i = 0;
-
-        for(struct deque_iterator it = deque_begin(&v);
-            !deque_iterator_equal(it, deque_end(&v)); deque_iterator_next(&it))
-        {
-                TEST_ASSERT_EQUAL_INT(*deque_iterator_data(it),
-                                      *deque_at(&v, i));
-                ++i;
-        }
-
-        TEST_ASSERT_EQUAL_INT(*deque_iterator_data(deque_end(&v)),
-                              *deque_at(&v, i));
-
-        for(struct deque_iterator it = deque_end(&v);
-            !deque_iterator_equal(it, deque_begin(&v));
-            deque_iterator_prev(&it))
-        {
-                TEST_ASSERT_EQUAL_INT(*deque_iterator_data(it),
-                                      *deque_at(&v, i));
-                --i;
-        }
-
-        TEST_ASSERT_EQUAL_INT(*deque_iterator_data(deque_begin(&v)),
-                              *deque_at(&v, i));
-
-        i = TEST_ELEMENTS_NUM / 2;
-        struct deque_iterator it = deque_from(&v, i);
-
-        TEST_ASSERT_EQUAL_INT(*deque_iterator_data(it), *deque_at(&v, i));
-
-        deque_free(&v);
+void test_static_deque_iterator_from(void) {
+    TEST_PUSH_BACK_ITERATOR_FROM(deque);
 }
 
-int main(void)
-{
-        UNITY_BEGIN();
-        RUN_TEST(test_deque_push_pop);
-        RUN_TEST(test_deque_copy);
-        RUN_TEST(test_deque_front_back);
-        RUN_TEST(test_deque_insert_set_at);
-        RUN_TEST(test_deque_erase_at);
-        RUN_TEST(test_adeque);
-        RUN_TEST(test_deque_deque);
-        RUN_TEST(test_deque_iterator);
+int main(void) {
+    UNITY_BEGIN();
 
-        return UNITY_END();
+    RUN_TEST(test_static_deque_push_pop_front_back);
+    RUN_TEST(test_static_deque_copy);
+    RUN_TEST(test_static_deque_insert);
+    RUN_TEST(test_static_deque_insert_set);
+    RUN_TEST(test_static_deque_erase_at);
+    RUN_TEST(test_astatic_deque);
+    RUN_TEST(test_static_deque_static_deque);
+    RUN_TEST(test_static_deque_iterator);
+    RUN_TEST(test_static_deque_iterator_from);
+
+    return UNITY_END();
 }

@@ -178,6 +178,11 @@
         DST = SRC;                                                             \
     }
 
+#define SGC_FREE(FREE_FUN, SRC, IS_SHARED)                                     \
+    if (!IS_SHARED) {                                                          \
+        FREE_FUN(&SRC);                                                        \
+    }
+
 #define SGC_TOKENPASTE(x, y) x##y
 #define SGC_TOKENPASTE2(x, y) SGC_TOKENPASTE(x, y)
 #define SGC_UNIQUE(x) SGC_TOKENPASTE2(__sgc_unique_##x, __LINE__)
