@@ -1,4 +1,6 @@
-﻿# Semi-Generic C
+﻿Work In Progress
+
+# Semi-Generic C
 Algorithms and data structures written in **C** using macros. The data structures used are similar to the ones used in the **C++ STL** with little difference.
 
 # Simple Example 'intro.c'
