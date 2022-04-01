@@ -6,7 +6,7 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_SFUNCTIONS_SPRIORITY_QUEUE(T, S, N)               \
+#define _SGC_INIT_PP_SPRIORITY_QUEUE(T, S, N)               \
     static void N##_node(const struct N* const p);                             \
     static void _p_##N##_stack_size(T* i, T* j);                               \
     static void _p_##N##_is_left_child(struct N* p);                           \
@@ -81,7 +81,7 @@
 
 #define SGC_INIT_SPRIORITY_QUEUE(T, S, N)                                \
     SGC_INIT_HEADERS_SPRIORITY_QUEUE(T, S, N)                            \
-    SGC_INIT_SFUNCTIONS_SPRIORITY_QUEUE(T, S, N)                   \
+    _SGC_INIT_PP_SPRIORITY_QUEUE(T, S, N)                   \
     _SGC_INIT_UNIQUE_SPRIORITY_QUEUE_FUNCTIONS(T, S, N)                  \
     _SGC_INIT_PRIORITY_QUEUE_TYPE_FUNCTIONS(T, N)                              \
     _SGC_INIT_COMMON(N)

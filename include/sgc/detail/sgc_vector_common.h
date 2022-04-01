@@ -35,7 +35,10 @@
     }                                                                          \
                                                                                \
     const T* N##_at(const struct N* const v, size_t at) {                      \
-        return v->data_ + at;                                                  \
+        if (at < v->size_) {                                                   \
+            return v->data_ + at;                                              \
+        }                                                                      \
+        return NULL;                                                           \
     }                                                                          \
                                                                                \
     void N##_set(struct N* v, size_t at, T new_el) {                           \

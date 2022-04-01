@@ -207,10 +207,10 @@
     }                                                                          \
                                                                                \
     const T* N##_at(const struct N* const d, size_t at) {                      \
-        if (at >= d->size_) {                                                  \
-            return NULL;                                                       \
+        if (at < d->size_) {                                                   \
+            return &d->data_[(d->front_ + at) % _p_##N##_max(d)];              \
         }                                                                      \
-        return &d->data_[(d->front_ + at) % _p_##N##_max(d)];                  \
+        return NULL;                                                           \
     }                                                                          \
                                                                                \
     void N##_set(struct N* d, size_t at, T new_el) {                           \

@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define _SGC_INIT_STACK_TYPE_FUNCTIONS(T, N)                                   \
+#define _SGC_INIT_COMMON_STACK(T, N)                                           \
     void N##_push(struct N* s, T el) {                                         \
         _p_##N##_resize(s);                                                    \
         SGC_COPY(T##_copy, s->data_[s->size_], el, s->shared_);                \
@@ -12,19 +12,16 @@
     void N##_pop(struct N* s) {                                                \
         if (s->size_) {                                                        \
             T* el = &s->data_[s->size_ - 1];                                   \
-            if (!s->shared_) {                                                 \
-                T##_free(el);                                                  \
-            }                                                                  \
+            SGC_FREE(T##_free, *el, s->shared_);                               \
             --s->size_;                                                        \
         }                                                                      \
     }                                                                          \
                                                                                \
-    T* N##_top(struct N* s) {                                                  \
-        T* ret = NULL;                                                         \
+    const T* N##_top(const struct N* const s) {                                \
         if (s->size_) {                                                        \
-            ret = &s->data_[s->size_ - 1];                                     \
+           return &s->data_[s->size_ - 1];                                           \
         }                                                                      \
-        return ret;                                                            \
+        return NULL;                                                           \
     }                                                                          \
                                                                                \
     void N##_set_top(struct N* s, T new_el) {                                  \

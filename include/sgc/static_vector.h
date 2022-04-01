@@ -12,7 +12,7 @@
 #define SGC_INIT_HEADER_SVECTOR(T, S, N)                                       \
     struct N {                                                                 \
         size_t size_;                                                          \
-        size_t shared_;                                                        \
+        bool shared_;                                                        \
         T data_[S];                                                            \
     };                                                                         \
                                                                                \
@@ -91,11 +91,13 @@
                                                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
-        dst->size_ = src->size_;                                               \
         if (src->size_ != 0) {                                                 \
+            dst->size_ = src->size_;                                           \
             dst->shared_ = src->shared_;                                       \
             SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,              \
                            src->shared_)                                       \
+        } else {                                                               \
+            N##_init(dst);                                                     \
         }                                                                      \
     }
 

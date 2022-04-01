@@ -57,7 +57,7 @@
                                                                                \
     void N##_init(struct N* q) {                                               \
         q->size_ = q->front_ = q->back_ = 0;                                   \
-        q->shared_ = 0;                                                        \
+        q->shared_ = false;                                                    \
     }                                                                          \
                                                                                \
     void N##_free(struct N* q) {                                               \
@@ -69,13 +69,14 @@
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
         if (src->size_ != 0) {                                                 \
+            dst->size_ = src->size_;                                           \
+            dst->back_ = src->size_ - 1;                                       \
+            dst->front_ = 0;                                                   \
             dst->shared_ = src->shared_;                                       \
             _p_##N##_copy_data(dst, src);                                      \
+        } else {                                                               \
+            N##_init(dst);                                                     \
         }                                                                      \
-                                                                               \
-        dst->size_ = src->size_;                                               \
-        dst->back_ = src->size_ - 1;                                           \
-        dst->front_ = 0;                                                       \
     }
 
 #define SGC_INIT_SQUEUE(T, S, N)                                               \

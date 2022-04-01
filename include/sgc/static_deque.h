@@ -105,15 +105,15 @@
                                                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
-        N##_init(dst);                                                         \
         if (src->size_ != 0) {                                                 \
+            dst->size_ = src->size_;                                           \
+            dst->back_ = src->size_ - 1;                                       \
+            dst->front_ = 0;                                                   \
             dst->shared_ = src->shared_;                                       \
             _p_##N##_copy_data(dst, src);                                      \
+        } else {                                                               \
+            N##_init(dst);                                                     \
         }                                                                      \
-                                                                               \
-        dst->size_ = src->size_;                                               \
-        dst->back_ = src->size_ - 1;                                           \
-        dst->front_ = 0;                                                       \
     }
 
 #define SGC_INIT_SDEQUE(T, S, N)                                               \

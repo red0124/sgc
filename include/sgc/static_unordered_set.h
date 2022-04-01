@@ -8,7 +8,7 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_SFUNCTIONS_SUNORDERED_SET(KV, S, N)               \
+#define _SGC_INIT_PP_SUNORDERED_SET(KV, S, N)               \
     static struct N##_it _p_##N##_find_by_hash(struct N* u,              \
                                                      const KV* const k,        \
                                                      size_t hash);             \
@@ -138,7 +138,7 @@
 
 #define SGC_INIT_SUNORDERED_SET(V, S, N)                                 \
     SGC_INIT_HEADERS_SUNORDERED_SET(V, S, N)                             \
-    SGC_INIT_SFUNCTIONS_SUNORDERED_SET(V, S, N)                    \
+    _SGC_INIT_PP_SUNORDERED_SET(V, S, N)                    \
     _SGC_INIT_UNIQUE_SUNORDERED_SET_FUNCTIONS(V, S, N)                   \
     _SGC_INIT_COMMON_DICTIONARY_NONE_PAIR_FUNCTIONS(V, N)                      \
     _SGC_INIT_SHASH_MAP_TYPE_FUNCTIONS(V, S, N)                          \

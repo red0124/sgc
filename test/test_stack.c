@@ -72,7 +72,7 @@ void test_astack(void) {
 
 SGC_INIT_STACK(stack, vstack)
 
-int* vstack_top_pair(vstack* l) {
+const int* vstack_top_pair(const vstack* const l) {
     return stack_top(vstack_top(l));
 }
 

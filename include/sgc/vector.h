@@ -68,8 +68,7 @@
     struct N##_it N##_cfrom(const struct N* const v, size_t at);               \
     void N##_it_jump(struct N##_it* i, int range);                             \
     bool N##_it_equal(const struct N##_it first, const struct N##_it second);  \
-    int N##_it_diff(const struct N##_it first,                             \
-                        const struct N##_it second);                           \
+    int N##_it_diff(const struct N##_it first, const struct N##_it second);    \
     bool N##_it_valid(const struct N##_it i);
 
 #define _SGC_INIT_UNIQUE_VECTOR(T, N)                                          \
@@ -89,13 +88,15 @@
                                                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
-        dst->size_ = src->size_;                                               \
-        dst->max_ = src->size_;                                                \
         if (src->size_ != 0) {                                                 \
+            dst->size_ = src->size_;                                           \
+            dst->max_ = src->size_;                                            \
             dst->data_ = sgc_malloc(dst->max_ * sizeof(T));                    \
             dst->shared_ = src->shared_;                                       \
             SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,              \
                            src->shared_)                                       \
+        } else {                                                               \
+            N##_init(dst);                                                     \
         }                                                                      \
     }                                                                          \
                                                                                \

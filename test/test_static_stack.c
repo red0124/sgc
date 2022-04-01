@@ -4,7 +4,7 @@
 #define TEST_ELEMENTS_NUM 50
 #define STACK_MAX 512
 
-SGC_INIT_STATIC_STACK(int, STACK_MAX, stack)
+SGC_INIT_SSTACK(int, STACK_MAX, stack)
 
 void test_stack_xxx(void) {
     TEST_TSTK(stack);
@@ -45,7 +45,7 @@ void test_stack_front_back(void) {
     stack_free(&v);
 }
 
-SGC_INIT_STATIC_STACK(al, STACK_MAX, astack)
+SGC_INIT_SSTACK(al, STACK_MAX, astack)
 
 void test_astack(void) {
     astack v;
@@ -71,9 +71,9 @@ void test_astack(void) {
     // no memory should be left dealocated
 }
 
-SGC_INIT_STATIC_STACK(stack, STACK_MAX, vstack)
+SGC_INIT_SSTACK(stack, STACK_MAX, vstack)
 
-int* vstack_top_pair(vstack* l) {
+const int* vstack_top_pair(const vstack* const l) {
     return stack_top(vstack_top(l));
 }
 

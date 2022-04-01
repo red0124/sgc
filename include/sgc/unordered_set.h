@@ -9,7 +9,7 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_SFUNCTIONS_UNORDERED_SET(KV, N)                         \
+#define _SGC_INIT_PP_UNORDERED_SET(KV, N)                         \
     static void _p_##N##_bucket_sgc_free(const struct N* const u,              \
                                          struct N##_node* bucket);             \
     static void _p_##N##_bucket_insert(struct N##_node* bucket,                \
@@ -196,7 +196,7 @@
 
 #define SGC_INIT_UNORDERED_SET(KV, N)                                          \
     SGC_INIT_HEADERS_UNORDERED_SET(KV, N)                                      \
-    SGC_INIT_SFUNCTIONS_UNORDERED_SET(KV, N)                             \
+    _SGC_INIT_PP_UNORDERED_SET(KV, N)                             \
     _SGC_INIT_UNIQUE_UNORDERED_SET_FUNCTIONS(KV, N)                            \
     _SGC_INIT_COMMON_DICTIONARY_NONE_PAIR_FUNCTIONS(KV, N)                     \
     _SGC_INIT_COMMON(N)                                              \

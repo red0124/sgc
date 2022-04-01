@@ -26,7 +26,7 @@
 #define SGC_INIT_HEADERS_STRING1(N)                                            \
     SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, SGC_STRING_BUFF_SIZE)
 
-#define SGC_INIT_SFUNCTIONS_STRING_WITH_BUFFER(N, S)                     \
+#define _SGC_INIT_PP_STRING_WITH_BUFFER(N, S)                     \
     static int N##_char_find(const char* const del, char c);
 
 #define SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, S)                              \
@@ -78,7 +78,7 @@
 
 #define SGC_INIT_STRING_WITH_BUFFER(N, S)                                      \
     SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, S)                                  \
-    SGC_INIT_SFUNCTIONS_STRING_WITH_BUFFER(N, S)                         \
+    _SGC_INIT_PP_STRING_WITH_BUFFER(N, S)                         \
                                                                                \
     void N##_copy(N* first, const N* const second) {                           \
         *first = NULL;                                                         \

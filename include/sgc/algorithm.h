@@ -77,7 +77,7 @@
     void N##_fprintf_reverse_pair(const N* const c, const char* const format,  \
                                   FILE* file);
 
-#define SGC_INIT_SFUNCTIONS_QSORT(T, N)                                  \
+#define _SGC_INIT_PP_QSORT(T, N)                                  \
     static void _p_##N##_memswp(char* i, char* j);                             \
     static void _p_##N##_qsort(void* array, size_t array_size,                 \
                                int (*comp)(const void*, const void*));
@@ -455,7 +455,7 @@
 
 #define SGC_INIT_QSORT(T, N)                                                   \
     SGC_INIT_HEADERS_QSORT(T, N)                                               \
-    SGC_INIT_SFUNCTIONS_QSORT(T, N)                                      \
+    _SGC_INIT_PP_QSORT(T, N)                                      \
     static void _p_##N##_memswp(char* i, char* j) {                            \
         N##_type tmp;                                                          \
                                                                                \

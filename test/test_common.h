@@ -1051,7 +1051,7 @@ void ts_print(ts* ts) {
                     log("set top %d\n", i);                                    \
                     if (!N##_empty(&ds)) {                                     \
                         ta.data[ta.size - 1] = i;                              \
-                        *N##_top(&ds) = i;                                     \
+                        N##_set_top(&ds, i);                                     \
                     }                                                          \
                     break;                                                     \
                 default:                                                       \

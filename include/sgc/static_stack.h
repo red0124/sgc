@@ -6,13 +6,13 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_SFUNCTIONS_STACK(T, N)                                  \
+#define _SGC_INIT_PP_SSTACK(T, N)                                              \
     static void _p_##N##_resize(const struct N* const s);
 
-#define SGC_INIT_HEADERS_SSTACK(T, S, N)                                 \
+#define SGC_INIT_HEADERS_SSTACK(T, S, N)                                       \
     struct N {                                                                 \
         size_t size_;                                                          \
-        size_t shared_;                                                        \
+        bool shared_;                                                          \
         T data_[S];                                                            \
     };                                                                         \
                                                                                \
@@ -20,7 +20,7 @@
     typedef T N##_type;                                                        \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_share(N* s, int shared);                                   \
+    void N##_set_share(N* s, bool shared);                                     \
     void N##_init(struct N* s);                                                \
     size_t N##_size(const struct N* s);                                        \
     void N##_free(struct N* s);                                                \
@@ -28,11 +28,11 @@
                   const struct N* __restrict__ const src);                     \
     void N##_push(struct N* s, T el);                                          \
     void N##_pop(struct N* s);                                                 \
-    T* N##_top(struct N* s);                                                   \
+    const T* N##_top(const struct N* const s);                                 \
     void N##_set_top(struct N* s, T new_el);                                   \
     bool N##_empty(const struct N* const s);
 
-#define SGC_INIT_UNIQUE_VECTOR_SSTACK(T, S, N)                        \
+#define _SGC_INIT_UNIQUE_SSTACK(T, S, N)                                       \
     static void _p_##N##_resize(const struct N* const v) {                     \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
@@ -49,11 +49,7 @@
                                                                                \
     void N##_free(struct N* s) {                                               \
         if (s->size_) {                                                        \
-            if (!s->shared_) {                                                 \
-                for (size_t i = 0; i < s->size_; ++i) {                        \
-                    T##_free(&s->data_[i]);                                    \
-                }                                                              \
-            }                                                                  \
+            SGC_ARRAY_FREE(T, s->data_, s->size_, s->shared_);                 \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -62,19 +58,16 @@
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->shared_ = src->shared_;                                       \
-            if (dst->shared_) {                                                \
-                memcpy(dst->data_, src->data_, src->size_ * sizeof(T));        \
-            } else {                                                           \
-                for (size_t i = 0; i < dst->size_; ++i) {                      \
-                    T##_copy(&dst->data_[i], &src->data_[i]);                  \
-                }                                                              \
-            }                                                                  \
+            SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,              \
+                           src->shared_);                                      \
+        } else {                                                               \
+            N##_init(dst);                                                     \
         }                                                                      \
     }
 
-#define SGC_INIT_SSTACK(T, S, N)                                         \
-    SGC_INIT_HEADERS_SSTACK(T, S, N)                                     \
-    SGC_INIT_UNIQUE_VECTOR_SSTACK(T, S, N)                            \
-    SGC_INIT_SFUNCTIONS_STACK(T, N)                                      \
-    _SGC_INIT_STACK_TYPE_FUNCTIONS(T, N)                                       \
+#define SGC_INIT_SSTACK(T, S, N)                                               \
+    SGC_INIT_HEADERS_SSTACK(T, S, N)                                           \
+    _SGC_INIT_PP_SSTACK(T, N)                                                  \
+    _SGC_INIT_UNIQUE_SSTACK(T, S, N)                                           \
+    _SGC_INIT_COMMON_STACK(T, N)                                               \
     _SGC_INIT_COMMON(N)

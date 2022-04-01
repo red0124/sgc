@@ -85,7 +85,7 @@
     void N##_init(struct N* d) {                                               \
         d->size_ = d->max_ = d->front_ = d->back_ = 0;                         \
         d->data_ = NULL;                                                       \
-        d->shared_ = 0;                                                        \
+        d->shared_ = false;                                                    \
     }                                                                          \
                                                                                \
     void N##_free(struct N* d) {                                               \
@@ -97,16 +97,16 @@
                                                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
-        N##_init(dst);                                                         \
         if (src->size_ != 0) {                                                 \
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
             dst->shared_ = src->shared_;                                       \
+            dst->size_ = dst->max_ = src->size_;                               \
+            dst->back_ = src->size_ - 1;                                       \
+            dst->front_ = 0;                                                   \
             _p_##N##_copy_data(dst, src);                                      \
+        } else {                                                               \
+            N##_init(dst);                                                     \
         }                                                                      \
-                                                                               \
-        dst->size_ = dst->max_ = src->size_;                                   \
-        dst->back_ = src->size_ - 1;                                           \
-        dst->front_ = 0;                                                       \
     }                                                                          \
                                                                                \
     static void _p_##N##_resize(struct N* d) {                                 \
