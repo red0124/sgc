@@ -12,13 +12,13 @@
 SGC_INIT(VECTOR, int, vector, ITERATE, FIND, FIND_IT)
 SGC_INIT_DEQUE(int, deque)
 
-void fold_sum(const int* const el, void* acc) {
+void accumulate_sum(const int* const el, void* acc) {
     *(int*)acc += *el;
 }
 
 #define SUM(n) ((n) * ((n) + 1) / 2)
 
-void test_fold(void) {
+void test_accumulate(void) {
     vector v;
     vector_init(&v);
 
@@ -28,31 +28,19 @@ void test_fold(void) {
 
     int sum = 0;
     const int m = TEST_ELEMENTS_NUM;
-    vector_fold(&v, fold_sum, &sum);
-    TEST_ASSERT_EQUAL_INT(SUM(m - 1), sum);
-
-    sum = 0;
-    vector_fold_reverse(&v, fold_sum, &sum);
+    vector_accumulate(&v, accumulate_sum, &sum);
     TEST_ASSERT_EQUAL_INT(SUM(m - 1), sum);
 
     sum = 0;
     const int n = 10;
-    vector_fold_range(vector_begin(&v), vector_from(&v, n), fold_sum, &sum);
-    TEST_ASSERT_EQUAL_INT(SUM(n), sum);
-
-    sum = 0;
-    vector_fold_range_reverse(vector_begin(&v), vector_from(&v, n), fold_sum,
-                              &sum);
+    vector_accumulate_range(vector_begin(&v), vector_from(&v, n),
+                            accumulate_sum, &sum);
     TEST_ASSERT_EQUAL_INT(SUM(n), sum);
 
     const int o = 5;
     sum = 0;
-    vector_fold_range(vector_from(&v, o), vector_from(&v, n), fold_sum, &sum);
-    TEST_ASSERT_EQUAL_INT(SUM(n) - SUM(o - 1), sum);
-
-    sum = 0;
-    vector_fold_range_reverse(vector_from(&v, o), vector_from(&v, n), fold_sum,
-                              &sum);
+    vector_accumulate_range(vector_from(&v, o), vector_from(&v, n),
+                            accumulate_sum, &sum);
     TEST_ASSERT_EQUAL_INT(SUM(n) - SUM(o - 1), sum);
 
     vector_free(&v);
@@ -60,12 +48,12 @@ void test_fold(void) {
 
 int call = 0;
 
-void execute(const int* const el) {
+void call_fun(const int* const el) {
     (void)el;
     ++call;
 }
 
-void test_execute(void) {
+void test_foreach(void) {
     vector v;
     vector_init(&v);
 
@@ -74,30 +62,17 @@ void test_execute(void) {
     }
 
     call = 0;
-    vector_execute(&v, execute);
-    TEST_ASSERT_EQUAL_INT(vector_size(&v), call);
-
-    call = 0;
-    vector_execute_reverse(&v, execute);
+    vector_foreach(&v, call_fun);
     TEST_ASSERT_EQUAL_INT(vector_size(&v), call);
 
     call = 0;
     const int n = 10;
-    vector_execute_range(vector_begin(&v), vector_from(&v, n), execute);
-    TEST_ASSERT_EQUAL_INT(n + 1, call);
-
-    call = 0;
-    vector_execute_range_reverse(vector_begin(&v), vector_from(&v, n), execute);
+    vector_foreach_range(vector_begin(&v), vector_from(&v, n), call_fun);
     TEST_ASSERT_EQUAL_INT(n + 1, call);
 
     const int o = 5;
     call = 0;
-    vector_execute_range(vector_from(&v, o), vector_from(&v, n), execute);
-    TEST_ASSERT_EQUAL_INT(n - o + 1, call);
-
-    call = 0;
-    vector_execute_range_reverse(vector_from(&v, o), vector_from(&v, n),
-                                 execute);
+    vector_foreach_range(vector_from(&v, o), vector_from(&v, n), call_fun);
     TEST_ASSERT_EQUAL_INT(n - o + 1, call);
 
     vector_free(&v);
@@ -113,9 +88,9 @@ void test_find(void) {
     }
 
     struct vector_it it = vector_find_it(&v, -1);
-    TEST_ASSERT_EQUAL_INT(1, vector_it_equal(it, vector_end(&v)));
+    TEST_ASSERT_EQUAL(vector_it_valid(it), false);
     it = vector_find_it(&v, TEST_ELEMENTS_NUM);
-    TEST_ASSERT_EQUAL_INT(1, vector_it_equal(it, vector_end(&v)));
+    TEST_ASSERT_EQUAL(vector_it_valid(it), false);
 
     TEST_ASSERT_EQUAL_INT(NULL, vector_find_el(&v, -1));
     TEST_ASSERT_EQUAL_INT(NULL, vector_find_el(&v, TEST_ELEMENTS_NUM));
@@ -126,9 +101,9 @@ void test_find(void) {
             it = vector_find_it(&v, i);
             TEST_ASSERT_EQUAL_INT(0, vector_it_equal(it, vector_end(&v)));
         }
-        ssize_t index = vector_find_index(&v, i);
-        if (index >= 0) {
-            TEST_ASSERT_EQUAL_INT(i, *vector_at(&v, index));
+        sgc_index index = vector_find_index(&v, i);
+        if (index.valid) {
+            TEST_ASSERT_EQUAL_INT(i, *vector_at(&v, index.value));
         }
     }
 
@@ -158,8 +133,8 @@ void test_binary_find(void) {
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         TEST_ASSERT_EQUAL_INT(i, *vector_binary_find_el(&v, i));
-        TEST_ASSERT_EQUAL_INT(i,
-                              *vector_at(&v, vector_binary_find_index(&v, i)));
+        sgc_index index = vector_binary_find_index(&v, i);
+        TEST_ASSERT_EQUAL_INT(i, *vector_at(&v, index.value));
     }
 
     vector_free(&v);
@@ -194,13 +169,13 @@ void test_sort(void) {
     vector_free(&v);
 }
 
-SGC_INIT_PAIR(MAP, int, int, map, ITERATE, ITERATE_PAIR)
+SGC_INIT_PAIR(MAP, int, int, map, ITERATE)
 
-void fold_sum_pair(const struct map_pair* const p, void* acc) {
+void accumulate_sum_pair(const struct map_pair* const p, void* acc) {
     *(int*)acc += p->value;
 }
 
-void test_fold_map(void) {
+void test_accumulate_map(void) {
     map m;
     map_init(&m);
 
@@ -210,34 +185,26 @@ void test_fold_map(void) {
 
     int sum = 0;
     const int q = TEST_ELEMENTS_NUM;
-    map_fold(&m, fold_sum_pair, &sum);
+    map_accumulate(&m, accumulate_sum_pair, &sum);
     TEST_ASSERT_EQUAL_INT(SUM(q - 1), sum);
 
     sum = 0;
-    map_fold_reverse(&m, fold_sum_pair, &sum);
-    TEST_ASSERT_EQUAL_INT(SUM(q - 1), sum);
-
-    sum = 0;
-    map_fold_range_reverse(map_begin(&m), map_end(&m), fold_sum_pair, &sum);
-    TEST_ASSERT_EQUAL_INT(SUM(q - 1), sum);
-
-    sum = 0;
-    map_fold_range(map_begin(&m), map_end(&m), fold_sum_pair, &sum);
+    map_accumulate_range(map_begin(&m), map_end(&m), accumulate_sum_pair, &sum);
     TEST_ASSERT_EQUAL_INT(SUM(q - 1), sum);
 
     map_free(&m);
 }
 
-void fold_pair(const int* const k, const int* const v, void* arg) {
+void accumulate_pair(const int* const k, const int* const v, void* arg) {
     *(int*)arg += *k + *v * 2;
 }
 
-void execute_pair(const struct map_pair* const m) {
+void foreach_pair(const struct map_pair* const m) {
     (void)m;
     ++call;
 }
 
-void test_execute_map(void) {
+void test_foreach_map(void) {
     map m;
     map_init(&m);
 
@@ -246,25 +213,17 @@ void test_execute_map(void) {
     }
 
     call = 0;
-    map_execute(&m, execute_pair);
+    map_foreach(&m, foreach_pair);
     TEST_ASSERT_EQUAL_INT(map_size(&m), call);
 
     call = 0;
-    map_execute_reverse(&m, execute_pair);
-    TEST_ASSERT_EQUAL_INT(map_size(&m), call);
-
-    call = 0;
-    map_execute_range(map_begin(&m), map_end(&m), execute_pair);
-    TEST_ASSERT_EQUAL_INT(map_size(&m), call);
-
-    call = 0;
-    map_execute_range_reverse(map_begin(&m), map_end(&m), execute_pair);
+    map_foreach_range(map_begin(&m), map_end(&m), foreach_pair);
     TEST_ASSERT_EQUAL_INT(map_size(&m), call);
 
     map_free(&m);
 }
 
-void test_for_each1(void) {
+void test_for_each(void) {
     vector v;
     vector_init(&v);
 
@@ -272,12 +231,12 @@ void test_for_each1(void) {
         vector_push_back(&v, i);
     }
 
-    sgc_for_each(i, v, vector) {
+    for_each(i IN v AS vector) {
         *i += 1;
     }
 
     size_t j = 1;
-    sgc_for_each(i, v, vector) {
+    for_each(i IN v AS vector) {
         TEST_ASSERT_EQUAL_INT(*i, j);
         ++j;
     }
@@ -285,119 +244,39 @@ void test_for_each1(void) {
     vector_free(&v);
 }
 
-void test_for_each2(void) {
-    vector v1;
-    vector v2;
-    vector_init(&v1);
-    vector_init(&v2);
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        vector_push_back(&v1, i);
-        vector_push_back(&v2, 2 * i);
-    }
-
-    sgc_for_each(i, v1, vector, v2, vector) {
-        *i.first += 1;
-        *i.second += 2;
-    }
-
-    size_t j = 1;
-    sgc_for_each(i, v1, vector) {
-        TEST_ASSERT_EQUAL_INT(*i, j);
-        ++j;
-    }
-
-    j = 2;
-    sgc_for_each(i, v2, vector) {
-        TEST_ASSERT_EQUAL_INT(*i, j);
-        j += 2;
-    }
-
-    sgc_for_each(i, v1, vector, v2, vector) {
-        TEST_ASSERT_EQUAL_INT(*i.first * 2, *i.second);
-        j += 2;
-    }
-
-    vector_free(&v1);
-    vector_free(&v2);
-}
-
-SGC_INIT(DEQUE, char, cdeq)
-
-void test_for_each3(void) {
+void test_for_each_reverse(void) {
     vector v;
     vector_init(&v);
 
-    map m;
-    map_init(&m);
-
-    cdeq d;
-    cdeq_init(&d);
-
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        vector_push_back(&v, 0);
-        map_set(&m, i, 0);
-        cdeq_push_back(&d, '0');
+        vector_push_back(&v, i);
     }
 
-    int j = 0;
-    sgc_for_each(i, v, vector, m, map, d, cdeq) {
-        TEST_ASSERT_EQUAL_INT(*i.first, 0);
-        TEST_ASSERT_EQUAL_INT(i.second->key, j);
-        TEST_ASSERT_EQUAL_INT(i.second->value, 0);
-        TEST_ASSERT_EQUAL_INT(*i.third, '0');
-        ++j;
+    for_each_reverse(i IN v AS vector) {
+        *i += 1;
     }
 
-    TEST_ASSERT_EQUAL_INT(j, TEST_ELEMENTS_NUM);
-
-    sgc_for_each_reverse(i, v, vector, m, map, d, cdeq) {
+    size_t j = TEST_ELEMENTS_NUM;
+    for_each_reverse(i IN v AS vector) {
+        TEST_ASSERT_EQUAL_INT(*i, j);
         --j;
-        TEST_ASSERT_EQUAL_INT(*i.first, 0);
-        TEST_ASSERT_EQUAL_INT(i.second->key, j);
-        TEST_ASSERT_EQUAL_INT(i.second->value, 0);
-        TEST_ASSERT_EQUAL_INT(*i.third, '0');
     }
-
-    TEST_ASSERT_EQUAL_INT(j, 0);
 
     vector_free(&v);
-    map_free(&m);
-    cdeq_free(&d);
-}
-
-void test_for_each_intersect(void) {
-    vector v1, v2;
-    vector_init(&v1);
-    vector_init(&v2);
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        vector_push_back(&v1, i);
-        vector_push_back(&v1, TEST_ELEMENTS_NUM - i);
-    }
-
-    sgc_for_each_intersect(i, v1, v2, vector) {
-        TEST_ASSERT_EQUAL_INT(*i.first, *i.second);
-    }
-
-    vector_free(&v2);
-    vector_free(&v1);
 }
 
 int main(void) {
     UNITY_BEGIN();
 
-    RUN_TEST(test_fold);
-    RUN_TEST(test_execute);
+    RUN_TEST(test_accumulate);
+    RUN_TEST(test_foreach);
     RUN_TEST(test_find);
     RUN_TEST(test_binary_find);
     RUN_TEST(test_sort);
-    RUN_TEST(test_fold_map);
-    RUN_TEST(test_execute_map);
-    RUN_TEST(test_for_each1);
-    RUN_TEST(test_for_each2);
-    RUN_TEST(test_for_each3);
-    RUN_TEST(test_for_each_intersect);
+    RUN_TEST(test_accumulate_map);
+    RUN_TEST(test_foreach_map);
+    RUN_TEST(test_for_each);
+    RUN_TEST(test_for_each_reverse);
 
     return UNITY_END();
 }
