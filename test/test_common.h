@@ -98,7 +98,7 @@ inline size_t al_hash(const al* const a) {
 // VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(N)                         \
     N ds;                                                                      \
-    const size_t size = 100;                                                   \
+    size_t size = 100;                                                   \
                                                                                \
     N##_init(&ds);                                                             \
     ASSERT_EQUAL(0, N##_size(&ds));                                            \
@@ -158,7 +158,7 @@ inline size_t al_hash(const al* const a) {
 // VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_COPY_EQUAL(N)                                           \
     N ds;                                                                      \
-    const size_t size = 100;                                                   \
+    size_t size = 100;                                                   \
                                                                                \
     N##_init(&ds);                                                             \
                                                                                \

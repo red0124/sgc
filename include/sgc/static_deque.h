@@ -43,8 +43,8 @@
     void N##_set_back(struct N* d, T new_el);                                  \
     void N##_pop_front(struct N* d);                                           \
     void N##_pop_back(struct N* d);                                            \
-    void N##_insert(struct N* d, const size_t at, T el);                       \
-    void N##_erase(struct N* d, const size_t at);                              \
+    void N##_insert(struct N* d, size_t at, T el);                       \
+    void N##_erase(struct N* d, size_t at);                              \
     const T* N##_at(const struct N* const d, size_t at);                       \
     void N##_set(struct N* d, size_t at, T new_el);                            \
     bool N##_empty(const struct N* const d);                                   \

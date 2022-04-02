@@ -36,7 +36,7 @@
     const T* N##_top(const struct N* const p);                                 \
     bool N##_empty(const struct N* const d);                                   \
     T* N##_array(struct N* d);                                                 \
-    void N##_from_array(struct N* p, const T* const arr, const size_t size);
+    void N##_from_array(struct N* p, const T* const arr, size_t size);
 
 #define _SGC_INIT_UNIEUE_PRIORITY_QUEUE(T, N)                                  \
     static void N##_node(struct N* p) {                                        \

@@ -39,7 +39,7 @@
     void N##_set_back(N* v, T new_el);                                         \
     T* N##_front(N* v);                                                        \
     void N##_set_front(N* v, T new_el);                                        \
-    void N##_erase(N* v, const size_t at);                                     \
+    void N##_erase(N* v, size_t at);                                     \
     bool N##_empty(const N* const d);                                          \
     T* N##_array(N* d);                                                        \
                                                                                \
@@ -86,7 +86,7 @@
         v->shared_ = false;                                                    \
     }                                                                          \
                                                                                \
-    void N##_from_array(N* v, const T* const arr, const size_t size) {         \
+    void N##_from_array(N* v, const T* const arr, size_t size) {         \
         if (size) {                                                            \
             v->max_ = v->size_ = size;                                         \
             v->data_ = (T*)sgc_malloc(sizeof(T) * size);                       \
