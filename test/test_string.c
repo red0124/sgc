@@ -43,7 +43,7 @@ void test_string_copy(void) {
     string_free(&v_cp);
 }
 
-void test_string_iterator(void) {
+void test_string_it(void) {
     string v;
     string_init(&v);
 
@@ -53,28 +53,26 @@ void test_string_iterator(void) {
 
     size_t i = 0;
 
-    for (string_iterator it = string_begin(&v);
-         !string_iterator_equal(it, string_end(&v));
-         string_iterator_next(&it)) {
-        TEST_ASSERT_EQUAL_INT(*string_iterator_data(it), v[i]);
+    for (string_it it = string_begin(&v); !string_it_equal(it, string_end(&v));
+         string_it_go_next(&it)) {
+        TEST_ASSERT_EQUAL_INT(*string_it_data(it), v[i]);
         ++i;
     }
 
-    TEST_ASSERT_EQUAL_INT(*string_iterator_data(string_end(&v)), v[i]);
+    TEST_ASSERT_EQUAL_INT(*string_it_data(string_end(&v)), v[i]);
 
-    for (string_iterator it = string_end(&v);
-         !string_iterator_equal(it, string_begin(&v));
-         string_iterator_prev(&it)) {
-        TEST_ASSERT_EQUAL_INT(*string_iterator_data(it), v[i]);
+    for (string_it it = string_end(&v); !string_it_equal(it, string_begin(&v));
+         string_it_go_prev(&it)) {
+        TEST_ASSERT_EQUAL_INT(*string_it_data(it), v[i]);
         --i;
     }
 
-    TEST_ASSERT_EQUAL_INT(*string_iterator_data(string_begin(&v)), v[i]);
+    TEST_ASSERT_EQUAL_INT(*string_it_data(string_begin(&v)), v[i]);
 
     i = TEST_ELEMENTS_NUM / 2;
-    string_iterator it = string_from(&v, i);
+    string_it it = string_from(&v, i);
 
-    TEST_ASSERT_EQUAL_INT(*string_iterator_data(it), v[i]);
+    TEST_ASSERT_EQUAL_INT(*string_it_data(it), v[i]);
 
     string_free(&v);
 }
@@ -83,7 +81,7 @@ int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_string_push_pop);
     RUN_TEST(test_string_copy);
-    RUN_TEST(test_string_iterator);
+    RUN_TEST(test_string_it);
 
     return UNITY_END();
 }

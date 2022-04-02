@@ -74,7 +74,7 @@
         return NULL;                                                           \
     }                                                                          \
                                                                                \
-    void N##_from_array(struct N* p, const T* const arr, const size_t size) {  \
+    void N##_from_array(struct N* p, const T* const arr, size_t size) {  \
         N##_init(p);                                                           \
         if (size) {                                                            \
             for (size_t i = 0; i < size; ++i) {                                \

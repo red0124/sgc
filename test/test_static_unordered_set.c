@@ -4,7 +4,7 @@
 #define TEST_ELEMENTS_NUM 50
 #define SET_MAX 127
 
-SGC_INIT_STATIC_UNORDERED_SET(int, SET_MAX, set)
+SGC_INIT_SUNORDERED_SET(int, SET_MAX, set)
 
 void test_set_xxx(void) {
     TEST_TS(set);
@@ -19,7 +19,7 @@ void test_set_insert_erase(void) {
     }
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
-        TEST_ASSERT_EQUAL_INT(i, *set_iterator_data(set_find(&v, i)));
+        TEST_ASSERT_EQUAL_INT(i, *set_it_data(set_find(&v, i)));
     }
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
@@ -40,14 +40,14 @@ void test_set_insert_multiple(void) {
     }
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
-        TEST_ASSERT_EQUAL_INT(0, *set_iterator_data(set_find(&v, 0)));
+        TEST_ASSERT_EQUAL_INT(0, *set_it_data(set_find(&v, 0)));
     }
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         set_erase(&v, 0);
     }
 
-    TEST_ASSERT_EQUAL_INT(0, set_iterator_valid(set_find(&v, 0)));
+    TEST_ASSERT_EQUAL_INT(0, set_it_valid(set_find(&v, 0)));
     TEST_ASSERT_EQUAL_INT(0, set_size(&v));
 
     set_free(&v);
@@ -70,7 +70,7 @@ void test_set_copy(void) {
     set_free(&v_cp);
 }
 
-SGC_INIT_STATIC_UNORDERED_SET(al, SET_MAX, aset)
+SGC_INIT_SUNORDERED_SET(al, SET_MAX, aset)
 
 void test_aset(void) {
     aset v;
@@ -109,7 +109,7 @@ size_t set_hash(const set* const s) {
 }
 
 /* TODO update
-SGC_INIT_STATIC_UNORDERED_SET(set, SET_MAX, vset)
+SGC_INIT_SUNORDERED_SET(set, SET_MAX, vset)
 
 void test_set_set(void) {
     vset v;
@@ -140,8 +140,8 @@ void test_set_set(void) {
     // {{0}, {0, 1}, {0, 1, 2}}
 
     TEST_ASSERT_EQUAL_INT(0,
-                          *set_iterator_data(
-                              set_find(vset_iterator_data(vset_find(&v, tmp)),
+                          *set_it_data(
+                              set_find(vset_it_data(vset_find(&v, tmp)),
                                        0)));
 
     vset_free(&v);
@@ -149,7 +149,7 @@ void test_set_set(void) {
 }
 */
 
-void test_set_iterator(void) {
+void test_set_it(void) {
     set v;
     set_init(&v);
 
@@ -159,22 +159,22 @@ void test_set_iterator(void) {
 
     size_t i = 0;
 
-    for (struct set_iterator it = set_begin(&v);
-         !set_iterator_equal(it, set_end(&v)); set_iterator_next(&it)) {
-        TEST_ASSERT_EQUAL_INT(*set_iterator_data(it), i);
+    for (struct set_it it = set_begin(&v);
+         !set_it_equal(it, set_end(&v)); set_it_go_next(&it)) {
+        TEST_ASSERT_EQUAL_INT(*set_it_data(it), i);
         ++i;
     }
 
-    TEST_ASSERT_EQUAL_INT(*set_iterator_data(set_end(&v)),
+    TEST_ASSERT_EQUAL_INT(*set_it_data(set_end(&v)),
                           TEST_ELEMENTS_NUM - 1);
 
-    for (struct set_iterator it = set_end(&v);
-         !set_iterator_equal(it, set_begin(&v)); set_iterator_prev(&it)) {
-        TEST_ASSERT_EQUAL_INT(*set_iterator_data(it), i);
+    for (struct set_it it = set_end(&v);
+         !set_it_equal(it, set_begin(&v)); set_it_go_prev(&it)) {
+        TEST_ASSERT_EQUAL_INT(*set_it_data(it), i);
         --i;
     }
 
-    TEST_ASSERT_EQUAL_INT(*set_iterator_data(set_begin(&v)), 0);
+    TEST_ASSERT_EQUAL_INT(*set_it_data(set_begin(&v)), 0);
 
     set_free(&v);
 }
@@ -187,7 +187,7 @@ int main(void) {
     RUN_TEST(test_set_copy);
     RUN_TEST(test_aset);
     // TODO update RUN_TEST(test_set_set);
-    RUN_TEST(test_set_iterator);
+    RUN_TEST(test_set_it);
 
     return UNITY_END();
 }

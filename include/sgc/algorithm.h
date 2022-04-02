@@ -6,24 +6,24 @@
 #include "detail/sgc_utils.h"
 
 #define SGC_INIT_HEADERS_ITERATE(T, N)                                         \
-    void N##_fold_range(N##_it begin, N##_it end,                  \
+    void N##_fold_range(N##_it begin, N##_it end,                              \
                         void (*fun)(const N##_type* const, void*),             \
                         void* argout);                                         \
                                                                                \
     void N##_fold(const N* const c, void (*fun)(const N##_type* const, void*), \
                   void* argout);                                               \
                                                                                \
-    void N##_execute_range(N##_it begin, N##_it end,               \
+    void N##_execute_range(N##_it begin, N##_it end,                           \
                            void (*fun)(const N##_type* const));                \
                                                                                \
     void N##_execute(const N* const c, void (*fun)(const N##_type* const));    \
                                                                                \
-    void N##_fprintf_range(N##_it begin, N##_it end,               \
-                           const char* const format, FILE* file);              \
+    void N##_fprintf_range(N##_it begin, N##_it end, const char* const format, \
+                           FILE* file);                                        \
                                                                                \
     void N##_fprintf(const N* const c, const char* const format, FILE* file);  \
                                                                                \
-    void N##_fold_range_reverse(N##_it begin, N##_it end,          \
+    void N##_fold_range_reverse(N##_it begin, N##_it end,                      \
                                 void (*fun)(const N##_type* const, void*),     \
                                 void* argout);                                 \
                                                                                \
@@ -31,31 +31,29 @@
                           void (*fun)(const N##_type* const, void*),           \
                           void* argout);                                       \
                                                                                \
-    void N##_execute_range_reverse(N##_it begin, N##_it end,       \
+    void N##_execute_range_reverse(N##_it begin, N##_it end,                   \
                                    void (*fun)(const N##_type* const));        \
                                                                                \
     void N##_execute_reverse(const N* const c,                                 \
                              void (*fun)(const N##_type* const));              \
                                                                                \
-    void N##_fprintf_range_reverse(N##_it begin, N##_it end,       \
+    void N##_fprintf_range_reverse(N##_it begin, N##_it end,                   \
                                    const char* const format, FILE* file);      \
                                                                                \
     void N##_fprintf_reverse(const N* const c, const char* const format,       \
                              FILE* file);
 
 #define SGC_INIT_HEADERS_FIND(T, N)                                            \
-    N##_type* N##_find_el_range(N##_it begin, N##_it end,          \
-                                const N##_type el);                            \
+    N##_type* N##_find_el_range(N##_it begin, N##_it end, const N##_type el);  \
                                                                                \
     N##_type* N##_find_el(const N* const c, const N##_type el);                \
                                                                                \
-    int N##_find_index(const N* const c, const N##_type el);               \
+    int N##_find_index(const N* const c, const N##_type el);                   \
                                                                                \
     size_t N##_count(const N* const c, const N##_type el);
 
-#define SGC_INIT_HEADERS_FIND_ITERATOR(T, N)                                   \
-    N##_it N##_find_range(N##_it begin, N##_it end,          \
-                                const N##_type el);                            \
+#define SGC_INIT_HEADERS_FIND_IT(T, N)                                         \
+    N##_it N##_find_range(N##_it begin, N##_it end, const N##_type el);        \
                                                                                \
     N##_it N##_find(const N* const c, const N##_type el);
 
@@ -65,19 +63,19 @@
     size_t N##_binary_find_index(N* c, const N##_type el);
 
 #define SGC_INIT_HEADERS_ITERATE_PAIR(V, N)                                    \
-    void N##_fprintf_range_pair(N##_it begin, N##_it end,          \
+    void N##_fprintf_range_pair(N##_it begin, N##_it end,                      \
                                 const char* const format, FILE* file);         \
                                                                                \
     void N##_fprintf_pair(const N* const c, const char* const format,          \
                           FILE* file);                                         \
                                                                                \
-    void N##_fprintf_range_reverse_pair(N##_it begin, N##_it end,  \
+    void N##_fprintf_range_reverse_pair(N##_it begin, N##_it end,              \
                                         const char* const format, FILE* file); \
                                                                                \
     void N##_fprintf_reverse_pair(const N* const c, const char* const format,  \
                                   FILE* file);
 
-#define _SGC_INIT_PP_QSORT(T, N)                                  \
+#define _SGC_INIT_PP_QSORT(T, N)                                               \
     static void _p_##N##_memswp(char* i, char* j);                             \
     static void _p_##N##_qsort(void* array, size_t array_size,                 \
                                int (*comp)(const void*, const void*));
@@ -87,16 +85,16 @@
 
 #define SGC_INIT_ITERATE(T, N)                                                 \
     SGC_INIT_HEADERS_ITERATE(T, N)                                             \
-    void N##_fold_range(N##_it begin, N##_it end,                  \
+    void N##_fold_range(N##_it begin, N##_it end,                              \
                         void (*fun)(const N##_type* const, void*),             \
                         void* argout) {                                        \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        fun(N##_it_data(begin), argout);                                 \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_next(&begin);                                         \
-            fun(N##_it_data(begin), argout);                             \
+        fun(N##_it_data(begin), argout);                                       \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_next(&begin);                                            \
+            fun(N##_it_data(begin), argout);                                   \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -105,15 +103,15 @@
         N##_fold_range(N##_cbegin(c), N##_cend(c), fun, argout);               \
     }                                                                          \
                                                                                \
-    void N##_execute_range(N##_it begin, N##_it end,               \
+    void N##_execute_range(N##_it begin, N##_it end,                           \
                            void (*fun)(const N##_type* const)) {               \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        fun(N##_it_data(begin));                                         \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_next(&begin);                                         \
-            fun(N##_it_data(begin));                                     \
+        fun(N##_it_data(begin));                                               \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_next(&begin);                                            \
+            fun(N##_it_data(begin));                                           \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -121,15 +119,15 @@
         N##_execute_range(N##_cbegin(c), N##_cend(c), fun);                    \
     }                                                                          \
                                                                                \
-    void N##_fprintf_range(N##_it begin, N##_it end,               \
-                           const char* const format, FILE* file) {             \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+    void N##_fprintf_range(N##_it begin, N##_it end, const char* const format, \
+                           FILE* file) {                                       \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        fprintf(file, format, *N##_it_data(begin));                      \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_next(&begin);                                         \
-            fprintf(file, format, *N##_it_data(begin));                  \
+        fprintf(file, format, *N##_it_data(begin));                            \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_next(&begin);                                            \
+            fprintf(file, format, *N##_it_data(begin));                        \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -137,16 +135,16 @@
         N##_fprintf_range(N##_cbegin(c), N##_cend(c), format, file);           \
     }                                                                          \
                                                                                \
-    void N##_sprintf_range(N##_it begin, N##_it end,               \
-                           const char* const format, char* buff) {             \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+    void N##_sprintf_range(N##_it begin, N##_it end, const char* const format, \
+                           char* buff) {                                       \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        sprintf(buff, format, *N##_it_data(begin));                      \
+        sprintf(buff, format, *N##_it_data(begin));                            \
         buff += strlen(buff);                                                  \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_next(&begin);                                         \
-            sprintf(buff, format, *N##_it_data(begin));                  \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_next(&begin);                                            \
+            sprintf(buff, format, *N##_it_data(begin));                        \
             buff += strlen(buff);                                              \
         }                                                                      \
     }                                                                          \
@@ -155,16 +153,16 @@
         N##_sprintf_range(N##_cbegin(c), N##_cend(c), format, buff);           \
     }                                                                          \
                                                                                \
-    void N##_fold_range_reverse(N##_it begin, N##_it end,          \
+    void N##_fold_range_reverse(N##_it begin, N##_it end,                      \
                                 void (*fun)(const N##_type* const, void*),     \
                                 void* argout) {                                \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        fun(N##_it_data(end), argout);                                   \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_prev(&end);                                           \
-            fun(N##_it_data(end), argout);                               \
+        fun(N##_it_data(end), argout);                                         \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_prev(&end);                                              \
+            fun(N##_it_data(end), argout);                                     \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -174,15 +172,15 @@
         N##_fold_range_reverse(N##_cbegin(c), N##_cend(c), fun, argout);       \
     }                                                                          \
                                                                                \
-    void N##_execute_range_reverse(N##_it begin, N##_it end,       \
+    void N##_execute_range_reverse(N##_it begin, N##_it end,                   \
                                    void (*fun)(const N##_type* const)) {       \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        fun(N##_it_data(end));                                           \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_prev(&end);                                           \
-            fun(N##_it_data(end));                                       \
+        fun(N##_it_data(end));                                                 \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_prev(&end);                                              \
+            fun(N##_it_data(end));                                             \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -191,15 +189,15 @@
         N##_execute_range_reverse(N##_cbegin(c), N##_cend(c), fun);            \
     }                                                                          \
                                                                                \
-    void N##_fprintf_range_reverse(N##_it begin, N##_it end,       \
+    void N##_fprintf_range_reverse(N##_it begin, N##_it end,                   \
                                    const char* const format, FILE* file) {     \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        fprintf(file, format, *N##_it_data(end));                        \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_prev(&end);                                           \
-            fprintf(file, format, *N##_it_data(end));                    \
+        fprintf(file, format, *N##_it_data(end));                              \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_prev(&end);                                              \
+            fprintf(file, format, *N##_it_data(end));                          \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -208,16 +206,16 @@
         N##_fprintf_range_reverse(N##_cbegin(c), N##_cend(c), format, file);   \
     }                                                                          \
                                                                                \
-    void N##_sprintf_range_reverse(N##_it begin, N##_it end,       \
+    void N##_sprintf_range_reverse(N##_it begin, N##_it end,                   \
                                    const char* const format, char* buff) {     \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        sprintf(buff, format, *N##_it_data(end));                        \
+        sprintf(buff, format, *N##_it_data(end));                              \
         buff += strlen(buff);                                                  \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_prev(&end);                                           \
-            sprintf(buff, format, *N##_it_data(end));                    \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_prev(&end);                                              \
+            sprintf(buff, format, *N##_it_data(end));                          \
             buff += strlen(buff);                                              \
         }                                                                      \
     }                                                                          \
@@ -229,43 +227,42 @@
 
 #define SGC_INIT_FIND(T, N)                                                    \
     SGC_INIT_HEADERS_FIND(T, N)                                                \
-    N##_type* N##_find_el_range(N##_it begin, N##_it end,          \
-                                const N##_type el) {                           \
-        N##_type* ret = NULL;                                                  \
-        if (N##_it_valid(begin) || N##_it_valid(end)) {            \
-            if (T##_equal(&el, N##_it_data(begin))) {                    \
-                ret = N##_it_data(begin);                                \
+    const N##_type* N##_find_el_range(N##_it begin, N##_it end,                \
+                                      const N##_type el) {                     \
+        if (N##_it_valid(begin) || N##_it_valid(end)) {                        \
+            if (T##_equal(&el, N##_it_data(begin))) {                          \
+                return N##_it_data(begin);                                     \
             }                                                                  \
-            while (!ret && !N##_it_equal(begin, end)) {                  \
-                N##_it_go_next(&begin);                                     \
-                if (T##_equal(&el, N##_it_data(begin))) {                \
-                    ret = N##_it_data(begin);                            \
+            while (!ret && !N##_it_equal(begin, end)) {                        \
+                N##_it_go_next(&begin);                                        \
+                if (T##_equal(&el, N##_it_data(begin))) {                      \
+                    return N##_it_data(begin);                                 \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        return ret;                                                            \
+        return NULL;                                                           \
     }                                                                          \
                                                                                \
-    N##_type* N##_find_el(const N* const c, const N##_type el) {               \
+    const N##_type* N##_find_el(const N* const c, const N##_type el) {         \
         return N##_find_el_range(N##_cbegin(c), N##_cend(c), el);              \
     }                                                                          \
                                                                                \
-    int N##_find_index(const N* const c, const N##_type el) {              \
-        int ret = -1;                                                      \
+    int N##_find_index(const N* const c, const N##_type el) {                  \
+        int ret = -1;                                                          \
         int found = 0;                                                         \
-        N##_it begin = N##_cbegin(c);                                    \
-        N##_it end = N##_cend(c);                                        \
-        if (!T##_equal(&el, N##_it_data(begin))) {                       \
-            while (!N##_it_equal(begin, end)) {                          \
+        N##_it begin = N##_cbegin(c);                                          \
+        N##_it end = N##_cend(c);                                              \
+        if (!T##_equal(&el, N##_it_data(begin))) {                             \
+            while (!N##_it_equal(begin, end)) {                                \
                 ++ret;                                                         \
-                N##_it_go_next(&begin);                                     \
-                if (T##_equal(&el, N##_it_data(begin))) {                \
+                N##_it_go_next(&begin);                                        \
+                if (T##_equal(&el, N##_it_data(begin))) {                      \
                     found = 1;                                                 \
                     break;                                                     \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        if (!T##_equal(&el, N##_it_data(begin))) {                       \
+        if (!T##_equal(&el, N##_it_data(begin))) {                             \
             ++ret;                                                             \
             found = 1;                                                         \
         }                                                                      \
@@ -275,15 +272,15 @@
                                                                                \
     size_t N##_count(const N* const c, const N##_type el) {                    \
         size_t ret = 0;                                                        \
-        N##_it begin = N##_cbegin(c);                                    \
-        N##_it end = N##_cend(c);                                        \
-        if (N##_it_valid(begin) || N##_it_valid(end)) {            \
-            if (T##_equal(&el, N##_it_data(begin))) {                    \
+        N##_it begin = N##_cbegin(c);                                          \
+        N##_it end = N##_cend(c);                                              \
+        if (N##_it_valid(begin) || N##_it_valid(end)) {                        \
+            if (T##_equal(&el, N##_it_data(begin))) {                          \
                 ++ret;                                                         \
             }                                                                  \
-            while (!N##_it_equal(begin, end)) {                          \
-                N##_it_go_next(&begin);                                     \
-                if (T##_equal(&el, N##_it_data(begin))) {                \
+            while (!N##_it_equal(begin, end)) {                                \
+                N##_it_go_next(&begin);                                        \
+                if (T##_equal(&el, N##_it_data(begin))) {                      \
                     ++ret;                                                     \
                 }                                                              \
             }                                                                  \
@@ -291,20 +288,19 @@
         return ret;                                                            \
     }
 
-#define SGC_INIT_FIND_ITERATOR(T, N)                                           \
-    SGC_INIT_HEADERS_FIND_ITERATOR(T, N)                                       \
-    N##_it N##_find_range(N##_it begin, N##_it end,          \
-                                const N##_type el) {                           \
-        N##_it ret = end;                                                \
+#define SGC_INIT_FIND_IT(T, N)                                                 \
+    SGC_INIT_HEADERS_FIND_IT(T, N)                                             \
+    N##_it N##_find_range(N##_it begin, N##_it end, const N##_type el) {       \
+        N##_it ret = end;                                                      \
         int done = 0;                                                          \
-        if (N##_it_valid(begin) || N##_it_valid(end)) {            \
-            if (T##_equal(&el, N##_it_data(begin))) {                    \
+        if (N##_it_valid(begin) || N##_it_valid(end)) {                        \
+            if (T##_equal(&el, N##_it_data(begin))) {                          \
                 ret = begin;                                                   \
                 done = 1;                                                      \
             }                                                                  \
-            while (!done && !N##_it_equal(begin, end)) {                 \
-                N##_it_go_next(&begin);                                     \
-                if (T##_equal(&el, N##_it_data(begin))) {                \
+            while (!done && !N##_it_equal(begin, end)) {                       \
+                N##_it_go_next(&begin);                                        \
+                if (T##_equal(&el, N##_it_data(begin))) {                      \
                     ret = begin;                                               \
                     done = 1;                                                  \
                 }                                                              \
@@ -313,7 +309,7 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    N##_it N##_find(const N* const c, const N##_type el) {               \
+    N##_it N##_find(const N* const c, const N##_type el) {                     \
         return N##_find_range(N##_cbegin(c), N##_cend(c), el);                 \
     }
 
@@ -322,9 +318,9 @@
     N##_type* N##_binary_find_el(N* c, const N##_type el) {                    \
         N##_type* ret = NULL;                                                  \
         if (!N##_empty(c)) {                                                   \
-            int l = 0;                                                     \
-            int r = N##_size(c) - 1;                                       \
-            int m;                                                         \
+            int l = 0;                                                         \
+            int r = N##_size(c) - 1;                                           \
+            int m;                                                             \
             while (l <= r) {                                                   \
                 m = l + (r - l) / 2;                                           \
                 N##_type* curr = N##_at(c, m);                                 \
@@ -346,9 +342,9 @@
     size_t N##_binary_find_index(N* c, const N##_type el) {                    \
         size_t ret = N##_size(c) + 1;                                          \
         if (!N##_empty(c)) {                                                   \
-            int l = 0;                                                     \
-            int r = N##_size(c) - 1;                                       \
-            int m;                                                         \
+            int l = 0;                                                         \
+            int r = N##_size(c) - 1;                                           \
+            int m;                                                             \
             while (l <= r) {                                                   \
                 m = l + (r - l) / 2;                                           \
                 N##_type* curr = N##_at(c, m);                                 \
@@ -369,17 +365,17 @@
 
 #define SGC_INIT_ITERATE_PAIR(T, N)                                            \
     SGC_INIT_HEADERS_ITERATE_PAIR(T, N)                                        \
-    void N##_fprintf_range_pair(N##_it begin, N##_it end,          \
+    void N##_fprintf_range_pair(N##_it begin, N##_it end,                      \
                                 const char* const format, FILE* file) {        \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        fprintf(file, format, N##_it_data(begin)->key,                   \
-                N##_it_data(begin)->value);                              \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_next(&begin);                                         \
-            fprintf(file, format, N##_it_data(begin)->key,               \
-                    N##_it_data(begin)->value);                          \
+        fprintf(file, format, N##_it_data(begin)->key,                         \
+                N##_it_data(begin)->value);                                    \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_next(&begin);                                            \
+            fprintf(file, format, N##_it_data(begin)->key,                     \
+                    N##_it_data(begin)->value);                                \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -388,18 +384,18 @@
         N##_fprintf_range_pair(N##_cbegin(c), N##_cend(c), format, file);      \
     }                                                                          \
                                                                                \
-    void N##_sprintf_range_pair(N##_it begin, N##_it end,          \
+    void N##_sprintf_range_pair(N##_it begin, N##_it end,                      \
                                 const char* const format, char* buff) {        \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        sprintf(buff, format, N##_it_data(begin)->key,                   \
-                N##_it_data(begin)->value);                              \
+        sprintf(buff, format, N##_it_data(begin)->key,                         \
+                N##_it_data(begin)->value);                                    \
         buff += strlen(buff);                                                  \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_next(&begin);                                         \
-            sprintf(buff, format, N##_it_data(begin)->key,               \
-                    N##_it_data(begin)->value);                          \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_next(&begin);                                            \
+            sprintf(buff, format, N##_it_data(begin)->key,                     \
+                    N##_it_data(begin)->value);                                \
             buff += strlen(buff);                                              \
         }                                                                      \
     }                                                                          \
@@ -409,18 +405,17 @@
         N##_sprintf_range_pair(N##_cbegin(c), N##_cend(c), format, buff);      \
     }                                                                          \
                                                                                \
-    void N##_fprintf_range_reverse_pair(N##_it begin, N##_it end,  \
+    void N##_fprintf_range_reverse_pair(N##_it begin, N##_it end,              \
                                         const char* const format,              \
                                         FILE* file) {                          \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        fprintf(file, format, N##_it_data(end)->key,                     \
-                N##_it_data(end)->value);                                \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_prev(&end);                                           \
-            fprintf(file, format, N##_it_data(end)->key,                 \
-                    N##_it_data(end)->value);                            \
+        fprintf(file, format, N##_it_data(end)->key, N##_it_data(end)->value); \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_prev(&end);                                              \
+            fprintf(file, format, N##_it_data(end)->key,                       \
+                    N##_it_data(end)->value);                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -430,19 +425,18 @@
                                        file);                                  \
     }                                                                          \
                                                                                \
-    void N##_sprintf_range_reverse_pair(N##_it begin, N##_it end,  \
+    void N##_sprintf_range_reverse_pair(N##_it begin, N##_it end,              \
                                         const char* const format,              \
                                         char* buff) {                          \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {          \
+        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
             return;                                                            \
         }                                                                      \
-        sprintf(buff, format, N##_it_data(end)->value,                   \
-                N##_it_data(end)->key);                                  \
+        sprintf(buff, format, N##_it_data(end)->value, N##_it_data(end)->key); \
         buff += strlen(buff);                                                  \
-        while (!N##_it_equal(begin, end)) {                              \
-            N##_it_go_prev(&end);                                           \
-            sprintf(buff, format, N##_it_data(end)->key,                 \
-                    N##_it_data(end)->value);                            \
+        while (!N##_it_equal(begin, end)) {                                    \
+            N##_it_go_prev(&end);                                              \
+            sprintf(buff, format, N##_it_data(end)->key,                       \
+                    N##_it_data(end)->value);                                  \
             buff += strlen(buff);                                              \
         }                                                                      \
     }                                                                          \
@@ -455,7 +449,7 @@
 
 #define SGC_INIT_QSORT(T, N)                                                   \
     SGC_INIT_HEADERS_QSORT(T, N)                                               \
-    _SGC_INIT_PP_QSORT(T, N)                                      \
+    _SGC_INIT_PP_QSORT(T, N)                                                   \
     static void _p_##N##_memswp(char* i, char* j) {                            \
         N##_type tmp;                                                          \
                                                                                \

@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define _SGC_INIT_COMMON_DICTIONARY_PAIR_FUNCTIONS(K, V, N)                    \
+#define _SGC_INIT_COMMON_DICT_PAIR(K, V, N)                              \
     static inline void                                                         \
         _p_##N##_node_copy_values(const struct N* const ds,                    \
                                   struct N##_node* dst,                        \
@@ -40,7 +40,7 @@
         m->shared_key_ = shared;                                               \
     }
 
-#define _SGC_INIT_COMMON_DICTIONARY_NONE_PAIR_FUNCTIONS(KV, N)                 \
+#define _SGC_INIT_COMMON_DICT_NONE_PAIR(KV, N)                           \
     static inline void                                                         \
         _p_##N##_node_copy_values(const struct N* const ds,                    \
                                   struct N##_node* dst,                        \

@@ -57,7 +57,7 @@
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
-    _SGC_INIT_RA_IT_PROTOTIPES(N, T)
+    _SGC_INIT_RA_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_DEQUE(T, N)                                           \
     static size_t _p_##N##_max(const struct N* const q) {                      \

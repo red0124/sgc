@@ -5,11 +5,12 @@
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_ocmmon.h"
 #include "detail/sgc_hash_map_common.h"
+#include "detail/sgc_iterator.h"
 #include "detail/sgc_prime.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define _SGC_INIT_PP_UNORDERED_SET(KV, N)                         \
+#define _SGC_INIT_PP_UNORDERED_SET(KV, N)                                      \
     static void _p_##N##_bucket_sgc_free(const struct N* const u,              \
                                          struct N##_node* bucket);             \
     static void _p_##N##_bucket_insert(struct N##_node* bucket,                \
@@ -19,9 +20,8 @@
                                                    struct N##_node* bucket,    \
                                                    const KV* const key);       \
     static struct N##_node* _p_##N##_bucket_end(struct N##_node* bucket);      \
-    static struct N##_it _p_##N##_find_by_hash(struct N* u,              \
-                                                     const KV* const v,        \
-                                                     size_t hash);             \
+    static struct N##_it _p_##N##_find_by_hash(struct N* u, const KV* const v, \
+                                               size_t hash);                   \
     static void _p_##N##_rehash_size(const struct N* const u, size_t* max,     \
                                      size_t* new_max);                         \
     static void _p_##N##_resize(struct N* u);                                  \
@@ -48,63 +48,46 @@
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t max_;                                                           \
-        size_t shared_;                                                        \
+        bool shared_;                                                          \
         struct N##_node** data_;                                               \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
     typedef KV N##_type;                                                       \
                                                                                \
-    struct N##_node* _p_##N##_node_new(const KV* const value,                  \
-                                       size_t shared);                      \
+    struct N##_node* _p_##N##_node_new(const KV* const value, bool shared);    \
     size_t N##_bucket_count(const struct N* const u);                          \
     size_t N##_bucket_size(const struct N* const u, size_t n);                 \
     size_t N##_buckets_used(const struct N* const u);                          \
                                                                                \
-    struct N##_it {                                                      \
+    struct N##_it {                                                            \
         struct N##_node** data_;                                               \
         struct N##_node* curr_;                                                \
         size_t curr_bucket_;                                                   \
         size_t max_;                                                           \
-        int valid_;                                                         \
+        bool valid_;                                                           \
     };                                                                         \
                                                                                \
-    typedef struct N##_it N##_it;                                  \
-                                                                               \
-    const KV* N##_it_cdata(struct N##_it i);                       \
-    KV* N##_it_data(struct N##_it i);                              \
-    void N##_it_go_next(struct N##_it* i);                            \
-    void N##_it_begin(struct N* m, struct N##_it* i);              \
-    void N##_it_cbegin(const struct N* const m, struct N##_it* i); \
-    void N##_it_go_prev(struct N##_it* i);                            \
-    void N##_it_end(struct N* m, struct N##_it* i);                \
-    void N##_it_cend(const struct N* const m, struct N##_it* i);   \
-    struct N##_it N##_begin(struct N* m);                                \
-    struct N##_it N##_cbegin(const struct N* const m);                   \
-    struct N##_it N##_end(struct N* m);                                  \
-    struct N##_it N##_cend(const struct N* const m);                     \
-    bool N##_it_equal(const struct N##_it first,                   \
-                            const struct N##_it second);                 \
-    bool N##_it_valid(const struct N##_it i);                      \
-    void N##_set_share(N* u, int shared);                                   \
+    typedef struct N##_it N##_it;                                              \
+    _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
+    void N##_set_share(N* u, bool shared);                                     \
     size_t N##_size(const struct N* const u);                                  \
     void N##_init(struct N* u);                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
     void N##_free(struct N* u);                                                \
-    struct N##_it N##_find(struct N* u, const KV v);                     \
+    struct N##_it N##_find(struct N* u, const KV v);                           \
     void N##_rehash(struct N* u, size_t new_max);                              \
     void N##_insert(struct N* u, const KV v);                                  \
     void N##_insert_multiple(struct N* u, const KV v);                         \
     void N##_erase(struct N* u, const KV v);                                   \
-    void N##_it_erase(struct N* u, struct N##_it* i);              \
+    void N##_it_erase(struct N* u, struct N##_it* i);                          \
     bool N##_empty(const struct N* const u);
 
-#define _SGC_INIT_UNIQUE_UNORDERED_SET_FUNCTIONS(KV, N)                        \
-    struct N##_node* _p_##N##_node_new(const KV* const value,                  \
-                                       size_t shared) {                     \
+#define _SGC_INIT_UNIQUE_UNORDERED_SET(KV, N)                                  \
+    struct N##_node* _p_##N##_node_new(const KV* const value, bool shared) {   \
         struct N##_node* new_node =                                            \
             (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
-        SGC_COPY(KV##_copy, new_node->value_, *value, shared);              \
+        SGC_COPY(KV##_copy, new_node->value_, *value, shared);                 \
         new_node->next_ = NULL;                                                \
         return new_node;                                                       \
     }                                                                          \
@@ -126,17 +109,16 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static struct N##_it _p_##N##_find_by_hash(struct N* u,              \
-                                                     const KV* const v,        \
-                                                     size_t hash) {            \
-        struct N##_it ret = {NULL, NULL, 0, 0, 0};                       \
+    static struct N##_it _p_##N##_find_by_hash(struct N* u, const KV* const v, \
+                                               size_t hash) {                  \
+        struct N##_it ret = {NULL, NULL, 0, 0, 0};                             \
         if (u->max_) {                                                         \
             size_t position = hash % u->max_;                                  \
             struct N##_node* tmp = u->data_[position];                         \
             while (tmp) {                                                      \
                 if (KV##_equal(&tmp->value_, v)) {                             \
-                    ret = (struct N##_it){u->data_, tmp, position,       \
-                                                u->max_, 1};                   \
+                    ret =                                                      \
+                        (struct N##_it){u->data_, tmp, position, u->max_, 1};  \
                 }                                                              \
                 tmp = tmp->next_;                                              \
             }                                                                  \
@@ -144,14 +126,14 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    struct N##_it N##_find(struct N* u, const KV v) {                    \
+    struct N##_it N##_find(struct N* u, const KV v) {                          \
         size_t hash = KV##_hash(&v);                                           \
         return _p_##N##_find_by_hash(u, &v, hash);                             \
     }                                                                          \
                                                                                \
     void N##_insert(struct N* u, const KV v) {                                 \
         size_t hash = KV##_hash(&v);                                           \
-        struct N##_it i = _p_##N##_find_by_hash(u, &v, hash);            \
+        struct N##_it i = _p_##N##_find_by_hash(u, &v, hash);                  \
         if (!i.curr_) {                                                        \
             _p_##N##_resize(u);                                                \
             struct N##_node* new_node = _p_##N##_node_new(&v, u->shared_);     \
@@ -178,10 +160,10 @@
         ++u->size_;                                                            \
     }                                                                          \
                                                                                \
-    void N##_it_erase(struct N* u, struct N##_it* i) {             \
-        if (N##_it_valid(*i)) {                                          \
+    void N##_it_erase(struct N* u, struct N##_it* i) {                         \
+        if (N##_it_valid(*i)) {                                                \
             KV value = i->curr_->value_;                                       \
-            N##_it_go_next(i);                                              \
+            N##_it_go_next(i);                                                 \
             N##_erase(u, value);                                               \
         }                                                                      \
     }                                                                          \
@@ -196,8 +178,8 @@
 
 #define SGC_INIT_UNORDERED_SET(KV, N)                                          \
     SGC_INIT_HEADERS_UNORDERED_SET(KV, N)                                      \
-    _SGC_INIT_PP_UNORDERED_SET(KV, N)                             \
-    _SGC_INIT_UNIQUE_UNORDERED_SET_FUNCTIONS(KV, N)                            \
-    _SGC_INIT_COMMON_DICTIONARY_NONE_PAIR_FUNCTIONS(KV, N)                     \
-    _SGC_INIT_COMMON(N)                                              \
-    _SGC_INIT_HASH_MAP_TYPE_FUNCTIONS(KV, N)
+    _SGC_INIT_PP_UNORDERED_SET(KV, N)                                          \
+    _SGC_INIT_UNIQUE_UNORDERED_SET(KV, N)                                      \
+    _SGC_INIT_COMMON_DICT_NONE_PAIR(KV, N)                                     \
+    _SGC_INIT_COMMON_HASH_MAP(KV, N)                                           \
+    _SGC_INIT_COMMON(N)

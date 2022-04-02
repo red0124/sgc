@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define _SGC_INIT_SHASH_MAP_TYPE_FUNCTIONS(T, S, N)                            \
+#define _SGC_INIT_COMMON_SHASH_MAP(T, S, N)                                    \
     void N##_it_erase(struct N* ds, struct N##_it* it) {                       \
         if (N##_it_valid(*it)) {                                               \
             _p_##N##_node_free(ds, it->curr_);                                 \

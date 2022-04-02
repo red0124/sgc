@@ -86,7 +86,7 @@
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
-    _SGC_INIT_BD_IT_PROTOTIPES(N)                                             \
+    _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
                                                                                \
     struct N##_it N##_find(struct N* s, const KV v);                           \
     size_t N##_size(const struct N* const s);                                  \
@@ -102,7 +102,7 @@
 
 #define _SGC_INIT_UNIQUE_SET(KV, N)                                            \
     static struct N##_node* _p_##N##_node_new(const KV* const v,               \
-                                              bool shared) {                 \
+                                              bool shared) {                   \
         struct N##_node* n =                                                   \
             (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
         SGC_COPY(KV##_copy, n->value_, *v, shared);                            \
@@ -272,7 +272,7 @@
 #define SGC_INIT_SET(KV, N)                                                    \
     SGC_INIT_HEADERS_SET(KV, N)                                                \
     _SGC_INIT_PP_SET(KV, N)                                                    \
-    _SGC_INIT_COMMON_DICTIONARY_NONE_PAIR_FUNCTIONS(KV, N)                     \
     _SGC_INIT_UNIQUE_SET(KV, N)                                                \
-    _SGC_INIT_RBTREE_TYPE_FUNCTIONS(KV, N)                                     \
+    _SGC_INIT_COMMON_DICT_NONE_PAIR(KV, N)                                     \
+    _SGC_INIT_COMMON_RBTREE(KV, N)                                             \
     _SGC_INIT_COMMON(N)

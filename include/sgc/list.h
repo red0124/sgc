@@ -61,7 +61,7 @@
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
-    _SGC_INIT_BD_IT_PROTOTIPES(N, T)
+    _SGC_INIT_BD_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_LIST(T, N)                                            \
     static void _p_##N##_ptr_array_to_list(struct N##_node** nodes_ptr,        \

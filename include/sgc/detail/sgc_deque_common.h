@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON_DEQUE(T, N)                                           \
-    void N##_erase(struct N* d, const size_t at) {                             \
+    void N##_erase(struct N* d, size_t at) {                             \
         if (at < d->size_ && d->size_ > 0) {                                   \
             if (!d->shared_) {                                                 \
                 T##_free(&d->data_[at]);                                       \
@@ -145,7 +145,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_insert(struct N* d, const size_t at, T el) {                      \
+    void N##_insert(struct N* d, size_t at, T el) {                      \
         if (at > d->size_) {                                                   \
             return;                                                            \
         }                                                                      \

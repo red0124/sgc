@@ -317,7 +317,7 @@
 #define SGC_INIT_MAP(K, V, N)                                                  \
     SGC_INIT_HEADERS_MAP(K, V, N)                                              \
     _SGC_INIT_PP_MAP(K, V, N)                                                  \
-    _SGC_INIT_COMMON_DICTIONARY_PAIR_FUNCTIONS(K, V, N)                        \
     _SGC_INIT_UNIQUE_MAP(K, V, N)                                              \
-    _SGC_INIT_RBTREE_TYPE_FUNCTIONS(K, N)                                      \
+    _SGC_INIT_COMMON_DICT_PAIR(K, V, N)                                        \
+    _SGC_INIT_COMMON_RBTREE(K, N)                                              \
     _SGC_INIT_COMMON(N)

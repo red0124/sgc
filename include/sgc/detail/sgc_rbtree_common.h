@@ -10,7 +10,7 @@ enum sgc_map_color {
     SGC_MAP_BLACK,
 };
 
-#define _SGC_INIT_RBTREE_TYPE_FUNCTIONS(K, N)                                  \
+#define _SGC_INIT_COMMON_RBTREE(K, N)                                          \
     bool N##_erase(struct N* m, const K key) {                                 \
         struct N##_node* n = _p_##N##_node_find(m, key);                       \
         if (n) {                                                               \
@@ -396,8 +396,12 @@ enum sgc_map_color {
                                                                                \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
-        _p_##N##_copy_base_data(dst, src);                                     \
-        _p_##N##_copy_nodes(dst, src);                                         \
+        if (src->size_ != 0) {                                                 \
+            _p_##N##_copy_base_data(dst, src);                                 \
+            _p_##N##_copy_nodes(dst, src);                                     \
+        } else {                                                               \
+            N##_init(dst);                                                     \
+        }                                                                      \
     }                                                                          \
                                                                                \
     static void _p_##N##_copy_nodes(struct N* __restrict__ dst,                \

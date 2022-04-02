@@ -60,7 +60,7 @@
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
-    _SGC_INIT_FWD_IT_PROTOTIPES(N, T)
+    _SGC_INIT_FWD_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_FORWARD_LIST(T, N)                                    \
     void N##_copy(struct N* __restrict__ dst,                                  \

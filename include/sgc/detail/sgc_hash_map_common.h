@@ -2,14 +2,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define _SGC_INIT_HASH_MAP_TYPE_FUNCTIONS(T, N)                                \
-    void N##_it_go_next(struct N##_it* i) {                           \
+#define _SGC_INIT_COMMON_HASH_MAP(T, N)                                        \
+    void N##_it_go_next(struct N##_it* i) {                                    \
         if (i->curr_ && i->curr_->next_) {                                     \
             i->curr_ = i->curr_->next_;                                        \
         } else {                                                               \
             struct N##_node* tmp = i->curr_;                                   \
             ++i->curr_bucket_;                                                 \
-            i->valid_ = (i->curr_bucket_ != i->max_);                       \
+            i->valid_ = (i->curr_bucket_ != i->max_);                          \
             while (i->curr_bucket_ < i->max_) {                                \
                 i->curr_ = i->data_[i->curr_bucket_];                          \
                 if (i->curr_) {                                                \
@@ -18,44 +18,43 @@
                 ++i->curr_bucket_;                                             \
             }                                                                  \
             if (!i->curr_) {                                                   \
-                i->valid_ = 0;                                              \
+                i->valid_ = 0;                                                 \
                 i->curr_ = tmp;                                                \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_begin(struct N* m, struct N##_it* i) {             \
+    void N##_it_begin(struct N* m, struct N##_it* i) {                         \
         if (m->data_) {                                                        \
             i->data_ = m->data_;                                               \
             i->curr_ = m->data_[0];                                            \
             i->curr_bucket_ = 0;                                               \
             i->max_ = m->max_;                                                 \
             if (!i->curr_) {                                                   \
-                N##_it_go_next(i);                                          \
+                N##_it_go_next(i);                                             \
             }                                                                  \
-            i->valid_ = 1;                                                  \
+            i->valid_ = 1;                                                     \
         } else {                                                               \
-            *i = (struct N##_it){NULL, NULL, 0, 0, 0};                   \
+            *i = (struct N##_it){NULL, NULL, 0, 0, 0};                         \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_cbegin(const struct N* const m,                          \
-                             struct N##_it* i) {                         \
+    void N##_it_cbegin(const struct N* const m, struct N##_it* i) {            \
         if (m->data_) {                                                        \
             i->data_ = m->data_;                                               \
             i->curr_ = m->data_[0];                                            \
             i->curr_bucket_ = 0;                                               \
             i->max_ = m->max_;                                                 \
             if (!i->curr_) {                                                   \
-                N##_it_go_next(i);                                          \
+                N##_it_go_next(i);                                             \
             }                                                                  \
-            i->valid_ = 1;                                                  \
+            i->valid_ = 1;                                                     \
         } else {                                                               \
-            *i = (struct N##_it){NULL, NULL, 0, 0, 0};                   \
+            *i = (struct N##_it){NULL, NULL, 0, 0, 0};                         \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_go_prev(struct N##_it* i) {                           \
+    void N##_it_go_prev(struct N##_it* i) {                                    \
         if (i->curr_ && i->data_[i->curr_bucket_] != i->curr_) {               \
             struct N##_node* curr = i->data_[i->curr_bucket_];                 \
             struct N##_node* next = curr->next_;                               \
@@ -75,13 +74,13 @@
                 --i->curr_bucket_;                                             \
             }                                                                  \
             if (!i->curr_) {                                                   \
-                i->valid_ = 0;                                              \
+                i->valid_ = 0;                                                 \
                 i->curr_ = tmp;                                                \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_end(struct N* m, struct N##_it* i) {               \
+    void N##_it_end(struct N* m, struct N##_it* i) {                           \
         if (m->data_) {                                                        \
             i->data_ = m->data_;                                               \
             i->curr_ = m->data_[m->max_ - 1];                                  \
@@ -90,15 +89,15 @@
             if (i->curr_) {                                                    \
                 i->curr_ = _p_##N##_bucket_end(i->curr_);                      \
             } else {                                                           \
-                N##_it_go_prev(i);                                          \
+                N##_it_go_prev(i);                                             \
             }                                                                  \
-            i->valid_ = 1;                                                  \
+            i->valid_ = 1;                                                     \
         } else {                                                               \
-            *i = (struct N##_it){NULL, NULL, 0, 0, 0};                   \
+            *i = (struct N##_it){NULL, NULL, 0, 0, 0};                         \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_cend(const struct N* const m, struct N##_it* i) {  \
+    void N##_it_cend(const struct N* const m, struct N##_it* i) {              \
         if (m->data_) {                                                        \
             i->data_ = m->data_;                                               \
             i->curr_ = m->data_[m->max_ - 1];                                  \
@@ -107,45 +106,44 @@
             if (i->curr_) {                                                    \
                 i->curr_ = _p_##N##_bucket_end(i->curr_);                      \
             } else {                                                           \
-                N##_it_go_prev(i);                                          \
+                N##_it_go_prev(i);                                             \
             }                                                                  \
-            i->valid_ = 1;                                                  \
+            i->valid_ = 1;                                                     \
         } else {                                                               \
-            *i = (struct N##_it){NULL, NULL, 0, 0, 0};                   \
+            *i = (struct N##_it){NULL, NULL, 0, 0, 0};                         \
         }                                                                      \
     }                                                                          \
                                                                                \
-    struct N##_it N##_begin(struct N* m) {                               \
-        struct N##_it i;                                                 \
-        N##_it_begin(m, &i);                                             \
+    struct N##_it N##_begin(struct N* m) {                                     \
+        struct N##_it i;                                                       \
+        N##_it_begin(m, &i);                                                   \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cbegin(const struct N* const m) {                  \
-        struct N##_it i;                                                 \
-        N##_it_cbegin(m, &i);                                            \
+    struct N##_it N##_cbegin(const struct N* const m) {                        \
+        struct N##_it i;                                                       \
+        N##_it_cbegin(m, &i);                                                  \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_end(struct N* m) {                                 \
-        struct N##_it i;                                                 \
-        N##_it_end(m, &i);                                               \
+    struct N##_it N##_end(struct N* m) {                                       \
+        struct N##_it i;                                                       \
+        N##_it_end(m, &i);                                                     \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cend(const struct N* const m) {                    \
-        struct N##_it i;                                                 \
-        N##_it_cend(m, &i);                                              \
+    struct N##_it N##_cend(const struct N* const m) {                          \
+        struct N##_it i;                                                       \
+        N##_it_cend(m, &i);                                                    \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    bool N##_it_equal(const struct N##_it first,                   \
-                            const struct N##_it second) {                \
+    bool N##_it_equal(const struct N##_it first, const struct N##_it second) { \
         return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \
-    bool N##_it_valid(const struct N##_it i) {                     \
-        return i.valid_;                                                    \
+    bool N##_it_valid(const struct N##_it i) {                                 \
+        return i.valid_;                                                       \
     }                                                                          \
                                                                                \
     static void _p_##N##_bucket_sgc_free(const struct N* const u,              \
@@ -216,8 +214,12 @@
     }                                                                          \
                                                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
-        _p_##N##_copy_base_data(dst, src);                                     \
-        _p_##N##_copy_nodes(dst, src);                                         \
+        if (src->size_) {                                                      \
+            _p_##N##_copy_base_data(dst, src);                                 \
+            _p_##N##_copy_nodes(dst, src);                                     \
+        } else {                                                               \
+            N##_init(dst);                                                     \
+        }                                                                      \
     }                                                                          \
                                                                                \
     static void _p_##N##_resize(struct N* u) {                                 \
@@ -231,7 +233,7 @@
             }                                                                  \
                                                                                \
             size_t position;                                                   \
-            struct N##_it tmp = N##_begin(u);                            \
+            struct N##_it tmp = N##_begin(u);                                  \
             struct N##_node* next;                                             \
             for (size_t i = 0; i < u->size_; ++i) {                            \
                 position = _p_##N##_node_hash_value(tmp.curr_) % new_max;      \
@@ -245,7 +247,7 @@
                 if (next) {                                                    \
                     tmp.curr_ = next;                                          \
                 } else {                                                       \
-                    N##_it_go_next(&tmp);                                   \
+                    N##_it_go_next(&tmp);                                      \
                 }                                                              \
             }                                                                  \
             sgc_free(u->data_);                                                \
@@ -293,7 +295,7 @@
             *new_max = sgc_next_prime(2 * u->max_ + 1);                        \
         }                                                                      \
     }                                                                          \
-    /* TODO check why this exists */                                           \
+                                                                               \
     void N##_rehash(struct N* u, size_t new_max) {                             \
         struct N##_node** new_data =                                           \
             (struct N##_node**)sgc_malloc(sizeof(struct N##_node*) * new_max); \
@@ -302,7 +304,7 @@
         }                                                                      \
                                                                                \
         size_t position;                                                       \
-        struct N##_it tmp = N##_begin(u);                                \
+        struct N##_it tmp = N##_begin(u);                                      \
         struct N##_node* next;                                                 \
         for (size_t i = 0; i < u->size_; ++i) {                                \
             position = _p_##N##_node_hash_value(tmp.curr_) % new_max;          \
@@ -317,7 +319,7 @@
             if (next) {                                                        \
                 tmp.curr_ = next;                                              \
             } else {                                                           \
-                N##_it_go_next(&tmp);                                       \
+                N##_it_go_next(&tmp);                                          \
             }                                                                  \
         }                                                                      \
         sgc_free(u->data_);                                                    \

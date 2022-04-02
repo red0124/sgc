@@ -12,7 +12,7 @@
     static void _p_##N##_free_data(struct N* d);                               \
     static void _p_##N##_copy_data(struct N* dst, const struct N* const src);  \
     static size_t _p_##N##_max(const struct N* const q);                       \
-    static void _p_##N##_go_next(size_t* pos, size_t max);                    \
+    static void _p_##N##_go_next(size_t* pos, size_t max);                     \
     static void _p_##N##_go_prev(size_t* pos, size_t max);
 
 #define SGC_INIT_HEADERS_SDEQUE(T, S, N)                                       \
@@ -57,7 +57,7 @@
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
-    _SGC_INIT_RA_IT_PROTOTIPES(N, T)
+    _SGC_INIT_RA_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_SDEQUE(T, S, N)                                       \
     static void _p_##N##_resize(const struct N* const v) {                     \

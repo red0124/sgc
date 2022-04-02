@@ -12,6 +12,7 @@
 SGC_INIT(VECTOR, int, vector, ITERATE, FIND, FIND_ITERATOR)
 SGC_INIT_DEQUE(int, deque)
 
+    /*
 void fold_sum(const int* const el, void* acc) {
     *(int*)acc += *el;
 }
@@ -112,10 +113,10 @@ void test_find(void) {
         vector_push_back(&v, i);
     }
 
-    struct vector_iterator it = vector_find(&v, -1);
-    TEST_ASSERT_EQUAL_INT(1, vector_iterator_equal(it, vector_end(&v)));
+    struct vector_it it = vector_find(&v, -1);
+    TEST_ASSERT_EQUAL_INT(1, vector_it_equal(it, vector_end(&v)));
     it = vector_find(&v, TEST_ELEMENTS_NUM);
-    TEST_ASSERT_EQUAL_INT(1, vector_iterator_equal(it, vector_end(&v)));
+    TEST_ASSERT_EQUAL_INT(1, vector_it_equal(it, vector_end(&v)));
 
     TEST_ASSERT_EQUAL_INT(NULL, vector_find_el(&v, -1));
     TEST_ASSERT_EQUAL_INT(NULL, vector_find_el(&v, TEST_ELEMENTS_NUM));
@@ -124,7 +125,7 @@ void test_find(void) {
         TEST_ASSERT_EQUAL_INT(i, *vector_find_el(&v, i));
         if (i != TEST_ELEMENTS_NUM - 1) {
             it = vector_find(&v, i);
-            TEST_ASSERT_EQUAL_INT(0, vector_iterator_equal(it, vector_end(&v)));
+            TEST_ASSERT_EQUAL_INT(0, vector_it_equal(it, vector_end(&v)));
         }
         ssize_t index = vector_find_index(&v, i);
         if (index >= 0) {
@@ -205,7 +206,7 @@ void test_fold_map(void) {
     map_init(&m);
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        map_set_at(&m, i, i);
+        map_set(&m, i, i);
     }
 
     int sum = 0;
@@ -242,7 +243,7 @@ void test_execute_map(void) {
     map_init(&m);
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        map_set_at(&m, i, i);
+        map_set(&m, i, i);
     }
 
     call = 0;
@@ -336,7 +337,7 @@ void test_for_each3(void) {
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         vector_push_back(&v, 0);
-        map_set_at(&m, i, 0);
+        map_set(&m, i, 0);
         cdeq_push_back(&d, '0');
     }
 
@@ -401,3 +402,4 @@ int main(void) {
 
     return UNITY_END();
 }
+    */
