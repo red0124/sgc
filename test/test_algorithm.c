@@ -9,10 +9,9 @@
 
 #define TEST_ELEMENTS_NUM 50
 
-SGC_INIT(VECTOR, int, vector, ITERATE, FIND, FIND_ITERATOR)
+SGC_INIT(VECTOR, int, vector, ITERATE, FIND, FIND_IT)
 SGC_INIT_DEQUE(int, deque)
 
-    /*
 void fold_sum(const int* const el, void* acc) {
     *(int*)acc += *el;
 }
@@ -113,9 +112,9 @@ void test_find(void) {
         vector_push_back(&v, i);
     }
 
-    struct vector_it it = vector_find(&v, -1);
+    struct vector_it it = vector_find_it(&v, -1);
     TEST_ASSERT_EQUAL_INT(1, vector_it_equal(it, vector_end(&v)));
-    it = vector_find(&v, TEST_ELEMENTS_NUM);
+    it = vector_find_it(&v, TEST_ELEMENTS_NUM);
     TEST_ASSERT_EQUAL_INT(1, vector_it_equal(it, vector_end(&v)));
 
     TEST_ASSERT_EQUAL_INT(NULL, vector_find_el(&v, -1));
@@ -124,7 +123,7 @@ void test_find(void) {
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         TEST_ASSERT_EQUAL_INT(i, *vector_find_el(&v, i));
         if (i != TEST_ELEMENTS_NUM - 1) {
-            it = vector_find(&v, i);
+            it = vector_find_it(&v, i);
             TEST_ASSERT_EQUAL_INT(0, vector_it_equal(it, vector_end(&v)));
         }
         ssize_t index = vector_find_index(&v, i);
@@ -402,4 +401,3 @@ int main(void) {
 
     return UNITY_END();
 }
-    */

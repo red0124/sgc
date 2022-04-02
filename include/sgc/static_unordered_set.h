@@ -14,16 +14,16 @@
                                                size_t hash);                   \
     static struct N##_it N##_it_at(const N* const u, size_t at);        \
     static void _p_##N##_node_free(const N* const m,                    \
-                                   struct N##_node* n);                        \
+                                   struct _p_##N##_node* n);                        \
     static void _p_##N##_node_copy_values(const N* const m,             \
-                                          struct N##_node* dst,                \
-                                          const struct N##_node* const src);   \
-    static size_t _p_##N##_node_hash_value(const struct N##_node* n);          \
-    static bool _p_##N##_node_equal_key(const struct N##_node* const n,        \
+                                          struct _p_##N##_node* dst,                \
+                                          const struct _p_##N##_node* const src);   \
+    static size_t _p_##N##_node_hash_value(const struct _p_##N##_node* n);          \
+    static bool _p_##N##_node_equal_key(const struct _p_##N##_node* const n,        \
                                         const KV* const key);
 
 #define SGC_INIT_HEADERS_SUNORDERED_SET(V, S, N)                               \
-    struct N##_node {                                                          \
+    struct _p_##N##_node {                                                          \
         V value_;                                                              \
         enum sgc_node_state state_;                                            \
     };                                                                         \
@@ -31,7 +31,7 @@
     struct N {                                                                 \
         size_t size_;                                                          \
         bool shared_;                                                          \
-        struct N##_node data_[S];                                              \
+        struct _p_##N##_node data_[S];                                              \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
@@ -40,9 +40,9 @@
     size_t N##_max(void);                                                      \
                                                                                \
     struct N##_it {                                                            \
-        struct N##_node* begin_;                                               \
-        struct N##_node* curr_;                                                \
-        struct N##_node* end_;                                                 \
+        struct _p_##N##_node* begin_;                                               \
+        struct _p_##N##_node* curr_;                                                \
+        struct _p_##N##_node* end_;                                                 \
         bool valid_;                                                           \
     };                                                                         \
                                                                                \

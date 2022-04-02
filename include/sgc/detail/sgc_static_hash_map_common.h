@@ -29,7 +29,7 @@
                                                size_t hash) {                  \
         if (ds->size_) {                                                       \
             size_t position = hash % S;                                        \
-            struct N##_node* data = ds->data_;                                 \
+            struct _p_##N##_node* data = ds->data_;                                 \
             while (data[position].state_ != SGC_NODE_STATE_OPEN) {             \
                 if (data[position].state_ == SGC_NODE_STATE_USED &&            \
                     _p_##N##_node_equal_key(&data[position], key)) {           \
@@ -59,7 +59,7 @@
                                                                                \
     static struct N##_it N##_it_at(const N* const m, size_t at) {       \
         N##_it i;                                                              \
-        i.begin_ = (struct N##_node*)(m->data_);                               \
+        i.begin_ = (struct _p_##N##_node*)(m->data_);                               \
         i.curr_ = i.begin_ + at;                                               \
         i.end_ = i.begin_ + S;                                                 \
         i.valid_ = (i.curr_->state_ == SGC_NODE_STATE_USED) ? 1 : 0;           \
@@ -82,7 +82,7 @@
     }                                                                          \
                                                                                \
     void N##_it_cbegin(const N* const m, struct N##_it* i) {            \
-        i->begin_ = (struct N##_node*)(m->data_);                              \
+        i->begin_ = (struct _p_##N##_node*)(m->data_);                              \
         i->curr_ = i->begin_;                                                  \
         i->end_ = i->begin_ + S - 1;                                           \
         i->valid_ = 1;                                                         \
@@ -111,8 +111,8 @@
     }                                                                          \
                                                                                \
     void N##_it_cend(const N* const m, struct N##_it* i) {              \
-        i->begin_ = (struct N##_node*)(m->data_);                              \
-        i->end_ = (struct N##_node*)(m->data_) + S - 1;                        \
+        i->begin_ = (struct _p_##N##_node*)(m->data_);                              \
+        i->end_ = (struct _p_##N##_node*)(m->data_) + S - 1;                        \
         i->curr_ = i->end_;                                                    \
         i->valid_ = 1;                                                         \
         if (i->curr_->state_ != SGC_NODE_STATE_USED) {                         \

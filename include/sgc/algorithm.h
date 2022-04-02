@@ -53,9 +53,9 @@
     size_t N##_count(const N* const c, const N##_type el);
 
 #define SGC_INIT_HEADERS_FIND_IT(T, N)                                         \
-    N##_it N##_find_range(N##_it begin, N##_it end, const N##_type el);        \
+    N##_it N##_find_range_it(N##_it begin, N##_it end, const N##_type el);     \
                                                                                \
-    N##_it N##_find(const N* const c, const N##_type el);
+    N##_it N##_find_it(const N* const c, const N##_type el);
 
 #define SGC_INIT_HEADERS_BINARY_FIND(T, N)                                     \
     N##_type* N##_binary_find_el(N* c, const N##_type el);                     \
@@ -227,13 +227,12 @@
 
 #define SGC_INIT_FIND(T, N)                                                    \
     SGC_INIT_HEADERS_FIND(T, N)                                                \
-    const N##_type* N##_find_el_range(N##_it begin, N##_it end,                \
-                                      const N##_type el) {                     \
+    N##_type* N##_find_el_range(N##_it begin, N##_it end, const N##_type el) { \
         if (N##_it_valid(begin) || N##_it_valid(end)) {                        \
             if (T##_equal(&el, N##_it_data(begin))) {                          \
                 return N##_it_data(begin);                                     \
             }                                                                  \
-            while (!ret && !N##_it_equal(begin, end)) {                        \
+            while (!N##_it_equal(begin, end)) {                                \
                 N##_it_go_next(&begin);                                        \
                 if (T##_equal(&el, N##_it_data(begin))) {                      \
                     return N##_it_data(begin);                                 \
@@ -243,7 +242,7 @@
         return NULL;                                                           \
     }                                                                          \
                                                                                \
-    const N##_type* N##_find_el(const N* const c, const N##_type el) {         \
+    N##_type* N##_find_el(const N* const c, const N##_type el) {               \
         return N##_find_el_range(N##_cbegin(c), N##_cend(c), el);              \
     }                                                                          \
                                                                                \
@@ -290,27 +289,23 @@
 
 #define SGC_INIT_FIND_IT(T, N)                                                 \
     SGC_INIT_HEADERS_FIND_IT(T, N)                                             \
-    N##_it N##_find_range(N##_it begin, N##_it end, const N##_type el) {       \
-        N##_it ret = end;                                                      \
-        int done = 0;                                                          \
+    N##_it N##_find_range_it(N##_it begin, N##_it end, const N##_type el) {    \
         if (N##_it_valid(begin) || N##_it_valid(end)) {                        \
             if (T##_equal(&el, N##_it_data(begin))) {                          \
-                ret = begin;                                                   \
-                done = 1;                                                      \
+                return begin;                                                  \
             }                                                                  \
-            while (!done && !N##_it_equal(begin, end)) {                       \
+            while (!N##_it_equal(begin, end)) {                                \
                 N##_it_go_next(&begin);                                        \
                 if (T##_equal(&el, N##_it_data(begin))) {                      \
-                    ret = begin;                                               \
-                    done = 1;                                                  \
+                    return begin;                                              \
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        return ret;                                                            \
+        return begin;                                                          \
     }                                                                          \
                                                                                \
-    N##_it N##_find(const N* const c, const N##_type el) {                     \
-        return N##_find_range(N##_cbegin(c), N##_cend(c), el);                 \
+    N##_it N##_find_it(const N* const c, const N##_type el) {                  \
+        return N##_find_range_it(N##_cbegin(c), N##_cend(c), el);              \
     }
 
 #define SGC_INIT_BINARY_FIND(T, N)                                             \
