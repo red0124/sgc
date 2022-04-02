@@ -8,17 +8,17 @@
 
 #define _SGC_INIT_PP_SQUEUE(T, S, N)                                           \
     static void _p_##N##_go_next(size_t* pos, size_t max);                     \
-    static void _p_##N##_resize(const struct N* const q);                      \
-    static void _p_##N##_free_data(struct N* q);                               \
-    static void _p_##N##_copy_data(struct N* dst, const struct N* const src);  \
-    static size_t _p_##N##_max(const struct N* const q);
+    static void _p_##N##_resize(const N* const q);                             \
+    static void _p_##N##_free_data(N* q);                                      \
+    static void _p_##N##_copy_data(N* dst, const N* const src);                \
+    static size_t _p_##N##_max(const N* const q);
 
 #define SGC_INIT_HEADERS_SQUEUE(T, S, N)                                       \
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t back_;                                                          \
         size_t front_;                                                         \
-        size_t shared_;                                                        \
+        bool shared_;                                                        \
         T data_[S];                                                            \
     };                                                                         \
                                                                                \
@@ -27,26 +27,25 @@
                                                                                \
     size_t N##_max(void);                                                      \
     void N##_set_share(N* q, bool shared);                                     \
-    size_t N##_size(const struct N* const q);                                  \
-    void N##_init(struct N* q);                                                \
-    void N##_free(struct N* q);                                                \
-    void N##_copy(struct N* __restrict__ dst,                                  \
-                  const struct N* __restrict__ const src);                     \
-    void N##_push(struct N* q, T el);                                          \
-    const T* N##_front(const struct N* const q);                               \
-    void N##_set_front(struct N* q, T new_el);                                 \
-    const T* N##_back(const struct N* const q);                                \
-    void N##_set_back(struct N* q, T new_el);                                  \
-    void N##_pop(struct N* q);                                                 \
-    bool N##_empty(const struct N* const q);
+    size_t N##_size(const N* const q);                                         \
+    void N##_init(N* q);                                                       \
+    void N##_free(N* q);                                                       \
+    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_push(N* q, T el);                                                 \
+    T* N##_front(N* q);                                                        \
+    void N##_set_front(N* q, T new_el);                                        \
+    T* N##_back(N* q);                                                         \
+    void N##_set_back(N* q, T new_el);                                         \
+    void N##_pop(N* q);                                                        \
+    bool N##_empty(const N* const q);
 
 #define _SGC_INIT_UNIQUE_SQUEUE(T, S, N)                                       \
-    static void _p_##N##_resize(const struct N* const v) {                     \
+    static void _p_##N##_resize(const N* const v) {                            \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
                                                                                \
-    static size_t _p_##N##_max(const struct N* const v) {                      \
+    static size_t _p_##N##_max(const N* const v) {                             \
         (void)(v);                                                             \
         return S;                                                              \
     }                                                                          \
@@ -55,19 +54,18 @@
         return S;                                                              \
     }                                                                          \
                                                                                \
-    void N##_init(struct N* q) {                                               \
+    void N##_init(N* q) {                                                      \
         q->size_ = q->front_ = q->back_ = 0;                                   \
         q->shared_ = false;                                                    \
     }                                                                          \
                                                                                \
-    void N##_free(struct N* q) {                                               \
+    void N##_free(N* q) {                                                      \
         if (q->data_) {                                                        \
             _p_##N##_free_data(q);                                             \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(struct N* __restrict__ dst,                                  \
-                  const struct N* __restrict__ const src) {                    \
+    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->back_ = src->size_ - 1;                                       \

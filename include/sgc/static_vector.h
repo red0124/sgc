@@ -28,7 +28,7 @@
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
     void N##_push_back(N* v, T el);                                            \
     void N##_pop_back(N* v);                                                   \
-    void N##_insert(N* v, size_t at, T el);                              \
+    void N##_insert(N* v, size_t at, T el);                                    \
     void N##_push_front(N* v, T el);                                           \
     T* N##_at(N* v, size_t at);                                                \
     void N##_set(N* v, size_t at, T new_el);                                   \
@@ -36,7 +36,7 @@
     void N##_set_back(N* v, T new_el);                                         \
     T* N##_front(N* v);                                                        \
     void N##_set_front(N* v, T new_el);                                        \
-    void N##_erase(N* v, size_t at);                                     \
+    void N##_erase(N* v, size_t at);                                           \
     bool N##_empty(const N* const d);                                          \
     T* N##_array(N* d);                                                        \
                                                                                \

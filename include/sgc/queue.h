@@ -8,11 +8,11 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_QUEUE(T, N)                                               \
-    static void _p_##N##_go_next(size_t* pos, size_t max);                    \
-    static void _p_##N##_resize(struct N* q);                                  \
-    static void _p_##N##_free_data(struct N* q);                               \
-    static void _p_##N##_copy_data(struct N* dst, const struct N* const src);  \
-    static size_t _p_##N##_max(const struct N* const q);
+    static void _p_##N##_go_next(size_t* pos, size_t max);                     \
+    static void _p_##N##_resize(N* q);                                         \
+    static void _p_##N##_free_data(N* q);                                      \
+    static void _p_##N##_copy_data(N* dst, const N* const src);                \
+    static size_t _p_##N##_max(const N* const q);
 
 #define SGC_INIT_HEADERS_QUEUE(T, N)                                           \
                                                                                \
@@ -29,39 +29,37 @@
     typedef T N##_type;                                                        \
                                                                                \
     void N##_set_share(N* q, bool shared);                                     \
-    size_t N##_size(const struct N* const q);                                  \
-    void N##_init(struct N* q);                                                \
-    void N##_free(struct N* q);                                                \
-    void N##_copy(struct N* __restrict__ dst,                                  \
-                  const struct N* __restrict__ const src);                     \
-    void N##_push(struct N* q, T el);                                          \
-    const T* N##_front(const struct N* const q);                               \
-    void N##_set_front(struct N* q, T new_el);                                 \
-    const T* N##_back(const struct N* const q);                                \
-    void N##_set_back(struct N* q, T new_el);                                  \
-    void N##_pop(struct N* q);                                                 \
-    bool N##_empty(const struct N* const q);
+    size_t N##_size(const N* const q);                                         \
+    void N##_init(N* q);                                                       \
+    void N##_free(N* q);                                                       \
+    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_push(N* q, T el);                                                 \
+    T* N##_front(N* q);                                                        \
+    void N##_set_front(N* q, T new_el);                                        \
+    T* N##_back(N* q);                                                         \
+    void N##_set_back(N* q, T new_el);                                         \
+    void N##_pop(N* q);                                                        \
+    bool N##_empty(const N* const q);
 
 #define _SGC_INIT_UNIQUE_QUEUE(T, N)                                           \
-    static size_t _p_##N##_max(const struct N* const q) {                      \
+    static size_t _p_##N##_max(const N* const q) {                             \
         return q->max_;                                                        \
     }                                                                          \
                                                                                \
-    void N##_init(struct N* q) {                                               \
+    void N##_init(N* q) {                                                      \
         q->size_ = q->max_ = q->front_ = q->back_ = 0;                         \
         q->data_ = NULL;                                                       \
         q->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
-    void N##_free(struct N* q) {                                               \
+    void N##_free(N* q) {                                                      \
         if (q->data_) {                                                        \
             _p_##N##_free_data(q);                                             \
             sgc_free(q->data_);                                                \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(struct N* __restrict__ dst,                                  \
-                  const struct N* __restrict__ const src) {                    \
+    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
             dst->shared_ = src->shared_;                                       \
@@ -74,7 +72,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_resize(struct N* q) {                                 \
+    static void _p_##N##_resize(N* q) {                                        \
         if (q->size_ == q->max_) {                                             \
             size_t max = q->max_;                                              \
             q->max_ = (q->max_ == 0) ? 1 : q->max_ * 2;                        \

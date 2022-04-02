@@ -11,28 +11,28 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_UNORDERED_MAP(K, V, N)                                    \
-    static void _p_##N##_bucket_sgc_free(const struct N* const u,              \
+    static void _p_##N##_bucket_sgc_free(const N* const u,              \
                                          struct N##_node* bucket);             \
     static void _p_##N##_bucket_insert(struct N##_node* bucket,                \
                                        struct N##_node* new_node);             \
     static size_t _p_##N##_bucket_node_size(struct N##_node* bucket);          \
-    static struct N##_node* _p_##N##_bucket_remove(struct N* u,                \
+    static struct N##_node* _p_##N##_bucket_remove(N* u,                \
                                                    struct N##_node* bucket,    \
                                                    const K* const key);        \
     static struct N##_node* _p_##N##_bucket_end(struct N##_node* bucket);      \
-    static struct N##_it _p_##N##_find_by_hash(struct N* u, const K* const k,  \
+    static struct N##_it _p_##N##_find_by_hash(N* u, const K* const k,  \
                                                size_t hash);                   \
-    static void _p_##N##_rehash_size(const struct N* const u, size_t* max,     \
+    static void _p_##N##_rehash_size(const N* const u, size_t* max,     \
                                      size_t* new_max);                         \
-    static void _p_##N##_resize(struct N* u);                                  \
+    static void _p_##N##_resize(N* u);                                  \
     static void                                                                \
-        _p_##N##_copy_base_data(struct N* __restrict__ dst,                    \
-                                const struct N* __restrict__ const src);       \
-    static void _p_##N##_copy_nodes(struct N* __restrict__ dst,                \
-                                    const struct N* __restrict__ const src);   \
-    static void _p_##N##_node_free(const struct N* const m,                    \
+        _p_##N##_copy_base_data(N* __restrict__ dst,                    \
+                                const N* __restrict__ const src);       \
+    static void _p_##N##_copy_nodes(N* __restrict__ dst,                \
+                                    const N* __restrict__ const src);   \
+    static void _p_##N##_node_free(const N* const m,                    \
                                    struct N##_node* n);                        \
-    static void _p_##N##_node_copy_values(const struct N* const m,             \
+    static void _p_##N##_node_copy_values(const N* const m,             \
                                           struct N##_node* dst,                \
                                           const struct N##_node* const src);   \
     static size_t _p_##N##_node_hash_value(const struct N##_node* n);          \
@@ -66,9 +66,9 @@
                                                                                \
     struct N##_node* _p_##N##_node_new(const K* key, const V* const value,     \
                                        bool shared_key, bool shared);          \
-    size_t N##_bucket_count(const struct N* const u);                          \
-    size_t N##_bucket_size(const struct N* const u, size_t n);                 \
-    size_t N##_buckets_used(const struct N* const u);                          \
+    size_t N##_bucket_count(const N* const u);                          \
+    size_t N##_bucket_size(const N* const u, size_t n);                 \
+    size_t N##_buckets_used(const N* const u);                          \
                                                                                \
     struct N##_it {                                                            \
         struct N##_node** data_;                                               \
@@ -83,17 +83,17 @@
                                                                                \
     void N##_set_share(N* u, bool shared);                                     \
     void N##_set_share_key(N* u, bool shared_key);                             \
-    size_t N##_size(const struct N* const u);                                  \
-    void N##_init(struct N* u);                                                \
+    size_t N##_size(const N* const u);                                  \
+    void N##_init(N* u);                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
-    void N##_free(struct N* u);                                                \
-    struct N##_it N##_find(struct N* u, const K k);                            \
-    void N##_rehash(struct N* u, size_t new_max);                              \
-    void N##_set(struct N* u, const K k, const V v);                           \
-    const V* N##_at(struct N* u, K k);                                         \
-    void N##_erase(struct N* u, const K k);                                    \
-    void N##_it_erase(struct N* u, struct N##_it* i);                          \
-    bool N##_empty(const struct N* const u);
+    void N##_free(N* u);                                                \
+    struct N##_it N##_find(N* u, const K k);                            \
+    void N##_rehash(N* u, size_t new_max);                              \
+    void N##_set(N* u, const K k, const V v);                           \
+    const V* N##_at(N* u, K k);                                         \
+    void N##_erase(N* u, const K k);                                    \
+    void N##_it_erase(N* u, struct N##_it* i);                          \
+    bool N##_empty(const N* const u);
 
 #define _SGC_INIT_UNIQUE_UNORDERED_MAP(K, V, N)                                \
     struct N##_node* _p_##N##_node_new(const K* key, const V* const value,     \
@@ -106,13 +106,13 @@
         return new_node;                                                       \
     }                                                                          \
                                                                                \
-    void N##_init(struct N* u) {                                               \
+    void N##_init(N* u) {                                               \
         u->shared_ = u->shared_key_ = false;                                   \
         u->size_ = u->max_ = 0;                                                \
         u->data_ = NULL;                                                       \
     }                                                                          \
                                                                                \
-    void N##_free(struct N* u) {                                               \
+    void N##_free(N* u) {                                               \
         if (u->size_) {                                                        \
             for (size_t i = 0; i < u->max_; ++i) {                             \
                 _p_##N##_bucket_sgc_free(u, u->data_[i]);                      \
@@ -123,7 +123,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static struct N##_it _p_##N##_find_by_hash(struct N* u, const K* const k,  \
+    static struct N##_it _p_##N##_find_by_hash(N* u, const K* const k,  \
                                                size_t hash) {                  \
         struct N##_it ret = {NULL, NULL, 0, 0, 0};                             \
         if (u->max_) {                                                         \
@@ -141,12 +141,12 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    struct N##_it N##_find(struct N* u, const K k) {                           \
+    struct N##_it N##_find(N* u, const K k) {                           \
         size_t hash = K##_hash(&k);                                            \
         return _p_##N##_find_by_hash(u, &k, hash);                             \
     }                                                                          \
                                                                                \
-    void N##_set(struct N* u, const K k, const V v) {                          \
+    void N##_set(N* u, const K k, const V v) {                          \
         size_t hash = K##_hash(&k);                                            \
         struct N##_it i = _p_##N##_find_by_hash(u, &k, hash);                  \
         if (i.curr_) {                                                         \
@@ -165,7 +165,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    const V* N##_at(struct N* u, K k) {                                        \
+    const V* N##_at(N* u, K k) {                                        \
         size_t hash = K##_hash(&k);                                            \
         struct N##_it i = _p_##N##_find_by_hash(u, &k, hash);                  \
         V* ret;                                                                \
@@ -189,7 +189,7 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    void N##_it_erase(struct N* u, struct N##_it* i) {                         \
+    void N##_it_erase(N* u, struct N##_it* i) {                         \
         if (N##_it_valid(*i)) {                                                \
             K key = i->curr_->data_.key;                                       \
             N##_it_go_next(i);                                                 \
@@ -198,8 +198,8 @@
     }                                                                          \
                                                                                \
     static void                                                                \
-        _p_##N##_copy_base_data(struct N* __restrict__ dst,                    \
-                                const struct N* __restrict__ const src) {      \
+        _p_##N##_copy_base_data(N* __restrict__ dst,                    \
+                                const N* __restrict__ const src) {      \
         dst->size_ = src->size_;                                               \
         dst->max_ = src->max_;                                                 \
         dst->shared_key_ = src->shared_key_;                                   \

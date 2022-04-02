@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON_DEQUE(T, N)                                           \
-    void N##_erase(struct N* d, size_t at) {                             \
+    void N##_erase(N* d, size_t at) {                                          \
         if (at < d->size_ && d->size_ > 0) {                                   \
             if (!d->shared_) {                                                 \
                 T##_free(&d->data_[at]);                                       \
@@ -47,7 +47,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    T* N##_array(struct N* d) {                                                \
+    T* N##_array(N* d) {                                                       \
         T* ret = NULL;                                                         \
         if (d->size_) {                                                        \
             if (d->back_ >= d->front_) {                                       \
@@ -63,7 +63,7 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    void N##_pop_back(struct N* d) {                                           \
+    void N##_pop_back(N* d) {                                                  \
         if (d->size_) {                                                        \
             SGC_FREE(T##_free, d->data_[d->back_], d->shared_);                \
             --d->size_;                                                        \
@@ -89,7 +89,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_push_back(struct N* d, T el) {                                    \
+    void N##_push_back(N* d, T el) {                                           \
         _p_##N##_resize(d);                                                    \
         if (d->size_ != 0) {                                                   \
             _p_##N##_go_next(&d->back_, _p_##N##_max(d));                      \
@@ -98,7 +98,7 @@
         ++d->size_;                                                            \
     }                                                                          \
                                                                                \
-    void N##_push_front(struct N* d, T el) {                                   \
+    void N##_push_front(N* d, T el) {                                          \
         _p_##N##_resize(d);                                                    \
         if (d->size_ != 0) {                                                   \
             _p_##N##_go_prev(&d->front_, _p_##N##_max(d));                     \
@@ -107,35 +107,35 @@
         ++d->size_;                                                            \
     }                                                                          \
                                                                                \
-    const T* N##_front(const struct N* const d) {                              \
+    T* N##_front(N* d) {                                                       \
         if (!d->size_) {                                                       \
             return NULL;                                                       \
         }                                                                      \
         return &d->data_[d->front_];                                           \
     }                                                                          \
                                                                                \
-    void N##_set_front(struct N* d, T new_el) {                                \
+    void N##_set_front(N* d, T new_el) {                                       \
         if (d->size_) {                                                        \
             T* el = &d->data_[d->front_];                                      \
             SGC_REPLACE(T##_copy, T##_free, *el, new_el, d->shared_);          \
         }                                                                      \
     }                                                                          \
                                                                                \
-    const T* N##_back(const struct N* const d) {                               \
+    T* N##_back(N* d) {                                                        \
         if (!d->size_) {                                                       \
             return NULL;                                                       \
         }                                                                      \
         return &d->data_[d->back_];                                            \
     }                                                                          \
                                                                                \
-    void N##_set_back(struct N* d, T new_el) {                                 \
+    void N##_set_back(N* d, T new_el) {                                        \
         if (d->size_) {                                                        \
             T* el = &d->data_[d->back_];                                       \
             SGC_REPLACE(T##_copy, T##_free, *el, new_el, d->shared_);          \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_pop_front(struct N* d) {                                          \
+    void N##_pop_front(N* d) {                                                 \
         if (d->size_) {                                                        \
             SGC_FREE(T##_free, d->data_[d->front_], d->shared_);               \
             --d->size_;                                                        \
@@ -145,7 +145,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_insert(struct N* d, size_t at, T el) {                      \
+    void N##_insert(N* d, size_t at, T el) {                                   \
         if (at > d->size_) {                                                   \
             return;                                                            \
         }                                                                      \
@@ -206,25 +206,25 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    const T* N##_at(const struct N* const d, size_t at) {                      \
+    T* N##_at(N* d, size_t at) {                                               \
         if (at < d->size_) {                                                   \
             return &d->data_[(d->front_ + at) % _p_##N##_max(d)];              \
         }                                                                      \
         return NULL;                                                           \
     }                                                                          \
                                                                                \
-    void N##_set(struct N* d, size_t at, T new_el) {                           \
+    void N##_set(N* d, size_t at, T new_el) {                                  \
         if (at < d->size_) {                                                   \
             T* el = &d->data_[(d->front_ + at) % _p_##N##_max(d)];             \
             SGC_REPLACE(T##_copy, T##_free, *el, new_el, d->shared_);          \
         }                                                                      \
     }                                                                          \
                                                                                \
-    const T* N##_it_data(const struct N##_it i) {                              \
+    T* N##_it_data(N##_it i) {                                                 \
         return &i.deque_->data_[i.curr_];                                      \
     }                                                                          \
                                                                                \
-    void N##_it_go_next(struct N##_it* i) {                                    \
+    void N##_it_go_next(N##_it* i) {                                           \
         if (i->curr_ + 1 == _p_##N##_max(i->deque_)) {                         \
             i->curr_ = 0;                                                      \
         } else {                                                               \
@@ -232,7 +232,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_go_prev(struct N##_it* i) {                                    \
+    void N##_it_go_prev(N##_it* i) {                                           \
         if (i->curr_ == 0) {                                                   \
             i->curr_ = _p_##N##_max(i->deque_) - 1;                            \
         } else {                                                               \
@@ -240,60 +240,60 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    struct N##_it N##_begin(struct N* d) {                                     \
-        struct N##_it i;                                                       \
+    N##_it N##_begin(N* d) {                                                   \
+        N##_it i;                                                              \
         N##_it_begin(d, &i);                                                   \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cbegin(const struct N* const d) {                        \
-        struct N##_it i;                                                       \
+    N##_it N##_cbegin(const N* const d) {                                      \
+        N##_it i;                                                              \
         N##_it_cbegin(d, &i);                                                  \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_end(struct N* d) {                                       \
-        struct N##_it i;                                                       \
+    N##_it N##_end(N* d) {                                                     \
+        N##_it i;                                                              \
         N##_it_end(d, &i);                                                     \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cend(const struct N* const d) {                          \
-        struct N##_it i;                                                       \
+    N##_it N##_cend(const N* const d) {                                        \
+        N##_it i;                                                              \
         N##_it_cend(d, &i);                                                    \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_from(struct N* d, size_t at) {                           \
-        struct N##_it i;                                                       \
+    N##_it N##_from(N* d, size_t at) {                                         \
+        N##_it i;                                                              \
         N##_it_from(d, &i, at);                                                \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cfrom(const struct N* const d, size_t at) {              \
-        struct N##_it i;                                                       \
+    N##_it N##_cfrom(const N* const d, size_t at) {                            \
+        N##_it i;                                                              \
         N##_it_cfrom(d, &i, at);                                               \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    void N##_it_jump(struct N##_it* i, int range) {                            \
+    void N##_it_jump(N##_it* i, int range) {                                   \
         i->curr_ = (_p_##N##_max(i->deque_) + i->curr_ + range) %              \
                    _p_##N##_max(i->deque_);                                    \
     }                                                                          \
                                                                                \
-    bool N##_it_equal(const struct N##_it first, const struct N##_it second) { \
+    bool N##_it_equal(const N##_it first, const N##_it second) {               \
         return first.curr_ == second.curr_ && first.deque_ == second.deque_;   \
     }                                                                          \
                                                                                \
-    int N##_it_diff(const struct N##_it first, const struct N##_it second) {   \
+    int N##_it_diff(const N##_it first, const N##_it second) {                 \
         return second.curr_ - first.curr_;                                     \
     }                                                                          \
                                                                                \
-    bool N##_it_valid(const struct N##_it it) {                                \
+    bool N##_it_valid(const N##_it it) {                                       \
         return it.valid_;                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_copy_data(struct N* dst, const struct N* const src) { \
+    static void _p_##N##_copy_data(N* dst, const N* const src) {               \
         if (dst->shared_) {                                                    \
             if (src->front_ < src->back_) {                                    \
                 memcpy(dst->data_, src->data_ + src->front_,                   \
@@ -315,7 +315,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_free_data(struct N* d) {                              \
+    static void _p_##N##_free_data(N* d) {                                     \
         if (!d->shared_) {                                                     \
             size_t i;                                                          \
             for (i = d->front_; i != d->back_;) {                              \
@@ -326,31 +326,31 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_begin(struct N* d, struct N##_it* i) {                         \
+    void N##_it_begin(N* d, N##_it* i) {                                       \
         N##_it_cbegin(d, i);                                                   \
     }                                                                          \
                                                                                \
-    void N##_it_cbegin(const struct N* const d, struct N##_it* i) {            \
+    void N##_it_cbegin(const N* const d, N##_it* i) {                          \
         i->deque_ = (N*)d;                                                     \
         i->curr_ = d->front_;                                                  \
         i->valid_ = (d->size_ > 0);                                            \
     }                                                                          \
                                                                                \
-    void N##_it_end(struct N* d, struct N##_it* i) {                           \
+    void N##_it_end(N* d, N##_it* i) {                                         \
         N##_it_cend(d, i);                                                     \
     }                                                                          \
                                                                                \
-    void N##_it_cend(const struct N* const d, struct N##_it* i) {              \
+    void N##_it_cend(const N* const d, N##_it* i) {                            \
         i->deque_ = (N*)d;                                                     \
         i->curr_ = d->back_;                                                   \
         i->valid_ = (d->size_ > 0);                                            \
     }                                                                          \
                                                                                \
-    void N##_it_from(struct N* d, struct N##_it* i, size_t at) {               \
+    void N##_it_from(N* d, N##_it* i, size_t at) {                             \
         N##_it_cfrom(d, i, at);                                                \
     }                                                                          \
                                                                                \
-    void N##_it_cfrom(const struct N* const d, struct N##_it* i, size_t at) {  \
+    void N##_it_cfrom(const N* const d, N##_it* i, size_t at) {                \
         i->deque_ = (N*)d;                                                     \
         i->curr_ = (d->front_ + at) % _p_##N##_max(d);                         \
         i->valid_ = (d->size_ > at);                                           \

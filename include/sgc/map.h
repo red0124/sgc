@@ -24,42 +24,42 @@
     static struct N##_node*                                                    \
         _p_##N##_sibling(const struct N##_node* const n,                       \
                          const struct N##_node* const parent);                 \
-    static void _p_##N##_rotate_left(struct N* m, struct N##_node* parent,     \
+    static void _p_##N##_rotate_left(N* m, struct N##_node* parent,     \
                                      struct N##_node* gparent);                \
-    static void _p_##N##_rotate_right(struct N* m, struct N##_node* parent,    \
+    static void _p_##N##_rotate_right(N* m, struct N##_node* parent,    \
                                       struct N##_node* gparent);               \
-    static void _p_##N##_rotate_left_right(struct N* m, struct N##_node* n,    \
+    static void _p_##N##_rotate_left_right(N* m, struct N##_node* n,    \
                                            struct N##_node* parent,            \
                                            struct N##_node* gparent);          \
-    static void _p_##N##_rotate_right_left(struct N* m, struct N##_node* n,    \
+    static void _p_##N##_rotate_right_left(N* m, struct N##_node* n,    \
                                            struct N##_node* parent,            \
                                            struct N##_node* gparent);          \
-    static void _p_##N##_rotate(struct N* m, struct N##_node* n,               \
+    static void _p_##N##_rotate(N* m, struct N##_node* n,               \
                                 struct N##_node* parent,                       \
                                 struct N##_node* gparent);                     \
-    static void _p_##N##_correct_tree(struct N* m, struct N##_node* n,         \
+    static void _p_##N##_correct_tree(N* m, struct N##_node* n,         \
                                       struct N##_node* p,                      \
                                       struct N##_node* gp);                    \
-    static void _p_##N##_check_color(struct N* m, struct N##_node* n);         \
-    static void _p_##N##_node_insert(struct N* m, K* k, V* v);                 \
-    static V* N##_node_insert_or_get(struct N* m, K* k);                       \
-    static struct N##_node* _p_##N##_node_find(struct N* m, K k);              \
-    static void _p_##N##_erase_rebalanse(struct N* m, struct N##_node* n,      \
+    static void _p_##N##_check_color(N* m, struct N##_node* n);         \
+    static void _p_##N##_node_insert(N* m, K* k, V* v);                 \
+    static V* N##_node_insert_or_get(N* m, K* k);                       \
+    static struct N##_node* _p_##N##_node_find(N* m, K k);              \
+    static void _p_##N##_erase_rebalanse(N* m, struct N##_node* n,      \
                                          struct N##_node* p);                  \
-    static struct N##_node* _p_##N##_node_erase(struct N* m,                   \
+    static struct N##_node* _p_##N##_node_erase(N* m,                   \
                                                 struct N##_node* n);           \
-    static void _p_##N##_node_copy_values(const struct N* const m,             \
+    static void _p_##N##_node_copy_values(const N* const m,             \
                                           struct N##_node* dst,                \
                                           const struct N##_node* const src);   \
     static struct N##_node*                                                    \
-        _p_##N##_node_duplicate(const struct N* const m,                       \
+        _p_##N##_node_duplicate(const N* const m,                       \
                                 const struct N##_node* const n);               \
     static void                                                                \
-        _p_##N##_copy_base_data(struct N* __restrict__ dst,                    \
-                                const struct N* __restrict__ const src);       \
-    static void _p_##N##_copy_nodes(struct N* __restrict__ dst,                \
-                                    const struct N* __restrict__ const src);   \
-    static void _p_##N##_node_free(const struct N* const m, struct N##_node* n);
+        _p_##N##_copy_base_data(N* __restrict__ dst,                    \
+                                const N* __restrict__ const src);       \
+    static void _p_##N##_copy_nodes(N* __restrict__ dst,                \
+                                    const N* __restrict__ const src);   \
+    static void _p_##N##_node_free(const N* const m, struct N##_node* n);
 
 #define SGC_INIT_HEADERS_MAP(K, V, N)                                          \
     struct N##_pair {                                                          \
@@ -98,17 +98,17 @@
                                                                                \
     void N##_set_share(N* m, bool shared);                                     \
     void N##_set_share_key(N* m, bool shared);                                 \
-    size_t N##_size(const struct N* const m);                                  \
-    void N##_init(struct N* m);                                                \
-    void N##_free(struct N* m);                                                \
-    void N##_copy(struct N* __restrict__ dst,                                  \
-                  const struct N* __restrict__ const src);                     \
-    void N##_set(struct N* m, K k, V v);                                       \
-    const V* N##_at(struct N* m, K k);                                         \
-    struct N##_it N##_find(struct N* m, const K k);                            \
-    bool N##_erase(struct N* m, const K key);                                  \
-    bool N##_it_erase(struct N* m, struct N##_it* i);                          \
-    bool N##_empty(const struct N* const m);
+    size_t N##_size(const N* const m);                                  \
+    void N##_init(N* m);                                                \
+    void N##_free(N* m);                                                \
+    void N##_copy(N* __restrict__ dst,                                  \
+                  const N* __restrict__ const src);                     \
+    void N##_set(N* m, K k, V v);                                       \
+    const V* N##_at(N* m, K k);                                         \
+    struct N##_it N##_find(N* m, const K k);                            \
+    bool N##_erase(N* m, const K key);                                  \
+    bool N##_it_erase(N* m, struct N##_it* i);                          \
+    bool N##_empty(const N* const m);
 
 #define _SGC_INIT_UNIQUE_MAP(K, V, N)                                          \
     static struct N##_node* _p_##N##_node_new(const K* const k,                \
@@ -124,7 +124,7 @@
         return n;                                                              \
     }                                                                          \
                                                                                \
-    static void _p_##N##_node_insert(struct N* m, K* k, V* v) {                \
+    static void _p_##N##_node_insert(N* m, K* k, V* v) {                \
         struct N##_node* parent = m->root_;                                    \
         struct N##_node* new_node = NULL;                                      \
         while (true) {                                                         \
@@ -160,7 +160,7 @@
         _p_##N##_check_color(m, new_node);                                     \
     }                                                                          \
                                                                                \
-    void N##_set(struct N* m, K k, V v) {                                      \
+    void N##_set(N* m, K k, V v) {                                      \
         if (m->root_ == SGC_MAP_LEAF) {                                        \
             struct N##_node* new_node =                                        \
                 _p_##N##_node_new(&k, &v, m->shared_key_, m->shared_);         \
@@ -174,7 +174,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static V* N##_node_insert_or_get(struct N* m, K* k) {                      \
+    static V* N##_node_insert_or_get(N* m, K* k) {                      \
         V new_el;                                                              \
         V* v = &new_el;                                                        \
         struct N##_node* parent = m->root_;                                    \
@@ -216,7 +216,7 @@
         return v;                                                              \
     }                                                                          \
                                                                                \
-    const V* N##_at(struct N* const m, K k) {                                  \
+    const V* N##_at(N* const m, K k) {                                  \
         V* ret = NULL;                                                         \
         if (m->root_ == SGC_MAP_LEAF) {                                        \
             V v;                                                               \
@@ -235,7 +235,7 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    static struct N##_node* _p_##N##_node_erase(struct N* m,                   \
+    static struct N##_node* _p_##N##_node_erase(N* m,                   \
                                                 struct N##_node* n) {          \
         struct N##_node* succ;                                                 \
         struct N##_node* succ_p;                                               \
@@ -298,7 +298,7 @@
         return succ;                                                           \
     }                                                                          \
                                                                                \
-    void N##_init(struct N* s) {                                               \
+    void N##_init(N* s) {                                               \
         s->size_ = 0;                                                          \
         s->root_ = SGC_MAP_LEAF;                                               \
         s->shared_ = 0;                                                        \
@@ -306,8 +306,8 @@
     }                                                                          \
                                                                                \
     static void                                                                \
-        _p_##N##_copy_base_data(struct N* __restrict__ dst,                    \
-                                const struct N* __restrict__ const src) {      \
+        _p_##N##_copy_base_data(N* __restrict__ dst,                    \
+                                const N* __restrict__ const src) {      \
         dst->size_ = src->size_;                                               \
         dst->root_ = SGC_MAP_LEAF;                                             \
         dst->shared_key_ = src->shared_key_;                                   \

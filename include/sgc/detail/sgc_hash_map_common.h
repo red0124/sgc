@@ -24,7 +24,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_begin(struct N* m, struct N##_it* i) {                         \
+    void N##_it_begin(N* m, struct N##_it* i) {                         \
         if (m->data_) {                                                        \
             i->data_ = m->data_;                                               \
             i->curr_ = m->data_[0];                                            \
@@ -39,7 +39,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_cbegin(const struct N* const m, struct N##_it* i) {            \
+    void N##_it_cbegin(const N* const m, struct N##_it* i) {            \
         if (m->data_) {                                                        \
             i->data_ = m->data_;                                               \
             i->curr_ = m->data_[0];                                            \
@@ -80,7 +80,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_end(struct N* m, struct N##_it* i) {                           \
+    void N##_it_end(N* m, struct N##_it* i) {                           \
         if (m->data_) {                                                        \
             i->data_ = m->data_;                                               \
             i->curr_ = m->data_[m->max_ - 1];                                  \
@@ -97,7 +97,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_cend(const struct N* const m, struct N##_it* i) {              \
+    void N##_it_cend(const N* const m, struct N##_it* i) {              \
         if (m->data_) {                                                        \
             i->data_ = m->data_;                                               \
             i->curr_ = m->data_[m->max_ - 1];                                  \
@@ -114,25 +114,25 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    struct N##_it N##_begin(struct N* m) {                                     \
+    struct N##_it N##_begin(N* m) {                                     \
         struct N##_it i;                                                       \
         N##_it_begin(m, &i);                                                   \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cbegin(const struct N* const m) {                        \
+    struct N##_it N##_cbegin(const N* const m) {                        \
         struct N##_it i;                                                       \
         N##_it_cbegin(m, &i);                                                  \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_end(struct N* m) {                                       \
+    struct N##_it N##_end(N* m) {                                       \
         struct N##_it i;                                                       \
         N##_it_end(m, &i);                                                     \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cend(const struct N* const m) {                          \
+    struct N##_it N##_cend(const N* const m) {                          \
         struct N##_it i;                                                       \
         N##_it_cend(m, &i);                                                    \
         return i;                                                              \
@@ -146,7 +146,7 @@
         return i.valid_;                                                       \
     }                                                                          \
                                                                                \
-    static void _p_##N##_bucket_sgc_free(const struct N* const u,              \
+    static void _p_##N##_bucket_sgc_free(const N* const u,              \
                                          struct N##_node* bucket) {            \
         if (bucket) {                                                          \
             struct N##_node* curr = bucket;                                    \
@@ -193,11 +193,11 @@
         return curr;                                                           \
     }                                                                          \
                                                                                \
-    size_t N##_bucket_count(const struct N* const u) {                         \
+    size_t N##_bucket_count(const N* const u) {                         \
         return u->max_;                                                        \
     }                                                                          \
                                                                                \
-    size_t N##_bucket_size(const struct N* const u, size_t n) {                \
+    size_t N##_bucket_size(const N* const u, size_t n) {                \
         size_t ret = 0;                                                        \
         if (u->data_) {                                                        \
             ret = _p_##N##_bucket_node_size(u->data_[n]);                      \
@@ -205,7 +205,7 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    size_t N##_buckets_used(const struct N* const u) {                         \
+    size_t N##_buckets_used(const N* const u) {                         \
         size_t ret = 0;                                                        \
         for (size_t i = 0; i < u->max_; ++i) {                                 \
             ret += (u->data_[i] == NULL) ? 0 : 1;                              \
@@ -222,7 +222,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_resize(struct N* u) {                                 \
+    static void _p_##N##_resize(N* u) {                                 \
         size_t max, new_max;                                                   \
         _p_##N##_rehash_size(u, &max, &new_max);                               \
         if (u->size_ == max) {                                                 \
@@ -256,8 +256,8 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_copy_nodes(struct N* __restrict__ dst,                \
-                                    const struct N* __restrict__ const src) {  \
+    static void _p_##N##_copy_nodes(N* __restrict__ dst,                \
+                                    const N* __restrict__ const src) {  \
         dst->data_ = (struct N##_node**)sgc_malloc(sizeof(struct N##_node*) *  \
                                                    dst->max_);                 \
         for (size_t i = 0; i < src->max_; ++i) {                               \
@@ -288,7 +288,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_rehash_size(const struct N* const u, size_t* max,     \
+    static void _p_##N##_rehash_size(const N* const u, size_t* max,     \
                                      size_t* new_max) {                        \
         *max = u->max_;                                                        \
         if (u->size_ == *max) {                                                \
@@ -296,7 +296,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_rehash(struct N* u, size_t new_max) {                             \
+    void N##_rehash(N* u, size_t new_max) {                             \
         struct N##_node** new_data =                                           \
             (struct N##_node**)sgc_malloc(sizeof(struct N##_node*) * new_max); \
         for (size_t i = 0; i < new_max; ++i) {                                 \
@@ -327,7 +327,7 @@
         u->max_ = new_max;                                                     \
     }                                                                          \
                                                                                \
-    static struct N##_node* _p_##N##_bucket_remove(struct N* u,                \
+    static struct N##_node* _p_##N##_bucket_remove(N* u,                \
                                                    struct N##_node* bucket,    \
                                                    const T* const key) {       \
         struct N##_node* ret = bucket;                                         \
@@ -350,7 +350,7 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    void N##_erase(struct N* u, const T v) {                                   \
+    void N##_erase(N* u, const T v) {                                   \
         if (u->data_) {                                                        \
             size_t hash = T##_hash(&v);                                        \
             size_t position = hash % u->max_;                                  \

@@ -91,13 +91,13 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_init(struct N* l) {                                               \
+    void N##_init(N* l) {                                               \
         l->size_ = 0;                                                          \
         l->head_ = l->tail_ = NULL;                                            \
         l->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
-    void N##_free(struct N* l) {                                               \
+    void N##_free(N* l) {                                               \
         struct N##_node* curr = l->head_;                                      \
         struct N##_node* tmp;                                                  \
         for (size_t i = 0; i < l->size_; ++i) {                                \
@@ -110,35 +110,35 @@
         l->size_ = 0;                                                          \
     }                                                                          \
                                                                                \
-    const T* N##_back(const struct N* const l) {                               \
+    const T* N##_back(const N* const l) {                               \
         if (l->size_) {                                                        \
             return &l->tail_->data_;                                           \
         }                                                                      \
         return NULL;                                                           \
     }                                                                          \
                                                                                \
-    void N##_set_back(struct N* l, T new_el) {                                 \
+    void N##_set_back(N* l, T new_el) {                                 \
         if (l->size_) {                                                        \
             SGC_REPLACE(T##_copy, T##_free, l->tail_->data_, new_el,           \
                         l->shared_);                                           \
         }                                                                      \
     }                                                                          \
                                                                                \
-    const T* N##_front(const struct N* const l) {                              \
+    const T* N##_front(const N* const l) {                              \
         if (l->size_) {                                                        \
             return &l->head_->data_;                                           \
         }                                                                      \
         return NULL;                                                           \
     }                                                                          \
                                                                                \
-    void N##_set_front(struct N* l, T new_el) {                                \
+    void N##_set_front(N* l, T new_el) {                                \
         if (l->size_) {                                                        \
             SGC_REPLACE(T##_copy, T##_free, l->head_->data_, new_el,           \
                         l->shared_);                                           \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_sort(struct N* l, int (*comp)(const void*, const void*)) {        \
+    void N##_sort(N* l, int (*comp)(const void*, const void*)) {        \
         struct N##_node** nodes_ptr = (struct N##_node**)sgc_malloc(           \
             sizeof(struct N##_node*) * l->size_);                              \
         struct N##_node* curr = l->head_;                                      \
@@ -169,25 +169,25 @@
         return i.curr_ != NULL;                                                \
     }                                                                          \
                                                                                \
-    struct N##_it N##_end(struct N* l) {                                       \
+    struct N##_it N##_end(N* l) {                                       \
         struct N##_it i;                                                       \
         N##_it_end(l, &i);                                                     \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cend(const struct N* const l) {                          \
+    struct N##_it N##_cend(const N* const l) {                          \
         struct N##_it i;                                                       \
         N##_it_cend(l, &i);                                                    \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_begin(struct N* l) {                                     \
+    struct N##_it N##_begin(N* l) {                                     \
         struct N##_it i;                                                       \
         N##_it_begin(l, &i);                                                   \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cbegin(const struct N* const l) {                        \
+    struct N##_it N##_cbegin(const N* const l) {                        \
         struct N##_it i;                                                       \
         N##_it_cbegin(l, &i);                                                  \
         return i;                                                              \

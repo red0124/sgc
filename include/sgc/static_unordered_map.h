@@ -10,12 +10,12 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_SUNORDERED_MAP(K, V, S, N)                                \
-    static struct N##_it _p_##N##_find_by_hash(struct N* u, const K* const k,  \
+    static struct N##_it _p_##N##_find_by_hash(N* u, const K* const k,  \
                                                size_t hash);                   \
-    static struct N##_it N##_it_at(const struct N* const u, size_t at);        \
-    static void _p_##N##_node_free(const struct N* const m,                    \
+    static struct N##_it N##_it_at(const N* const u, size_t at);        \
+    static void _p_##N##_node_free(const N* const m,                    \
                                    struct N##_node* n);                        \
-    static void _p_##N##_node_copy_values(const struct N* const m,             \
+    static void _p_##N##_node_copy_values(const N* const m,             \
                                           struct N##_node* dst,                \
                                           const struct N##_node* const src);   \
     static size_t _p_##N##_node_hash_value(const struct N##_node* n);          \
@@ -58,23 +58,23 @@
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
     void N##_set_share(N* u, bool shared);                                     \
     void N##_set_share_key(N* u, bool shared);                                 \
-    size_t N##_size(const struct N* const u);                                  \
-    void N##_init(struct N* u);                                                \
+    size_t N##_size(const N* const u);                                  \
+    void N##_init(N* u);                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
-    void N##_free(struct N* u);                                                \
-    struct N##_it N##_find(struct N* u, const K k);                            \
-    void N##_set(struct N* u, const K k, const V v);                           \
-    const V* N##_at(struct N* u, K k);                                         \
-    void N##_it_erase(struct N* u, struct N##_it* i);                          \
-    void N##_erase(struct N* u, const K k);                                    \
-    bool N##_empty(const struct N* const u);
+    void N##_free(N* u);                                                \
+    struct N##_it N##_find(N* u, const K k);                            \
+    void N##_set(N* u, const K k, const V v);                           \
+    const V* N##_at(N* u, K k);                                         \
+    void N##_it_erase(N* u, struct N##_it* i);                          \
+    void N##_erase(N* u, const K k);                                    \
+    bool N##_empty(const N* const u);
 
 #define _SGC_INIT_UNIQUE_SUNORDERED_MAP(K, V, S, N)                            \
     size_t N##_max(void) {                                                     \
         return S;                                                              \
     }                                                                          \
                                                                                \
-    void N##_init(struct N* u) {                                               \
+    void N##_init(N* u) {                                               \
         u->size_ = 0;                                                          \
         u->shared_ = u->shared_key_ = 0;                                       \
         for (size_t i = 0; i < S; ++i) {                                       \
@@ -82,7 +82,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_set(struct N* u, const K k, const V v) {                          \
+    void N##_set(N* u, const K k, const V v) {                          \
         size_t hash = K##_hash(&k);                                            \
         struct N##_it i = _p_##N##_find_by_hash(u, &k, hash);                  \
         if (i.valid_) {                                                        \
@@ -105,7 +105,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    const V* N##_at(struct N* u, K k) {                                        \
+    const V* N##_at(N* u, K k) {                                        \
         size_t hash = K##_hash(&k);                                            \
         struct N##_it i = _p_##N##_find_by_hash(u, &k, hash);                  \
         V* ret = NULL;                                                         \

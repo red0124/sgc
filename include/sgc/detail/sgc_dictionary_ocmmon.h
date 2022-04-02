@@ -4,14 +4,14 @@
 
 #define _SGC_INIT_COMMON_DICT_PAIR(K, V, N)                              \
     static inline void                                                         \
-        _p_##N##_node_copy_values(const struct N* const ds,                    \
+        _p_##N##_node_copy_values(const N* const ds,                    \
                                   struct N##_node* dst,                        \
                                   const struct N##_node* const src) {          \
         SGC_COPY(K##_copy, dst->data_.key, src->data_.key, ds->shared_key_);   \
         SGC_COPY(V##_copy, dst->data_.value, src->data_.value, ds->shared_);   \
     }                                                                          \
                                                                                \
-    static inline void _p_##N##_node_free(const struct N* const ds,            \
+    static inline void _p_##N##_node_free(const N* const ds,            \
                                           struct N##_node* n) {                \
         SGC_FREE(V##_free, n->data_.value, ds->shared_);                       \
         SGC_FREE(K##_free, n->data_.key, ds->shared_key_);                     \
@@ -42,13 +42,13 @@
 
 #define _SGC_INIT_COMMON_DICT_NONE_PAIR(KV, N)                           \
     static inline void                                                         \
-        _p_##N##_node_copy_values(const struct N* const ds,                    \
+        _p_##N##_node_copy_values(const N* const ds,                    \
                                   struct N##_node* dst,                        \
                                   const struct N##_node* const src) {          \
         SGC_COPY(KV##_copy, dst->value_, src->value_, ds->shared_);            \
     }                                                                          \
                                                                                \
-    static inline void _p_##N##_node_free(const struct N* const ds,            \
+    static inline void _p_##N##_node_free(const N* const ds,            \
                                           struct N##_node* n) {                \
         SGC_FREE(KV##_free, n->value_, ds->shared_);                           \
     }                                                                          \

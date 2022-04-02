@@ -7,10 +7,10 @@
         c->shared_ = shared;                                                   \
     }                                                                          \
                                                                                \
-    size_t N##_size(const struct N* const c) {                                 \
+    size_t N##_size(const N* const c) {                                 \
         return c->size_;                                                       \
     }                                                                          \
                                                                                \
-    bool N##_empty(const struct N* const l) {                                        \
+    bool N##_empty(const N* const l) {                                        \
         return (l->size_ == 0);                                                \
     }

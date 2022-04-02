@@ -2,7 +2,7 @@
 
 set -x
 
-SUB="s|\Q const size_t \E| size_t |g"
+SUB="s|\Qstruct N* \E|N* |g"
 echo $SUB
 
 for i in $(find -type f -name "*.h"); do

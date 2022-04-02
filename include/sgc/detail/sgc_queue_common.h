@@ -9,7 +9,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_push(struct N* q, T el) {                                         \
+    void N##_push(N* q, T el) {                                                \
         _p_##N##_resize(q);                                                    \
         if (!N##_empty(q)) {                                                   \
             _p_##N##_go_next(&q->back_, _p_##N##_max(q));                      \
@@ -18,35 +18,35 @@
         ++q->size_;                                                            \
     }                                                                          \
                                                                                \
-    const T* N##_front(const struct N* const q) {                              \
+    T* N##_front(N* q) {                                                       \
         if (q->size_ == 0) {                                                   \
             return NULL;                                                       \
         }                                                                      \
         return &q->data_[q->front_];                                           \
     }                                                                          \
                                                                                \
-    void N##_set_front(struct N* q, T new_el) {                                \
+    void N##_set_front(N* q, T new_el) {                                       \
         if (q->size_) {                                                        \
             SGC_REPLACE(T##_copy, T##_free, q->data_[q->front_], new_el,       \
                         q->shared_);                                           \
         }                                                                      \
     }                                                                          \
                                                                                \
-    const T* N##_back(const struct N* const q) {                               \
+    T* N##_back(N* q) {                                                        \
         if (q->size_ == 0) {                                                   \
             return NULL;                                                       \
         }                                                                      \
         return &q->data_[q->back_];                                            \
     }                                                                          \
                                                                                \
-    void N##_set_back(struct N* q, T new_el) {                                 \
+    void N##_set_back(N* q, T new_el) {                                        \
         if (q->size_ > 0) {                                                    \
             SGC_REPLACE(T##_copy, T##_free, q->data_[q->back_], new_el,        \
                         q->shared_);                                           \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_pop(struct N* q) {                                                \
+    void N##_pop(N* q) {                                                       \
         if (q->size_) {                                                        \
             SGC_FREE(T##_free, q->data_[q->front_], q->shared_);               \
             --q->size_;                                                        \
@@ -56,7 +56,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_copy_data(struct N* dst, const struct N* const src) { \
+    static void _p_##N##_copy_data(N* dst, const N* const src) {               \
         if (dst->shared_) {                                                    \
             if (src->front_ < src->back_) {                                    \
                 memcpy(dst->data_, src->data_ + src->front_,                   \
@@ -78,7 +78,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_free_data(struct N* q) {                              \
+    static void _p_##N##_free_data(N* q) {                                     \
         if (!q->shared_) {                                                     \
             size_t i;                                                          \
             for (i = q->front_; i != q->back_;) {                              \

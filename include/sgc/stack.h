@@ -7,7 +7,7 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define _SGC_INIT_PP_STACK(T, N) static void _p_##N##_resize(struct N* s);
+#define _SGC_INIT_PP_STACK(T, N) static void _p_##N##_resize(N* s);
 
 #define SGC_INIT_HEADERS_STACK(T, N)                                           \
     struct N {                                                                 \
@@ -21,33 +21,31 @@
     typedef T N##_type;                                                        \
                                                                                \
     void N##_set_share(N* s, bool shared);                                     \
-    size_t N##_size(const struct N* const s);                                  \
-    void N##_init(struct N* const s);                                          \
-    void N##_free(struct N* s);                                                \
-    void N##_copy(struct N* __restrict__ dst,                                  \
-                  const struct N* __restrict__ const src);                     \
-    void N##_push(struct N* s, T el);                                          \
-    void N##_pop(struct N* s);                                                 \
-    const T* N##_top(const struct N* const s);                                 \
-    void N##_set_top(struct N* s, T new_el);                                   \
-    bool N##_empty(const struct N* const s);
+    size_t N##_size(const N* const s);                                         \
+    void N##_init(N* const s);                                                 \
+    void N##_free(N* s);                                                       \
+    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_push(N* s, T el);                                                 \
+    void N##_pop(N* s);                                                        \
+    T* N##_top(N* s);                                                          \
+    void N##_set_top(N* s, T new_el);                                          \
+    bool N##_empty(const N* const s);
 
 #define _SGC_INIT_UNIQUE_STACK(T, N)                                           \
-    void N##_init(struct N* const s) {                                         \
+    void N##_init(N* const s) {                                                \
         s->size_ = s->max_ = 0;                                                \
         s->data_ = NULL;                                                       \
         s->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
-    void N##_free(struct N* s) {                                               \
+    void N##_free(N* s) {                                                      \
         if (s->data_) {                                                        \
             SGC_ARRAY_FREE(T, s->data_, s->size_, s->shared_)                  \
             sgc_free(s->data_);                                                \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(struct N* __restrict__ dst,                                  \
-                  const struct N* __restrict__ const src) {                    \
+    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->max_ = src->size_;                                            \
@@ -60,7 +58,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_resize(struct N* s) {                                 \
+    static void _p_##N##_resize(N* s) {                                        \
         if (s->size_ == s->max_) {                                             \
             s->max_ = (s->max_ == 0) ? 1 : s->max_ * 2;                        \
             s->data_ = (T*)sgc_realloc(s->data_, sizeof(T) * s->max_);         \

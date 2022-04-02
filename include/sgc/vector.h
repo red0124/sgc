@@ -39,7 +39,7 @@
     void N##_set_back(N* v, T new_el);                                         \
     T* N##_front(N* v);                                                        \
     void N##_set_front(N* v, T new_el);                                        \
-    void N##_erase(N* v, size_t at);                                     \
+    void N##_erase(N* v, size_t at);                                           \
     bool N##_empty(const N* const d);                                          \
     T* N##_array(N* d);                                                        \
                                                                                \
@@ -82,28 +82,24 @@
                                                                                \
     void N##_init(N* v) {                                                      \
         v->size_ = v->max_ = 0;                                                \
-        v->data_ = NULL;                                                       \
         v->shared_ = false;                                                    \
+        v->data_ = NULL;                                                       \
     }                                                                          \
                                                                                \
-    void N##_from_array(N* v, const T* const arr, size_t size) {         \
+    void N##_from_array(N* v, const T* const arr, size_t size) {               \
         if (size) {                                                            \
             v->max_ = v->size_ = size;                                         \
             v->data_ = (T*)sgc_malloc(sizeof(T) * size);                       \
             v->shared_ = false;                                                \
             SGC_ARRAY_COPY(T, v->data_, arr, size, true)                       \
         } else {                                                               \
-            v->max_ = v->size_ = 0;                                            \
-            v->data_ = NULL;                                                   \
+            N##_init(v);                                                       \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_shrink(N* v) {                                                    \
-        if (!v->shared_) {                                                     \
-            for (size_t i = v->size_; i < v->max_; ++i) {                      \
-                T##_free(&v->data_[i]);                                        \
-            }                                                                  \
-        }                                                                      \
+        SGC_ARRAY_FREE(T, (&v->data_[v->size_]), (v->max_ - v->size_),         \
+                       v->shared_)                                             \
         v->data_ = (T*)sgc_realloc(v->data_, sizeof(T) * v->size_);            \
     }
 

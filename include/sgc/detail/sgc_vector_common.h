@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON_VECTOR(T, N)                                          \
-    void N##_insert(N* v, size_t at, T el) {                             \
+    void N##_insert(N* v, size_t at, T el) {                                   \
         if (at > v->size_) {                                                   \
             return;                                                            \
         }                                                                      \
@@ -63,7 +63,7 @@
         N##_set(v, 0, new_el);                                                 \
     }                                                                          \
                                                                                \
-    void N##_erase(N* v, size_t at) {                                    \
+    void N##_erase(N* v, size_t at) {                                          \
         if (at >= v->size_) {                                                  \
             return;                                                            \
         }                                                                      \
@@ -78,7 +78,7 @@
         return v->data_;                                                       \
     }                                                                          \
                                                                                \
-    const T* N##_it_data(const N##_it i) {                                     \
+    T* N##_it_data(N##_it i) {                                                 \
         return i.curr_;                                                        \
     }                                                                          \
                                                                                \

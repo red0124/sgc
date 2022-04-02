@@ -6,8 +6,7 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define _SGC_INIT_PP_SSTACK(T, N)                                              \
-    static void _p_##N##_resize(const struct N* const s);
+#define _SGC_INIT_PP_SSTACK(T, N) static void _p_##N##_resize(const N* const s);
 
 #define SGC_INIT_HEADERS_SSTACK(T, S, N)                                       \
     struct N {                                                                 \
@@ -21,19 +20,18 @@
                                                                                \
     size_t N##_max(void);                                                      \
     void N##_set_share(N* s, bool shared);                                     \
-    void N##_init(struct N* s);                                                \
-    size_t N##_size(const struct N* s);                                        \
-    void N##_free(struct N* s);                                                \
-    void N##_copy(struct N* __restrict__ dst,                                  \
-                  const struct N* __restrict__ const src);                     \
-    void N##_push(struct N* s, T el);                                          \
-    void N##_pop(struct N* s);                                                 \
-    const T* N##_top(const struct N* const s);                                 \
-    void N##_set_top(struct N* s, T new_el);                                   \
-    bool N##_empty(const struct N* const s);
+    void N##_init(N* s);                                                       \
+    size_t N##_size(const N* s);                                               \
+    void N##_free(N* s);                                                       \
+    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_push(N* s, T el);                                                 \
+    void N##_pop(N* s);                                                        \
+    T* N##_top(N* s);                                                          \
+    void N##_set_top(N* s, T new_el);                                          \
+    bool N##_empty(const N* const s);
 
 #define _SGC_INIT_UNIQUE_SSTACK(T, S, N)                                       \
-    static void _p_##N##_resize(const struct N* const v) {                     \
+    static void _p_##N##_resize(const N* const v) {                            \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
@@ -42,19 +40,18 @@
         return S;                                                              \
     }                                                                          \
                                                                                \
-    void N##_init(struct N* s) {                                               \
+    void N##_init(N* s) {                                                      \
         s->size_ = 0;                                                          \
         s->shared_ = 0;                                                        \
     }                                                                          \
                                                                                \
-    void N##_free(struct N* s) {                                               \
+    void N##_free(N* s) {                                                      \
         if (s->size_) {                                                        \
             SGC_ARRAY_FREE(T, s->data_, s->size_, s->shared_);                 \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(struct N* __restrict__ dst,                                  \
-                  const struct N* __restrict__ const src) {                    \
+    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->shared_ = src->shared_;                                       \
