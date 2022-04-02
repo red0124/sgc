@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define _SGC_INIT_PRIORITY_QUEUE_TYPE_FUNCTIONS(T, N)                          \
+#define _SGC_INIT_COMMON_PRIORITY_QUEUE(T, N)                                  \
     static void _p_##N##_stack_size(T* i, T* j) {                              \
         char* tmp[sizeof(T)];                                                  \
                                                                                \
@@ -55,9 +55,7 @@
     void N##_pop(struct N* p) {                                                \
         if (p->size_) {                                                        \
             _p_##N##_stack_size(&p->data_[0], &p->data_[--p->size_]);          \
-            if (!p->shared_) {                                                 \
-                T##_free(&p->data_[p->size_]);                                 \
-            }                                                                  \
+            SGC_FREE(T##_free, p->data_[p->size_], p->shared_)                 \
             _p_##N##_resize(p);                                                \
         }                                                                      \
     }                                                                          \
@@ -70,11 +68,10 @@
     }                                                                          \
                                                                                \
     T* N##_array(struct N* d) {                                                \
-        T* ret = NULL;                                                         \
         if (d->size_) {                                                        \
-            ret = d->data_;                                                    \
+            return d->data_;                                                   \
         }                                                                      \
-        return ret;                                                            \
+        return NULL;                                                           \
     }                                                                          \
                                                                                \
     void N##_from_array(struct N* p, const T* const arr, const size_t size) {  \
@@ -83,7 +80,5 @@
             for (size_t i = 0; i < size; ++i) {                                \
                 N##_push(p, arr[i]);                                           \
             }                                                                  \
-        } else {                                                               \
-            p->size_ = 0;                                                      \
         }                                                                      \
     }

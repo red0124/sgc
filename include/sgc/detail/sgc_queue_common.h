@@ -3,9 +3,9 @@
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON_QUEUE(T, N)                                           \
-    static void _p_##N##_go_next(size_t* flag, size_t max) {                   \
-        if ((++*flag) == max) {                                                \
-            *flag = 0;                                                         \
+    static void _p_##N##_go_next(size_t* pos, size_t max) {                    \
+        if ((++*pos) == max) {                                                 \
+            *pos = 0;                                                          \
         }                                                                      \
     }                                                                          \
                                                                                \

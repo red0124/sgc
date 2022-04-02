@@ -32,16 +32,12 @@
         return K##_hash(&n->data_.key);                                        \
     }                                                                          \
                                                                                \
-    struct N##_pair* N##_it_data(struct N##_it i) {                \
+    const struct N##_pair* N##_it_data(const struct N##_it i) {                \
         return &i.curr_->data_;                                                \
     }                                                                          \
                                                                                \
-    const struct N##_pair* N##_it_cdata(struct N##_it i) {         \
-        return &i.curr_->data_;                                                \
-    }                                                                          \
-                                                                               \
-    void N##_set_share_key(N* m, int shared) {                              \
-        m->shared_key_ = shared;                                            \
+    void N##_set_share_key(N* m, bool shared) {                                \
+        m->shared_key_ = shared;                                               \
     }
 
 #define _SGC_INIT_COMMON_DICTIONARY_NONE_PAIR_FUNCTIONS(KV, N)                 \
@@ -72,10 +68,10 @@
         return KV##_hash(&n->value_);                                          \
     }                                                                          \
                                                                                \
-    KV* N##_it_data(struct N##_it i) {                             \
+    const KV* N##_it_data(const struct N##_it i) {                             \
         return &i.curr_->value_;                                               \
     }                                                                          \
                                                                                \
-    const KV* N##_it_cdata(struct N##_it i) {                      \
+    const KV* N##_it_cdata(struct N##_it i) {                                  \
         return &i.curr_->value_;                                               \
     }

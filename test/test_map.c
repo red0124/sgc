@@ -14,7 +14,7 @@ void test_map_insert_erase(void) {
     map_init(&v);
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
-        map_set_at(&v, i, i);
+        map_set(&v, i, i);
     }
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
@@ -35,7 +35,7 @@ void test_map_copy(void) {
     map_init(&v);
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        map_set_at(&v, 0, i);
+        map_set(&v, 0, i);
     }
 
     map v_cp;
@@ -93,22 +93,22 @@ void test_map_map(void) {
     map tmp;
     map_init(&tmp);
 
-    map_set_at(&tmp, 0, 0);
+    map_set(&tmp, 0, 0);
     // {(0, 0)}
 
-    vmap_set_at(&v, tmp, tmp);
+    vmap_set(&v, tmp, tmp);
     // pushed map into vmap, it will make a copy
 
-    map_set_at(&tmp, 1, 1);
+    map_set(&tmp, 1, 1);
     // {(0, 0) (1, 1)}
 
-    vmap_set_at(&v, tmp, tmp);
+    vmap_set(&v, tmp, tmp);
 
-    map_set_at(&tmp, 2, 2);
+    map_set(&tmp, 2, 2);
     // {(0, 0), (1, 1), (2, 2)}
 
     vmap_set_share(&v, 1);
-    vmap_set_at(&v, tmp, tmp);
+    vmap_set(&v, tmp, tmp);
     vmap_set_share(&v, 0);
     // pushed map into vmap, it will use the original
 
@@ -123,32 +123,32 @@ void test_map_map(void) {
 }
 */
 
-void test_map_iterator(void) {
+void test_map_it(void) {
     map v;
     map_init(&v);
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        map_set_at(&v, i, i);
+        map_set(&v, i, i);
     }
 
     size_t i = 0;
 
-    for (struct map_iterator it = map_begin(&v);
-         !map_iterator_equal(it, map_end(&v)); map_iterator_next(&it)) {
-        TEST_ASSERT_EQUAL_INT(map_iterator_data(it)->value, i);
+    for (struct map_it it = map_begin(&v); !map_it_equal(it, map_end(&v));
+         map_it_go_next(&it)) {
+        TEST_ASSERT_EQUAL_INT(map_it_data(it)->value, i);
         ++i;
     }
 
-    TEST_ASSERT_EQUAL_INT(map_iterator_data(map_end(&v))->value,
+    TEST_ASSERT_EQUAL_INT(map_it_data(map_end(&v))->value,
                           TEST_ELEMENTS_NUM - 1);
 
-    for (struct map_iterator it = map_end(&v);
-         !map_iterator_equal(it, map_begin(&v)); map_iterator_prev(&it)) {
-        TEST_ASSERT_EQUAL_INT(map_iterator_data(it)->value, i);
+    for (struct map_it it = map_end(&v); !map_it_equal(it, map_begin(&v));
+         map_it_go_prev(&it)) {
+        TEST_ASSERT_EQUAL_INT(map_it_data(it)->value, i);
         --i;
     }
 
-    TEST_ASSERT_EQUAL_INT(map_iterator_data(map_begin(&v))->value, 0);
+    TEST_ASSERT_EQUAL_INT(map_it_data(map_begin(&v))->value, 0);
 
     map_free(&v);
 }
@@ -160,7 +160,7 @@ int main(void) {
     RUN_TEST(test_map_copy);
     RUN_TEST(test_amap);
     // TODO update RUN_TEST(test_map_map);
-    RUN_TEST(test_map_iterator);
+    RUN_TEST(test_map_it);
 
     return UNITY_END();
 }

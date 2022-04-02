@@ -702,7 +702,7 @@ void tm_print(tm* tm) {
 #define TEST_TM(N)                                                             \
     {                                                                          \
         size_t n = 5;                                                          \
-        size_t m = 18;                                                         \
+        size_t m = 12;                                                         \
         size_t comb_max = (size_t)pow(m, n);                                   \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
@@ -743,62 +743,32 @@ void tm_print(tm* tm) {
                     tm_set(&tm, 4, i + 10);                                    \
                     N##_set(&ds, 4, i + 10);                                   \
                     break;                                                     \
-                case (6):                                                      \
-                    log("at %d %d\n", i, i + 10);                              \
-                    tm_set(&tm, i, i + 10);                                    \
-                    *N##_at(&ds, i) = i + 10;                                  \
-                    break;                                                     \
-                case (7):                                                      \
-                    log("at 0 %d\n", i + 10);                                  \
-                    tm_set(&tm, 0, i + 10);                                    \
-                    *N##_at(&ds, 0) = i + 10;                                  \
-                    break;                                                     \
-                case (8):                                                      \
-                    log("at 1 %d\n", i + 10);                                  \
-                    tm_set(&tm, 1, i + 10);                                    \
-                    *N##_at(&ds, 1) = i + 10;                                  \
-                    break;                                                     \
-                case (9):                                                      \
-                    log("at 2 %d\n", i + 10);                                  \
-                    tm_set(&tm, 2, i + 10);                                    \
-                    *N##_at(&ds, 2) = i + 10;                                  \
-                    break;                                                     \
-                case (10):                                                     \
-                    log("at 3 %d\n", i + 10);                                  \
-                    tm_set(&tm, 3, i + 10);                                    \
-                    *N##_at(&ds, 3) = i + 10;                                  \
-                    break;                                                     \
-                case (11):                                                     \
-                    log("at 4 %d\n", i + 10);                                  \
-                    tm_set(&tm, 4, i + 10);                                    \
-                    *N##_at(&ds, 4) = i + 10;                                  \
-                    break;                                                     \
-                case (12):                                                     \
+                case (6):                                                     \
                     log("erase %d\n", i);                                      \
                     tm_erase(&tm, i);                                          \
                     N##_erase(&ds, i);                                         \
                     break;                                                     \
-                case (13):                                                     \
+                case (7):                                                     \
                     log("erase 0\n");                                          \
                     tm_erase(&tm, 0);                                          \
                     N##_erase(&ds, 0);                                         \
                     break;                                                     \
-                case (14):                                                     \
+                case (8):                                                     \
                     log("erase 1\n");                                          \
                     tm_erase(&tm, 1);                                          \
                     N##_erase(&ds, 1);                                         \
                     break;                                                     \
-                case (15):                                                     \
+                case (9):                                                     \
                     log("erase 2\n");                                          \
                     tm_erase(&tm, 2);                                          \
                     N##_erase(&ds, 2);                                         \
                     break;                                                     \
-                case (16):                                                     \
+                case (10):                                                     \
                     log("erase 3\n");                                          \
                     tm_erase(&tm, 3);                                          \
                     N##_erase(&ds, 3);                                         \
                     break;                                                     \
-                case (17):                                                     \
+                case (11):                                                     \
                     log("erase 4\n");                                          \
                     tm_erase(&tm, 4);                                          \
                     N##_erase(&ds, 4);                                         \
@@ -1051,7 +1021,7 @@ void ts_print(ts* ts) {
                     log("set top %d\n", i);                                    \
                     if (!N##_empty(&ds)) {                                     \
                         ta.data[ta.size - 1] = i;                              \
-                        N##_set_top(&ds, i);                                     \
+                        N##_set_top(&ds, i);                                   \
                     }                                                          \
                     break;                                                     \
                 default:                                                       \

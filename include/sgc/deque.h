@@ -3,13 +3,14 @@
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_deque_common.h"
+#include "detail/sgc_iterator.h"
 #include "detail/sgc_utils.h"
 #include <stdlib.h>
 #include <string.h>
 
 #define _SGC_INIT_PP_DEQUE(T, N)                                               \
-    static void _p_##N##_go_next(size_t* flag, size_t max);                    \
-    static void _p_##N##_go_prev(size_t* flag, size_t max);                    \
+    static void _p_##N##_go_next(size_t* pos, size_t max);                     \
+    static void _p_##N##_go_prev(size_t* pos, size_t max);                     \
     static void _p_##N##_resize(struct N* d);                                  \
     static void _p_##N##_free_data(struct N* d);                               \
     static void _p_##N##_copy_data(struct N* dst, const struct N* const src);  \
@@ -56,26 +57,7 @@
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
-                                                                               \
-    const T* N##_it_data(const struct N##_it i);                               \
-    void N##_it_go_next(struct N##_it* i);                                     \
-    void N##_it_go_prev(struct N##_it* i);                                     \
-    void N##_it_begin(struct N* d, struct N##_it* i);                          \
-    void N##_it_cbegin(const struct N* const d, struct N##_it* i);             \
-    struct N##_it N##_begin(struct N* d);                                      \
-    struct N##_it N##_cbegin(const struct N* const d);                         \
-    void N##_it_end(struct N* d, struct N##_it* i);                            \
-    void N##_it_cend(const struct N* const d, struct N##_it* i);               \
-    struct N##_it N##_end(struct N* d);                                        \
-    struct N##_it N##_cend(const struct N* const d);                           \
-    void N##_it_from(struct N* d, struct N##_it* i, size_t at);                \
-    void N##_it_cfrom(const struct N* const d, struct N##_it* i, size_t at);   \
-    struct N##_it N##_from(struct N* d, size_t at);                            \
-    struct N##_it N##_cfrom(const struct N* const d, size_t at);               \
-    void N##_it_jump(struct N##_it* i, int range);                             \
-    bool N##_it_equal(const struct N##_it first, const struct N##_it second);  \
-    int N##_it_diff(const struct N##_it first, const struct N##_it second);    \
-    bool N##_it_valid(const struct N##_it it);
+    _SGC_INIT_RA_IT_PROTOTIPES(N, T)
 
 #define _SGC_INIT_UNIQUE_DEQUE(T, N)                                           \
     static size_t _p_##N##_max(const struct N* const q) {                      \

@@ -4,18 +4,18 @@
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_ocmmon.h"
+#include "detail/sgc_iterator.h"
 #include "detail/sgc_log.h"
 #include "detail/sgc_rbtree_common.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define _SGC_INIT_PRIKVATE_SET_FUNCTION_DECLARATIONS(KV, N)                    \
+#define _SGC_INIT_PP_SET(KV, N)                                                \
     static int _p_##N##_node_compare(const struct N##_node* const n,           \
                                      const KV* const key);                     \
     static struct N##_node* _p_##N##_node_begin(struct N##_node* n);           \
     static struct N##_node* _p_##N##_node_end(struct N##_node* n);             \
-    static struct N##_node* _p_##N##_node_new(const KV* const v,               \
-                                              size_t shared);               \
+    static struct N##_node* _p_##N##_node_new(const KV* const v, bool shared); \
     static size_t _p_##N##_stack_size(size_t size);                            \
     static bool _p_##N##_is_left_child(const struct N##_node* const n,         \
                                        const struct N##_node* const parent);   \
@@ -41,7 +41,6 @@
     static void _p_##N##_check_color(struct N* s, struct N##_node* n);         \
     static void _p_##N##_node_insert(struct N* s, KV* v);                      \
     static void _p_##N##_node_insert_multiple(struct N* s, KV* v);             \
-    struct N##_it N##_find(struct N* s, KV v);                           \
     static struct N##_node* _p_##N##_node_find(struct N* s, KV v);             \
     static void _p_##N##_erase_rebalanse(struct N* m, struct N##_node* n,      \
                                          struct N##_node* p);                  \
@@ -74,35 +73,22 @@
                                                                                \
     struct N {                                                                 \
         size_t size_;                                                          \
-        size_t shared_;                                                        \
+        bool shared_;                                                          \
         struct N##_node* root_;                                                \
     };                                                                         \
                                                                                \
-    void N##_set_share(N* s, int shared);                                   \
+    void N##_set_share(N* s, bool shared);                                     \
                                                                                \
-    struct N##_it {                                                      \
+    struct N##_it {                                                            \
         struct N##_node* curr_;                                                \
         struct N##_node* next_;                                                \
-        int valid_;                                                         \
+        bool valid_;                                                           \
     };                                                                         \
                                                                                \
-    typedef struct N##_it N##_it;                                  \
+    typedef struct N##_it N##_it;                                              \
+    _SGC_INIT_BD_IT_PROTOTIPES(N)                                             \
                                                                                \
-    KV* N##_it_data(struct N##_it i);                              \
-    const KV* N##_it_cdata(struct N##_it i);                       \
-    void N##_it_go_next(struct N##_it* i);                            \
-    void N##_it_begin(struct N* s, struct N##_it* i);              \
-    void N##_it_cbegin(const struct N* const s, struct N##_it* i); \
-    void N##_it_go_prev(struct N##_it* i);                            \
-    void N##_it_end(struct N* s, struct N##_it* i);                \
-    void N##_it_cend(const struct N* const s, struct N##_it* i);   \
-    struct N##_it N##_begin(struct N* m);                                \
-    struct N##_it N##_cbegin(const struct N* const m);                   \
-    struct N##_it N##_end(struct N* m);                                  \
-    struct N##_it N##_cend(const struct N* const m);                     \
-    bool N##_it_equal(const struct N##_it first,                   \
-                            const struct N##_it second);                 \
-    bool N##_it_valid(const struct N##_it i);                      \
+    struct N##_it N##_find(struct N* s, const KV v);                           \
     size_t N##_size(const struct N* const s);                                  \
     void N##_init(struct N* s);                                                \
     void N##_free(struct N* s);                                                \
@@ -111,15 +97,15 @@
     void N##_insert(struct N* s, KV v);                                        \
     void N##_insert_multiple(struct N* s, KV v);                               \
     bool N##_erase(struct N* m, const KV value);                               \
-    bool N##_it_erase(struct N* m, struct N##_it* i);              \
+    bool N##_it_erase(struct N* m, struct N##_it* i);                          \
     bool N##_empty(const struct N* const m);
 
-#define _SGC_INIT_UNIQUE_SET_FUNCTIONS(KV, N)                                  \
+#define _SGC_INIT_UNIQUE_SET(KV, N)                                            \
     static struct N##_node* _p_##N##_node_new(const KV* const v,               \
-                                              size_t shared) {              \
+                                              bool shared) {                 \
         struct N##_node* n =                                                   \
             (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
-        SGC_COPY(KV##_copy, n->value_, *v, shared);                         \
+        SGC_COPY(KV##_copy, n->value_, *v, shared);                            \
         n->left_ = n->right_ = SGC_MAP_LEAF;                                   \
         n->color_ = SGC_MAP_RED;                                               \
         return n;                                                              \
@@ -285,8 +271,8 @@
 
 #define SGC_INIT_SET(KV, N)                                                    \
     SGC_INIT_HEADERS_SET(KV, N)                                                \
-    _SGC_INIT_PRIKVATE_SET_FUNCTION_DECLARATIONS(KV, N)                        \
+    _SGC_INIT_PP_SET(KV, N)                                                    \
     _SGC_INIT_COMMON_DICTIONARY_NONE_PAIR_FUNCTIONS(KV, N)                     \
-    _SGC_INIT_UNIQUE_SET_FUNCTIONS(KV, N)                                      \
+    _SGC_INIT_UNIQUE_SET(KV, N)                                                \
     _SGC_INIT_RBTREE_TYPE_FUNCTIONS(KV, N)                                     \
     _SGC_INIT_COMMON(N)

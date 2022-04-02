@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_SQUEUE(T, S, N)                                           \
-    static void _p_##N##_go_next(size_t* flag, size_t max);                    \
+    static void _p_##N##_go_next(size_t* pos, size_t max);                     \
     static void _p_##N##_resize(const struct N* const q);                      \
     static void _p_##N##_free_data(struct N* q);                               \
     static void _p_##N##_copy_data(struct N* dst, const struct N* const src);  \

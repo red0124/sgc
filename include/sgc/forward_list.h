@@ -3,6 +3,7 @@
 #include "detail/sgc_allocator.h"
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
+#include "detail/sgc_iterator.h"
 #include "detail/sgc_list_common.h"
 #include "detail/sgc_sort_stack.h"
 #include "detail/sgc_utils.h"
@@ -59,21 +60,9 @@
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
-                                                                               \
-    const T* N##_it_data(const struct N##_it i);                               \
-    void N##_it_go_next(struct N##_it* i);                                     \
-    void N##_it_begin(struct N* l, struct N##_it* i);                          \
-    void N##_it_cbegin(const struct N* const l, struct N##_it* i);             \
-    struct N##_it N##_begin(struct N* l);                                      \
-    struct N##_it N##_cbegin(const struct N* const l);                         \
-    void N##_it_end(struct N* l, struct N##_it* i);                            \
-    void N##_it_cend(const struct N* const l, struct N##_it* i);               \
-    struct N##_it N##_end(struct N* l);                                        \
-    struct N##_it N##_cend(const struct N* const l);                           \
-    bool N##_it_equal(const struct N##_it first, const struct N##_it second);  \
-    bool N##_it_valid(const struct N##_it i);
+    _SGC_INIT_FWD_IT_PROTOTIPES(N, T)
 
-#define _SGC_INIT_UNIQUE_FORWARD_LIST(T, N)                          \
+#define _SGC_INIT_UNIQUE_FORWARD_LIST(T, N)                                    \
     void N##_copy(struct N* __restrict__ dst,                                  \
                   const struct N* __restrict__ const src) {                    \
         if (src->size_ != 0) {                                                 \

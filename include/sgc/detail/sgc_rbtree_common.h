@@ -19,16 +19,16 @@ enum sgc_map_color {
         return (bool)n;                                                        \
     }                                                                          \
                                                                                \
-    bool N##_it_erase(struct N* m, struct N##_it* i) {             \
-        struct N##_it tmp = {i->curr_, i->next_, i->valid_};          \
-        N##_it_go_next(&tmp);                                               \
-        bool valid = i->valid_;                                             \
+    bool N##_it_erase(struct N* m, struct N##_it* i) {                         \
+        struct N##_it tmp = {i->curr_, i->next_, i->valid_};                   \
+        N##_it_go_next(&tmp);                                                  \
+        bool valid = i->valid_;                                                \
         if (valid) {                                                           \
             sgc_free(_p_##N##_node_erase(m, i->curr_));                        \
         }                                                                      \
         i->curr_ = tmp.curr_;                                                  \
         i->next_ = tmp.next_;                                                  \
-        i->valid_ = tmp.valid_;                                          \
+        i->valid_ = tmp.valid_;                                                \
         return valid;                                                          \
     }                                                                          \
                                                                                \
@@ -98,8 +98,8 @@ enum sgc_map_color {
         }                                                                      \
     }                                                                          \
                                                                                \
-    struct N##_it N##_find(struct N* m, K key) {                         \
-        struct N##_it ret = {SGC_MAP_LEAF, SGC_MAP_LEAF, 0};             \
+    struct N##_it N##_find(struct N* m, const K key) {                         \
+        struct N##_it ret = {SGC_MAP_LEAF, SGC_MAP_LEAF, 0};                   \
         struct N##_node* prev;                                                 \
         if (m->root_) {                                                        \
             struct N##_node* curr = m->root_;                                  \
@@ -114,8 +114,8 @@ enum sgc_map_color {
                 } else {                                                       \
                     ret.next_ = curr;                                          \
                     ret.curr_ = prev;                                          \
-                    ret.valid_ = 1;                                         \
-                    N##_it_go_next(&ret);                                   \
+                    ret.valid_ = 1;                                            \
+                    N##_it_go_next(&ret);                                      \
                     break;                                                     \
                 }                                                              \
             }                                                                  \
@@ -124,7 +124,7 @@ enum sgc_map_color {
     }                                                                          \
                                                                                \
     static struct N##_node* _p_##N##_node_find(struct N* s, K key) {           \
-        struct N##_it i = N##_find(s, key);                              \
+        struct N##_it i = N##_find(s, key);                                    \
         return i.curr_;                                                        \
     }                                                                          \
                                                                                \
@@ -291,9 +291,9 @@ enum sgc_map_color {
         return n;                                                              \
     }                                                                          \
                                                                                \
-    void N##_it_go_next(struct N##_it* i) {                           \
+    void N##_it_go_next(struct N##_it* i) {                                    \
         if (!i->next_) {                                                       \
-            i->valid_ = 0;                                                  \
+            i->valid_ = 0;                                                     \
             return;                                                            \
         }                                                                      \
         i->curr_ = i->next_;                                                   \
@@ -311,24 +311,23 @@ enum sgc_map_color {
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_begin(struct N* m, struct N##_it* i) {             \
+    void N##_it_begin(struct N* m, struct N##_it* i) {                         \
         i->curr_ = SGC_MAP_LEAF;                                               \
         i->next_ = (m->root_) ? _p_##N##_node_begin(m->root_) : SGC_MAP_LEAF;  \
-        i->valid_ = 1;                                                      \
-        N##_it_go_next(i);                                                  \
+        i->valid_ = 1;                                                         \
+        N##_it_go_next(i);                                                     \
     }                                                                          \
                                                                                \
-    void N##_it_cbegin(const struct N* const m,                          \
-                             struct N##_it* i) {                         \
+    void N##_it_cbegin(const struct N* const m, struct N##_it* i) {            \
         i->curr_ = SGC_MAP_LEAF;                                               \
         i->next_ = (m->root_) ? _p_##N##_node_begin(m->root_) : SGC_MAP_LEAF;  \
-        i->valid_ = 1;                                                      \
-        N##_it_go_next(i);                                                  \
+        i->valid_ = 1;                                                         \
+        N##_it_go_next(i);                                                     \
     }                                                                          \
                                                                                \
-    void N##_it_go_prev(struct N##_it* i) {                           \
+    void N##_it_go_prev(struct N##_it* i) {                                    \
         if (!i->curr_) {                                                       \
-            i->valid_ = 0;                                                  \
+            i->valid_ = 0;                                                     \
             return;                                                            \
         }                                                                      \
         i->next_ = i->curr_;                                                   \
@@ -346,49 +345,48 @@ enum sgc_map_color {
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_end(struct N* m, struct N##_it* i) {               \
+    void N##_it_end(struct N* m, struct N##_it* i) {                           \
         i->curr_ = (m->root_) ? _p_##N##_node_end(m->root_) : SGC_MAP_LEAF;    \
         i->next_ = SGC_MAP_LEAF;                                               \
-        i->valid_ = (i->curr_) ? 1 : 0;                                     \
+        i->valid_ = (i->curr_) ? 1 : 0;                                        \
     }                                                                          \
                                                                                \
-    void N##_it_cend(const struct N* const m, struct N##_it* i) {  \
+    void N##_it_cend(const struct N* const m, struct N##_it* i) {              \
         i->curr_ = (m->root_) ? _p_##N##_node_end(m->root_) : SGC_MAP_LEAF;    \
         i->next_ = SGC_MAP_LEAF;                                               \
-        i->valid_ = (i->curr_) ? 1 : 0;                                     \
+        i->valid_ = (i->curr_) ? 1 : 0;                                        \
     }                                                                          \
                                                                                \
-    struct N##_it N##_begin(struct N* m) {                               \
-        struct N##_it i;                                                 \
-        N##_it_begin(m, &i);                                             \
+    struct N##_it N##_begin(struct N* m) {                                     \
+        struct N##_it i;                                                       \
+        N##_it_begin(m, &i);                                                   \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cbegin(const struct N* const m) {                  \
-        struct N##_it i;                                                 \
-        N##_it_cbegin(m, &i);                                            \
+    struct N##_it N##_cbegin(const struct N* const m) {                        \
+        struct N##_it i;                                                       \
+        N##_it_cbegin(m, &i);                                                  \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_end(struct N* m) {                                 \
-        struct N##_it i;                                                 \
-        N##_it_end(m, &i);                                               \
+    struct N##_it N##_end(struct N* m) {                                       \
+        struct N##_it i;                                                       \
+        N##_it_end(m, &i);                                                     \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cend(const struct N* const m) {                    \
-        struct N##_it i;                                                 \
-        N##_it_cend(m, &i);                                              \
+    struct N##_it N##_cend(const struct N* const m) {                          \
+        struct N##_it i;                                                       \
+        N##_it_cend(m, &i);                                                    \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    bool N##_it_equal(const struct N##_it first,                   \
-                            const struct N##_it second) {                \
+    bool N##_it_equal(const struct N##_it first, const struct N##_it second) { \
         return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \
-    bool N##_it_valid(const struct N##_it i) {                     \
-        return i.valid_;                                                    \
+    bool N##_it_valid(const struct N##_it i) {                                 \
+        return i.valid_;                                                       \
     }                                                                          \
                                                                                \
     static size_t _p_##N##_stack_size(size_t size) {                           \

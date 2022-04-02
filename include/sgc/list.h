@@ -3,6 +3,7 @@
 #include "detail/sgc_allocator.h"
 #include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
+#include "detail/sgc_iterator.h"
 #include "detail/sgc_list_common.h"
 #include "detail/sgc_sort_stack.h"
 #include "detail/sgc_utils.h"
@@ -10,10 +11,9 @@
 
 #define _SGC_INIT_PP_LIST(T, N)                                                \
     static void _p_##N##_memswp(char* i, char* j);                             \
-    static bool _p_##N##_node_compare(const void* const first,            \
-                                           const void* const second,           \
-                                           int comp(const void*,               \
-                                                    const void*));             \
+    static bool _p_##N##_node_compare(const void* const first,                 \
+                                      const void* const second,                \
+                                      int comp(const void*, const void*));     \
     static void _p_##N##_qsort(void* array, size_t array_size,                 \
                                int (*comp)(const void*, const void*));         \
     static void _p_##N##_ptr_array_to_list(struct N##_node** nodes_ptr,        \
@@ -61,20 +61,7 @@
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
-                                                                               \
-    const T* N##_it_data(const struct N##_it i);                               \
-    void N##_it_go_next(struct N##_it* i);                                     \
-    void N##_it_go_prev(struct N##_it* i);                                     \
-    void N##_it_begin(struct N* l, struct N##_it* i);                          \
-    void N##_it_cbegin(const struct N* const l, struct N##_it* i);             \
-    struct N##_it N##_begin(struct N* l);                                      \
-    struct N##_it N##_cbegin(const struct N* const l);                         \
-    void N##_it_end(struct N* l, struct N##_it* i);                            \
-    void N##_it_cend(const struct N* const l, struct N##_it* i);               \
-    struct N##_it N##_end(struct N* l);                                        \
-    struct N##_it N##_cend(const struct N* const l);                           \
-    bool N##_it_equal(const struct N##_it first, const struct N##_it second);  \
-    bool N##_it_valid(const struct N##_it i);
+    _SGC_INIT_BD_IT_PROTOTIPES(N, T)
 
 #define _SGC_INIT_UNIQUE_LIST(T, N)                                            \
     static void _p_##N##_ptr_array_to_list(struct N##_node** nodes_ptr,        \

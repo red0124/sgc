@@ -4,7 +4,7 @@
 #define TEST_ELEMENTS_NUM 50
 #define PQUEUE_MAX 512
 
-SGC_INIT_STATIC_PRIORITY_QUEUE(int, PQUEUE_MAX, pqueue)
+SGC_INIT_SPRIORITY_QUEUE(int, PQUEUE_MAX, pqueue)
 
 void test_pqueue_xxx(void) {
     TEST_TPQ(pqueue);
@@ -45,7 +45,7 @@ void test_pqueue_copy(void) {
     pqueue_free(&v_cp);
 }
 
-SGC_INIT_STATIC_PRIORITY_QUEUE(al, PQUEUE_MAX, apqueue)
+SGC_INIT_SPRIORITY_QUEUE(al, PQUEUE_MAX, apqueue)
 
 void test_apqueue(void) {
     apqueue v;
@@ -78,7 +78,7 @@ int pqueue_compare(const struct pqueue* const first,
     return pqueue_size(first) - pqueue_size(second);
 }
 
-SGC_INIT_STATIC_PRIORITY_QUEUE(pqueue, PQUEUE_MAX, vpqueue)
+SGC_INIT_SPRIORITY_QUEUE(pqueue, PQUEUE_MAX, vpqueue)
 const int* vpqueue_top_pair(struct vpqueue* const v) {
     return pqueue_top(vpqueue_top(v));
 }

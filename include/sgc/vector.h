@@ -4,6 +4,7 @@
 #include "detail/sgc_common.h"
 #include "detail/sgc_utils.h"
 #include "detail/sgc_vector_common.h"
+#include "detail/sgc_iterator.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,26 +51,7 @@
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
-                                                                               \
-    const T* N##_it_data(const struct N##_it i);                               \
-    void N##_it_go_next(struct N##_it* i);                                     \
-    void N##_it_go_prev(struct N##_it* i);                                     \
-    void N##_it_begin(struct N* v, struct N##_it* i);                          \
-    void N##_it_cbegin(const struct N* const v, struct N##_it* i);             \
-    struct N##_it N##_begin(struct N* v);                                      \
-    struct N##_it N##_cbegin(const struct N* const v);                         \
-    void N##_it_end(struct N* v, struct N##_it* i);                            \
-    void N##_it_cend(const struct N* const v, struct N##_it* i);               \
-    struct N##_it N##_end(struct N* v);                                        \
-    struct N##_it N##_cend(const struct N* const v);                           \
-    void N##_it_from(struct N* v, struct N##_it* i, size_t at);                \
-    void N##_it_cfrom(const struct N* const v, struct N##_it* i, size_t at);   \
-    struct N##_it N##_from(struct N* v, size_t at);                            \
-    struct N##_it N##_cfrom(const struct N* const v, size_t at);               \
-    void N##_it_jump(struct N##_it* i, int range);                             \
-    bool N##_it_equal(const struct N##_it first, const struct N##_it second);  \
-    int N##_it_diff(const struct N##_it first, const struct N##_it second);    \
-    bool N##_it_valid(const struct N##_it i);
+    _SGC_INIT_RA_IT_PROTOTIPES(N, T)
 
 #define _SGC_INIT_UNIQUE_VECTOR(T, N)                                          \
     static void _p_##N##_resize(struct N* v) {                                 \
