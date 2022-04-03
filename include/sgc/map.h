@@ -150,7 +150,7 @@
                     break;                                                     \
                 }                                                              \
                 parent = parent->right_;                                       \
-            } else if (!V##_equal(&parent->data_.value, v)) {                  \
+            } else if (!V##_eq(&parent->data_.value, v)) {                     \
                 SGC_REPLACE(V##_copy, V##_free, parent->data_.value, *v,       \
                             m->sharing_);                                      \
                 return;                                                        \

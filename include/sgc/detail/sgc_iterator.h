@@ -13,7 +13,7 @@
     void N##_it_cend(const N* const ds, N##_it* i);                            \
     N##_it N##_end(N* ds);                                                     \
     N##_it N##_cend(const N* const ds);                                        \
-    bool N##_it_equal(const N##_it first, const N##_it second);                \
+    bool N##_it_eq(const N##_it first, const N##_it second);                   \
     bool N##_it_valid(const N##_it i);
 
 // BIDIRECTIONAL ITERATOR

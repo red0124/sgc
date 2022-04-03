@@ -158,7 +158,7 @@ void test_set_it(void) {
 
     size_t i = 0;
 
-    for (struct set_it it = set_begin(&v); !set_it_equal(it, set_end(&v));
+    for (struct set_it it = set_begin(&v); !set_it_eq(it, set_end(&v));
          set_it_go_next(&it)) {
         TEST_ASSERT_EQUAL_INT(*set_it_data(it), i);
         ++i;
@@ -166,7 +166,7 @@ void test_set_it(void) {
 
     TEST_ASSERT_EQUAL_INT(*set_it_data(set_end(&v)), TEST_ELEMENTS_NUM - 1);
 
-    for (struct set_it it = set_end(&v); !set_it_equal(it, set_begin(&v));
+    for (struct set_it it = set_end(&v); !set_it_eq(it, set_begin(&v));
          set_it_go_prev(&it)) {
         TEST_ASSERT_EQUAL_INT(*set_it_data(it), i);
         --i;

@@ -31,7 +31,7 @@
             struct _p_##N##_node* data = ds->data_;                            \
             while (data[position].state_ != SGC_NODE_STATE_OPEN) {             \
                 if (data[position].state_ == SGC_NODE_STATE_USED &&            \
-                    _p_##N##_node_equal_key(&data[position], key)) {           \
+                    _p_##N##_node_eq_key(&data[position], key)) {              \
                     return N##_it_at(ds, position);                            \
                 }                                                              \
                 if (position == S - 1) {                                       \
@@ -147,7 +147,7 @@
         return i;                                                              \
     }                                                                          \
                                                                                \
-    bool N##_it_equal(const struct N##_it first, const struct N##_it second) { \
+    bool N##_it_eq(const struct N##_it first, const struct N##_it second) {    \
         return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \

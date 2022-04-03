@@ -48,7 +48,7 @@ inline void al_free(al* a) {
     free(a->el);
 }
 
-inline int al_equal(const al* const first, const al* const second) {
+inline int al_eq(const al* const first, const al* const second) {
     return *first->el == *second->el;
 }
 
@@ -363,7 +363,7 @@ inline size_t al_hash(const al* const a) {
     /* {0, 1, 2, 3, 4} */                                                      \
     PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
                                                                                \
-    for (struct N##_it it = N##_begin(&ds); !N##_it_equal(it, N##_end(&ds));   \
+    for (struct N##_it it = N##_begin(&ds); !N##_it_eq(it, N##_end(&ds));      \
          N##_it_go_next(&it)) {                                                \
         ASSERT_EQUAL(*N##_it_data(it), *N##_at(&ds, i));                       \
         ++i;                                                                   \
@@ -371,7 +371,7 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     ASSERT_EQUAL(*N##_it_data(N##_end(&ds)), *N##_at(&ds, i));                 \
                                                                                \
-    for (struct N##_it it = N##_end(&ds); !N##_it_equal(it, N##_begin(&ds));   \
+    for (struct N##_it it = N##_end(&ds); !N##_it_eq(it, N##_begin(&ds));      \
          N##_it_go_prev(&it)) {                                                \
         ASSERT_EQUAL(*N##_it_data(it), *N##_at(&ds, i));                       \
         --i;                                                                   \
@@ -416,7 +416,7 @@ inline size_t al_hash(const al* const a) {
         ASSERT_EQUAL(1, *N##_at(&ds, i) <= *N##_at(&ds, i + 1));               \
     }                                                                          \
                                                                                \
-    ASSERT_EQUAL(1, N##_equal(&ds, &ds_sorted));                               \
+    ASSERT_EQUAL(1, N##_eq(&ds, &ds_sorted));                                  \
                                                                                \
     N##_free(&ds);
 

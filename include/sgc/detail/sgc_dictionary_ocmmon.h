@@ -18,9 +18,9 @@
     }                                                                          \
                                                                                \
     static inline bool                                                         \
-        _p_##N##_node_equal_key(const struct _p_##N##_node* const n,           \
-                                const K* const key) {                          \
-        return K##_equal(&n->data_.key, key);                                  \
+        _p_##N##_node_eq_key(const struct _p_##N##_node* const n,              \
+                             const K* const key) {                             \
+        return K##_eq(&n->data_.key, key);                                     \
     }                                                                          \
                                                                                \
     static inline int                                                          \
@@ -60,9 +60,9 @@
     }                                                                          \
                                                                                \
     static inline bool                                                         \
-        _p_##N##_node_equal_key(const struct _p_##N##_node* const n,           \
-                                const KV* const key) {                         \
-        return KV##_equal(&n->value_, key);                                    \
+        _p_##N##_node_eq_key(const struct _p_##N##_node* const n,              \
+                             const KV* const key) {                            \
+        return KV##_eq(&n->value_, key);                                       \
     }                                                                          \
                                                                                \
     static inline int                                                          \

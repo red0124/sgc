@@ -99,7 +99,7 @@ void test_find(void) {
         TEST_ASSERT_EQUAL_INT(i, *vector_find_el(&v, i));
         if (i != TEST_ELEMENTS_NUM - 1) {
             it = vector_find_it(&v, i);
-            TEST_ASSERT_EQUAL_INT(0, vector_it_equal(it, vector_end(&v)));
+            TEST_ASSERT_EQUAL_INT(0, vector_it_eq(it, vector_end(&v)));
         }
         sgc_index index = vector_find_index(&v, i);
         if (index.valid) {

@@ -225,7 +225,7 @@
         N##_it_valid(SGC_UNIQUE(curr)) && N##_it_valid(SGC_UNIQUE(end));       \
     for (N##_type* EL = (N##_type*)N##_it_data(SGC_UNIQUE(curr));              \
          SGC_UNIQUE(valid);                                                    \
-         SGC_UNIQUE(tmp) = !N##_it_equal(SGC_UNIQUE(curr), SGC_UNIQUE(end)),   \
+         SGC_UNIQUE(tmp) = !N##_it_eq(SGC_UNIQUE(curr), SGC_UNIQUE(end)),      \
                    SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                        \
                    N##_it_go_next(&SGC_UNIQUE(curr)),                          \
                    EL = (N##_type*)N##_it_data(SGC_UNIQUE(curr)))
@@ -245,7 +245,7 @@
         N##_it_valid(SGC_UNIQUE(curr)) && N##_it_valid(SGC_UNIQUE(begin));     \
     for (N##_type* EL = (N##_type*)N##_it_data(SGC_UNIQUE(curr));              \
          SGC_UNIQUE(valid);                                                    \
-         SGC_UNIQUE(tmp) = !N##_it_equal(SGC_UNIQUE(curr), SGC_UNIQUE(begin)), \
+         SGC_UNIQUE(tmp) = !N##_it_eq(SGC_UNIQUE(curr), SGC_UNIQUE(begin)),    \
                    SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                        \
                    N##_it_go_prev(&SGC_UNIQUE(curr)),                          \
                    EL = (N##_type*)N##_it_data(SGC_UNIQUE(curr)))

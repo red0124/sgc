@@ -281,7 +281,7 @@
                    _p_##N##_max(i->deque_);                                    \
     }                                                                          \
                                                                                \
-    bool N##_it_equal(const N##_it first, const N##_it second) {               \
+    bool N##_it_eq(const N##_it first, const N##_it second) {                  \
         return first.curr_ == second.curr_ && first.deque_ == second.deque_;   \
     }                                                                          \
                                                                                \

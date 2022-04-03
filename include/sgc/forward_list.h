@@ -41,7 +41,7 @@
     size_t N##_size(const N* const l);                                         \
     void N##_init(N* l);                                                       \
     void N##_free(N* l);                                                       \
-    bool N##_equal(const N* const first, const N* const second);               \
+    bool N##_eq(const N* const first, const N* const second);                  \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
     void N##_push_back(N* l, T el);                                            \
     const T* N##_back(const N* const l);                                       \

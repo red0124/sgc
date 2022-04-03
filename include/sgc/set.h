@@ -133,7 +133,7 @@
                     break;                                                     \
                 }                                                              \
                 parent = parent->right_;                                       \
-            } else if (!KV##_equal(&parent->value_, v)) {                      \
+            } else if (!KV##_eq(&parent->value_, v)) {                         \
                 SGC_REPLACE(KV##_copy, KV##_free, parent->value_, *v,          \
                             s->sharing_);                                      \
                 return;                                                        \

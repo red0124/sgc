@@ -18,8 +18,8 @@
         _p_##N##_node_copy_values(const N* const m, struct _p_##N##_node* dst, \
                                   const struct _p_##N##_node* const src);      \
     static size_t _p_##N##_node_hash_value(const struct _p_##N##_node* n);     \
-    static bool _p_##N##_node_equal_key(const struct _p_##N##_node* const n,   \
-                                        const KV* const key);
+    static bool _p_##N##_node_eq_key(const struct _p_##N##_node* const n,      \
+                                     const KV* const key);
 
 #define SGC_INIT_HEADERS_SUNORDERED_SET(V, S, N)                               \
     struct _p_##N##_node {                                                     \

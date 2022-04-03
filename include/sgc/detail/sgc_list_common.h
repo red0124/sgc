@@ -164,7 +164,7 @@
         i->curr_ = i->curr_->next_;                                            \
     }                                                                          \
                                                                                \
-    bool N##_it_equal(const N##_it first, const N##_it second) {               \
+    bool N##_it_eq(const N##_it first, const N##_it second) {                  \
         return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \

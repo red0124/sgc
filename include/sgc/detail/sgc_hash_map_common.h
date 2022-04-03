@@ -138,7 +138,7 @@
         return i;                                                              \
     }                                                                          \
                                                                                \
-    bool N##_it_equal(const N##_it first, const N##_it second) {               \
+    bool N##_it_eq(const N##_it first, const N##_it second) {                  \
         return first.curr_ == second.curr_;                                    \
     }                                                                          \
                                                                                \
@@ -336,7 +336,7 @@
         struct _p_##N##_node* tmp = bucket;                                    \
         struct _p_##N##_node* prev = bucket;                                   \
         while (tmp) {                                                          \
-            if (_p_##N##_node_equal_key(tmp, key)) {                           \
+            if (_p_##N##_node_eq_key(tmp, key)) {                              \
                 if (tmp == bucket) {                                           \
                     ret = tmp->next_;                                          \
                 }                                                              \

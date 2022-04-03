@@ -36,8 +36,8 @@
                                   const struct _p_##N##_node* const src);      \
     static size_t _p_##N##_node_hash_value(                                    \
         const struct _p_##N##_node* const n);                                  \
-    static bool _p_##N##_node_equal_key(const struct _p_##N##_node* const n,   \
-                                        const KV* const key);
+    static bool _p_##N##_node_eq_key(const struct _p_##N##_node* const n,      \
+                                     const KV* const key);
 
 #define SGC_INIT_HEADERS_UNORDERED_SET(KV, N)                                  \
     struct _p_##N##_node {                                                     \
@@ -119,7 +119,7 @@
             size_t position = hash % u->max_;                                  \
             struct _p_##N##_node* tmp = u->data_[position];                    \
             while (tmp) {                                                      \
-                if (KV##_equal(&tmp->value_, v)) {                             \
+                if (KV##_eq(&tmp->value_, v)) {                                \
                     ret = (N##_it){u->data_, tmp, position, u->max_, 1};       \
                 }                                                              \
                 tmp = tmp->next_;                                              \

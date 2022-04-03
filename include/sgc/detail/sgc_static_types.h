@@ -6,7 +6,7 @@
     F void N##_init(T* el);                                                    \
     F void N##_free(T* el);                                                    \
     F void N##_copy(T* dst, const T* const src);                               \
-    F int N##_equal(const T* const first, const T* const second);              \
+    F int N##_eq(const T* const first, const T* const second);                 \
     F int N##_compare(const T* const first, const T* const second);            \
     F int N##_void_compare(const void* const first, const void* const second);
 
@@ -24,7 +24,7 @@
         *dst = *(T*)src;                                                       \
     }                                                                          \
                                                                                \
-    F int N##_equal(const T* const first, const T* const second) {             \
+    F int N##_eq(const T* const first, const T* const second) {                \
         return *first == *second;                                              \
     }                                                                          \
                                                                                \
@@ -51,7 +51,7 @@
     void N##_init(T* el);                                                      \
     void N##_free(T* el);                                                      \
     void N##_copy(T* dst, const T* const src);                                 \
-    int N##_equal(const T* const first, const T* const second);
+    int N##_eq(const T* const first, const T* const second);
 
 #define SGC_INIT_SSTRUCT(T, N)                                                 \
     SGC_INIT_HEADERS_SSTRUCT(T, N)                                             \
@@ -67,6 +67,6 @@
         *dst = *src;                                                           \
     }                                                                          \
                                                                                \
-    int N##_equal(const T* const first, const T* const second) {               \
+    int N##_eq(const T* const first, const T* const second) {                  \
         return memcmp(first, second, sizeof(T)) == 0;                          \
     }

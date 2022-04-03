@@ -133,7 +133,7 @@ void test_map_it(void) {
 
     size_t i = 0;
 
-    for (struct map_it it = map_begin(&v); !map_it_equal(it, map_end(&v));
+    for (struct map_it it = map_begin(&v); !map_it_eq(it, map_end(&v));
          map_it_go_next(&it)) {
         TEST_ASSERT_EQUAL_INT(map_it_data(it)->value, i);
         ++i;
@@ -142,7 +142,7 @@ void test_map_it(void) {
     TEST_ASSERT_EQUAL_INT(map_it_data(map_end(&v))->value,
                           TEST_ELEMENTS_NUM - 1);
 
-    for (struct map_it it = map_end(&v); !map_it_equal(it, map_begin(&v));
+    for (struct map_it it = map_end(&v); !map_it_eq(it, map_begin(&v));
          map_it_go_prev(&it)) {
         TEST_ASSERT_EQUAL_INT(map_it_data(it)->value, i);
         --i;
