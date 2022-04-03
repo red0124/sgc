@@ -3,7 +3,7 @@ compile_commands.json
 .ccls-cache/*
 experiment/
 build/
-hbuild/build/
+hbuild/
 test/build/
 subprojects/*
 !subprojects/*.wrap
