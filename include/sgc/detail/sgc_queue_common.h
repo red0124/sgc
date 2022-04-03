@@ -14,7 +14,7 @@
         if (!N##_empty(q)) {                                                   \
             _p_##N##_go_next(&q->back_, _p_##N##_max(q));                      \
         }                                                                      \
-        SGC_COPY(T##_copy, q->data_[q->back_], el, q->shared_);                \
+        SGC_COPY(T##_copy, q->data_[q->back_], el, q->sharing_);               \
         ++q->size_;                                                            \
     }                                                                          \
                                                                                \
@@ -28,7 +28,7 @@
     void N##_set_front(N* q, T new_el) {                                       \
         if (q->size_) {                                                        \
             SGC_REPLACE(T##_copy, T##_free, q->data_[q->front_], new_el,       \
-                        q->shared_);                                           \
+                        q->sharing_);                                          \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -42,13 +42,13 @@
     void N##_set_back(N* q, T new_el) {                                        \
         if (q->size_ > 0) {                                                    \
             SGC_REPLACE(T##_copy, T##_free, q->data_[q->back_], new_el,        \
-                        q->shared_);                                           \
+                        q->sharing_);                                          \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_pop(N* q) {                                                       \
         if (q->size_) {                                                        \
-            SGC_FREE(T##_free, q->data_[q->front_], q->shared_);               \
+            SGC_FREE(T##_free, q->data_[q->front_], q->sharing_);              \
             --q->size_;                                                        \
             if (q->size_ > 0) {                                                \
                 _p_##N##_go_next(&q->front_, _p_##N##_max(q));                 \
@@ -57,7 +57,7 @@
     }                                                                          \
                                                                                \
     static void _p_##N##_copy_data(N* dst, const N* const src) {               \
-        if (dst->shared_) {                                                    \
+        if (dst->sharing_) {                                                   \
             if (src->front_ < src->back_) {                                    \
                 memcpy(dst->data_, src->data_ + src->front_,                   \
                        src->size_ * sizeof(T));                                \
@@ -79,7 +79,7 @@
     }                                                                          \
                                                                                \
     static void _p_##N##_free_data(N* q) {                                     \
-        if (!q->shared_) {                                                     \
+        if (!q->sharing_) {                                                    \
             size_t i;                                                          \
             for (i = q->front_; i != q->back_;) {                              \
                 T##_free(&q->data_[i]);                                        \

@@ -53,8 +53,8 @@
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t max_;                                                           \
-        bool shared_;                                                          \
-        bool shared_key_;                                                      \
+        bool sharing_;                                                         \
+        bool sharing_key_;                                                     \
         struct _p_##N##_node** data_;                                          \
     };                                                                         \
                                                                                \
@@ -66,7 +66,7 @@
                                                                                \
     struct _p_##N##_node* _p_##N##_node_new(const K* key,                      \
                                             const V* const value,              \
-                                            bool shared_key, bool shared);     \
+                                            bool sharing_key, bool shared);    \
     size_t N##_bucket_count(const N* const u);                                 \
     size_t N##_bucket_size(const N* const u, size_t n);                        \
     size_t N##_buckets_used(const N* const u);                                 \
@@ -82,8 +82,10 @@
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
                                                                                \
-    void N##_set_share(N* u, bool shared);                                     \
-    void N##_set_share_key(N* u, bool shared_key);                             \
+    void N##_set_shareing(N* u);                                               \
+    void N##_set_owning(N* u);                                                 \
+    void N##_set_shareing_key(N* u);                                           \
+    void N##_set_owning_key(N* u);                                             \
     size_t N##_size(const N* const u);                                         \
     void N##_init(N* u);                                                       \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
@@ -99,17 +101,17 @@
 #define _SGC_INIT_UNIQUE_UNORDERED_MAP(K, V, N)                                \
     struct _p_##N##_node* _p_##N##_node_new(const K* key,                      \
                                             const V* const value,              \
-                                            bool shared_key, bool shared) {    \
+                                            bool sharing_key, bool shared) {   \
         struct _p_##N##_node* new_node =                                       \
             (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
-        SGC_COPY(K##_copy, new_node->data_.key, *key, shared_key);             \
+        SGC_COPY(K##_copy, new_node->data_.key, *key, sharing_key);            \
         SGC_COPY(V##_copy, new_node->data_.value, *value, shared);             \
         new_node->next_ = NULL;                                                \
         return new_node;                                                       \
     }                                                                          \
                                                                                \
     void N##_init(N* u) {                                                      \
-        u->shared_ = u->shared_key_ = false;                                   \
+        u->sharing_ = u->sharing_key_ = false;                                 \
         u->size_ = u->max_ = 0;                                                \
         u->data_ = NULL;                                                       \
     }                                                                          \
@@ -154,7 +156,7 @@
         } else {                                                               \
             _p_##N##_resize(u);                                                \
             struct _p_##N##_node* new_node =                                   \
-                _p_##N##_node_new(&k, &v, u->shared_key_, u->shared_);         \
+                _p_##N##_node_new(&k, &v, u->sharing_key_, u->sharing_);       \
             size_t position = hash % u->max_;                                  \
             if (u->data_[position]) {                                          \
                 _p_##N##_bucket_insert(u->data_[position], new_node);          \
@@ -176,7 +178,7 @@
             _p_##N##_resize(u);                                                \
             V##_init(&v);                                                      \
             struct _p_##N##_node* new_node =                                   \
-                _p_##N##_node_new(&k, &v, u->shared_key_, u->shared_);         \
+                _p_##N##_node_new(&k, &v, u->sharing_key_, u->sharing_);       \
             size_t position = hash % u->max_;                                  \
             if (u->data_[position]) {                                          \
                 _p_##N##_bucket_insert(u->data_[position], new_node);          \
@@ -201,8 +203,8 @@
                                         const N* __restrict__ const src) {     \
         dst->size_ = src->size_;                                               \
         dst->max_ = src->max_;                                                 \
-        dst->shared_key_ = src->shared_key_;                                   \
-        dst->shared_ = src->shared_;                                           \
+        dst->sharing_key_ = src->sharing_key_;                                 \
+        dst->sharing_ = src->sharing_;                                         \
     }
 
 #define SGC_INIT_UNORDERED_MAP(K, V, N)                                        \

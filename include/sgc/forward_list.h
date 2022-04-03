@@ -29,7 +29,7 @@
                                                                                \
     struct N {                                                                 \
         size_t size_;                                                          \
-        bool shared_;                                                          \
+        bool sharing_;                                                         \
         struct _p_##N##_node* head_;                                           \
         struct _p_##N##_node* tail_;                                           \
     };                                                                         \
@@ -65,10 +65,10 @@
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
-            dst->shared_ = src->shared_;                                       \
+            dst->sharing_ = src->sharing_;                                     \
             dst->head_ = _p_##N##_node_alloc(dst);                             \
             SGC_COPY(T##_copy, dst->head_->data_, src->head_->data_,           \
-                     src->shared_);                                            \
+                     src->sharing_);                                           \
             struct _p_##N##_node* curr_src = src->head_;                       \
             struct _p_##N##_node* curr_dst = dst->head_;                       \
             struct _p_##N##_node* tmp_src = NULL;                              \
@@ -80,7 +80,7 @@
                 }                                                              \
                 tmp_dst = _p_##N##_node_alloc(dst);                            \
                 SGC_COPY(T##_copy, tmp_dst->data_, tmp_src->data_,             \
-                         src->shared_);                                        \
+                         src->sharing_);                                       \
                 curr_dst->next_ = tmp_dst;                                     \
                 curr_dst = tmp_dst;                                            \
                 curr_src = tmp_src;                                            \
@@ -94,7 +94,7 @@
                                                                                \
     void N##_push_back(N* l, T el) {                                           \
         struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
-        SGC_COPY(T##_copy, new_el->data_, el, l->shared_);                     \
+        SGC_COPY(T##_copy, new_el->data_, el, l->sharing_);                    \
         new_el->next_ = NULL;                                                  \
         switch (l->size_) {                                                    \
         case 0:                                                                \
@@ -114,7 +114,7 @@
                                                                                \
     void N##_push_front(N* l, const T el) {                                    \
         struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
-        SGC_COPY(T##_copy, new_el->data_, el, l->shared_);                     \
+        SGC_COPY(T##_copy, new_el->data_, el, l->sharing_);                    \
         switch (l->size_) {                                                    \
         case 0:                                                                \
             new_el->next_ = NULL;                                              \
@@ -136,7 +136,7 @@
         if (l->size_) {                                                        \
             struct _p_##N##_node* tmp = l->head_;                              \
             l->head_ = l->head_->next_;                                        \
-            SGC_FREE(T##_free, tmp->data_, l->shared_)                         \
+            SGC_FREE(T##_free, tmp->data_, l->sharing_)                        \
             sgc_free(tmp);                                                     \
             --l->size_;                                                        \
             if (l->size_ == 0) {                                               \
@@ -153,7 +153,7 @@
         if (prev) {                                                            \
             prev->next_ = n->next_;                                            \
         }                                                                      \
-        SGC_FREE(T##_free, n->data_, l->shared_)                               \
+        SGC_FREE(T##_free, n->data_, l->sharing_)                              \
         sgc_free(n);                                                           \
         n = NULL;                                                              \
     }                                                                          \

@@ -18,7 +18,7 @@
         size_t size_;                                                          \
         size_t back_;                                                          \
         size_t front_;                                                         \
-        bool shared_;                                                        \
+        bool sharing_;                                                         \
         T data_[S];                                                            \
     };                                                                         \
                                                                                \
@@ -26,7 +26,8 @@
     typedef T N##_type;                                                        \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_share(N* q, bool shared);                                     \
+    void N##_set_shareing(N* q);                                               \
+    void N##_set_owning(N* q);                                                 \
     size_t N##_size(const N* const q);                                         \
     void N##_init(N* q);                                                       \
     void N##_free(N* q);                                                       \
@@ -56,7 +57,7 @@
                                                                                \
     void N##_init(N* q) {                                                      \
         q->size_ = q->front_ = q->back_ = 0;                                   \
-        q->shared_ = false;                                                    \
+        q->sharing_ = false;                                                   \
     }                                                                          \
                                                                                \
     void N##_free(N* q) {                                                      \
@@ -70,7 +71,7 @@
             dst->size_ = src->size_;                                           \
             dst->back_ = src->size_ - 1;                                       \
             dst->front_ = 0;                                                   \
-            dst->shared_ = src->shared_;                                       \
+            dst->sharing_ = src->sharing_;                                     \
             _p_##N##_copy_data(dst, src);                                      \
         } else {                                                               \
             N##_init(dst);                                                     \

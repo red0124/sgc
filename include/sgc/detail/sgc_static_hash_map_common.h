@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON_SHASH_MAP(T, S, N)                                    \
-    void N##_it_erase(N* ds, struct N##_it* it) {                       \
+    void N##_it_erase(N* ds, struct N##_it* it) {                              \
         if (N##_it_valid(*it)) {                                               \
             _p_##N##_node_free(ds, it->curr_);                                 \
             it->curr_->state_ = SGC_NODE_STATE_ERASED;                         \
@@ -12,24 +12,23 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_erase(N* ds, const T key) {                                \
+    void N##_erase(N* ds, const T key) {                                       \
         struct N##_it it = N##_find(ds, key);                                  \
         if (it.valid_) {                                                       \
             N##_it_erase(ds, &it);                                             \
         }                                                                      \
     }                                                                          \
                                                                                \
-    struct N##_it N##_find(N* ds, const T key) {                        \
+    struct N##_it N##_find(N* ds, const T key) {                               \
         size_t hash = T##_hash(&key);                                          \
         return _p_##N##_find_by_hash(ds, &key, hash);                          \
     }                                                                          \
                                                                                \
-    static struct N##_it _p_##N##_find_by_hash(N* ds,                   \
-                                               const T* const key,             \
+    static struct N##_it _p_##N##_find_by_hash(N* ds, const T* const key,      \
                                                size_t hash) {                  \
         if (ds->size_) {                                                       \
             size_t position = hash % S;                                        \
-            struct _p_##N##_node* data = ds->data_;                                 \
+            struct _p_##N##_node* data = ds->data_;                            \
             while (data[position].state_ != SGC_NODE_STATE_OPEN) {             \
                 if (data[position].state_ == SGC_NODE_STATE_USED &&            \
                     _p_##N##_node_equal_key(&data[position], key)) {           \
@@ -46,7 +45,7 @@
         return it;                                                             \
     }                                                                          \
                                                                                \
-    void N##_free(N* u) {                                               \
+    void N##_free(N* u) {                                                      \
         if (u->size_) {                                                        \
             for (size_t i = 0; i < S; ++i) {                                   \
                 if (u->data_[i].state_ == SGC_NODE_STATE_USED) {               \
@@ -57,9 +56,9 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static struct N##_it N##_it_at(const N* const m, size_t at) {       \
+    static struct N##_it N##_it_at(const N* const m, size_t at) {              \
         N##_it i;                                                              \
-        i.begin_ = (struct _p_##N##_node*)(m->data_);                               \
+        i.begin_ = (struct _p_##N##_node*)(m->data_);                          \
         i.curr_ = i.begin_ + at;                                               \
         i.end_ = i.begin_ + S;                                                 \
         i.valid_ = (i.curr_->state_ == SGC_NODE_STATE_USED) ? 1 : 0;           \
@@ -81,8 +80,8 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_cbegin(const N* const m, struct N##_it* i) {            \
-        i->begin_ = (struct _p_##N##_node*)(m->data_);                              \
+    void N##_it_cbegin(const N* const m, struct N##_it* i) {                   \
+        i->begin_ = (struct _p_##N##_node*)(m->data_);                         \
         i->curr_ = i->begin_;                                                  \
         i->end_ = i->begin_ + S - 1;                                           \
         i->valid_ = 1;                                                         \
@@ -91,7 +90,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_begin(N* m, struct N##_it* i) {                         \
+    void N##_it_begin(N* m, struct N##_it* i) {                                \
         N##_it_cbegin(m, i);                                                   \
     }                                                                          \
                                                                                \
@@ -110,9 +109,9 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_cend(const N* const m, struct N##_it* i) {              \
-        i->begin_ = (struct _p_##N##_node*)(m->data_);                              \
-        i->end_ = (struct _p_##N##_node*)(m->data_) + S - 1;                        \
+    void N##_it_cend(const N* const m, struct N##_it* i) {                     \
+        i->begin_ = (struct _p_##N##_node*)(m->data_);                         \
+        i->end_ = (struct _p_##N##_node*)(m->data_) + S - 1;                   \
         i->curr_ = i->end_;                                                    \
         i->valid_ = 1;                                                         \
         if (i->curr_->state_ != SGC_NODE_STATE_USED) {                         \
@@ -120,29 +119,29 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_end(N* m, struct N##_it* i) {                           \
+    void N##_it_end(N* m, struct N##_it* i) {                                  \
         N##_it_cend(m, i);                                                     \
     }                                                                          \
                                                                                \
-    struct N##_it N##_begin(N* m) {                                     \
+    struct N##_it N##_begin(N* m) {                                            \
         struct N##_it i;                                                       \
         N##_it_begin(m, &i);                                                   \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cbegin(const N* const m) {                        \
+    struct N##_it N##_cbegin(const N* const m) {                               \
         struct N##_it i;                                                       \
         N##_it_cbegin(m, &i);                                                  \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_end(N* m) {                                       \
+    struct N##_it N##_end(N* m) {                                              \
         struct N##_it i;                                                       \
         N##_it_end(m, &i);                                                     \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    struct N##_it N##_cend(const N* const m) {                          \
+    struct N##_it N##_cend(const N* const m) {                                 \
         struct N##_it i;                                                       \
         N##_it_cend(m, &i);                                                    \
         return i;                                                              \

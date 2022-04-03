@@ -63,10 +63,10 @@ void test_aqueue(void) {
 
     aqueue_pop(&v);
 
-    aqueue_set_share(&v, 1);
+    aqueue_set_shareing(&v);
     ++allocation_count;
     aqueue_push(&v, (al){(int*)malloc(sizeof(int))});
-    aqueue_set_share(&v, 0);
+    aqueue_set_owning(&v);
 
     aqueue_free(&v);
 
@@ -113,9 +113,9 @@ void test_queue_queue(void) {
     queue_push(&tmp, 2);
     // {0, 1, 2}
 
-    vqueue_set_share(&v, 1);
+    vqueue_set_shareing(&v);
     vqueue_push(&v, tmp);
-    vqueue_set_share(&v, 0);
+    vqueue_set_owning(&v);
     // pushed queue into vqueue, it will use the original
 
     // {{0}, {0, 1}, {0, 1, 2}}

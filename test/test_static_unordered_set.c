@@ -90,13 +90,13 @@ void test_aset(void) {
     aset_insert(&v, tmp);
     aset_insert(&v, tmp);
 
-    aset_set_share(&v, 1);
+    aset_set_shareing(&v);
     ++allocation_count;
     int* new_el = (int*)malloc(sizeof(int));
     *new_el = TEST_ELEMENTS_NUM + 2;
     tmp.el = new_el;
     aset_insert(&v, tmp);
-    aset_set_share(&v, 0);
+    aset_set_owning(&v);
 
     aset_free(&v);
 

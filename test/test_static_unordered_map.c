@@ -71,9 +71,9 @@ void test_amap(void) {
     *new_el = TEST_ELEMENTS_NUM + 2;
     tmp.el = new_el;
 
-    amap_set_share_key(&v, 1);
+    amap_set_shareing_key(&v);
     amap_at(&v, tmp);
-    amap_set_share_key(&v, 0);
+    amap_set_owning_key(&v);
 
     amap_free(&v);
 

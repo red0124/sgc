@@ -98,7 +98,7 @@ inline size_t al_hash(const al* const a) {
 // VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(N)                         \
     N ds;                                                                      \
-    size_t size = 100;                                                   \
+    size_t size = 100;                                                         \
                                                                                \
     N##_init(&ds);                                                             \
     ASSERT_EQUAL(0, N##_size(&ds));                                            \
@@ -158,7 +158,7 @@ inline size_t al_hash(const al* const a) {
 // VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
 #define TEST_PUSH_BACK_COPY_EQUAL(N)                                           \
     N ds;                                                                      \
-    size_t size = 100;                                                   \
+    size_t size = 100;                                                         \
                                                                                \
     N##_init(&ds);                                                             \
                                                                                \
@@ -300,9 +300,9 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     /* make collection the owner of the next element, it will not be copied */ \
     /* in other words, move it */                                              \
-    N##_set_share(&ds, 1);                                                     \
+    N##_set_shareing(&ds);                                                     \
     N##_push_back(&ds, al_new(0));                                             \
-    N##_set_share(&ds, 0);                                                     \
+    N##_set_owning(&ds);                                                       \
                                                                                \
     N##_free(&ds);                                                             \
                                                                                \
@@ -337,9 +337,9 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     /* push array into array of arrays, it will use the original, 'move' it */ \
     /* {{0}, {0, 1}, {0, 1, 2}} */                                             \
-    NN##_set_share(&ds, 1);                                                    \
+    NN##_set_shareing(&ds);                                                    \
     NN##_push_back(&ds, tmp);                                                  \
-    NN##_set_share(&ds, 0);                                                    \
+    NN##_set_owning(&ds);                                                      \
                                                                                \
     ASSERT_EQUAL(0, *MATRIX_AT(NN, N, ds, 0, 0));                              \
                                                                                \
@@ -743,22 +743,22 @@ void tm_print(tm* tm) {
                     tm_set(&tm, 4, i + 10);                                    \
                     N##_set(&ds, 4, i + 10);                                   \
                     break;                                                     \
-                case (6):                                                     \
+                case (6):                                                      \
                     log("erase %d\n", i);                                      \
                     tm_erase(&tm, i);                                          \
                     N##_erase(&ds, i);                                         \
                     break;                                                     \
-                case (7):                                                     \
+                case (7):                                                      \
                     log("erase 0\n");                                          \
                     tm_erase(&tm, 0);                                          \
                     N##_erase(&ds, 0);                                         \
                     break;                                                     \
-                case (8):                                                     \
+                case (8):                                                      \
                     log("erase 1\n");                                          \
                     tm_erase(&tm, 1);                                          \
                     N##_erase(&ds, 1);                                         \
                     break;                                                     \
-                case (9):                                                     \
+                case (9):                                                      \
                     log("erase 2\n");                                          \
                     tm_erase(&tm, 2);                                          \
                     N##_erase(&ds, 2);                                         \

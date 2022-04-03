@@ -60,10 +60,10 @@ void test_astack(void) {
 
     astack_pop(&v);
 
-    astack_set_share(&v, 1);
+    astack_set_shareing(&v);
     ++allocation_count;
     astack_push(&v, (al){(int*)malloc(sizeof(int))});
-    astack_set_share(&v, 0);
+    astack_set_owning(&v);
 
     astack_free(&v);
 
@@ -98,9 +98,9 @@ void test_stack_stack(void) {
     stack_push(&tmp, 2);
     // {0, 1, 2}
 
-    vstack_set_share(&v, 1);
+    vstack_set_shareing(&v);
     vstack_push(&v, tmp);
-    vstack_set_share(&v, 0);
+    vstack_set_owning(&v);
     // pushed stack into vstack, it will use the original
 
     // {{0}, {0, 1}, {0, 1, 2}}

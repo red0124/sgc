@@ -15,14 +15,15 @@
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t max_;                                                           \
-        bool shared_;                                                          \
+        bool sharing_;                                                         \
         T* data_;                                                              \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
                                                                                \
-    void N##_set_share(N* v, bool shared);                                     \
+    void N##_set_shareing(N* v);                                               \
+    void N##_set_owning(N* v);                                                 \
     void N##_init(N* v);                                                       \
     size_t N##_size(const N* const v);                                         \
     void N##_free(N* v);                                                       \
@@ -62,7 +63,7 @@
                                                                                \
     void N##_free(N* v) {                                                      \
         if (v->data_) {                                                        \
-            SGC_ARRAY_FREE(T, v->data_, v->size_, v->shared_);                 \
+            SGC_ARRAY_FREE(T, v->data_, v->size_, v->sharing_);                \
             sgc_free((void*)v->data_);                                         \
         }                                                                      \
     }                                                                          \
@@ -72,9 +73,9 @@
             dst->size_ = src->size_;                                           \
             dst->max_ = src->size_;                                            \
             dst->data_ = sgc_malloc(dst->max_ * sizeof(T));                    \
-            dst->shared_ = src->shared_;                                       \
+            dst->sharing_ = src->sharing_;                                     \
             SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,              \
-                           src->shared_)                                       \
+                           src->sharing_)                                      \
         } else {                                                               \
             N##_init(dst);                                                     \
         }                                                                      \
@@ -82,7 +83,7 @@
                                                                                \
     void N##_init(N* v) {                                                      \
         v->size_ = v->max_ = 0;                                                \
-        v->shared_ = false;                                                    \
+        v->sharing_ = false;                                                   \
         v->data_ = NULL;                                                       \
     }                                                                          \
                                                                                \
@@ -90,7 +91,7 @@
         if (size) {                                                            \
             v->max_ = v->size_ = size;                                         \
             v->data_ = (T*)sgc_malloc(sizeof(T) * size);                       \
-            v->shared_ = false;                                                \
+            v->sharing_ = false;                                               \
             SGC_ARRAY_COPY(T, v->data_, arr, size, true)                       \
         } else {                                                               \
             N##_init(v);                                                       \
@@ -99,7 +100,7 @@
                                                                                \
     void N##_shrink(N* v) {                                                    \
         SGC_ARRAY_FREE(T, (&v->data_[v->size_]), (v->max_ - v->size_),         \
-                       v->shared_)                                             \
+                       v->sharing_)                                            \
         v->data_ = (T*)sgc_realloc(v->data_, sizeof(T) * v->size_);            \
     }
 

@@ -97,7 +97,7 @@
     void N##_init(N* l) {                                                      \
         l->size_ = 0;                                                          \
         l->head_ = l->tail_ = NULL;                                            \
-        l->shared_ = 0;                                                        \
+        l->sharing_ = 0;                                                       \
     }                                                                          \
                                                                                \
     void N##_free(N* l) {                                                      \
@@ -106,7 +106,7 @@
         for (size_t i = 0; i < l->size_; ++i) {                                \
             tmp = curr;                                                        \
             curr = curr->next_;                                                \
-            SGC_FREE(T##_free, tmp->data_, l->shared_)                         \
+            SGC_FREE(T##_free, tmp->data_, l->sharing_)                        \
             sgc_free(tmp);                                                     \
         }                                                                      \
         l->head_ = l->tail_ = NULL;                                            \
@@ -123,7 +123,7 @@
     void N##_set_back(N* l, T new_el) {                                        \
         if (l->size_) {                                                        \
             SGC_REPLACE(T##_copy, T##_free, l->tail_->data_, new_el,           \
-                        l->shared_);                                           \
+                        l->sharing_);                                          \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -137,7 +137,7 @@
     void N##_set_front(N* l, T new_el) {                                       \
         if (l->size_) {                                                        \
             SGC_REPLACE(T##_copy, T##_free, l->head_->data_, new_el,           \
-                        l->shared_);                                           \
+                        l->sharing_);                                          \
         }                                                                      \
     }                                                                          \
                                                                                \

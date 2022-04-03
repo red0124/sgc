@@ -21,14 +21,15 @@
         size_t max_;                                                           \
         size_t back_;                                                          \
         size_t front_;                                                         \
-        bool shared_;                                                          \
+        bool sharing_;                                                         \
         T* data_;                                                              \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
                                                                                \
-    void N##_set_share(N* q, bool shared);                                     \
+    void N##_set_shareing(N* q);                                               \
+    void N##_set_owning(N* q);                                                 \
     size_t N##_size(const N* const q);                                         \
     void N##_init(N* q);                                                       \
     void N##_free(N* q);                                                       \
@@ -49,7 +50,7 @@
     void N##_init(N* q) {                                                      \
         q->size_ = q->max_ = q->front_ = q->back_ = 0;                         \
         q->data_ = NULL;                                                       \
-        q->shared_ = 0;                                                        \
+        q->sharing_ = 0;                                                       \
     }                                                                          \
                                                                                \
     void N##_free(N* q) {                                                      \
@@ -62,7 +63,7 @@
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
-            dst->shared_ = src->shared_;                                       \
+            dst->sharing_ = src->sharing_;                                     \
             dst->size_ = dst->max_ = src->size_;                               \
             dst->back_ = src->size_ - 1;                                       \
             dst->front_ = 0;                                                   \

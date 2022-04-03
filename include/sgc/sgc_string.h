@@ -26,14 +26,14 @@
 #define SGC_INIT_HEADERS_STRING1(N)                                            \
     SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, SGC_STRING_BUFF_SIZE)
 
-#define _SGC_INIT_PP_STRING_WITH_BUFFER(N, S)                     \
+#define _SGC_INIT_PP_STRING_WITH_BUFFER(N, S)                                  \
     static int N##_char_find(const char* const del, char c);
 
 #define SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, S)                              \
     typedef char* N;                                                           \
     typedef char N##_type;                                                     \
     typedef char static_##N[S];                                                \
-    typedef char* N##_it;                                                \
+    typedef char* N##_it;                                                      \
                                                                                \
     void N##_copy(N* first, const N* const second);                            \
     void N##_init(N* s);                                                       \
@@ -53,32 +53,30 @@
     N N##_read_file(N* s, const char* const file_name);                        \
     N##_type* N##_array(N*);                                                   \
                                                                                \
-    char* N##_it_data(N##_it i);                                   \
-    const char* N##_it_cdata(const N##_it i);                      \
-    void N##_it_go_next(N##_it* i);                                   \
-    void N##_it_go_prev(N##_it* i);                                   \
-    void N##_it_begin(N* s, N##_it* i);                            \
-    void N##_it_cbegin(const N* const s, N##_it* i);               \
-    N##_it N##_begin(N* s);                                              \
-    N##_it N##_cbegin(const N* const s);                                 \
-    void N##_it_end(N* s, N##_it* i);                              \
-    void N##_it_cend(const N* const s, N##_it* i);                 \
-    N##_it N##_end(N* s);                                                \
-    N##_it N##_cend(const N* const s);                                   \
-    void N##_it_from(N* s, N##_it* i, size_t at);                  \
-    void N##_it_cfrom(const N* const s, N##_it* i, size_t at);     \
-    N##_it N##_from(N* s, size_t at);                                    \
-    N##_it N##_cfrom(const N* const s, size_t at);                       \
-    void N##_it_jump(N##_it* i, int range);                    \
-    int N##_it_equal(const N##_it first,                           \
-                           const N##_it second);                         \
-    int N##_it_diff(const N##_it first,                       \
-                               const N##_it second);                     \
+    char* N##_it_data(N##_it i);                                               \
+    const char* N##_it_cdata(const N##_it i);                                  \
+    void N##_it_go_next(N##_it* i);                                            \
+    void N##_it_go_prev(N##_it* i);                                            \
+    void N##_it_begin(N* s, N##_it* i);                                        \
+    void N##_it_cbegin(const N* const s, N##_it* i);                           \
+    N##_it N##_begin(N* s);                                                    \
+    N##_it N##_cbegin(const N* const s);                                       \
+    void N##_it_end(N* s, N##_it* i);                                          \
+    void N##_it_cend(const N* const s, N##_it* i);                             \
+    N##_it N##_end(N* s);                                                      \
+    N##_it N##_cend(const N* const s);                                         \
+    void N##_it_from(N* s, N##_it* i, size_t at);                              \
+    void N##_it_cfrom(const N* const s, N##_it* i, size_t at);                 \
+    N##_it N##_from(N* s, size_t at);                                          \
+    N##_it N##_cfrom(const N* const s, size_t at);                             \
+    void N##_it_jump(N##_it* i, int range);                                    \
+    int N##_it_equal(const N##_it first, const N##_it second);                 \
+    int N##_it_diff(const N##_it first, const N##_it second);                  \
     int N##_it_valid(const N##_it i);
 
 #define SGC_INIT_STRING_WITH_BUFFER(N, S)                                      \
     SGC_INIT_HEADERS_STRING_WITH_BUFFER(N, S)                                  \
-    _SGC_INIT_PP_STRING_WITH_BUFFER(N, S)                         \
+    _SGC_INIT_PP_STRING_WITH_BUFFER(N, S)                                      \
                                                                                \
     void N##_copy(N* first, const N* const second) {                           \
         *first = NULL;                                                         \
@@ -228,97 +226,95 @@
         return *s;                                                             \
     }                                                                          \
                                                                                \
-    char* N##_it_data(N##_it i) {                                  \
+    char* N##_it_data(N##_it i) {                                              \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    const char* N##_it_cdata(const N##_it i) {                     \
+    const char* N##_it_cdata(const N##_it i) {                                 \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    void N##_it_go_next(N##_it* i) {                                  \
+    void N##_it_go_next(N##_it* i) {                                           \
         ++*i;                                                                  \
     }                                                                          \
                                                                                \
-    void N##_it_go_prev(N##_it* i) {                                  \
+    void N##_it_go_prev(N##_it* i) {                                           \
         --*i;                                                                  \
     }                                                                          \
                                                                                \
-    void N##_it_begin(N* s, N##_it* i) {                           \
+    void N##_it_begin(N* s, N##_it* i) {                                       \
         *i = *s;                                                               \
     }                                                                          \
                                                                                \
-    void N##_it_cbegin(const N* const s, N##_it* i) {              \
+    void N##_it_cbegin(const N* const s, N##_it* i) {                          \
         *i = *s;                                                               \
     }                                                                          \
                                                                                \
-    N##_it N##_begin(N* s) {                                             \
-        N##_it i;                                                        \
-        N##_it_begin(s, &i);                                             \
+    N##_it N##_begin(N* s) {                                                   \
+        N##_it i;                                                              \
+        N##_it_begin(s, &i);                                                   \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    N##_it N##_cbegin(const N* const s) {                                \
-        N##_it i;                                                        \
-        N##_it_cbegin(s, &i);                                            \
+    N##_it N##_cbegin(const N* const s) {                                      \
+        N##_it i;                                                              \
+        N##_it_cbegin(s, &i);                                                  \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    void N##_it_end(N* s, N##_it* i) {                             \
+    void N##_it_end(N* s, N##_it* i) {                                         \
         *i = *s + strlen(*s) - 1;                                              \
     }                                                                          \
                                                                                \
-    void N##_it_cend(const N* const s, N##_it* i) {                \
+    void N##_it_cend(const N* const s, N##_it* i) {                            \
         *i = *s + strlen(*s) - 1;                                              \
     }                                                                          \
                                                                                \
-    N##_it N##_end(N* s) {                                               \
-        N##_it i;                                                        \
-        N##_it_end(s, &i);                                               \
+    N##_it N##_end(N* s) {                                                     \
+        N##_it i;                                                              \
+        N##_it_end(s, &i);                                                     \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    N##_it N##_cend(const N* const s) {                                  \
-        N##_it i;                                                        \
-        N##_it_cend(s, &i);                                              \
+    N##_it N##_cend(const N* const s) {                                        \
+        N##_it i;                                                              \
+        N##_it_cend(s, &i);                                                    \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    void N##_it_from(N* s, N##_it* i, size_t at) {                 \
+    void N##_it_from(N* s, N##_it* i, size_t at) {                             \
         *i = *s + at;                                                          \
     }                                                                          \
                                                                                \
-    void N##_it_cfrom(const N* const s, N##_it* i, size_t at) {    \
+    void N##_it_cfrom(const N* const s, N##_it* i, size_t at) {                \
         *i = *s + at;                                                          \
     }                                                                          \
                                                                                \
-    N##_it N##_from(N* s, size_t at) {                                   \
-        N##_it i;                                                        \
-        N##_it_from(s, &i, at);                                          \
+    N##_it N##_from(N* s, size_t at) {                                         \
+        N##_it i;                                                              \
+        N##_it_from(s, &i, at);                                                \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    N##_it N##_cfrom(const N* const s, size_t at) {                      \
-        N##_it i;                                                        \
-        N##_it_cfrom(s, &i, at);                                         \
+    N##_it N##_cfrom(const N* const s, size_t at) {                            \
+        N##_it i;                                                              \
+        N##_it_cfrom(s, &i, at);                                               \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    void N##_it_jump(N##_it* i, int range) {                   \
+    void N##_it_jump(N##_it* i, int range) {                                   \
         *i = *i + range;                                                       \
     }                                                                          \
                                                                                \
-    int N##_it_equal(const N##_it first,                           \
-                           const N##_it second) {                        \
+    int N##_it_equal(const N##_it first, const N##_it second) {                \
         return *first == *second;                                              \
     }                                                                          \
                                                                                \
-    int N##_it_diff(const N##_it first,                       \
-                               const N##_it second) {                    \
+    int N##_it_diff(const N##_it first, const N##_it second) {                 \
         return *second - *first;                                               \
     }                                                                          \
                                                                                \
-    int N##_it_valid(const N##_it i) {                             \
+    int N##_it_valid(const N##_it i) {                                         \
         (void)i;                                                               \
         return 1;                                                              \
     }

@@ -73,31 +73,31 @@ void test_set_copy(void) {
 SGC_INIT_SET(al, aset)
 
 void test_aset(void) {
-    aset v;
-    aset_init(&v);
+    aset s;
+    aset_init(&s);
 
     int x = 0;
     al tmp = {&x};
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        aset_insert(&v, tmp);
+        aset_insert(&s, tmp);
     }
 
     x = TEST_ELEMENTS_NUM / 2;
-    aset_erase(&v, tmp);
-    aset_insert(&v, tmp);
-    aset_insert(&v, tmp);
-    aset_insert(&v, tmp);
+    aset_erase(&s, tmp);
+    aset_insert(&s, tmp);
+    aset_insert(&s, tmp);
+    aset_insert(&s, tmp);
 
-    aset_set_share(&v, 1);
+    aset_set_shareing(&s);
     ++allocation_count;
     int* new_el = (int*)malloc(sizeof(int));
     *new_el = TEST_ELEMENTS_NUM + 2;
     tmp.el = new_el;
-    aset_insert(&v, tmp);
-    aset_set_share(&v, 0);
+    aset_insert(&s, tmp);
+    aset_set_owning(&s);
 
-    aset_free(&v);
+    aset_free(&s);
 
     TEST_ASSERT_EQUAL_INT(0, allocation_count);
     // no memory should be left dealocated

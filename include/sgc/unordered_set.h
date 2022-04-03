@@ -48,7 +48,7 @@
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t max_;                                                           \
-        bool shared_;                                                          \
+        bool sharing_;                                                         \
         struct _p_##N##_node** data_;                                          \
     };                                                                         \
                                                                                \
@@ -71,7 +71,8 @@
                                                                                \
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
-    void N##_set_share(N* u, bool shared);                                     \
+    void N##_set_shareing(N* u);                                               \
+    void N##_set_owning(N* u);                                                 \
     size_t N##_size(const N* const u);                                         \
     void N##_init(N* u);                                                       \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
@@ -97,7 +98,7 @@
     void N##_init(N* u) {                                                      \
         u->size_ = u->max_ = 0;                                                \
         u->data_ = NULL;                                                       \
-        u->shared_ = 0;                                                        \
+        u->sharing_ = 0;                                                       \
     }                                                                          \
                                                                                \
     void N##_free(N* u) {                                                      \
@@ -138,7 +139,7 @@
         if (!i.curr_) {                                                        \
             _p_##N##_resize(u);                                                \
             struct _p_##N##_node* new_node =                                   \
-                _p_##N##_node_new(&v, u->shared_);                             \
+                _p_##N##_node_new(&v, u->sharing_);                            \
             size_t position = hash % u->max_;                                  \
             if (u->data_[position]) {                                          \
                 _p_##N##_bucket_insert(u->data_[position], new_node);          \
@@ -151,7 +152,7 @@
                                                                                \
     void N##_insert_multiple(N* u, const KV v) {                               \
         _p_##N##_resize(u);                                                    \
-        struct _p_##N##_node* new_node = _p_##N##_node_new(&v, u->shared_);    \
+        struct _p_##N##_node* new_node = _p_##N##_node_new(&v, u->sharing_);   \
         size_t hash = KV##_hash(&v);                                           \
         size_t position = hash % u->max_;                                      \
         if (u->data_[position]) {                                              \
@@ -174,7 +175,7 @@
                                         const N* __restrict__ const src) {     \
         dst->size_ = src->size_;                                               \
         dst->max_ = src->max_;                                                 \
-        dst->shared_ = src->shared_;                                           \
+        dst->sharing_ = src->sharing_;                                         \
     }
 
 #define SGC_INIT_UNORDERED_SET(KV, N)                                          \

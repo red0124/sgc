@@ -33,8 +33,8 @@
                                                                                \
     struct N {                                                                 \
         size_t size_;                                                          \
-        bool shared_;                                                          \
-        bool shared_key_;                                                      \
+        bool sharing_;                                                         \
+        bool sharing_key_;                                                     \
         struct _p_##N##_node data_[S];                                         \
     };                                                                         \
                                                                                \
@@ -55,7 +55,8 @@
                                                                                \
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
-    void N##_set_share(N* u, bool shared);                                     \
+    void N##_set_shareing(N* u);                                               \
+    void N##_set_owning(N* u);                                                 \
     void N##_set_share_key(N* u, bool shared);                                 \
     size_t N##_size(const N* const u);                                         \
     void N##_init(N* u);                                                       \
@@ -75,7 +76,7 @@
                                                                                \
     void N##_init(N* u) {                                                      \
         u->size_ = 0;                                                          \
-        u->shared_ = u->shared_key_ = 0;                                       \
+        u->sharing_ = u->sharing_key_ = 0;                                     \
         for (size_t i = 0; i < S; ++i) {                                       \
             u->data_[i].state_ = SGC_NODE_STATE_OPEN;                          \
         }                                                                      \
@@ -86,7 +87,7 @@
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
         if (i.valid_) {                                                        \
             SGC_REPLACE(V##_copy, V##_free, i.curr_->data_.value, v,           \
-                        u->shared_);                                           \
+                        u->sharing_);                                          \
         } else if (u->size_ < S - 1) {                                         \
             size_t position = hash % S;                                        \
             while (u->data_[position].state_ == SGC_NODE_STATE_USED) {         \
@@ -97,8 +98,9 @@
                 }                                                              \
             }                                                                  \
             SGC_COPY(K##_copy, u->data_[position].data_.key, k,                \
-                     u->shared_key_);                                          \
-            SGC_COPY(V##_copy, u->data_[position].data_.value, v, u->shared_); \
+                     u->sharing_key_);                                         \
+            SGC_COPY(V##_copy, u->data_[position].data_.value, v,              \
+                     u->sharing_);                                             \
             u->data_[position].state_ = SGC_NODE_STATE_USED;                   \
             ++u->size_;                                                        \
         }                                                                      \
@@ -122,8 +124,9 @@
                 }                                                              \
             }                                                                  \
             SGC_COPY(K##_copy, u->data_[position].data_.key, k,                \
-                     u->shared_key_);                                          \
-            SGC_COPY(V##_copy, u->data_[position].data_.value, v, u->shared_); \
+                     u->sharing_key_);                                         \
+            SGC_COPY(V##_copy, u->data_[position].data_.value, v,              \
+                     u->sharing_);                                             \
             u->data_[position].state_ = SGC_NODE_STATE_USED;                   \
             ++u->size_;                                                        \
             ret = &u->data_[position].data_.value;                             \
@@ -134,8 +137,8 @@
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ > 0) {                                                  \
             dst->size_ = src->size_;                                           \
-            dst->shared_ = src->shared_;                                       \
-            dst->shared_key_ = src->shared_key_;                               \
+            dst->sharing_ = src->sharing_;                                     \
+            dst->sharing_key_ = src->sharing_key_;                             \
             for (size_t i = 0; i < S; ++i) {                                   \
                 if (src->data_[i].state_ == SGC_NODE_STATE_USED) {             \
                     _p_##N##_node_copy_values(src, &dst->data_[i],             \

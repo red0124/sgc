@@ -13,7 +13,7 @@
 #define SGC_INIT_HEADER_SVECTOR(T, S, N)                                       \
     struct N {                                                                 \
         size_t size_;                                                          \
-        bool shared_;                                                          \
+        bool sharing_;                                                         \
         T data_[S];                                                            \
     };                                                                         \
                                                                                \
@@ -21,7 +21,8 @@
     typedef T N##_type;                                                        \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_share(N* v, bool shared);                                     \
+    void N##_set_shareing(N* v);                                               \
+    void N##_set_owning(N* v);                                                 \
     void N##_init(N* v);                                                       \
     size_t N##_size(const N* const v);                                         \
     void N##_free(N* v);                                                       \
@@ -61,21 +62,21 @@
                                                                                \
     void N##_init(N* v) {                                                      \
         v->size_ = 0;                                                          \
-        v->shared_ = false;                                                    \
+        v->sharing_ = false;                                                   \
     }                                                                          \
                                                                                \
     void N##_free(N* v) {                                                      \
         if (v->size_) {                                                        \
-            SGC_ARRAY_FREE(T, v->data_, v->size_, v->shared_);                 \
+            SGC_ARRAY_FREE(T, v->data_, v->size_, v->sharing_);                \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
-            dst->shared_ = src->shared_;                                       \
+            dst->sharing_ = src->sharing_;                                     \
             SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,              \
-                           src->shared_)                                       \
+                           src->sharing_)                                      \
         } else {                                                               \
             N##_init(dst);                                                     \
         }                                                                      \

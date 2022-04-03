@@ -28,7 +28,7 @@
                                                                                \
     void N##_push(N* p, T el) {                                                \
         _p_##N##_node(p);                                                      \
-        SGC_COPY(T##_copy, p->data_[p->size_], el, p->shared_);                \
+        SGC_COPY(T##_copy, p->data_[p->size_], el, p->sharing_);               \
         _p_##N##_is_left_child(p);                                             \
         ++p->size_;                                                            \
     }                                                                          \
@@ -55,7 +55,7 @@
     void N##_pop(N* p) {                                                       \
         if (p->size_) {                                                        \
             _p_##N##_stack_size(&p->data_[0], &p->data_[--p->size_]);          \
-            SGC_FREE(T##_free, p->data_[p->size_], p->shared_)                 \
+            SGC_FREE(T##_free, p->data_[p->size_], p->sharing_)                \
             _p_##N##_resize(p);                                                \
         }                                                                      \
     }                                                                          \
