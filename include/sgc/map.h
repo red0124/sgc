@@ -115,11 +115,11 @@
     static struct _p_##N##_node* _p_##N##_node_new(const K* const k,           \
                                                    const V* const v,           \
                                                    bool sharing_key,           \
-                                                   bool shared) {              \
+                                                   bool sharing_value) {       \
         struct _p_##N##_node* n = sgc_malloc(sizeof(struct _p_##N##_node));    \
                                                                                \
         SGC_COPY(K##_copy, n->data_.key, *k, sharing_key);                     \
-        SGC_COPY(V##_copy, n->data_.value, *v, shared);                        \
+        SGC_COPY(V##_copy, n->data_.value, *v, sharing_value);                 \
                                                                                \
         n->left_ = n->right_ = SGC_MAP_LEAF;                                   \
         n->color_ = SGC_MAP_RED;                                               \

@@ -42,7 +42,6 @@
                                       struct _p_##N##_node* gp);               \
     static void _p_##N##_check_color(N* s, struct _p_##N##_node* n);           \
     static void _p_##N##_node_insert(N* s, KV* v);                             \
-    static void _p_##N##_node_insert_multiple(N* s, KV* v);                    \
     static struct _p_##N##_node* _p_##N##_node_find(N* s, KV v);               \
     static void _p_##N##_erase_rebalanse(N* m, struct _p_##N##_node* n,        \
                                          struct _p_##N##_node* p);             \
@@ -95,7 +94,6 @@
     void N##_free(N* s);                                                       \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
     void N##_insert(N* s, KV v);                                               \
-    void N##_insert_multiple(N* s, KV v);                                      \
     bool N##_erase(N* m, const KV value);                                      \
     bool N##_it_erase(N* m, N##_it* i);                                        \
     bool N##_empty(const N* const m);
@@ -155,47 +153,6 @@
             s->size_ = 1;                                                      \
         } else {                                                               \
             _p_##N##_node_insert(s, &v);                                       \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    static void _p_##N##_node_insert_multiple(N* s, KV* v) {                   \
-        struct _p_##N##_node* parent = s->root_;                               \
-        struct _p_##N##_node* new_node = NULL;                                 \
-        while (true) {                                                         \
-            int compare = (KV##_compare(&parent->value_, v));                  \
-                                                                               \
-            if (compare > 0) {                                                 \
-                if (parent->left_ == SGC_MAP_LEAF) {                           \
-                    new_node = _p_##N##_node_new(v, s->sharing_);              \
-                    parent->left_ = new_node;                                  \
-                    s->size_++;                                                \
-                    break;                                                     \
-                }                                                              \
-                parent = parent->left_;                                        \
-            } else {                                                           \
-                if (parent->right_ == SGC_MAP_LEAF) {                          \
-                    new_node = _p_##N##_node_new(v, s->sharing_);              \
-                    parent->right_ = new_node;                                 \
-                    s->size_++;                                                \
-                    break;                                                     \
-                }                                                              \
-                parent = parent->right_;                                       \
-            }                                                                  \
-        }                                                                      \
-        new_node->parent_ = parent;                                            \
-        _p_##N##_check_color(s, new_node);                                     \
-    }                                                                          \
-                                                                               \
-    void N##_insert_multiple(N* s, KV v) {                                     \
-        if (s->root_ == SGC_MAP_LEAF) {                                        \
-            struct _p_##N##_node* new_node =                                   \
-                _p_##N##_node_new(&v, s->sharing_);                            \
-            new_node->color_ = SGC_MAP_BLACK;                                  \
-            new_node->parent_ = SGC_MAP_LEAF;                                  \
-            s->root_ = new_node;                                               \
-            s->size_ = 1;                                                      \
-        } else {                                                               \
-            _p_##N##_node_insert_multiple(s, &v);                              \
         }                                                                      \
     }                                                                          \
                                                                                \

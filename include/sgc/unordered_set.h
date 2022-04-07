@@ -80,7 +80,6 @@
     struct N##_it N##_find(N* u, const KV v);                                  \
     void N##_rehash(N* u, size_t new_max);                                     \
     void N##_insert(N* u, const KV v);                                         \
-    void N##_insert_multiple(N* u, const KV v);                                \
     void N##_erase(N* u, const KV v);                                          \
     void N##_it_erase(N* u, struct N##_it* i);                                 \
     bool N##_empty(const N* const u);
@@ -148,19 +147,6 @@
             }                                                                  \
             ++u->size_;                                                        \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_insert_multiple(N* u, const KV v) {                               \
-        _p_##N##_resize(u);                                                    \
-        struct _p_##N##_node* new_node = _p_##N##_node_new(&v, u->sharing_);   \
-        size_t hash = KV##_hash(&v);                                           \
-        size_t position = hash % u->max_;                                      \
-        if (u->data_[position]) {                                              \
-            _p_##N##_bucket_insert(u->data_[position], new_node);              \
-        } else {                                                               \
-            u->data_[position] = new_node;                                     \
-        }                                                                      \
-        ++u->size_;                                                            \
     }                                                                          \
                                                                                \
     void N##_it_erase(N* u, N##_it* i) {                                       \

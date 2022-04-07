@@ -31,28 +31,6 @@ void test_set_insert_erase(void) {
     set_free(&v);
 }
 
-void test_set_insert_multiple(void) {
-    set v;
-    set_init(&v);
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
-        set_insert_multiple(&v, 0);
-    }
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
-        TEST_ASSERT_EQUAL_INT(0, *set_it_data(set_find(&v, 0)));
-    }
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        set_erase(&v, 0);
-    }
-
-    TEST_ASSERT_EQUAL_INT(0, set_it_valid(set_find(&v, 0)));
-    TEST_ASSERT_EQUAL_INT(0, set_size(&v));
-
-    set_free(&v);
-}
-
 void test_set_copy(void) {
     set v;
     set_init(&v);
@@ -182,10 +160,8 @@ int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_set_xxx);
     RUN_TEST(test_set_insert_erase);
-    RUN_TEST(test_set_insert_multiple);
     RUN_TEST(test_set_copy);
     RUN_TEST(test_aset);
-    // TODO update RUN_TEST(test_set_set);
     RUN_TEST(test_set_it);
 
     return UNITY_END();

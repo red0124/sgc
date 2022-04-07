@@ -30,46 +30,6 @@ void test_set_insert_erase(void) {
     set_free(&v);
 }
 
-void test_set_insert_multiple(void) {
-    set v;
-    set_init(&v);
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
-        set_insert_multiple(&v, 0);
-    }
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
-        TEST_ASSERT_EQUAL_INT(0, *set_it_data(set_find(&v, 0)));
-    }
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        set_erase(&v, 0);
-    }
-
-    TEST_ASSERT_EQUAL_INT(0, set_it_valid(set_find(&v, 0)));
-    TEST_ASSERT_EQUAL_INT(0, set_size(&v));
-
-    set_free(&v);
-}
-
-/* TODO update
-void test_set_copy(void) {
-    set v;
-    set_init(&v);
-
-    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        set_insert(&v, i);
-    }
-
-    set v_cp;
-    set_copy(&v_cp, &v);
-
-    TEST_ASSERT_EQUAL_INT(1, set_equal(&v_cp, &v));
-
-    set_free(&v);
-    set_free(&v_cp);
-} */
-
 SGC_INIT_SET(al, aset)
 
 void test_aset(void) {
@@ -107,46 +67,6 @@ int set_compare(const set* const first, const set* const second) {
     return set_size(first) - set_size(second);
 }
 
-/* TODO update
-SGC_INIT_SET(set, vset)
-
-void test_set_set(void) {
-    vset v;
-    vset_init(&v);
-
-    set tmp;
-    set_init(&tmp);
-
-    set_insert(&tmp, 0);
-    // {0}
-
-    vset_insert(&v, tmp);
-    // pushed set into vset, it will make a copy
-
-    set_insert(&tmp, 1);
-    // {0, 1}
-
-    vset_insert(&v, tmp);
-
-    set_insert(&tmp, 2);
-    // {0, 1, 2}
-
-    vset_set_share(&v, 1);
-    vset_insert(&v, tmp);
-    vset_set_share(&v, 0);
-    // pushed set into vset, it will use the original
-
-    // {{0}, {0, 1}, {0, 1, 2}}
-
-    TEST_ASSERT_EQUAL_INT(0,
-                          *set_it_data(
-                              set_find(vset_it_data(vset_find(&v, tmp)),
-                                       0)));
-
-    vset_free(&v);
-    // no memory should be left dealocated
-} */
-
 void test_set_it(void) {
     set v;
     set_init(&v);
@@ -180,10 +100,7 @@ int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_set_xxx);
     RUN_TEST(test_set_insert_erase);
-    RUN_TEST(test_set_insert_multiple);
-    // TODO update RUN_TEST(test_set_copy);
     RUN_TEST(test_aset);
-    // TODO update RUN_TEST(test_set_set);
     RUN_TEST(test_set_it);
 
     return UNITY_END();

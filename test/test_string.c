@@ -1,5 +1,5 @@
 #include "test_common.h"
-#include <sgc/sgc_string.h>
+#include <sgc/string.h>
 
 #define TEST_ELEMENTS_NUM 20
 

@@ -128,7 +128,7 @@
     }                                                                          \
                                                                                \
     static N##_it _p_##N##_find_by_hash(N* u, const K* const k, size_t hash) { \
-        N##_it ret = {NULL, NULL, 0, 0, 0};                                    \
+        N##_it ret = {NULL, NULL, 0, 0, false};                                \
         if (u->max_) {                                                         \
             size_t position = hash % u->max_;                                  \
             struct _p_##N##_node* tmp = u->data_[position];                    \
@@ -151,8 +151,9 @@
     void N##_set(N* u, const K k, const V v) {                                 \
         size_t hash = K##_hash(&k);                                            \
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
-        if (i.curr_) {                                                         \
-            SGC_REPLACE(V##_copy, V##_free, i.curr_->data_.value, v, i.curr_); \
+        if (i.valid_) {                                                        \
+            SGC_REPLACE(V##_copy, V##_free, i.curr_->data_.value, v,           \
+                        u->sharing_);                                           \
         } else {                                                               \
             _p_##N##_resize(u);                                                \
             struct _p_##N##_node* new_node =                                   \

@@ -400,7 +400,6 @@ inline size_t al_hash(const al* const a) {
                                                                                \
     N##_free(&ds);
 
-// TODO update this LIST, FORWARD LIST
 #define TEST_LIST_SORT(N)                                                      \
     N ds;                                                                      \
     N##_init(&ds);                                                             \
@@ -439,7 +438,6 @@ ta ta_new(void) {
 
 void ta_insert(ta* ta, size_t at, int el) {
     if (at >= TA_MAX || ta->size == TA_MAX) {
-        // TODO update this
         printf("Exiting...\n");
         exit(EXIT_FAILURE);
     }
@@ -666,7 +664,6 @@ void tm_set(tm* tm, int key, int value) {
         }
     }
 
-    // TODO update this
     printf("Exiting...\n");
     exit(EXIT_FAILURE);
 }
@@ -829,21 +826,6 @@ void ts_insert(ts* ts, int kv) {
         }
     }
 
-    // TODO update this
-    printf("Exiting...\n");
-    exit(EXIT_FAILURE);
-}
-
-void ts_insert_multiple(ts* ts, int kv) {
-    for (size_t i = 0; i < TS_MAX; ++i) {
-        if (ts->data[i] == TS_EMPTY) {
-            ts->data[i] = kv;
-            ts->size++;
-            return;
-        }
-    }
-
-    // TODO update this
     printf("Exiting...\n");
     exit(EXIT_FAILURE);
 }
@@ -887,7 +869,7 @@ void ts_print(ts* ts) {
 #define TEST_TS(N)                                                             \
     {                                                                          \
         size_t n = 5;                                                          \
-        size_t m = 15;                                                         \
+        size_t m = 10;                                                         \
         size_t comb_max = (size_t)pow(m, n);                                   \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
@@ -924,52 +906,29 @@ void ts_print(ts* ts) {
                     N##_insert(&ds, 3);                                        \
                     break;                                                     \
                 case (5):                                                      \
-                    log("insert multiple %d\n", i);                            \
-                    ts_insert_multiple(&ts, i);                                \
-                    N##_insert_multiple(&ds, i);                               \
-                    break;                                                     \
-                case (6):                                                      \
-                    log("insert multiple 0\n");                                \
-                    ts_insert_multiple(&ts, 0);                                \
-                    N##_insert_multiple(&ds, 0);                               \
-                    break;                                                     \
-                case (7):                                                      \
-                    log("insert multiple 1\n");                                \
-                    ts_insert_multiple(&ts, 1);                                \
-                    N##_insert_multiple(&ds, 1);                               \
-                    break;                                                     \
-                case (8):                                                      \
-                    log("insert multiple 2\n");                                \
-                    ts_insert_multiple(&ts, 2);                                \
-                    N##_insert_multiple(&ds, 2);                               \
-                    break;                                                     \
-                case (9):                                                      \
                     log("erase %d\n", i);                                      \
                     ts_erase(&ts, i);                                          \
                     N##_erase(&ds, i);                                         \
                     break;                                                     \
-                case (10):                                                     \
+                case (6):                                                      \
                     log("erase 0\n");                                          \
                     ts_erase(&ts, 0);                                          \
                     N##_erase(&ds, 0);                                         \
                     break;                                                     \
-                case (11):                                                     \
+                case (7):                                                      \
                     log("erase 1\n");                                          \
                     ts_erase(&ts, 1);                                          \
                     N##_erase(&ds, 1);                                         \
                     break;                                                     \
-                case (12):                                                     \
+                case (8):                                                      \
                     log("erase 2\n");                                          \
                     ts_erase(&ts, 2);                                          \
                     N##_erase(&ds, 2);                                         \
                     break;                                                     \
-                case (13):                                                     \
+                case (9):                                                      \
                     log("erase 3\n");                                          \
                     ts_erase(&ts, 3);                                          \
                     N##_erase(&ds, 3);                                         \
-                    break;                                                     \
-                case (14):                                                     \
-                    log("erase all (TODO) %d\n", i);                           \
                     break;                                                     \
                 default:                                                       \
                     log("Unhandled digit %zu\n", digit);                       \

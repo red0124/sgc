@@ -56,7 +56,6 @@
     void N##_free(N* u);                                                       \
     struct N##_it N##_find(N* u, const V v);                                   \
     void N##_insert(N* u, const V v);                                          \
-    void N##_insert_multiple(N* u, const V v);                                 \
     void N##_it_erase(N* u, struct N##_it* i);                                 \
     void N##_erase(N* u, const V v);                                           \
     bool N##_empty(const N* const u);
@@ -79,22 +78,6 @@
         struct N##_it i = _p_##N##_find_by_hash(u, &v, hash);                  \
         if (!i.valid_ && u->size_ < S - 1) {                                   \
             size_t position = hash % S;                                        \
-            while (u->data_[position].state_ == SGC_NODE_STATE_USED) {         \
-                if (position == S - 1) {                                       \
-                    position = 0;                                              \
-                } else {                                                       \
-                    ++position;                                                \
-                }                                                              \
-            }                                                                  \
-            SGC_COPY(V##_copy, u->data_[position].value_, v, u->sharing_);     \
-            u->data_[position].state_ = SGC_NODE_STATE_USED;                   \
-            ++u->size_;                                                        \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_insert_multiple(N* u, const V v) {                                \
-        if (u->size_ < S - 1) {                                                \
-            size_t position = V##_hash(&v) % S;                                \
             while (u->data_[position].state_ == SGC_NODE_STATE_USED) {         \
                 if (position == S - 1) {                                       \
                     position = 0;                                              \
