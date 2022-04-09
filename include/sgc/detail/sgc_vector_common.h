@@ -15,11 +15,6 @@
     }                                                                          \
                                                                                \
     void N##_push_back(N* v, T el) {                                           \
-        /* TODO check if this is faster                                        \
-        _p_##N##_resize(v);                                                    \
-        SGC_COPY(T##_copy, v->data_[v->size_], el, v->sharing_);               \
-        ++v->size_;                                                            \
-        */                                                                     \
         N##_insert(v, v->size_, el);                                           \
     }                                                                          \
                                                                                \

@@ -250,6 +250,11 @@
                    N##_it_go_prev(&SGC_UNIQUE(curr)),                          \
                    EL = (N##_type*)N##_it_data(SGC_UNIQUE(curr)))
 
+#define SGC_MOVE(N, DS, ...)                                                   \
+    N##_set_shareing(&DS);                                                     \
+    __VA_ARGS__;                                                               \
+    N##_set_owning(&DS);
+
 #ifndef SGC_NO_KEYWORDS
 
 #define IN ,
