@@ -53,7 +53,7 @@ static void run_unordered_map_insert(size_t n) {
     umap m;
     umap_init(&m);
 
-    for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
+    for (size_t i = 0; i < NUM_ELEMENTS_UNORDERED_MAP; ++i) {
         *umap_at(&m, (i * 19) % n) = i;
     }
 
@@ -65,11 +65,11 @@ static void run_unordered_map_iterate(void) {
     umap m;
     umap_init(&m);
 
-    for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
+    for (size_t i = 0; i < NUM_ELEMENTS_UNORDERED_MAP; ++i) {
         *umap_at(&m, i) = i;
     }
 
-    for (size_t i = 0; i < NUM_REPEATS_MAP_ITERATE; ++i) {
+    for (size_t i = 0; i < NUM_REPEATS_UNORDERED_MAP_ITERATE; ++i) {
         size_t sum = 0;
         for_each(el IN m AS umap) {
             sum += el->value;
@@ -101,14 +101,18 @@ static void run_vector_iterate(void) {
     vector_free(&v);
 }
 
-static void run_deque_insert() {
+static void run_deque_insert(size_t n) {
     deq d;
     deq_init(&d);
 
-    for (size_t i = 0; i < NUM_ELEMENTS_DEQUE; ++i) {
-        size_t delta = deq_size(&d) / 10;
-        deq_insert(&d, delta, i);
-        deq_insert(&d, deq_size(&d) - delta, i);
+    for (size_t j = 0; j < NUM_TOTAL_INSERTS_DEQUE / n; ++j) {
+        deq_free(&d);
+        deq_init(&d);
+        for (size_t i = 0; i < n; ++i) {
+            size_t delta = deq_size(&d) / 10;
+            deq_insert(&d, delta, i);
+            deq_insert(&d, deq_size(&d) - delta, i);
+        }
     }
 
     nop(deq_size(&d));
@@ -149,20 +153,22 @@ static void run_unordered_map_of_vectors_insert(void) {
     umap_vector_free(&m);
 }
 
-static void run_priority_queue_push_pop(void) {
+static void run_priority_queue_push_pop(size_t n) {
     pqueue p;
     pqueue_init(&p);
 
-    for (size_t i = 0; i < NUM_ELEMENTS_PRIORIRTY_QUEUE; ++i) {
-        pqueue_push(&p, (i * 19) % 1000);
-    }
-    nop(pqueue_size(&p));
+    for (size_t j = 0; j < NUM_TOTAL_INSERTS_PRIORIRTY_QUEUE / n; ++j) {
+        for (size_t i = 0; i < n; ++i) {
+            pqueue_push(&p, (i * 19) % 1000);
+        }
+        nop(pqueue_size(&p));
 
-    while (!pqueue_empty(&p)) {
-        pqueue_pop(&p);
+        while (!pqueue_empty(&p)) {
+            pqueue_pop(&p);
+        }
+        nop(pqueue_size(&p));
     }
 
-    nop(pqueue_size(&p));
     pqueue_free(&p);
 }
 
@@ -200,8 +206,11 @@ int main(int argc, char* argv[]) {
     case vector_iterate:
         run_vector_iterate();
         break;
-    case deque_insert:
-        run_deque_insert();
+    case deque_insert_100:
+        run_deque_insert(100);
+        break;
+    case deque_insert_100000:
+        run_deque_insert(100000);
         break;
     case deque_iterate:
         run_deque_iterate();
@@ -209,8 +218,11 @@ int main(int argc, char* argv[]) {
     case unordered_map_of_vectors_insert:
         run_unordered_map_of_vectors_insert();
         break;
-    case priority_queue_push_pop:
-        run_priority_queue_push_pop();
+    case priority_queue_push_pop_100:
+        run_priority_queue_push_pop(100);
+        break;
+    case priority_queue_push_pop_100000:
+        run_priority_queue_push_pop(100000);
         break;
     };
     return 0;
