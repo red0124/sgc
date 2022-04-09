@@ -8,10 +8,10 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_PRIORITY_QUEUE(T, N)                                      \
-    static void _p_##N##_node(N* p);                                           \
-    static void _p_##N##_stack_size(T* i, T* j);                               \
-    static void _p_##N##_is_left_child(N* p);                                  \
-    static void _p_##N##_resize(N* p);
+    static void _p_##N##_resize(N* p);                                         \
+    static void _p_##N##_swap(T* i, T* j);                                     \
+    static void _p_##N##_fix_insert(N* p);                                  \
+    static void _p_##N##_fix_erase(N* p);
 
 #define SGC_INIT_HEADERS_PRIORITY_QUEUE(T, N)                                  \
     struct N {                                                                 \
@@ -39,7 +39,7 @@
     void N##_from_array(N* p, const T* const arr, size_t size);
 
 #define _SGC_INIT_UNIEUE_PRIORITY_QUEUE(T, N)                                  \
-    static void _p_##N##_node(N* p) {                                          \
+    static void _p_##N##_resize(N* p) {                                        \
         if (p->size_ == p->max_) {                                             \
             p->max_ = (p->max_ == 0) ? 1 : p->max_ * 2;                        \
             p->data_ = (T*)sgc_realloc(p->data_, sizeof(T) * p->max_);         \

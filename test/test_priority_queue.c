@@ -5,7 +5,7 @@
 
 SGC_INIT_PRIORITY_QUEUE(int, pqueue)
 
-void test_pqueue_xxx(void) {
+void test_pqueue_insert_erase_combinations(void) {
     TEST_TPQ(pqueue);
 }
 
@@ -118,7 +118,7 @@ void test_pqueue_pqueue(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_pqueue_xxx);
+    RUN_TEST(test_pqueue_insert_erase_combinations);
     RUN_TEST(test_pqueue_push_pop);
     RUN_TEST(test_pqueue_copy);
     RUN_TEST(test_apqueue);

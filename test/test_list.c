@@ -75,8 +75,8 @@ void list_erase(list* l, int at) {
     *l = new_list;
 }
 
-void test_list_xxx(void) {
-    TEST_TA(list);
+void test_list_insert_erase_combinations(void) {
+    TEST_INSERT_ERASE_COMBINATIONS(list);
 }
 
 void test_list_push_pop_front_back(void) {
@@ -109,7 +109,7 @@ void test_list_it(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_list_xxx);
+    RUN_TEST(test_list_insert_erase_combinations);
     RUN_TEST(test_list_push_pop_front_back);
     RUN_TEST(test_list_copy);
     RUN_TEST(test_list_insert_set_at);

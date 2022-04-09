@@ -5,7 +5,7 @@
 
 SGC_INIT_SET(int, set)
 
-void test_set_xxx(void) {
+void test_set_insert_erase_combinations(void) {
     TEST_TS(set);
 }
 
@@ -98,7 +98,7 @@ void test_set_it(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_set_xxx);
+    RUN_TEST(test_set_insert_erase_combinations);
     RUN_TEST(test_set_insert_erase);
     RUN_TEST(test_aset);
     RUN_TEST(test_set_it);

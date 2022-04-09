@@ -5,7 +5,7 @@
 
 SGC_INIT_STACK(int, stack)
 
-void test_stack_xxx(void) {
+void test_stack_insert_erase_combinations(void) {
     TEST_TSTK(stack);
 }
 
@@ -112,7 +112,7 @@ void test_stack_stack(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_stack_xxx);
+    RUN_TEST(test_stack_insert_erase_combinations);
     RUN_TEST(test_stack_copy);
     RUN_TEST(test_stack_front_back);
     RUN_TEST(test_astack);

@@ -11,7 +11,7 @@ void vector_pop_front(vector* v) {
 
 void test_static_vector_push_pop_front_back(void) {
     // TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(vector);
-    TEST_TA(vector);
+    TEST_INSERT_ERASE_COMBINATIONS(vector);
 }
 
 void test_static_vector_copy(void) {

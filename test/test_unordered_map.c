@@ -4,7 +4,7 @@
 #define TEST_ELEMENTS_NUM 50
 SGC_INIT_UNORDERED_MAP(int, int, map)
 
-void test_map_xxx(void) {
+void test_map_insert_erase_combinations(void) {
     TEST_TM(map);
 }
 
@@ -154,7 +154,7 @@ void test_map_it(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_map_xxx);
+    RUN_TEST(test_map_insert_erase_combinations);
     RUN_TEST(test_map_insert_erase);
     RUN_TEST(test_map_copy);
     RUN_TEST(test_amap);

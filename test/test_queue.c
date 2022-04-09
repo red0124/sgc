@@ -5,7 +5,7 @@
 
 SGC_INIT_QUEUE(int, queue)
 
-void test_queue_xxx(void) {
+void test_queue_insert_erase_combinations(void) {
     TEST_TQ(queue);
 }
 
@@ -129,7 +129,7 @@ void test_queue_queue(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_queue_xxx);
+    RUN_TEST(test_queue_insert_erase_combinations);
     RUN_TEST(test_queue_copy);
     RUN_TEST(test_queue_front_back);
     RUN_TEST(test_aqueue);

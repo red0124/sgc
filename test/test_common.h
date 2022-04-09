@@ -95,332 +95,6 @@ inline size_t al_hash(const al* const a) {
         }                                                                      \
     }
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(N)                         \
-    N ds;                                                                      \
-    size_t size = 100;                                                         \
-                                                                               \
-    N##_init(&ds);                                                             \
-    ASSERT_EQUAL(0, N##_size(&ds));                                            \
-                                                                               \
-    N##_push_back(&ds, 0);                                                     \
-    ASSERT_EQUAL(1, N##_size(&ds));                                            \
-    ASSERT_EQUAL(0, *N##_at(&ds, 0));                                          \
-    ASSERT_EQUAL(0, *N##_front(&ds));                                          \
-    ASSERT_EQUAL(0, *N##_back(&ds));                                           \
-                                                                               \
-    N##_push_back(&ds, 1);                                                     \
-    ASSERT_EQUAL(2, N##_size(&ds));                                            \
-    ASSERT_EQUAL(0, *N##_at(&ds, 0));                                          \
-    ASSERT_EQUAL(1, *N##_at(&ds, 1));                                          \
-    ASSERT_EQUAL(0, *N##_front(&ds));                                          \
-    ASSERT_EQUAL(1, *N##_back(&ds));                                           \
-                                                                               \
-    N##_pop_back(&ds);                                                         \
-    ASSERT_EQUAL(1, N##_size(&ds));                                            \
-    ASSERT_EQUAL(0, *N##_at(&ds, 0));                                          \
-    ASSERT_EQUAL(0, *N##_front(&ds));                                          \
-    ASSERT_EQUAL(0, *N##_back(&ds));                                           \
-                                                                               \
-    N##_pop_back(&ds);                                                         \
-    ASSERT_EQUAL(0, N##_size(&ds));                                            \
-    ASSERT_EQUAL(1, N##_empty(&ds));                                           \
-                                                                               \
-    for (size_t i = 0; i < size; ++i) {                                        \
-        N##_push_back(&ds, i);                                                 \
-        ASSERT_EQUAL(i + 1, N##_size(&ds));                                    \
-        ASSERT_EQUAL(0, *N##_front(&ds));                                      \
-        ASSERT_EQUAL(i, *N##_back(&ds));                                       \
-        for (size_t j = 0; j < N##_size(&ds); ++j) {                           \
-            ASSERT_EQUAL(j, *N##_at(&ds, j));                                  \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    for (size_t i = 1; i <= size; ++i) {                                       \
-        N##_pop_back(&ds);                                                     \
-        ASSERT_EQUAL(size - i, N##_size(&ds));                                 \
-                                                                               \
-        if (!N##_empty(&ds)) {                                                 \
-            ASSERT_EQUAL(0, *N##_front(&ds));                                  \
-            ASSERT_EQUAL(size - i - 1, *N##_back(&ds));                        \
-        }                                                                      \
-                                                                               \
-        for (size_t j = 0; j < N##_size(&ds); ++j) {                           \
-            ASSERT_EQUAL(j, *N##_at(&ds, j));                                  \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    ASSERT_EQUAL(0, N##_size(&ds));                                            \
-    ASSERT_EQUAL(1, N##_empty(&ds));                                           \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_COPY_EQUAL(N)                                           \
-    N ds;                                                                      \
-    size_t size = 100;                                                         \
-                                                                               \
-    N##_init(&ds);                                                             \
-                                                                               \
-    for (size_t i = 0; i < size; ++i) {                                        \
-        N##_push_back(&ds, i);                                                 \
-        ASSERT_EQUAL(i + 1, N##_size(&ds));                                    \
-    }                                                                          \
-                                                                               \
-    N ds_copy;                                                                 \
-    N##_copy(&ds_copy, &ds);                                                   \
-    ASSERT_EQUAL(N##_size(&ds), N##_size(&ds_copy));                           \
-                                                                               \
-    for (size_t i = 0; i < size; ++i) {                                        \
-        ASSERT_EQUAL(i, *N##_at(&ds_copy, i));                                 \
-    }                                                                          \
-                                                                               \
-    N##_free(&ds);                                                             \
-    N##_free(&ds_copy);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_AT_INSERT(N)                                                      \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    /* {3} */                                                                  \
-    N##_insert(&ds, 0, 3);                                                     \
-    ASSERT_ARRAY(N, ds, {3});                                                  \
-                                                                               \
-    /* {1, 3} */                                                               \
-    N##_insert(&ds, 0, 1);                                                     \
-    ASSERT_ARRAY(N, ds, {1, 3});                                               \
-                                                                               \
-    /* {1, 3, 4} */                                                            \
-    N##_insert(&ds, 2, 4);                                                     \
-    ASSERT_ARRAY(N, ds, {1, 3, 4});                                            \
-                                                                               \
-    /* {0, 1, 3, 4} */                                                         \
-    N##_insert(&ds, 0, 0);                                                     \
-    ASSERT_ARRAY(N, ds, {0, 1, 3, 4});                                         \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    N##_insert(&ds, 2, 2);                                                     \
-    ASSERT_ARRAY(N, ds, {0, 1, 2, 3, 4});                                      \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_AT_ERASE_AT(N)                                          \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
-                                                                               \
-    /* {0, 2, 3, 4} */                                                         \
-    N##_erase(&ds, 1);                                                         \
-    ASSERT_EQUAL(4, N##_size(&ds));                                            \
-    ASSERT_ARRAY(N, ds, {0, 2, 3, 4});                                         \
-                                                                               \
-    /* {0, 2, 3} */                                                            \
-    N##_erase(&ds, 3);                                                         \
-    ASSERT_EQUAL(3, N##_size(&ds));                                            \
-    ASSERT_ARRAY(N, ds, {0, 2, 3});                                            \
-                                                                               \
-    /* {2, 3} */                                                               \
-    N##_erase(&ds, 0);                                                         \
-    ASSERT_EQUAL(2, N##_size(&ds));                                            \
-    ASSERT_ARRAY(N, ds, {2, 3});                                               \
-                                                                               \
-    /* {2} */                                                                  \
-    N##_erase(&ds, 1);                                                         \
-    ASSERT_EQUAL(1, N##_size(&ds));                                            \
-    ASSERT_ARRAY(N, ds, {2});                                                  \
-                                                                               \
-    /* {} */                                                                   \
-    N##_erase(&ds, 0);                                                         \
-    ASSERT_EQUAL(0, N##_size(&ds));                                            \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_AT_SET_SET_AT_SET_FRONT_SET_BACK(N)                     \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set(&ds, 1, 10);                                                       \
-    ASSERT_ARRAY(N, ds, {0, 10, 2, 3, 4});                                     \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set(&ds, 0, 1);                                                        \
-    ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 4});                                     \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set(&ds, 4, 40);                                                       \
-    ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 40});                                    \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set(&ds, 4, 44);                                                       \
-    ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 44});                                    \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set(&ds, 0, 11);                                                       \
-    ASSERT_ARRAY(N, ds, {11, 10, 2, 3, 44});                                   \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set(&ds, 2, 22);                                                       \
-    ASSERT_ARRAY(N, ds, {11, 10, 22, 3, 44});                                  \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set_front(&ds, 111);                                                   \
-    ASSERT_ARRAY(N, ds, {111, 10, 22, 3, 44});                                 \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set_back(&ds, 444);                                                    \
-    ASSERT_ARRAY(N, ds, {111, 10, 22, 3, 444});                                \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_ERASE_AT_ALLOCATIONS(N)                                 \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    int stack_element = 0;                                                     \
-    al tmp;                                                                    \
-    tmp.el = &stack_element;                                                   \
-                                                                               \
-    for (size_t i = 0; i < 100; ++i) {                                         \
-        N##_push_back(&ds, tmp);                                               \
-    }                                                                          \
-                                                                               \
-    N##_pop_back(&ds);                                                         \
-    N##_erase(&ds, N##_size(&ds) - 1);                                         \
-    N##_erase(&ds, 0);                                                         \
-                                                                               \
-    /* make collection the owner of the next element, it will not be copied */ \
-    /* in other words, move it */                                              \
-    N##_set_shareing(&ds);                                                     \
-    N##_push_back(&ds, al_new(0));                                             \
-    N##_set_owning(&ds);                                                       \
-                                                                               \
-    N##_free(&ds);                                                             \
-                                                                               \
-    /* no memory should be left dealocated */                                  \
-    ASSERT_EQUAL(0, allocation_count);
-
-#define MATRIX_AT(NN, N, DS, P, Q) N##_at(NN##_at(&DS, P), Q)
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_ARRAY_OF_ARRAYS_PUSH_BACK_AT_SHARE(NN, N)                         \
-    NN ds;                                                                     \
-    NN##_init(&ds);                                                            \
-                                                                               \
-    N tmp;                                                                     \
-    N##_init(&tmp);                                                            \
-                                                                               \
-    /* {0} */                                                                  \
-    N##_push_back(&tmp, 0);                                                    \
-                                                                               \
-    /* push array into array of arrays, it will make a copy */                 \
-    /* {{0}} */                                                                \
-    NN##_push_back(&ds, tmp);                                                  \
-                                                                               \
-    /* {0, 1} */                                                               \
-    N##_push_back(&tmp, 1);                                                    \
-                                                                               \
-    /* {{0}, {0, 1}} */                                                        \
-    NN##_push_back(&ds, tmp);                                                  \
-                                                                               \
-    /* {0, 1, 2} */                                                            \
-    N##_push_back(&tmp, 2);                                                    \
-                                                                               \
-    /* push array into array of arrays, it will use the original, 'move' it */ \
-    /* {{0}, {0, 1}, {0, 1, 2}} */                                             \
-    NN##_set_shareing(&ds);                                                    \
-    NN##_push_back(&ds, tmp);                                                  \
-    NN##_set_owning(&ds);                                                      \
-                                                                               \
-    ASSERT_EQUAL(0, *MATRIX_AT(NN, N, ds, 0, 0));                              \
-                                                                               \
-    ASSERT_EQUAL(0, *MATRIX_AT(NN, N, ds, 1, 0));                              \
-    ASSERT_EQUAL(1, *MATRIX_AT(NN, N, ds, 1, 1));                              \
-                                                                               \
-    ASSERT_EQUAL(0, *MATRIX_AT(NN, N, ds, 2, 0));                              \
-    ASSERT_EQUAL(1, *MATRIX_AT(NN, N, ds, 2, 1));                              \
-    ASSERT_EQUAL(2, *MATRIX_AT(NN, N, ds, 2, 2));                              \
-                                                                               \
-    /* no memory should be left dealocated */                                  \
-    NN##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_ITERATOR(N)                                             \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    size_t i = 0;                                                              \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
-                                                                               \
-    for (struct N##_it it = N##_begin(&ds); !N##_it_eq(it, N##_end(&ds));      \
-         N##_it_go_next(&it)) {                                                \
-        ASSERT_EQUAL(*N##_it_data(it), *N##_at(&ds, i));                       \
-        ++i;                                                                   \
-    }                                                                          \
-                                                                               \
-    ASSERT_EQUAL(*N##_it_data(N##_end(&ds)), *N##_at(&ds, i));                 \
-                                                                               \
-    for (struct N##_it it = N##_end(&ds); !N##_it_eq(it, N##_begin(&ds));      \
-         N##_it_go_prev(&it)) {                                                \
-        ASSERT_EQUAL(*N##_it_data(it), *N##_at(&ds, i));                       \
-        --i;                                                                   \
-    }                                                                          \
-                                                                               \
-    ASSERT_EQUAL(*N##_it_data(N##_begin(&ds)), *N##_at(&ds, i));               \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_ITERATOR_FROM(N)                                        \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
-                                                                               \
-    struct N##_it it4 = N##_from(&ds, 4);                                      \
-    ASSERT_EQUAL(*N##_it_data(it4), *N##_at(&ds, 4));                          \
-                                                                               \
-    struct N##_it it2 = N##_from(&ds, 2);                                      \
-    ASSERT_EQUAL(*N##_it_data(it2), *N##_at(&ds, 2));                          \
-                                                                               \
-    struct N##_it it0 = N##_from(&ds, 0);                                      \
-    ASSERT_EQUAL(*N##_it_data(it0), *N##_at(&ds, 0));                          \
-                                                                               \
-    N##_free(&ds);
-
-#define TEST_LIST_SORT(N)                                                      \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    for (size_t i = 0; i < 100; ++i) {                                         \
-        int el = i % 10;                                                       \
-        N##_push_back(&ds, el);                                                \
-    }                                                                          \
-                                                                               \
-    N##_sort(&ds, int_void_compare);                                           \
-                                                                               \
-    for (size_t i = 0; i < N##_size(&ds) - 1; ++i) {                           \
-        ASSERT_EQUAL(1, *N##_at(&ds, i) <= *N##_at(&ds, i + 1));               \
-    }                                                                          \
-                                                                               \
-    ASSERT_EQUAL(1, N##_eq(&ds, &ds_sorted));                                  \
-                                                                               \
-    N##_free(&ds);
-
-#define TEST_COMBINATIONS(N) // nothing
-
 #define TA_MAX 1024
 
 struct test_array {
@@ -477,7 +151,7 @@ void ta_sort(ta* ta) {
     qsort(ta->data, ta->size, sizeof(int), ta_int_compare);
 }
 
-#define TEST_TA(N)                                                             \
+#define TEST_INSERT_ERASE_COMBINATIONS_ARRAY(N)                                \
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 21;                                                         \
@@ -610,11 +284,30 @@ void ta_sort(ta* ta) {
                     log("Unhandled digit %zu\n", digit);                       \
                     break;                                                     \
                 }                                                              \
-                ASSERT_EQUAL(ta.size, N##_size(&ds));                          \
                 ta_print(&ta);                                                 \
+                                                                               \
+                N ds_copy;                                                     \
+                N##_copy(&ds_copy, &ds);                                       \
+                                                                               \
+                ASSERT_EQUAL(ta.size, N##_size(&ds));                          \
+                ASSERT_EQUAL(ta.size, N##_size(&ds_copy));                     \
+                                                                               \
+                N##_it it = N##_begin(&ds);                                    \
                 for (size_t j = 0; j < ta.size; ++j) {                         \
                     ASSERT_EQUAL(ta.data[j], *N##_at(&ds, j));                 \
+                    ASSERT_EQUAL(ta.data[j], *N##_at(&ds_copy, j));            \
+                    ASSERT_EQUAL(ta.data[j], *N##_it_data(it));                \
+                    N##_it_go_next(&it);                                       \
                 }                                                              \
+                ASSERT_EQUAL(N##_it_valid(it), false);                         \
+                                                                               \
+                it = N##_end(&ds);                                             \
+                for (int j = ta.size - 1; j >= 0; --j) {                       \
+                    ASSERT_EQUAL(ta.data[j], *N##_it_data(it));                \
+                    N##_it_go_prev(&it);                                       \
+                }                                                              \
+                ASSERT_EQUAL(N##_it_valid(it), false);                         \
+                                                                               \
                 comb_copy /= m;                                                \
             }                                                                  \
             N##_free(&ds);                                                     \

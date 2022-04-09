@@ -7,10 +7,10 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_SPRIORITY_QUEUE(T, S, N)                                  \
-    static void _p_##N##_node(const N* const p);                               \
-    static void _p_##N##_stack_size(T* i, T* j);                               \
-    static void _p_##N##_is_left_child(N* p);                                  \
-    static void _p_##N##_resize(N* p);
+    static void _p_##N##_resize(const N* const p);                             \
+    static void _p_##N##_swap(T* i, T* j);                                     \
+    static void _p_##N##_fix_insert(N* p);                                     \
+    static void _p_##N##_fix_erase(N* p);
 
 #define SGC_INIT_HEADERS_SPRIORITY_QUEUE(T, S, N)                              \
                                                                                \
@@ -38,7 +38,7 @@
     void N##_from_array(N* p, const T* const arr, size_t size);
 
 #define _SGC_INIT_UNIQUE_SPRIORITY_QUEUE(T, S, N)                              \
-    static void _p_##N##_node(const N* const v) {                              \
+    static void _p_##N##_resize(const N* const v) {                            \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
     }                                                                          \
