@@ -164,21 +164,15 @@
             succ = n;                                                          \
         } else {                                                               \
             succ = n->right_;                                                  \
-            if (succ) {                                                        \
-                while (succ->left_) {                                          \
-                    succ = succ->left_;                                        \
-                }                                                              \
-            } else {                                                           \
-                succ = n->left_;                                               \
+            while (succ->left_) {                                              \
+                succ = succ->left_;                                            \
             }                                                                  \
         }                                                                      \
+                                                                               \
         if (succ != n) {                                                       \
-            KV##_copy(&n->value_, &succ->value_);                              \
-            if (!m->sharing_) {                                                \
-                KV##_free(&succ->value_);                                      \
-            }                                                                  \
-            /* relinking nodes would be better */                              \
+            _SGC_REPLACE(KV, n->value_, succ->value_, m->sharing_);            \
         }                                                                      \
+        _p_##N##_node_free(m, succ);                                           \
                                                                                \
         succ_p = succ->parent_;                                                \
         if (succ->left_) {                                                     \

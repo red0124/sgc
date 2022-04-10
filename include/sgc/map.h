@@ -111,204 +111,217 @@
     bool N##_it_erase(N* m, N##_it* i);                                        \
     bool N##_empty(const N* const m);
 
-#define _SGC_INIT_UNIQUE_MAP(K, V, N)                                          \
-    static struct _p_##N##_node* _p_##N##_node_new(const K* const k,           \
-                                                   const V* const v,           \
-                                                   bool sharing_key,           \
-                                                   bool sharing_value) {       \
-        struct _p_##N##_node* n = sgc_malloc(sizeof(struct _p_##N##_node));    \
-                                                                               \
-        _SGC_COPY(K, n->data_.key, *k, sharing_key);                           \
-        _SGC_COPY(V, n->data_.value, *v, sharing_value);                       \
-                                                                               \
-        n->left_ = n->right_ = _SGC_MAP_LEAF;                                  \
-        n->color_ = _SGC_MAP_COLOR_RED;                                        \
-        return n;                                                              \
-    }                                                                          \
-                                                                               \
-    static void _p_##N##_node_insert(N* m, K* k, V* v) {                       \
-        struct _p_##N##_node* parent = m->root_;                               \
-        struct _p_##N##_node* new_node = NULL;                                 \
-        while (true) {                                                         \
-            int compare = (K##_compare(&parent->data_.key, k));                \
-                                                                               \
-            if (compare > 0) {                                                 \
-                if (parent->left_ == _SGC_MAP_LEAF) {                          \
-                    new_node =                                                 \
-                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
-                    parent->left_ = new_node;                                  \
-                    m->size_++;                                                \
-                    break;                                                     \
-                }                                                              \
-                parent = parent->left_;                                        \
-            } else if (compare < 0) {                                          \
-                if (parent->right_ == _SGC_MAP_LEAF) {                         \
-                    new_node =                                                 \
-                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
-                    parent->right_ = new_node;                                 \
-                    m->size_++;                                                \
-                    break;                                                     \
-                }                                                              \
-                parent = parent->right_;                                       \
-            } else if (!V##_eq(&parent->data_.value, v)) {                     \
-                _SGC_REPLACE(V, parent->data_.value, *v, m->sharing_);         \
-                return;                                                        \
-            } else {                                                           \
-                return;                                                        \
-            }                                                                  \
-        }                                                                      \
-        new_node->parent_ = parent;                                            \
-        _p_##N##_check_color(m, new_node);                                     \
-    }                                                                          \
-                                                                               \
-    void N##_set(N* m, K k, V v) {                                             \
-        if (m->root_ == _SGC_MAP_LEAF) {                                       \
-            struct _p_##N##_node* new_node =                                   \
-                _p_##N##_node_new(&k, &v, m->sharing_key_, m->sharing_);       \
-            new_node->color_ = _SGC_MAP_COLOR_BLACK;                           \
-            new_node->parent_ = _SGC_MAP_LEAF;                                 \
-            m->root_ = new_node;                                               \
-            m->size_ = 1;                                                      \
-        } else {                                                               \
-            _p_##N##_node_insert(m, &k, &v);                                   \
-            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                           \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    static V* _p_##N##_node_insert_or_get(N* m, K* k) {                        \
-        V new_el;                                                              \
-        V* v = &new_el;                                                        \
-        struct _p_##N##_node* parent = m->root_;                               \
-        struct _p_##N##_node* new_node = NULL;                                 \
-        while (true) {                                                         \
-            int compare = (K##_compare(&parent->data_.key, k));                \
-                                                                               \
-            if (compare > 0) {                                                 \
-                if (parent->left_ == _SGC_MAP_LEAF) {                          \
-                    V##_init(v);                                               \
-                    new_node =                                                 \
-                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
-                    v = &new_node->data_.value;                                \
-                    parent->left_ = new_node;                                  \
-                    m->size_++;                                                \
-                    new_node->parent_ = parent;                                \
-                    _p_##N##_check_color(m, new_node);                         \
-                    break;                                                     \
-                }                                                              \
-                parent = parent->left_;                                        \
-            } else if (compare < 0) {                                          \
-                if (parent->right_ == _SGC_MAP_LEAF) {                         \
-                    V##_init(v);                                               \
-                    new_node =                                                 \
-                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
-                    v = &new_node->data_.value;                                \
-                    parent->right_ = new_node;                                 \
-                    m->size_++;                                                \
-                    new_node->parent_ = parent;                                \
-                    _p_##N##_check_color(m, new_node);                         \
-                    break;                                                     \
-                }                                                              \
-                parent = parent->right_;                                       \
-            } else {                                                           \
-                v = &parent->data_.value;                                      \
-                break;                                                         \
-            }                                                                  \
-        }                                                                      \
-        return v;                                                              \
-    }                                                                          \
-                                                                               \
-    V* N##_at(N* m, K k) {                                                     \
-        V* ret = NULL;                                                         \
-        if (m->root_ == _SGC_MAP_LEAF) {                                       \
-            V v;                                                               \
-            V##_init(&v);                                                      \
-            struct _p_##N##_node* new_node =                                   \
-                _p_##N##_node_new(&k, &v, m->sharing_key_, m->sharing_);       \
-            new_node->color_ = _SGC_MAP_COLOR_BLACK;                           \
-            new_node->parent_ = _SGC_MAP_LEAF;                                 \
-            m->root_ = new_node;                                               \
-            m->size_ = 1;                                                      \
-            ret = &m->root_->data_.value;                                      \
-        } else {                                                               \
-            ret = _p_##N##_node_insert_or_get(m, &k);                          \
-            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                           \
-        }                                                                      \
-        return ret;                                                            \
-    }                                                                          \
-                                                                               \
-    static struct _p_##N##_node*                                               \
-        _p_##N##_node_erase(N* m, struct _p_##N##_node* n) {                   \
-        struct _p_##N##_node* succ;                                            \
-        struct _p_##N##_node* succ_p;                                          \
-        struct _p_##N##_node* succ_c = _SGC_MAP_LEAF;                          \
-        if (!n->left_ || !n->right_) {                                         \
-            succ = n;                                                          \
-        } else {                                                               \
-            succ = n->right_;                                                  \
-            if (succ) {                                                        \
-                while (succ->left_) {                                          \
-                    succ = succ->left_;                                        \
-                }                                                              \
-            } else {                                                           \
-                succ = n->left_;                                               \
-            }                                                                  \
-        }                                                                      \
-                                                                               \
-        if (succ != n) {                                                       \
-            /* TODO relinking nodes would be better */                         \
-            _SGC_REPLACE(K, n->data_.key, succ->data_.key, m->sharing_key_)    \
-            _SGC_REPLACE(V, n->data_.value, succ->data_.value, m->sharing_)    \
-            _p_##N##_node_free(m, succ);                                       \
-        } else {                                                               \
-            _p_##N##_node_free(m, succ);                                       \
-        }                                                                      \
-                                                                               \
-        succ_p = succ->parent_;                                                \
-        if (succ->left_) {                                                     \
-            succ_c = succ->left_;                                              \
-            succ_c->parent_ = succ_p;                                          \
-        } else if (succ->right_) {                                             \
-            succ_c = succ->right_;                                             \
-            succ_c->parent_ = succ_p;                                          \
-        }                                                                      \
-        if (succ_p) {                                                          \
-            if (succ_p->left_ == succ) {                                       \
-                succ_p->left_ = succ_c;                                        \
-            } else {                                                           \
-                succ_p->right_ = succ_c;                                       \
-            }                                                                  \
-        } else {                                                               \
-            m->root_ = (m->root_->left_) ? m->root_->left_ : m->root_->right_; \
-        }                                                                      \
-                                                                               \
-        if ((succ_c && succ_c->color_ == _SGC_MAP_COLOR_RED) ||                \
-            succ->color_ == _SGC_MAP_COLOR_RED) {                              \
-            if (succ_c) {                                                      \
-                succ_c->color_ = _SGC_MAP_COLOR_BLACK;                         \
-            }                                                                  \
-        } else {                                                               \
-            _p_##N##_erase_rebalanse(m, succ_c, succ_p);                       \
-        }                                                                      \
-        if (m->root_) {                                                        \
-            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                           \
-        }                                                                      \
-        --m->size_;                                                            \
-        return succ;                                                           \
-    }                                                                          \
-                                                                               \
-    void N##_init(N* s) {                                                      \
-        s->size_ = 0;                                                          \
-        s->root_ = _SGC_MAP_LEAF;                                              \
-        s->sharing_ = 0;                                                       \
-        s->sharing_key_ = 0;                                                   \
-    }                                                                          \
-                                                                               \
-    static void _p_##N##_copy_base_data(N* __restrict__ dst,                   \
-                                        const N* __restrict__ const src) {     \
-        dst->size_ = src->size_;                                               \
-        dst->root_ = _SGC_MAP_LEAF;                                            \
-        dst->sharing_key_ = src->sharing_key_;                                 \
-        dst->sharing_ = src->sharing_;                                         \
+#define _SGC_INIT_UNIQUE_MAP(K, V, N)                                            \
+    static struct _p_##N##_node* _p_##N##_node_new(const K* const k,             \
+                                                   const V* const v,             \
+                                                   bool sharing_key,             \
+                                                   bool sharing_value) {         \
+        struct _p_##N##_node* n = sgc_malloc(sizeof(struct _p_##N##_node));      \
+                                                                                 \
+        _SGC_COPY(K, n->data_.key, *k, sharing_key);                             \
+        _SGC_COPY(V, n->data_.value, *v, sharing_value);                         \
+                                                                                 \
+        n->left_ = n->right_ = _SGC_MAP_LEAF;                                    \
+        n->color_ = _SGC_MAP_COLOR_RED;                                          \
+        return n;                                                                \
+    }                                                                            \
+                                                                                 \
+    static void _p_##N##_node_insert(N* m, K* k, V* v) {                         \
+        struct _p_##N##_node* parent = m->root_;                                 \
+        struct _p_##N##_node* new_node = NULL;                                   \
+        while (true) {                                                           \
+            int compare = (K##_compare(&parent->data_.key, k));                  \
+                                                                                 \
+            if (compare > 0) {                                                   \
+                if (parent->left_ == _SGC_MAP_LEAF) {                            \
+                    new_node =                                                   \
+                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_);   \
+                    parent->left_ = new_node;                                    \
+                    m->size_++;                                                  \
+                    break;                                                       \
+                }                                                                \
+                parent = parent->left_;                                          \
+            } else if (compare < 0) {                                            \
+                if (parent->right_ == _SGC_MAP_LEAF) {                           \
+                    new_node =                                                   \
+                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_);   \
+                    parent->right_ = new_node;                                   \
+                    m->size_++;                                                  \
+                    break;                                                       \
+                }                                                                \
+                parent = parent->right_;                                         \
+            } else if (!V##_eq(&parent->data_.value, v)) {                       \
+                _SGC_REPLACE(V, parent->data_.value, *v, m->sharing_);           \
+                return;                                                          \
+            } else {                                                             \
+                return;                                                          \
+            }                                                                    \
+        }                                                                        \
+        new_node->parent_ = parent;                                              \
+        _p_##N##_check_color(m, new_node);                                       \
+    }                                                                            \
+                                                                                 \
+    void N##_set(N* m, K k, V v) {                                               \
+        if (m->root_ == _SGC_MAP_LEAF) {                                         \
+            struct _p_##N##_node* new_node =                                     \
+                _p_##N##_node_new(&k, &v, m->sharing_key_, m->sharing_);         \
+            new_node->color_ = _SGC_MAP_COLOR_BLACK;                             \
+            new_node->parent_ = _SGC_MAP_LEAF;                                   \
+            m->root_ = new_node;                                                 \
+            m->size_ = 1;                                                        \
+        } else {                                                                 \
+            _p_##N##_node_insert(m, &k, &v);                                     \
+            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                             \
+        }                                                                        \
+    }                                                                            \
+                                                                                 \
+    static V* _p_##N##_node_insert_or_get(N* m, K* k) {                          \
+        V new_el;                                                                \
+        V* v = &new_el;                                                          \
+        struct _p_##N##_node* parent = m->root_;                                 \
+        struct _p_##N##_node* new_node = NULL;                                   \
+        while (true) {                                                           \
+            int compare = (K##_compare(&parent->data_.key, k));                  \
+                                                                                 \
+            if (compare > 0) {                                                   \
+                if (parent->left_ == _SGC_MAP_LEAF) {                            \
+                    V##_init(v);                                                 \
+                    new_node =                                                   \
+                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_);   \
+                    v = &new_node->data_.value;                                  \
+                    parent->left_ = new_node;                                    \
+                    m->size_++;                                                  \
+                    new_node->parent_ = parent;                                  \
+                    _p_##N##_check_color(m, new_node);                           \
+                    break;                                                       \
+                }                                                                \
+                parent = parent->left_;                                          \
+            } else if (compare < 0) {                                            \
+                if (parent->right_ == _SGC_MAP_LEAF) {                           \
+                    V##_init(v);                                                 \
+                    new_node =                                                   \
+                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_);   \
+                    v = &new_node->data_.value;                                  \
+                    parent->right_ = new_node;                                   \
+                    m->size_++;                                                  \
+                    new_node->parent_ = parent;                                  \
+                    _p_##N##_check_color(m, new_node);                           \
+                    break;                                                       \
+                }                                                                \
+                parent = parent->right_;                                         \
+            } else {                                                             \
+                v = &parent->data_.value;                                        \
+                break;                                                           \
+            }                                                                    \
+        }                                                                        \
+        return v;                                                                \
+    }                                                                            \
+                                                                                 \
+    V* N##_at(N* m, K k) {                                                       \
+        V* ret = NULL;                                                           \
+        if (m->root_ == _SGC_MAP_LEAF) {                                         \
+            V v;                                                                 \
+            V##_init(&v);                                                        \
+            struct _p_##N##_node* new_node =                                     \
+                _p_##N##_node_new(&k, &v, m->sharing_key_, m->sharing_);         \
+            new_node->color_ = _SGC_MAP_COLOR_BLACK;                             \
+            new_node->parent_ = _SGC_MAP_LEAF;                                   \
+            m->root_ = new_node;                                                 \
+            m->size_ = 1;                                                        \
+            ret = &m->root_->data_.value;                                        \
+        } else {                                                                 \
+            ret = _p_##N##_node_insert_or_get(m, &k);                            \
+            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                             \
+        }                                                                        \
+        return ret;                                                              \
+    }                                                                            \
+                                                                                 \
+    static struct _p_##N##_node*                                                 \
+        _p_##N##_node_erase(N* m, struct _p_##N##_node* n) {                     \
+        struct _p_##N##_node* succ;                                              \
+        struct _p_##N##_node* succ_p;                                            \
+        struct _p_##N##_node* succ_c = _SGC_MAP_LEAF;                            \
+        if (!n->left_ || !n->right_) {                                           \
+            succ = n;                                                            \
+        } else {                                                                 \
+            succ = n->right_;                                                    \
+            while (succ->left_) {                                                \
+                succ = succ->left_;                                              \
+            }                                                                    \
+        }                                                                        \
+                                                                                 \
+        if (succ != n) {                                                         \
+            /* TODO relinking nodes would be better */                           \
+            /*                                                                   \
+            succ->left_ = n->left_;                                              \
+            succ->right_ = n->right_;                                            \
+            succ->color_ = n->color_;                                            \
+            if (n->left_) {                                                      \
+                n->left_->parent_ = succ;                                        \
+            }                                                                    \
+            if (n->right_) {                                                     \
+                n->right_->parent_ = succ;                                       \
+            }                                                                    \
+                                                                               \ \
+            struct _p_##N##_node* parent = n->parent_;                           \
+            succ->parent_ = parent;                                              \
+            if (parent && parent->left_ == n) {                                  \
+                parent->left_ = succ;                                            \
+            } else if (parent && parent->right_ == n) {                          \
+                parent->right_ = succ;                                           \
+            }                                                                    \
+            */                                                                   \
+            _SGC_REPLACE(K, n->data_.key, succ->data_.key, m->sharing_key_);     \
+            _SGC_REPLACE(V, n->data_.value, succ->data_.value, m->sharing_);     \
+        }                                                                        \
+        _p_##N##_node_free(m, succ);                                             \
+                                                                                 \
+        succ_p = succ->parent_;                                                  \
+        if (succ->left_) {                                                       \
+            succ_c = succ->left_;                                                \
+            succ_c->parent_ = succ_p;                                            \
+        } else if (succ->right_) {                                               \
+            succ_c = succ->right_;                                               \
+            succ_c->parent_ = succ_p;                                            \
+        }                                                                        \
+        if (succ_p) {                                                            \
+            if (succ_p->left_ == succ) {                                         \
+                succ_p->left_ = succ_c;                                          \
+            } else {                                                             \
+                succ_p->right_ = succ_c;                                         \
+            }                                                                    \
+        } else {                                                                 \
+            m->root_ = (m->root_->left_) ? m->root_->left_ : m->root_->right_;   \
+        }                                                                        \
+                                                                                 \
+        if ((succ_c && succ_c->color_ == _SGC_MAP_COLOR_RED) ||                  \
+            succ->color_ == _SGC_MAP_COLOR_RED) {                                \
+            if (succ_c) {                                                        \
+                succ_c->color_ = _SGC_MAP_COLOR_BLACK;                           \
+            }                                                                    \
+        } else {                                                                 \
+            _p_##N##_erase_rebalanse(m, succ_c, succ_p);                         \
+        }                                                                        \
+        if (m->root_) {                                                          \
+            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                             \
+        }                                                                        \
+        --m->size_;                                                              \
+        return succ;                                                             \
+    }                                                                            \
+                                                                                 \
+    void N##_init(N* s) {                                                        \
+        s->size_ = 0;                                                            \
+        s->root_ = _SGC_MAP_LEAF;                                                \
+        s->sharing_ = 0;                                                         \
+        s->sharing_key_ = 0;                                                     \
+    }                                                                            \
+                                                                                 \
+    static void _p_##N##_copy_base_data(N* __restrict__ dst,                     \
+                                        const N* __restrict__ const src) {       \
+        dst->size_ = src->size_;                                                 \
+        dst->root_ = _SGC_MAP_LEAF;                                              \
+        dst->sharing_key_ = src->sharing_key_;                                   \
+        dst->sharing_ = src->sharing_;                                           \
     }
 
 #define SGC_INIT_MAP(K, V, N)                                                  \
