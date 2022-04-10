@@ -19,7 +19,7 @@
         for (size_t i = 0; i < l->size_; ++i) {                                \
             tmp = curr;                                                        \
             curr = curr->next_;                                                \
-            SGC_FREE(T##_free, tmp->data_, l->sharing_)                        \
+            SGC_FREE(T, tmp->data_, l->sharing_)                        \
             sgc_free(tmp);                                                     \
         }                                                                      \
         l->head_ = l->tail_ = NULL;                                            \
@@ -35,8 +35,7 @@
                                                                                \
     void N##_set_back(N* l, T new_el) {                                        \
         if (l->size_) {                                                        \
-            SGC_REPLACE(T##_copy, T##_free, l->tail_->data_, new_el,           \
-                        l->sharing_);                                          \
+            SGC_REPLACE(T, l->tail_->data_, new_el, l->sharing_);              \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -49,8 +48,7 @@
                                                                                \
     void N##_set_front(N* l, T new_el) {                                       \
         if (l->size_) {                                                        \
-            SGC_REPLACE(T##_copy, T##_free, l->head_->data_, new_el,           \
-                        l->sharing_);                                          \
+            SGC_REPLACE(T, l->head_->data_, new_el, l->sharing_);              \
         }                                                                      \
     }                                                                          \
                                                                                \

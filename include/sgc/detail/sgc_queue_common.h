@@ -14,7 +14,7 @@
         if (!N##_empty(q)) {                                                   \
             _p_##N##_go_next(&q->back_, _p_##N##_max(q));                      \
         }                                                                      \
-        SGC_COPY(T##_copy, q->data_[q->back_], el, q->sharing_);               \
+        SGC_COPY(T, q->data_[q->back_], el, q->sharing_);                      \
         ++q->size_;                                                            \
     }                                                                          \
                                                                                \
@@ -27,8 +27,7 @@
                                                                                \
     void N##_set_front(N* q, T new_el) {                                       \
         if (q->size_) {                                                        \
-            SGC_REPLACE(T##_copy, T##_free, q->data_[q->front_], new_el,       \
-                        q->sharing_);                                          \
+            SGC_REPLACE(T, q->data_[q->front_], new_el, q->sharing_);          \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -41,14 +40,13 @@
                                                                                \
     void N##_set_back(N* q, T new_el) {                                        \
         if (q->size_ > 0) {                                                    \
-            SGC_REPLACE(T##_copy, T##_free, q->data_[q->back_], new_el,        \
-                        q->sharing_);                                          \
+            SGC_REPLACE(T, q->data_[q->back_], new_el, q->sharing_);           \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_pop(N* q) {                                                       \
         if (q->size_) {                                                        \
-            SGC_FREE(T##_free, q->data_[q->front_], q->sharing_);              \
+            SGC_FREE(T, q->data_[q->front_], q->sharing_);                     \
             --q->size_;                                                        \
             if (q->size_ > 0) {                                                \
                 _p_##N##_go_next(&q->front_, _p_##N##_max(q));                 \

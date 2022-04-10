@@ -84,7 +84,7 @@
                     ++position;                                                \
                 }                                                              \
             }                                                                  \
-            SGC_COPY(V##_copy, u->data_[position].value_, v, u->sharing_);     \
+            SGC_COPY(V, u->data_[position].value_, v, u->sharing_);     \
             u->data_[position].state_ = SGC_NODE_STATE_USED;                   \
             ++u->size_;                                                        \
         }                                                                      \

@@ -7,14 +7,14 @@
         _p_##N##_node_copy_values(const N* const ds,                           \
                                   struct _p_##N##_node* dst,                   \
                                   const struct _p_##N##_node* const src) {     \
-        SGC_COPY(K##_copy, dst->data_.key, src->data_.key, ds->sharing_key_);  \
-        SGC_COPY(V##_copy, dst->data_.value, src->data_.value, ds->sharing_);  \
+        SGC_COPY(K, dst->data_.key, src->data_.key, ds->sharing_key_);         \
+        SGC_COPY(V, dst->data_.value, src->data_.value, ds->sharing_);         \
     }                                                                          \
                                                                                \
     static void _p_##N##_node_free(const N* const ds,                          \
                                    struct _p_##N##_node* n) {                  \
-        SGC_FREE(V##_free, n->data_.value, ds->sharing_);                      \
-        SGC_FREE(K##_free, n->data_.key, ds->sharing_key_);                    \
+        SGC_FREE(V, n->data_.value, ds->sharing_);                             \
+        SGC_FREE(K, n->data_.key, ds->sharing_key_);                           \
     }                                                                          \
                                                                                \
     N##_pair* N##_it_data(N##_it i) {                                          \
@@ -60,24 +60,24 @@
         _p_##N##_node_copy_values(const N* const ds,                           \
                                   struct _p_##N##_node* dst,                   \
                                   const struct _p_##N##_node* const src) {     \
-        SGC_COPY(KV##_copy, dst->value_, src->value_, ds->sharing_);           \
+        SGC_COPY(KV, dst->value_, src->value_, ds->sharing_);                  \
     }                                                                          \
                                                                                \
     static void _p_##N##_node_free(const N* const ds,                          \
                                    struct _p_##N##_node* n) {                  \
-        SGC_FREE(KV##_free, n->value_, ds->sharing_);                          \
+        SGC_FREE(KV, n->value_, ds->sharing_);                                 \
     }                                                                          \
                                                                                \
     KV* N##_it_data(N##_it i) {                                                \
         return &i.curr_->value_;                                               \
     }
 
-#define _SGC_INIT_COMMON_DICT_NONE_PAIR_FS_HASH(KV, N)                            \
+#define _SGC_INIT_COMMON_DICT_NONE_PAIR_FS_HASH(KV, N)                         \
     _SGC_INIT_COMMON_DICT_NONE_PAIR(KV, N)                                     \
     static bool _p_##N##_node_eq_key(const struct _p_##N##_node* const n,      \
                                      const KV* const key) {                    \
         return KV##_eq(&n->value_, key);                                       \
-    }                                                                          \
+    }
 
 #define _SGC_INIT_COMMON_DICT_NONE_PAIR_HASH(KV, N)                            \
     _SGC_INIT_COMMON_DICT_NONE_PAIR(KV, N)                                     \

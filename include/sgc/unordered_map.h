@@ -104,8 +104,8 @@
                                             bool sharing_key, bool shared) {   \
         struct _p_##N##_node* new_node =                                       \
             (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
-        SGC_COPY(K##_copy, new_node->data_.key, *key, sharing_key);            \
-        SGC_COPY(V##_copy, new_node->data_.value, *value, shared);             \
+        SGC_COPY(K, new_node->data_.key, *key, sharing_key);                   \
+        SGC_COPY(V, new_node->data_.value, *value, shared);                    \
         new_node->next_ = NULL;                                                \
         return new_node;                                                       \
     }                                                                          \
@@ -152,8 +152,7 @@
         size_t hash = K##_hash(&k);                                            \
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
         if (i.valid_) {                                                        \
-            SGC_REPLACE(V##_copy, V##_free, i.curr_->data_.value, v,           \
-                        u->sharing_);                                          \
+            SGC_REPLACE(V, i.curr_->data_.value, v, u->sharing_);              \
         } else {                                                               \
             _p_##N##_resize(u);                                                \
             struct _p_##N##_node* new_node =                                   \
@@ -212,6 +211,6 @@
     SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                    \
     _SGC_INIT_PP_UNORDERED_MAP(K, V, N)                                        \
     _SGC_INIT_UNIQUE_UNORDERED_MAP(K, V, N)                                    \
-    _SGC_INIT_COMMON_DICT_PAIR_HASH(K, V, N)                                \
+    _SGC_INIT_COMMON_DICT_PAIR_HASH(K, V, N)                                   \
     _SGC_INIT_COMMON_HASH_MAP(K, N)                                            \
     _SGC_INIT_COMMON(N)

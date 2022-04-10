@@ -161,27 +161,24 @@
     SGC_INIT_S##C(K, V, S, N) SGC_INIT_##A1(V, N) SGC_INIT_##A2(V, N)          \
         SGC_INIT_##A3(V, N) SGC_INIT_##A4(V, N) SGC_INIT_##A5(V, N)
 
-// TODO update
-#define SGC_COPY(COPY_FUN, DST, SRC, IS_SHARED)                                \
+#define SGC_COPY(N, DST, SRC, IS_SHARED)                                       \
     if (!IS_SHARED) {                                                          \
-        COPY_FUN(&DST, &SRC);                                                  \
+        N##_copy(&DST, &SRC);                                                  \
     } else {                                                                   \
         DST = SRC;                                                             \
     }
 
-// TODO update
-#define SGC_REPLACE(COPY_FUN, FREE_FUN, DST, SRC, IS_SHARED)                   \
+#define SGC_REPLACE(N, DST, SRC, IS_SHARED)                                    \
     if (!IS_SHARED) {                                                          \
-        FREE_FUN(&DST);                                                        \
-        COPY_FUN(&DST, &SRC);                                                  \
+        N##_free(&DST);                                                        \
+        N##_copy(&DST, &SRC);                                                  \
     } else {                                                                   \
         DST = SRC;                                                             \
     }
 
-// TODO update
-#define SGC_FREE(FREE_FUN, SRC, SHARED)                                        \
+#define SGC_FREE(N, SRC, SHARED)                                               \
     if (!SHARED) {                                                             \
-        FREE_FUN(&SRC);                                                        \
+        N##_free(&SRC);                                                        \
     }
 
 #define SGC_ARRAY_COPY(T, DST, SRC, SIZE, SHARED)                              \

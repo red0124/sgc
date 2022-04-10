@@ -59,8 +59,7 @@
             dst->sharing_ = src->sharing_;                                     \
             dst->head_ = _p_##N##_node_alloc(dst);                             \
             dst->size_ = src->size_;                                           \
-            SGC_COPY(T##_copy, dst->head_->data_, src->head_->data_,           \
-                     src->sharing_);                                           \
+            SGC_COPY(T, dst->head_->data_, src->head_->data_, src->sharing_);  \
             struct _p_##N##_node* curr_src = src->head_;                       \
             struct _p_##N##_node* curr_dst = dst->head_;                       \
             struct _p_##N##_node* tmp_src = NULL;                              \
@@ -71,8 +70,7 @@
                     break;                                                     \
                 }                                                              \
                 tmp_dst = _p_##N##_node_alloc(dst);                            \
-                SGC_COPY(T##_copy, tmp_dst->data_, tmp_src->data_,             \
-                         src->sharing_)                                        \
+                SGC_COPY(T, tmp_dst->data_, tmp_src->data_, src->sharing_)     \
                 tmp_dst->prev_ = curr_dst;                                     \
                 curr_dst->next_ = tmp_dst;                                     \
                 curr_dst = tmp_dst;                                            \
@@ -87,7 +85,7 @@
                                                                                \
     void N##_push_back(N* l, T el) {                                           \
         struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
-        SGC_COPY(T##_copy, new_el->data_, el, l->sharing_)                     \
+        SGC_COPY(T, new_el->data_, el, l->sharing_)                            \
         new_el->next_ = NULL;                                                  \
         switch (l->size_) {                                                    \
         case 0:                                                                \
@@ -112,7 +110,7 @@
         if (l->size_) {                                                        \
             struct _p_##N##_node* tmp = l->tail_;                              \
             l->tail_ = l->tail_->prev_;                                        \
-            SGC_FREE(T##_free, tmp->data_, l->sharing_)                        \
+            SGC_FREE(T, tmp->data_, l->sharing_)                        \
             sgc_free(tmp);                                                     \
             if (l->tail_) {                                                    \
                 l->tail_->next_ = NULL;                                        \
@@ -126,7 +124,7 @@
                                                                                \
     void N##_push_front(N* l, const T el) {                                    \
         struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
-        SGC_COPY(T##_copy, new_el->data_, el, l->sharing_)                     \
+        SGC_COPY(T, new_el->data_, el, l->sharing_)                            \
         new_el->prev_ = NULL;                                                  \
         switch (l->size_) {                                                    \
         case 0:                                                                \
@@ -151,7 +149,7 @@
         if (l->size_) {                                                        \
             struct _p_##N##_node* tmp = l->head_;                              \
             l->head_ = l->head_->next_;                                        \
-            SGC_FREE(T##_free, tmp->data_, l->sharing_)                        \
+            SGC_FREE(T, tmp->data_, l->sharing_)                        \
             sgc_free(tmp);                                                     \
             if (l->head_) {                                                    \
                 l->head_->prev_ = NULL;                                        \
