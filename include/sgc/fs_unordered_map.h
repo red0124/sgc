@@ -1,11 +1,11 @@
 #pragma once
 
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_common.h"
 #include "detail/sgc_fs_hash_map_common.h"
 #include "detail/sgc_hash_node_state.h"
 #include "detail/sgc_iterator.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
@@ -16,7 +16,6 @@
     static void                                                                \
         _p_##N##_node_copy_values(const N* const m, struct _p_##N##_node* dst, \
                                   const struct _p_##N##_node* const src);      \
-    static size_t _p_##N##_node_hash_value(const struct _p_##N##_node* n);     \
     static bool _p_##N##_node_eq_key(const struct _p_##N##_node* const n,      \
                                      const K* const key);
 
@@ -155,6 +154,6 @@
     SGC_INIT_HEADERS_FS_UNORDERED_MAP(K, V, S, N)                              \
     _SGC_INIT_PP_FS_UNORDERED_MAP(K, V, S, N)                                  \
     _SGC_INIT_UNIQUE_FS_UNORDERED_MAP(K, V, S, N)                              \
-    _SGC_INIT_COMMON_DICT_PAIR_HASH(K, V, N)                                   \
+    _SGC_INIT_COMMON_DICT_PAIR_FS_HASH(K, V, N)                                \
     _SGC_INIT_COMMON_FS_HASH_MAP(K, S, N)                                      \
     _SGC_INIT_COMMON(N)

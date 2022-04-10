@@ -1,12 +1,12 @@
 #pragma once
 
 #include "detail/sgc_allocator.h"
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_common.h"
 #include "detail/sgc_hash_map_common.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_prime.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
@@ -153,7 +153,7 @@
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
         if (i.valid_) {                                                        \
             SGC_REPLACE(V##_copy, V##_free, i.curr_->data_.value, v,           \
-                        u->sharing_);                                           \
+                        u->sharing_);                                          \
         } else {                                                               \
             _p_##N##_resize(u);                                                \
             struct _p_##N##_node* new_node =                                   \
@@ -212,6 +212,6 @@
     SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                    \
     _SGC_INIT_PP_UNORDERED_MAP(K, V, N)                                        \
     _SGC_INIT_UNIQUE_UNORDERED_MAP(K, V, N)                                    \
-    _SGC_INIT_COMMON_DICT_PAIR_HASH(K, V, N)                                   \
+    _SGC_INIT_COMMON_DICT_PAIR_HASH(K, V, N)                                \
     _SGC_INIT_COMMON_HASH_MAP(K, N)                                            \
     _SGC_INIT_COMMON(N)
