@@ -56,7 +56,10 @@
                                         const N* __restrict__ const src);      \
     static void _p_##N##_copy_nodes(N* __restrict__ dst,                       \
                                     const N* __restrict__ const src);          \
-    static void _p_##N##_node_free(const N* const m, struct _p_##N##_node* n);
+    static void _p_##N##_node_free(const N* const m, struct _p_##N##_node* n); \
+    static void _p_##N##_node_replace_data(const N* const m,                   \
+                                           struct _p_##N##_node* dst,          \
+                                           struct _p_##N##_node* src);
 
 #define SGC_INIT_HEADERS_SET(KV, N)                                            \
     struct _p_##N##_node {                                                     \
@@ -154,55 +157,10 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_node_erase(N* m, struct _p_##N##_node* n) {           \
-        struct _p_##N##_node* succ;                                            \
-        struct _p_##N##_node* succ_p;                                          \
-        struct _p_##N##_node* succ_c = _SGC_MAP_LEAF;                          \
-        if (!n->left_ || !n->right_) {                                         \
-            succ = n;                                                          \
-        } else {                                                               \
-            succ = n->right_;                                                  \
-            while (succ->left_) {                                              \
-                succ = succ->left_;                                            \
-            }                                                                  \
-        }                                                                      \
-                                                                               \
-        if (succ != n) {                                                       \
-            _SGC_REPLACE(KV, n->value_, succ->value_, m->sharing_);            \
-        }                                                                      \
-        _p_##N##_node_free(m, succ);                                           \
-                                                                               \
-        succ_p = succ->parent_;                                                \
-        if (succ->left_) {                                                     \
-            succ_c = succ->left_;                                              \
-            succ_c->parent_ = succ_p;                                          \
-        } else if (succ->right_) {                                             \
-            succ_c = succ->right_;                                             \
-            succ_c->parent_ = succ_p;                                          \
-        }                                                                      \
-        if (succ_p) {                                                          \
-            if (succ_p->left_ == succ) {                                       \
-                succ_p->left_ = succ_c;                                        \
-            } else {                                                           \
-                succ_p->right_ = succ_c;                                       \
-            }                                                                  \
-        } else {                                                               \
-            m->root_ = (m->root_->left_) ? m->root_->left_ : m->root_->right_; \
-        }                                                                      \
-                                                                               \
-        if ((succ_c && succ_c->color_ == _SGC_MAP_COLOR_RED) ||                \
-            succ->color_ == _SGC_MAP_COLOR_RED) {                              \
-            if (succ_c) {                                                      \
-                succ_c->color_ = _SGC_MAP_COLOR_BLACK;                         \
-            }                                                                  \
-        } else {                                                               \
-            _p_##N##_erase_rebalanse(m, succ_c, succ_p);                       \
-        }                                                                      \
-        if (m->root_) {                                                        \
-            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                           \
-        }                                                                      \
-        --m->size_;                                                            \
-        free(succ);                                                            \
+    static void _p_##N##_node_replace_data(const N* const m,                   \
+                                           struct _p_##N##_node* dst,          \
+                                           struct _p_##N##_node* src) {        \
+        _SGC_REPLACE(KV, dst->value_, src->value_, m->sharing_);     \
     }                                                                          \
                                                                                \
     void N##_init(N* s) {                                                      \
