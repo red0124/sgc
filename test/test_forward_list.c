@@ -83,7 +83,7 @@ void list_pop_back(list* l) {
 
 void list_it_go_prev(list_it* it) {
     struct _p_list_node* curr = it->head_;
-    if(curr == it->curr_) {
+    if (curr == it->curr_) {
         it->curr_ = NULL;
         return;
     }

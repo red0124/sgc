@@ -10,7 +10,7 @@
 #define _SGC_INIT_PP_PRIORITY_QUEUE(T, N)                                      \
     static void _p_##N##_resize(N* p);                                         \
     static void _p_##N##_swap(T* i, T* j);                                     \
-    static void _p_##N##_fix_insert(N* p);                                  \
+    static void _p_##N##_fix_insert(N* p);                                     \
     static void _p_##N##_fix_erase(N* p);
 
 #define SGC_INIT_HEADERS_PRIORITY_QUEUE(T, N)                                  \

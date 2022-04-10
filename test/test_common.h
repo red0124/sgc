@@ -17,6 +17,15 @@ inline void setUp(void) {
 inline void tearDown(void) {
 }
 
+size_t power(size_t base, size_t exp) {
+    size_t x = 1;
+    for (size_t i = 0; i < exp; ++i) {
+        x *= base;
+    }
+
+    return x;
+}
+
 struct alocated_element {
     int* el;
 };
@@ -25,7 +34,7 @@ typedef struct alocated_element al;
 
 size_t allocation_count = 0;
 
-inline void al_copy(al* dst, const al* const src) {
+static inline void al_copy(al* dst, const al* const src) {
     if (src->el) {
         dst->el = (int*)malloc(sizeof(int));
         *dst->el = *src->el;
@@ -35,7 +44,7 @@ inline void al_copy(al* dst, const al* const src) {
     ++allocation_count;
 }
 
-inline al al_new(int el) {
+static inline al al_new(int el) {
     al e;
     e.el = malloc(sizeof(int));
     *e.el = el;
@@ -43,24 +52,24 @@ inline al al_new(int el) {
     return e;
 }
 
-inline void al_free(al* a) {
+static inline void al_free(al* a) {
     --allocation_count;
     free(a->el);
 }
 
-inline int al_eq(const al* const first, const al* const second) {
+static inline int al_eq(const al* const first, const al* const second) {
     return *first->el == *second->el;
 }
 
-inline int al_compare(const al* const first, const al* const second) {
+static inline int al_compare(const al* const first, const al* const second) {
     return *first->el - *second->el;
 }
 
-inline void al_init(al* a) {
+static inline void al_init(al* a) {
     a->el = NULL;
 }
 
-inline size_t al_hash(const al* const a) {
+static inline size_t al_hash(const al* const a) {
     return *a->el;
 }
 
@@ -155,7 +164,7 @@ void ta_sort(ta* ta) {
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 21;                                                         \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -393,7 +402,7 @@ void tm_print(tm* tm) {
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 12;                                                         \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -563,7 +572,7 @@ void ts_print(ts* ts) {
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 10;                                                         \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -649,7 +658,7 @@ void ts_print(ts* ts) {
     {                                                                          \
         size_t n = 12;                                                         \
         size_t m = 3;                                                          \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -697,7 +706,7 @@ void ts_print(ts* ts) {
     {                                                                          \
         size_t n = 10;                                                         \
         size_t m = 4;                                                          \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -754,7 +763,7 @@ void ts_print(ts* ts) {
     {                                                                          \
         size_t n = 7;                                                          \
         size_t m = 7;                                                          \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
