@@ -1,23 +1,14 @@
 #pragma once
 
 #include "detail/sgc_allocator.h"
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_list_common.h"
-#include "detail/sgc_sort_stack.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_LIST(T, N)                                                \
-    static void _p_##N##_memswp(char* i, char* j);                             \
-    static bool _p_##N##_node_compare(const void* const first,                 \
-                                      const void* const second,                \
-                                      int comp(const void*, const void*));     \
-    static void _p_##N##_qsort(void* array, size_t array_size,                 \
-                               int (*comp)(const void*, const void*));         \
-    static void _p_##N##_ptr_array_to_list(struct _p_##N##_node** nodes_ptr,   \
-                                           N* l);                              \
     static struct _p_##N##_node* _p_##N##_node_alloc();
 
 #define SGC_INIT_HEADERS_LIST(T, N)                                            \
@@ -53,7 +44,6 @@
     void N##_set_front(N* l, T new_el);                                        \
     void N##_pop_front(N* l);                                                  \
     bool N##_empty(const N* l);                                                \
-    void N##_sort(N* l, int (*comp)(const void*, const void*));                \
                                                                                \
     struct N##_it {                                                            \
         struct _p_##N##_node* curr_;                                           \
@@ -196,9 +186,9 @@
     }                                                                          \
                                                                                \
     /* TODO create erase by it */                                              \
-    __attribute__(                                                             \
-        (unused)) static void _p_##N##_node_erase(N* l,                        \
-                                                  struct _p_##N##_node* n) {   \
+    __attribute__((                                                            \
+        unused)) static void _p_##N##_node_erase(N* l,                         \
+                                                 struct _p_##N##_node* n) {    \
         if (n->next_) {                                                        \
             n->next_->prev_ = n->prev_;                                        \
         }                                                                      \
