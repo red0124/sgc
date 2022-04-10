@@ -168,6 +168,6 @@
     SGC_INIT_HEADERS_UNORDERED_SET(KV, N)                                      \
     _SGC_INIT_PP_UNORDERED_SET(KV, N)                                          \
     _SGC_INIT_UNIQUE_UNORDERED_SET(KV, N)                                      \
-    _SGC_INIT_COMMON_DICT_NONE_PAIR(KV, N)                                     \
+    _SGC_INIT_COMMON_DICT_NONE_PAIR_HASH(KV, N)                                \
     _SGC_INIT_COMMON_HASH_MAP(KV, N)                                           \
     _SGC_INIT_COMMON(N)

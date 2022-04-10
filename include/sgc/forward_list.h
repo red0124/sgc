@@ -11,6 +11,7 @@
 #define _SGC_INIT_PP_FORWARD_LIST(T, N)                                        \
     static struct _p_##N##_node* _p_##N##_node_alloc();
 
+// TODO add iterator insert/erase, add sort
 #define SGC_INIT_HEADERS_FORWARD_LIST(T, N)                                    \
     struct _p_##N##_node {                                                     \
         T data_;                                                               \
@@ -131,48 +132,6 @@
             if (l->size_ == 0) {                                               \
                 l->tail_ = NULL;                                               \
             }                                                                  \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    /* TODO use when creating it erase */                                      \
-    __attribute__((                                                            \
-        unused)) static void _p_##N##_node_erase(N* l,                         \
-                                                 struct _p_##N##_node* n,      \
-                                                 struct _p_##N##_node* prev) { \
-        if (prev) {                                                            \
-            prev->next_ = n->next_;                                            \
-        }                                                                      \
-        SGC_FREE(T##_free, n->data_, l->sharing_)                              \
-        sgc_free(n);                                                           \
-        n = NULL;                                                              \
-    }                                                                          \
-                                                                               \
-    /* TODO use when creating it insert */                                     \
-    __attribute__((unused)) static void                                        \
-        N##_insert_node(struct _p_##N##_node* __restrict__ curr,               \
-                        struct _p_##N##_node* __restrict__ const node_new) {   \
-        struct _p_##N##_node* tmp = curr->next_;                               \
-        node_new->next_ = tmp;                                                 \
-        curr->next_ = node_new;                                                \
-    }                                                                          \
-                                                                               \
-    static void _p_##N##_ptr_array_to_list(struct _p_##N##_node** nodes_ptr,   \
-                                           N* l) {                             \
-        if (!l->size_) {                                                       \
-            return;                                                            \
-        }                                                                      \
-                                                                               \
-        l->head_ = nodes_ptr[0];                                               \
-                                                                               \
-        l->tail_ = nodes_ptr[l->size_ - 1];                                    \
-        l->tail_->next_ = NULL;                                                \
-                                                                               \
-        if (l->size_ > 1) {                                                    \
-            l->head_->next_ = nodes_ptr[1];                                    \
-        }                                                                      \
-                                                                               \
-        for (size_t i = 1; i < l->size_ - 1; i++) {                            \
-            nodes_ptr[i]->next_ = nodes_ptr[i + 1];                            \
         }                                                                      \
     }                                                                          \
                                                                                \

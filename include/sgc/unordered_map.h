@@ -212,6 +212,6 @@
     SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                    \
     _SGC_INIT_PP_UNORDERED_MAP(K, V, N)                                        \
     _SGC_INIT_UNIQUE_UNORDERED_MAP(K, V, N)                                    \
-    _SGC_INIT_COMMON_DICT_PAIR(K, V, N)                                        \
+    _SGC_INIT_COMMON_DICT_PAIR_HASH(K, V, N)                                   \
     _SGC_INIT_COMMON_HASH_MAP(K, N)                                            \
     _SGC_INIT_COMMON(N)

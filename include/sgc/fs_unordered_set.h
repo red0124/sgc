@@ -1,11 +1,11 @@
 #pragma once
 
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_common.h"
 #include "detail/sgc_fs_hash_map_common.h"
 #include "detail/sgc_hash_node_state.h"
 #include "detail/sgc_iterator.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
@@ -111,6 +111,6 @@
     SGC_INIT_HEADERS_FS_UNORDERED_SET(V, S, N)                                 \
     _SGC_INIT_PP_FS_UNORDERED_SET(V, S, N)                                     \
     _SGC_INIT_UNIQUE_FS_UNORDERED_SET(V, S, N)                                 \
-    _SGC_INIT_COMMON_DICT_NONE_PAIR(V, N)                                      \
-    _SGC_INIT_COMMON_SHASH_MAP(V, S, N)                                        \
+    _SGC_INIT_COMMON_DICT_NONE_PAIR_HASH(V, N)                                 \
+    _SGC_INIT_COMMON_FS_HASH_MAP(V, S, N)                                      \
     _SGC_INIT_COMMON(N)

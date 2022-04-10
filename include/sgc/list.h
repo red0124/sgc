@@ -11,6 +11,7 @@
 #define _SGC_INIT_PP_LIST(T, N)                                                \
     static struct _p_##N##_node* _p_##N##_node_alloc();
 
+// TODO add iterator insert/erase, add sort
 #define SGC_INIT_HEADERS_LIST(T, N)                                            \
                                                                                \
     struct _p_##N##_node {                                                     \
@@ -53,29 +54,6 @@
     _SGC_INIT_BD_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_LIST(T, N)                                            \
-    static void _p_##N##_ptr_array_to_list(struct _p_##N##_node** nodes_ptr,   \
-                                           N* l) {                             \
-        if (!l->size_) {                                                       \
-            return;                                                            \
-        }                                                                      \
-                                                                               \
-        l->head_ = nodes_ptr[0];                                               \
-        l->head_->prev_ = NULL;                                                \
-                                                                               \
-        l->tail_ = nodes_ptr[l->size_ - 1];                                    \
-        l->tail_->next_ = NULL;                                                \
-                                                                               \
-        if (l->size_ > 1) {                                                    \
-            l->head_->next_ = nodes_ptr[1];                                    \
-            l->tail_->prev_ = nodes_ptr[l->size_ - 2];                         \
-        }                                                                      \
-                                                                               \
-        for (size_t i = 1; i < l->size_ - 1; i++) {                            \
-            nodes_ptr[i]->prev_ = nodes_ptr[i - 1];                            \
-            nodes_ptr[i]->next_ = nodes_ptr[i + 1];                            \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->sharing_ = src->sharing_;                                     \
@@ -183,32 +161,6 @@
                 l->head_ = l->tail_ = NULL;                                    \
             }                                                                  \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    /* TODO create erase by it */                                              \
-    __attribute__((                                                            \
-        unused)) static void _p_##N##_node_erase(N* l,                         \
-                                                 struct _p_##N##_node* n) {    \
-        if (n->next_) {                                                        \
-            n->next_->prev_ = n->prev_;                                        \
-        }                                                                      \
-        if (n->prev_) {                                                        \
-            n->prev_->next_ = n->next_;                                        \
-        }                                                                      \
-        SGC_FREE(T##_free, n->data_, l->sharing_)                              \
-        sgc_free(n);                                                           \
-        n = NULL;                                                              \
-    }                                                                          \
-                                                                               \
-    /* TODO create insert by it */                                             \
-    __attribute__((unused)) static void                                        \
-        N##_insert_node(struct _p_##N##_node* __restrict__ curr,               \
-                        struct _p_##N##_node* __restrict__ const node_new) {   \
-        struct _p_##N##_node* tmp = curr->next_;                               \
-        node_new->prev_ = curr;                                                \
-        node_new->next_ = tmp;                                                 \
-        tmp->prev_ = node_new;                                                 \
-        curr->next_ = node_new;                                                \
     }                                                                          \
                                                                                \
     void N##_it_go_prev(N##_it* i) {                                           \

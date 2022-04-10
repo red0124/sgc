@@ -155,6 +155,6 @@
     SGC_INIT_HEADERS_FS_UNORDERED_MAP(K, V, S, N)                              \
     _SGC_INIT_PP_FS_UNORDERED_MAP(K, V, S, N)                                  \
     _SGC_INIT_UNIQUE_FS_UNORDERED_MAP(K, V, S, N)                              \
-    _SGC_INIT_COMMON_DICT_PAIR(K, V, N)                                        \
-    _SGC_INIT_COMMON_SHASH_MAP(K, S, N)                                        \
+    _SGC_INIT_COMMON_DICT_PAIR_HASH(K, V, N)                                   \
+    _SGC_INIT_COMMON_FS_HASH_MAP(K, S, N)                                      \
     _SGC_INIT_COMMON(N)

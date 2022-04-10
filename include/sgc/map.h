@@ -1,11 +1,11 @@
 #pragma once
 
 #include "detail/sgc_allocator.h"
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_common.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_log.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_rbtree_common.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
@@ -319,6 +319,6 @@
     SGC_INIT_HEADERS_MAP(K, V, N)                                              \
     _SGC_INIT_PP_MAP(K, V, N)                                                  \
     _SGC_INIT_UNIQUE_MAP(K, V, N)                                              \
-    _SGC_INIT_COMMON_DICT_PAIR(K, V, N)                                        \
+    _SGC_INIT_COMMON_DICT_PAIR_BST(K, V, N)                                    \
     _SGC_INIT_COMMON_RBTREE(K, N)                                              \
     _SGC_INIT_COMMON(N)
