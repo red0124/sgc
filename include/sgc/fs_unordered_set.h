@@ -3,7 +3,6 @@
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_common.h"
 #include "detail/sgc_fs_hash_map_common.h"
-#include "detail/sgc_hash_node_state.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"

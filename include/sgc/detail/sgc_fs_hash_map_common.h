@@ -2,6 +2,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+enum sgc_node_state {
+    SGC_NODE_STATE_OPEN,
+    SGC_NODE_STATE_USED,
+    SGC_NODE_STATE_ERASED,
+};
+
 #define _SGC_INIT_COMMON_FS_HASH_MAP(T, S, N)                                  \
     void N##_it_erase(N* ds, struct N##_it* it) {                              \
         if (N##_it_valid(*it)) {                                               \

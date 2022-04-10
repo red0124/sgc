@@ -205,15 +205,15 @@
 // ==============
 // COMMON MACROS
 // ==============
-#define _SGC_COPY(N, DST, SRC, IS_SHARED)                                      \
-    if (!IS_SHARED) {                                                          \
+#define _SGC_COPY(N, DST, SRC, SHARED)                                         \
+    if (!SHARED) {                                                             \
         N##_copy(&DST, &SRC);                                                  \
     } else {                                                                   \
         DST = SRC;                                                             \
     }
 
-#define _SGC_REPLACE(N, DST, SRC, IS_SHARED)                                   \
-    if (!IS_SHARED) {                                                          \
+#define _SGC_REPLACE(N, DST, SRC, SHARED)                                      \
+    if (!SHARED) {                                                             \
         N##_free(&DST);                                                        \
         N##_copy(&DST, &SRC);                                                  \
     } else {                                                                   \
@@ -226,22 +226,18 @@
     }
 
 #define _SGC_ARRAY_COPY(T, DST, SRC, SIZE, SHARED)                             \
-    {                                                                          \
-        if (!SHARED) {                                                         \
-            memcpy(DST, SRC, SIZE * sizeof(T));                                \
-        } else {                                                               \
-            for (size_t i = 0; i < SIZE; ++i) {                                \
-                T##_copy(&DST[i], &SRC[i]);                                    \
-            }                                                                  \
+    if (!SHARED) {                                                             \
+        memcpy(DST, SRC, SIZE * sizeof(T));                                    \
+    } else {                                                                   \
+        for (size_t i = 0; i < SIZE; ++i) {                                    \
+            T##_copy(&DST[i], &SRC[i]);                                        \
         }                                                                      \
     }
 
 #define _SGC_ARRAY_FREE(T, SRC, SIZE, SHARED)                                  \
-    {                                                                          \
-        if (!SHARED) {                                                         \
-            for (size_t i = 0; i < SIZE; ++i) {                                \
-                T##_free(&SRC[i]);                                             \
-            }                                                                  \
+    if (!SHARED) {                                                             \
+        for (size_t i = 0; i < SIZE; ++i) {                                    \
+            T##_free(&SRC[i]);                                                 \
         }                                                                      \
     }
 
