@@ -61,12 +61,9 @@ jobs:
           msystem: ${{ matrix.msystem }}
           install: ${{ matrix.install }}
 
-      - name: Install dependencies
-        run: script/ci_install_deps.sh
-
       - name: Configure
         run: >- 
-          cmake -DCMAKE_CXX_COMPILER=clang++ -S test -B build 
+          cmake -DCMAKE_C_COMPILER=clang -S test -B build 
           -DCMAKE_BUILD_TYPE=Debug
 
       - name: Build

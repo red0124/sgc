@@ -61,9 +61,6 @@ jobs:
           msystem: ${{ matrix.msystem }}
           install: ${{ matrix.install }}
 
-      - name: Install dependencies
-        run: script/ci_install_deps.sh
-
       - name: Configure
         run: cmake -S test -B build -D CMAKE_BUILD_TYPE=Debug
 
