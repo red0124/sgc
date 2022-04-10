@@ -35,7 +35,7 @@
 #define SGC_INIT_HEADERS_FS(...)                                               \
     _SGC_INIT_HEADERS_FS_N(__VA_ARGS__, _SGC_INIT_HEADERS_FS8,                 \
                            _SGC_INIT_HEADERS_FS7, _SGC_INIT_HEADERS_FS6,       \
-                           _SGC_INIT_HEADERS_FS5, _SGC_INIT_HEADERS_FS4)       \
+                           _SGC_INIT_HEADERS_FS5, _SGC_INIT_HEADERS_FS4, )     \
     (__VA_ARGS__)
 
 #define _SGC_INIT_HEADERS_FS4(C, T, S, N) SGC_INIT_HEADERS_##C(T, S, N)
@@ -89,7 +89,7 @@
                                 _SGC_INIT_HEADERS_FS_PAIR8,                    \
                                 _SGC_INIT_HEADERS_FS_PAIR7,                    \
                                 _SGC_INIT_HEADERS_FS_PAIR6,                    \
-                                _SGC_INIT_HEADERS_FS_PAIR5)                    \
+                                _SGC_INIT_HEADERS_FS_PAIR5, )                  \
     (__VA_ARGS__)
 
 #define _SGC_INIT_HEADERS_FS_PAIR5(C, K, V, S, N)                              \
@@ -136,7 +136,7 @@
 
 #define SGC_INIT_FS(...)                                                       \
     _SGC_INIT_FS_N(__VA_ARGS__, _SGC_INIT_FS8, _SGC_INIT_FS7, _SGC_INIT_FS6,   \
-                   _SGC_INIT_FS5, _SGC_INIT_FS4)                               \
+                   _SGC_INIT_FS5, _SGC_INIT_FS4, )                             \
     (__VA_ARGS__)
 
 #define _SGC_INIT_FS4(C, T, S, N) SGC_INIT_##C(T, S, N)
@@ -185,7 +185,7 @@
 #define SGC_INIT_FS_PAIR(...)                                                  \
     _SGC_INIT_FS_PAIR_N(__VA_ARGS__, _SGC_INIT_FS_PAIR9, _SGC_INIT_FS_PAIR8,   \
                         _SGC_INIT_FS_PAIR7, _SGC_INIT_FS_PAIR6,                \
-                        _SGC_INIT_FS_PAIR5)                                    \
+                        _SGC_INIT_FS_PAIR5, )                                  \
     (__VA_ARGS__)
 
 #define _SGC_INIT_FS_PAIR5(C, K, V, S, N) SGC_INIT_##C(K, V, S, N)
@@ -205,14 +205,14 @@
 // ==============
 // COMMON MACROS
 // ==============
-#define SGC_COPY(N, DST, SRC, IS_SHARED)                                       \
+#define _SGC_COPY(N, DST, SRC, IS_SHARED)                                      \
     if (!IS_SHARED) {                                                          \
         N##_copy(&DST, &SRC);                                                  \
     } else {                                                                   \
         DST = SRC;                                                             \
     }
 
-#define SGC_REPLACE(N, DST, SRC, IS_SHARED)                                    \
+#define _SGC_REPLACE(N, DST, SRC, IS_SHARED)                                   \
     if (!IS_SHARED) {                                                          \
         N##_free(&DST);                                                        \
         N##_copy(&DST, &SRC);                                                  \
@@ -220,12 +220,12 @@
         DST = SRC;                                                             \
     }
 
-#define SGC_FREE(N, SRC, SHARED)                                               \
+#define _SGC_FREE(N, SRC, SHARED)                                              \
     if (!SHARED) {                                                             \
         N##_free(&SRC);                                                        \
     }
 
-#define SGC_ARRAY_COPY(T, DST, SRC, SIZE, SHARED)                              \
+#define _SGC_ARRAY_COPY(T, DST, SRC, SIZE, SHARED)                             \
     {                                                                          \
         if (!SHARED) {                                                         \
             memcpy(DST, SRC, SIZE * sizeof(T));                                \
@@ -236,7 +236,7 @@
         }                                                                      \
     }
 
-#define SGC_ARRAY_FREE(T, SRC, SIZE, SHARED)                                   \
+#define _SGC_ARRAY_FREE(T, SRC, SIZE, SHARED)                                  \
     {                                                                          \
         if (!SHARED) {                                                         \
             for (size_t i = 0; i < SIZE; ++i) {                                \
@@ -248,51 +248,51 @@
 // ==============
 // RANGE LOOPS
 // ==============
-#define SGC_TOKENPASTE(x, y) x##y
-#define SGC_TOKENPASTE2(x, y) SGC_TOKENPASTE(x, y)
-#define SGC_UNIQUE(x) SGC_TOKENPASTE2(__sgc_unique_##x, __LINE__)
+#define _SGC_TOKENPASTE(x, y) x##y
+#define _SGC_TOKENPASTE2(x, y) _SGC_TOKENPASTE(x, y)
+#define _SGC_UNIQUE(x) _SGC_TOKENPASTE2(__sgc_unique_##x, __LINE__)
 
-#define SGC_NONE() (void*)NULL;
+#define _SGC_NONE() (void*)NULL;
 
-#define SGC_FOR_EACH_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
+#define _SGC_FOR_EACH_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
 #define sgc_for_each(...)                                                      \
-    SGC_FOR_EACH_N(__VA_ARGS__, SGC_NONE, SGC_NONE, SGC_NONE, SGC_NONE,        \
-                   SGC_FOR_EACH, )                                             \
+    _SGC_FOR_EACH_N(__VA_ARGS__, _SGC_NONE, _SGC_NONE, _SGC_NONE, _SGC_NONE,   \
+                    _SGC_FOR_EACH, )                                           \
     (__VA_ARGS__)
 
-#define SGC_FOR_EACH(EL, C, N)                                                 \
-    int SGC_UNIQUE(valid) = 0;                                                 \
-    int SGC_UNIQUE(tmp) = 0;                                                   \
-    N##_it SGC_UNIQUE(curr) = N##_begin(&C);                                   \
-    N##_it SGC_UNIQUE(end) = N##_end(&C);                                      \
-    SGC_UNIQUE(valid) =                                                        \
-        N##_it_valid(SGC_UNIQUE(curr)) && N##_it_valid(SGC_UNIQUE(end));       \
-    for (N##_type* EL = (N##_type*)N##_it_data(SGC_UNIQUE(curr));              \
-         SGC_UNIQUE(valid);                                                    \
-         SGC_UNIQUE(tmp) = !N##_it_eq(SGC_UNIQUE(curr), SGC_UNIQUE(end)),      \
-                   SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                        \
-                   N##_it_go_next(&SGC_UNIQUE(curr)),                          \
-                   EL = (N##_type*)N##_it_data(SGC_UNIQUE(curr)))
+#define _SGC_FOR_EACH(EL, C, N)                                                \
+    int _SGC_UNIQUE(valid) = 0;                                                \
+    int _SGC_UNIQUE(tmp) = 0;                                                  \
+    N##_it _SGC_UNIQUE(curr) = N##_begin(&C);                                  \
+    N##_it _SGC_UNIQUE(end) = N##_end(&C);                                     \
+    _SGC_UNIQUE(valid) =                                                       \
+        N##_it_valid(_SGC_UNIQUE(curr)) && N##_it_valid(_SGC_UNIQUE(end));     \
+    for (N##_type* EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr));             \
+         _SGC_UNIQUE(valid);                                                   \
+         _SGC_UNIQUE(tmp) = !N##_it_eq(_SGC_UNIQUE(curr), _SGC_UNIQUE(end)),   \
+                   _SGC_UNIQUE(valid) = _SGC_UNIQUE(tmp),                      \
+                   N##_it_go_next(&_SGC_UNIQUE(curr)),                         \
+                   EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr)))
 
-#define SGC_FOR_EACH_REVERSE_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
+#define _SGC_FOR_EACH_REVERSE_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
 #define sgc_for_each_reverse(...)                                              \
-    SGC_FOR_EACH_REVERSE_N(__VA_ARGS__, SGC_NONE, SGC_NONE, SGC_NONE,          \
-                           SGC_NONE, SGC_FOR_EACH_REVERSE, )                   \
+    _SGC_FOR_EACH_REVERSE_N(__VA_ARGS__, _SGC_NONE, _SGC_NONE, _SGC_NONE,      \
+                            _SGC_NONE, _SGC_FOR_EACH_REVERSE, )                \
     (__VA_ARGS__)
 
-#define SGC_FOR_EACH_REVERSE(EL, C, N)                                         \
-    int SGC_UNIQUE(valid) = 0;                                                 \
-    int SGC_UNIQUE(tmp) = 0;                                                   \
-    N##_it SGC_UNIQUE(curr) = N##_end(&C);                                     \
-    N##_it SGC_UNIQUE(begin) = N##_begin(&C);                                  \
-    SGC_UNIQUE(valid) =                                                        \
-        N##_it_valid(SGC_UNIQUE(curr)) && N##_it_valid(SGC_UNIQUE(begin));     \
-    for (N##_type* EL = (N##_type*)N##_it_data(SGC_UNIQUE(curr));              \
-         SGC_UNIQUE(valid);                                                    \
-         SGC_UNIQUE(tmp) = !N##_it_eq(SGC_UNIQUE(curr), SGC_UNIQUE(begin)),    \
-                   SGC_UNIQUE(valid) = SGC_UNIQUE(tmp),                        \
-                   N##_it_go_prev(&SGC_UNIQUE(curr)),                          \
-                   EL = (N##_type*)N##_it_data(SGC_UNIQUE(curr)))
+#define _SGC_FOR_EACH_REVERSE(EL, C, N)                                        \
+    int _SGC_UNIQUE(valid) = 0;                                                \
+    int _SGC_UNIQUE(tmp) = 0;                                                  \
+    N##_it _SGC_UNIQUE(curr) = N##_end(&C);                                    \
+    N##_it _SGC_UNIQUE(begin) = N##_begin(&C);                                 \
+    _SGC_UNIQUE(valid) =                                                       \
+        N##_it_valid(_SGC_UNIQUE(curr)) && N##_it_valid(_SGC_UNIQUE(begin));   \
+    for (N##_type* EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr));             \
+         _SGC_UNIQUE(valid);                                                   \
+         _SGC_UNIQUE(tmp) = !N##_it_eq(_SGC_UNIQUE(curr), _SGC_UNIQUE(begin)), \
+                   _SGC_UNIQUE(valid) = _SGC_UNIQUE(tmp),                      \
+                   N##_it_go_prev(&_SGC_UNIQUE(curr)),                         \
+                   EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr)))
 
 // ==============
 // USER MACROS

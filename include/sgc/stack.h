@@ -1,8 +1,8 @@
 #pragma once
 
 #include "detail/sgc_allocator.h"
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_stack_common.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
@@ -41,7 +41,7 @@
                                                                                \
     void N##_free(N* s) {                                                      \
         if (s->data_) {                                                        \
-            SGC_ARRAY_FREE(T, s->data_, s->size_, s->sharing_)                 \
+            _SGC_ARRAY_FREE(T, s->data_, s->size_, s->sharing_)                \
             sgc_free(s->data_);                                                \
         }                                                                      \
     }                                                                          \
@@ -52,8 +52,8 @@
             dst->max_ = src->size_;                                            \
             dst->sharing_ = src->sharing_;                                     \
             dst->data_ = (T*)sgc_malloc(dst->max_ * sizeof(T));                \
-            SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,              \
-                           src->sharing_)                                      \
+            _SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,             \
+                            src->sharing_)                                     \
         } else {                                                               \
             N##_init(dst);                                                     \
         }                                                                      \

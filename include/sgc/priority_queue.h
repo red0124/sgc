@@ -1,8 +1,8 @@
 #pragma once
 
 #include "detail/sgc_allocator.h"
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_priority_queue_common.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
@@ -54,7 +54,7 @@
                                                                                \
     void N##_free(N* p) {                                                      \
         if (p->data_) {                                                        \
-            SGC_ARRAY_FREE(T, p->data_, p->size_, p->sharing_)                 \
+            _SGC_ARRAY_FREE(T, p->data_, p->size_, p->sharing_)                \
             sgc_free(p->data_);                                                \
         }                                                                      \
     }                                                                          \
@@ -65,16 +65,16 @@
             dst->max_ = src->size_;                                            \
             dst->data_ = (T*)sgc_malloc(dst->max_ * sizeof(T));                \
             dst->sharing_ = src->sharing_;                                     \
-            SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,              \
-                           src->sharing_)                                      \
+            _SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,             \
+                            src->sharing_)                                     \
         } else {                                                               \
             N##_init(dst);                                                     \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_shrink(N* p) {                                                    \
-        SGC_ARRAY_FREE(T, (&p->data_[p->size_]), (p->max_ - p->size_),         \
-                       p->sharing_)                                            \
+        _SGC_ARRAY_FREE(T, (&p->data_[p->size_]), (p->max_ - p->size_),        \
+                        p->sharing_)                                           \
         p->data_ = (T*)sgc_realloc(p->data_, sizeof(T) * p->size_);            \
     }
 

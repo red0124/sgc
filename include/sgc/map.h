@@ -118,8 +118,8 @@
                                                    bool sharing_value) {       \
         struct _p_##N##_node* n = sgc_malloc(sizeof(struct _p_##N##_node));    \
                                                                                \
-        SGC_COPY(K, n->data_.key, *k, sharing_key);                            \
-        SGC_COPY(V, n->data_.value, *v, sharing_value);                        \
+        _SGC_COPY(K, n->data_.key, *k, sharing_key);                           \
+        _SGC_COPY(V, n->data_.value, *v, sharing_value);                       \
                                                                                \
         n->left_ = n->right_ = _SGC_MAP_LEAF;                                  \
         n->color_ = _SGC_MAP_RED;                                              \
@@ -151,7 +151,7 @@
                 }                                                              \
                 parent = parent->right_;                                       \
             } else if (!V##_eq(&parent->data_.value, v)) {                     \
-                SGC_REPLACE(V, parent->data_.value, *v, m->sharing_);          \
+                _SGC_REPLACE(V, parent->data_.value, *v, m->sharing_);         \
                 return;                                                        \
             } else {                                                           \
                 return;                                                        \
@@ -256,8 +256,8 @@
                                                                                \
         if (succ != n) {                                                       \
             /* TODO relinking nodes would be better */                         \
-            SGC_REPLACE(K, n->data_.key, succ->data_.key, m->sharing_key_)     \
-            SGC_REPLACE(V, n->data_.value, succ->data_.value, m->sharing_)     \
+            _SGC_REPLACE(K, n->data_.key, succ->data_.key, m->sharing_key_)    \
+            _SGC_REPLACE(V, n->data_.value, succ->data_.value, m->sharing_)    \
             _p_##N##_node_free(m, succ);                                       \
         } else {                                                               \
             _p_##N##_node_free(m, succ);                                       \

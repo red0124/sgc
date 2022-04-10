@@ -57,7 +57,7 @@
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \
             dst->head_ = _p_##N##_node_alloc(dst);                             \
-            SGC_COPY(T, dst->head_->data_, src->head_->data_, src->sharing_);  \
+            _SGC_COPY(T, dst->head_->data_, src->head_->data_, src->sharing_); \
             struct _p_##N##_node* curr_src = src->head_;                       \
             struct _p_##N##_node* curr_dst = dst->head_;                       \
             struct _p_##N##_node* tmp_src = NULL;                              \
@@ -68,7 +68,7 @@
                     break;                                                     \
                 }                                                              \
                 tmp_dst = _p_##N##_node_alloc(dst);                            \
-                SGC_COPY(T, tmp_dst->data_, tmp_src->data_, src->sharing_);    \
+                _SGC_COPY(T, tmp_dst->data_, tmp_src->data_, src->sharing_);   \
                 curr_dst->next_ = tmp_dst;                                     \
                 curr_dst = tmp_dst;                                            \
                 curr_src = tmp_src;                                            \
@@ -82,7 +82,7 @@
                                                                                \
     void N##_push_back(N* l, T el) {                                           \
         struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
-        SGC_COPY(T, new_el->data_, el, l->sharing_);                           \
+        _SGC_COPY(T, new_el->data_, el, l->sharing_);                          \
         new_el->next_ = NULL;                                                  \
         switch (l->size_) {                                                    \
         case 0:                                                                \
@@ -102,7 +102,7 @@
                                                                                \
     void N##_push_front(N* l, const T el) {                                    \
         struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
-        SGC_COPY(T, new_el->data_, el, l->sharing_);                           \
+        _SGC_COPY(T, new_el->data_, el, l->sharing_);                          \
         switch (l->size_) {                                                    \
         case 0:                                                                \
             new_el->next_ = NULL;                                              \
@@ -124,7 +124,7 @@
         if (l->size_) {                                                        \
             struct _p_##N##_node* tmp = l->head_;                              \
             l->head_ = l->head_->next_;                                        \
-            SGC_FREE(T, tmp->data_, l->sharing_)                               \
+            _SGC_FREE(T, tmp->data_, l->sharing_)                              \
             sgc_free(tmp);                                                     \
             --l->size_;                                                        \
             if (l->size_ == 0) {                                               \

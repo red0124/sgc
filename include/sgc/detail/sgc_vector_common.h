@@ -10,7 +10,7 @@
         _p_##N##_resize(v);                                                    \
         memmove(v->data_ + at + 1, v->data_ + at,                              \
                 (v->size_ - at) * sizeof(T));                                  \
-        SGC_COPY(T, v->data_[at], el, v->sharing_);                            \
+        _SGC_COPY(T, v->data_[at], el, v->sharing_);                           \
         ++v->size_;                                                            \
     }                                                                          \
                                                                                \
@@ -24,7 +24,7 @@
                                                                                \
     void N##_pop_back(N* v) {                                                  \
         if (v->size_) {                                                        \
-            SGC_FREE(T, v->data_[v->size_ - 1], v->sharing_)                   \
+            _SGC_FREE(T, v->data_[v->size_ - 1], v->sharing_)                  \
             --v->size_;                                                        \
         }                                                                      \
     }                                                                          \
@@ -38,7 +38,7 @@
                                                                                \
     void N##_set(N* v, size_t at, T new_el) {                                  \
         if (at < v->size_) {                                                   \
-            SGC_REPLACE(T, v->data_[at], new_el, v->sharing_);                 \
+            _SGC_REPLACE(T, v->data_[at], new_el, v->sharing_);                \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -63,7 +63,7 @@
             return;                                                            \
         }                                                                      \
                                                                                \
-        SGC_FREE(T, v->data_[at], v->sharing_)                                 \
+        _SGC_FREE(T, v->data_[at], v->sharing_)                                \
         memmove(v->data_ + at, v->data_ + at + 1,                              \
                 (v->size_ - at - 1) * sizeof(T));                              \
         --v->size_;                                                            \

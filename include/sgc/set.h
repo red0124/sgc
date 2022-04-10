@@ -103,7 +103,7 @@
                                                    bool shared) {              \
         struct _p_##N##_node* n =                                              \
             (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
-        SGC_COPY(KV, n->value_, *v, shared);                                   \
+        _SGC_COPY(KV, n->value_, *v, shared);                                  \
         n->left_ = n->right_ = _SGC_MAP_LEAF;                                  \
         n->color_ = _SGC_MAP_RED;                                              \
         return n;                                                              \
@@ -132,7 +132,7 @@
                 }                                                              \
                 parent = parent->right_;                                       \
             } else if (!KV##_eq(&parent->value_, v)) {                         \
-                SGC_REPLACE(KV, parent->value_, *v, s->sharing_);              \
+                _SGC_REPLACE(KV, parent->value_, *v, s->sharing_);             \
                 return;                                                        \
             } else {                                                           \
                 return;                                                        \

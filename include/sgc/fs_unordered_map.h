@@ -85,7 +85,7 @@
         size_t hash = K##_hash(&k);                                            \
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
         if (i.valid_) {                                                        \
-            SGC_REPLACE(V, i.curr_->data_.value, v, u->sharing_);              \
+            _SGC_REPLACE(V, i.curr_->data_.value, v, u->sharing_);             \
         } else if (u->size_ < S - 1) {                                         \
             size_t position = hash % S;                                        \
             while (u->data_[position].state_ == SGC_NODE_STATE_USED) {         \
@@ -95,8 +95,8 @@
                     ++position;                                                \
                 }                                                              \
             }                                                                  \
-            SGC_COPY(K, u->data_[position].data_.key, k, u->sharing_key_);     \
-            SGC_COPY(V, u->data_[position].data_.value, v, u->sharing_);       \
+            _SGC_COPY(K, u->data_[position].data_.key, k, u->sharing_key_);    \
+            _SGC_COPY(V, u->data_[position].data_.value, v, u->sharing_);      \
             u->data_[position].state_ = SGC_NODE_STATE_USED;                   \
             ++u->size_;                                                        \
         }                                                                      \
@@ -119,8 +119,8 @@
                     ++position;                                                \
                 }                                                              \
             }                                                                  \
-            SGC_COPY(K, u->data_[position].data_.key, k, u->sharing_key_);     \
-            SGC_COPY(V, u->data_[position].data_.value, v, u->sharing_);       \
+            _SGC_COPY(K, u->data_[position].data_.key, k, u->sharing_key_);    \
+            _SGC_COPY(V, u->data_[position].data_.value, v, u->sharing_);      \
             u->data_[position].state_ = SGC_NODE_STATE_USED;                   \
             ++u->size_;                                                        \
             ret = &u->data_[position].data_.value;                             \

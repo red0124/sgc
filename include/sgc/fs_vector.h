@@ -67,7 +67,7 @@
                                                                                \
     void N##_free(N* v) {                                                      \
         if (v->size_) {                                                        \
-            SGC_ARRAY_FREE(T, v->data_, v->size_, v->sharing_);                \
+            _SGC_ARRAY_FREE(T, v->data_, v->size_, v->sharing_);               \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -75,8 +75,8 @@
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \
-            SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,              \
-                           src->sharing_)                                      \
+            _SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,             \
+                            src->sharing_)                                     \
         } else {                                                               \
             N##_init(dst);                                                     \
         }                                                                      \

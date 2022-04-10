@@ -1,7 +1,7 @@
 #pragma once
 
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_priority_queue_common.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
@@ -54,7 +54,7 @@
                                                                                \
     void N##_free(N* p) {                                                      \
         if (p->data_) {                                                        \
-            SGC_ARRAY_FREE(T, p->data_, p->size_, p->sharing_)                 \
+            _SGC_ARRAY_FREE(T, p->data_, p->size_, p->sharing_)                \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -62,8 +62,8 @@
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \
-            SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,              \
-                           src->sharing_)                                      \
+            _SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,             \
+                            src->sharing_)                                     \
         } else {                                                               \
             N##_init(dst);                                                     \
         }                                                                      \

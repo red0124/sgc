@@ -89,7 +89,7 @@
                                             bool shared) {                     \
         struct _p_##N##_node* new_node =                                       \
             (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
-        SGC_COPY(KV, new_node->value_, *value, shared);                        \
+        _SGC_COPY(KV, new_node->value_, *value, shared);                       \
         new_node->next_ = NULL;                                                \
         return new_node;                                                       \
     }                                                                          \

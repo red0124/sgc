@@ -5,14 +5,14 @@
 #define _SGC_INIT_COMMON_STACK(T, N)                                           \
     void N##_push(N* s, T el) {                                                \
         _p_##N##_resize(s);                                                    \
-        SGC_COPY(T, s->data_[s->size_], el, s->sharing_);                      \
+        _SGC_COPY(T, s->data_[s->size_], el, s->sharing_);                     \
         ++s->size_;                                                            \
     }                                                                          \
                                                                                \
     void N##_pop(N* s) {                                                       \
         if (s->size_) {                                                        \
             T* el = &s->data_[s->size_ - 1];                                   \
-            SGC_FREE(T, *el, s->sharing_);                                     \
+            _SGC_FREE(T, *el, s->sharing_);                                    \
             --s->size_;                                                        \
         }                                                                      \
     }                                                                          \
@@ -26,6 +26,6 @@
                                                                                \
     void N##_set_top(N* s, T new_el) {                                         \
         if (s->size_) {                                                        \
-            SGC_REPLACE(T, s->data_[s->size_ - 1], new_el, s->sharing_);       \
+            _SGC_REPLACE(T, s->data_[s->size_ - 1], new_el, s->sharing_);      \
         }                                                                      \
     }
