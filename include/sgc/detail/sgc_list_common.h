@@ -19,7 +19,7 @@
         for (size_t i = 0; i < l->size_; ++i) {                                \
             tmp = curr;                                                        \
             curr = curr->next_;                                                \
-            SGC_FREE(T, tmp->data_, l->sharing_)                        \
+            SGC_FREE(T, tmp->data_, l->sharing_)                               \
             sgc_free(tmp);                                                     \
         }                                                                      \
         l->head_ = l->tail_ = NULL;                                            \

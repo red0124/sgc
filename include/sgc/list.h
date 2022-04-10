@@ -110,7 +110,7 @@
         if (l->size_) {                                                        \
             struct _p_##N##_node* tmp = l->tail_;                              \
             l->tail_ = l->tail_->prev_;                                        \
-            SGC_FREE(T, tmp->data_, l->sharing_)                        \
+            SGC_FREE(T, tmp->data_, l->sharing_)                               \
             sgc_free(tmp);                                                     \
             if (l->tail_) {                                                    \
                 l->tail_->next_ = NULL;                                        \
@@ -149,7 +149,7 @@
         if (l->size_) {                                                        \
             struct _p_##N##_node* tmp = l->head_;                              \
             l->head_ = l->head_->next_;                                        \
-            SGC_FREE(T, tmp->data_, l->sharing_)                        \
+            SGC_FREE(T, tmp->data_, l->sharing_)                               \
             sgc_free(tmp);                                                     \
             if (l->head_) {                                                    \
                 l->head_->prev_ = NULL;                                        \

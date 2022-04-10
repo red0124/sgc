@@ -1,12 +1,12 @@
 #pragma once
 
 #include "detail/sgc_allocator.h"
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_common.h"
 #include "detail/sgc_hash_map_common.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_prime.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
@@ -89,7 +89,7 @@
                                             bool shared) {                     \
         struct _p_##N##_node* new_node =                                       \
             (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
-        SGC_COPY(KV, new_node->value_, *value, shared);                 \
+        SGC_COPY(KV, new_node->value_, *value, shared);                        \
         new_node->next_ = NULL;                                                \
         return new_node;                                                       \
     }                                                                          \

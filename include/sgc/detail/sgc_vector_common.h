@@ -24,7 +24,7 @@
                                                                                \
     void N##_pop_back(N* v) {                                                  \
         if (v->size_) {                                                        \
-            SGC_FREE(T, v->data_[v->size_ - 1], v->sharing_)            \
+            SGC_FREE(T, v->data_[v->size_ - 1], v->sharing_)                   \
             --v->size_;                                                        \
         }                                                                      \
     }                                                                          \
@@ -63,7 +63,7 @@
             return;                                                            \
         }                                                                      \
                                                                                \
-        SGC_FREE(T, v->data_[at], v->sharing_)                          \
+        SGC_FREE(T, v->data_[at], v->sharing_)                                 \
         memmove(v->data_ + at, v->data_ + at + 1,                              \
                 (v->size_ - at - 1) * sizeof(T));                              \
         --v->size_;                                                            \

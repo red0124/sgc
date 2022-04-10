@@ -1,9 +1,9 @@
 #pragma once
 
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_deque_common.h"
 #include "detail/sgc_iterator.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 

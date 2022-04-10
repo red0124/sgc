@@ -55,7 +55,7 @@
     void N##_pop(N* p) {                                                       \
         if (p->size_) {                                                        \
             _p_##N##_swap(&p->data_[0], &p->data_[--p->size_]);                \
-            SGC_FREE(T, p->data_[p->size_], p->sharing_)                \
+            SGC_FREE(T, p->data_[p->size_], p->sharing_)                       \
             _p_##N##_fix_erase(p);                                             \
         }                                                                      \
     }                                                                          \

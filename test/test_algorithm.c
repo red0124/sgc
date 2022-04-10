@@ -1,16 +1,26 @@
 #include "test_common.h"
 #include <sgc/algorithm.h>
 #include <sgc/deque.h>
+#include <sgc/fs_unordered_map.h>
+#include <sgc/fs_vector.h>
 #include <sgc/list.h>
 #include <sgc/map.h>
 #include <sgc/set.h>
-#include <sgc/fs_unordered_map.h>
 #include <sgc/vector.h>
 
 #define TEST_ELEMENTS_NUM 50
 
+SGC_INIT_HEADERS(VECTOR, int, hvector, ITERATE, FIND, FIND_IT)
 SGC_INIT(VECTOR, int, vector, ITERATE, FIND, FIND_IT)
+
+SGC_INIT_HEADERS_DEQUE(int, hdeque)
 SGC_INIT_DEQUE(int, deque)
+
+SGC_INIT_HEADERS_FS_PAIR(FS_UNORDERED_MAP, int, int, 100, hfs_map)
+SGC_INIT_FS_PAIR(FS_UNORDERED_MAP, int, int, 100, fs_map)
+
+SGC_INIT_HEADERS_FS(FS_VECTOR, int, 100, hfs_vector)
+SGC_INIT_FS(FS_VECTOR, int, 100, fs_vector)
 
 void accumulate_sum(const int* const el, void* acc) {
     *(int*)acc += *el;
