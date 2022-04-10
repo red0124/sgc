@@ -22,7 +22,7 @@
 #define SGC_INIT_HEADERS_FS_UNORDERED_SET(V, S, N)                             \
     struct _p_##N##_node {                                                     \
         V value_;                                                              \
-        enum sgc_node_state state_;                                            \
+        enum _sgc_node_state state_;                                           \
     };                                                                         \
                                                                                \
     struct N {                                                                 \
@@ -67,7 +67,7 @@
         u->size_ = 0;                                                          \
         u->sharing_ = false;                                                   \
         for (size_t i = 0; i < S; ++i) {                                       \
-            u->data_[i].state_ = SGC_NODE_STATE_OPEN;                          \
+            u->data_[i].state_ = _SGC_NODE_STATE_OPEN;                         \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -76,7 +76,7 @@
         struct N##_it i = _p_##N##_find_by_hash(u, &v, hash);                  \
         if (!i.valid_ && u->size_ < S - 1) {                                   \
             size_t position = hash % S;                                        \
-            while (u->data_[position].state_ == SGC_NODE_STATE_USED) {         \
+            while (u->data_[position].state_ == _SGC_NODE_STATE_USED) {        \
                 if (position == S - 1) {                                       \
                     position = 0;                                              \
                 } else {                                                       \
@@ -84,7 +84,7 @@
                 }                                                              \
             }                                                                  \
             _SGC_COPY(V, u->data_[position].value_, v, u->sharing_);           \
-            u->data_[position].state_ = SGC_NODE_STATE_USED;                   \
+            u->data_[position].state_ = _SGC_NODE_STATE_USED;                  \
             ++u->size_;                                                        \
         }                                                                      \
     }                                                                          \
@@ -94,7 +94,7 @@
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \
             for (size_t i = 0; i < S; ++i) {                                   \
-                if (src->data_[i].state_ == SGC_NODE_STATE_USED) {             \
+                if (src->data_[i].state_ == _SGC_NODE_STATE_USED) {            \
                     _p_##N##_node_copy_values(src, &dst->data_[i],             \
                                               &src->data_[i]);                 \
                 }                                                              \

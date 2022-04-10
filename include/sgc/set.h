@@ -105,7 +105,7 @@
             (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
         _SGC_COPY(KV, n->value_, *v, shared);                                  \
         n->left_ = n->right_ = _SGC_MAP_LEAF;                                  \
-        n->color_ = _SGC_MAP_RED;                                              \
+        n->color_ = _SGC_MAP_COLOR_RED;                                        \
         return n;                                                              \
     }                                                                          \
                                                                                \
@@ -146,7 +146,7 @@
         if (s->root_ == _SGC_MAP_LEAF) {                                       \
             struct _p_##N##_node* new_node =                                   \
                 _p_##N##_node_new(&v, s->sharing_);                            \
-            new_node->color_ = _SGC_MAP_BLACK;                                 \
+            new_node->color_ = _SGC_MAP_COLOR_BLACK;                           \
             new_node->parent_ = _SGC_MAP_LEAF;                                 \
             s->root_ = new_node;                                               \
             s->size_ = 1;                                                      \
@@ -198,16 +198,16 @@
             m->root_ = (m->root_->left_) ? m->root_->left_ : m->root_->right_; \
         }                                                                      \
                                                                                \
-        if ((succ_c && succ_c->color_ == _SGC_MAP_RED) ||                      \
-            succ->color_ == _SGC_MAP_RED) {                                    \
+        if ((succ_c && succ_c->color_ == _SGC_MAP_COLOR_RED) ||                \
+            succ->color_ == _SGC_MAP_COLOR_RED) {                              \
             if (succ_c) {                                                      \
-                succ_c->color_ = _SGC_MAP_BLACK;                               \
+                succ_c->color_ = _SGC_MAP_COLOR_BLACK;                         \
             }                                                                  \
         } else {                                                               \
             _p_##N##_erase_rebalanse(m, succ_c, succ_p);                       \
         }                                                                      \
         if (m->root_) {                                                        \
-            m->root_->color_ = _SGC_MAP_BLACK;                                 \
+            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                           \
         }                                                                      \
         --m->size_;                                                            \
         return succ;                                                           \

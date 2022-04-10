@@ -122,7 +122,7 @@
         _SGC_COPY(V, n->data_.value, *v, sharing_value);                       \
                                                                                \
         n->left_ = n->right_ = _SGC_MAP_LEAF;                                  \
-        n->color_ = _SGC_MAP_RED;                                              \
+        n->color_ = _SGC_MAP_COLOR_RED;                                        \
         return n;                                                              \
     }                                                                          \
                                                                                \
@@ -165,13 +165,13 @@
         if (m->root_ == _SGC_MAP_LEAF) {                                       \
             struct _p_##N##_node* new_node =                                   \
                 _p_##N##_node_new(&k, &v, m->sharing_key_, m->sharing_);       \
-            new_node->color_ = _SGC_MAP_BLACK;                                 \
+            new_node->color_ = _SGC_MAP_COLOR_BLACK;                           \
             new_node->parent_ = _SGC_MAP_LEAF;                                 \
             m->root_ = new_node;                                               \
             m->size_ = 1;                                                      \
         } else {                                                               \
             _p_##N##_node_insert(m, &k, &v);                                   \
-            m->root_->color_ = _SGC_MAP_BLACK;                                 \
+            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                           \
         }                                                                      \
     }                                                                          \
                                                                                \
@@ -224,14 +224,14 @@
             V##_init(&v);                                                      \
             struct _p_##N##_node* new_node =                                   \
                 _p_##N##_node_new(&k, &v, m->sharing_key_, m->sharing_);       \
-            new_node->color_ = _SGC_MAP_BLACK;                                 \
+            new_node->color_ = _SGC_MAP_COLOR_BLACK;                           \
             new_node->parent_ = _SGC_MAP_LEAF;                                 \
             m->root_ = new_node;                                               \
             m->size_ = 1;                                                      \
             ret = &m->root_->data_.value;                                      \
         } else {                                                               \
             ret = _p_##N##_node_insert_or_get(m, &k);                          \
-            m->root_->color_ = _SGC_MAP_BLACK;                                 \
+            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                           \
         }                                                                      \
         return ret;                                                            \
     }                                                                          \
@@ -281,16 +281,16 @@
             m->root_ = (m->root_->left_) ? m->root_->left_ : m->root_->right_; \
         }                                                                      \
                                                                                \
-        if ((succ_c && succ_c->color_ == _SGC_MAP_RED) ||                      \
-            succ->color_ == _SGC_MAP_RED) {                                    \
+        if ((succ_c && succ_c->color_ == _SGC_MAP_COLOR_RED) ||                \
+            succ->color_ == _SGC_MAP_COLOR_RED) {                              \
             if (succ_c) {                                                      \
-                succ_c->color_ = _SGC_MAP_BLACK;                               \
+                succ_c->color_ = _SGC_MAP_COLOR_BLACK;                         \
             }                                                                  \
         } else {                                                               \
             _p_##N##_erase_rebalanse(m, succ_c, succ_p);                       \
         }                                                                      \
         if (m->root_) {                                                        \
-            m->root_->color_ = _SGC_MAP_BLACK;                                 \
+            m->root_->color_ = _SGC_MAP_COLOR_BLACK;                           \
         }                                                                      \
         --m->size_;                                                            \
         return succ;                                                           \

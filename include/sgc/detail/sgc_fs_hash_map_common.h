@@ -2,17 +2,17 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-enum sgc_node_state {
-    SGC_NODE_STATE_OPEN,
-    SGC_NODE_STATE_USED,
-    SGC_NODE_STATE_ERASED,
+enum _sgc_node_state {
+    _SGC_NODE_STATE_OPEN,
+    _SGC_NODE_STATE_USED,
+    _SGC_NODE_STATE_ERASED,
 };
 
 #define _SGC_INIT_COMMON_FS_HASH_MAP(T, S, N)                                  \
     void N##_it_erase(N* ds, struct N##_it* it) {                              \
         if (N##_it_valid(*it)) {                                               \
             _p_##N##_node_free(ds, it->curr_);                                 \
-            it->curr_->state_ = SGC_NODE_STATE_ERASED;                         \
+            it->curr_->state_ = _SGC_NODE_STATE_ERASED;                        \
             N##_it_go_next(it);                                                \
             --ds->size_;                                                       \
         }                                                                      \
@@ -35,8 +35,8 @@ enum sgc_node_state {
         if (ds->size_) {                                                       \
             size_t position = hash % S;                                        \
             struct _p_##N##_node* data = ds->data_;                            \
-            while (data[position].state_ != SGC_NODE_STATE_OPEN) {             \
-                if (data[position].state_ == SGC_NODE_STATE_USED &&            \
+            while (data[position].state_ != _SGC_NODE_STATE_OPEN) {            \
+                if (data[position].state_ == _SGC_NODE_STATE_USED &&           \
                     _p_##N##_node_eq_key(&data[position], key)) {              \
                     return N##_it_at(ds, position);                            \
                 }                                                              \
@@ -54,7 +54,7 @@ enum sgc_node_state {
     void N##_free(N* u) {                                                      \
         if (u->size_) {                                                        \
             for (size_t i = 0; i < S; ++i) {                                   \
-                if (u->data_[i].state_ == SGC_NODE_STATE_USED) {               \
+                if (u->data_[i].state_ == _SGC_NODE_STATE_USED) {              \
                     _p_##N##_node_free(u, &u->data_[i]);                       \
                 }                                                              \
             }                                                                  \
@@ -67,7 +67,7 @@ enum sgc_node_state {
         i.begin_ = (struct _p_##N##_node*)(m->data_);                          \
         i.curr_ = i.begin_ + at;                                               \
         i.end_ = i.begin_ + S;                                                 \
-        i.valid_ = (i.curr_->state_ == SGC_NODE_STATE_USED) ? 1 : 0;           \
+        i.valid_ = (i.curr_->state_ == _SGC_NODE_STATE_USED) ? 1 : 0;          \
         return i;                                                              \
     }                                                                          \
                                                                                \
@@ -79,7 +79,7 @@ enum sgc_node_state {
                                                                                \
         while (i->curr_ < i->end_) {                                           \
             ++i->curr_;                                                        \
-            if (i->curr_->state_ == SGC_NODE_STATE_USED) {                     \
+            if (i->curr_->state_ == _SGC_NODE_STATE_USED) {                    \
                 i->valid_ = 1;                                                 \
                 break;                                                         \
             }                                                                  \
@@ -91,7 +91,7 @@ enum sgc_node_state {
         i->curr_ = i->begin_;                                                  \
         i->end_ = i->begin_ + S - 1;                                           \
         i->valid_ = 1;                                                         \
-        if (i->curr_->state_ != SGC_NODE_STATE_USED) {                         \
+        if (i->curr_->state_ != _SGC_NODE_STATE_USED) {                        \
             N##_it_go_next(i);                                                 \
         }                                                                      \
     }                                                                          \
@@ -108,7 +108,7 @@ enum sgc_node_state {
                                                                                \
         while (i->curr_ > i->begin_) {                                         \
             --i->curr_;                                                        \
-            if (i->curr_->state_ == SGC_NODE_STATE_USED) {                     \
+            if (i->curr_->state_ == _SGC_NODE_STATE_USED) {                    \
                 i->valid_ = 1;                                                 \
                 break;                                                         \
             }                                                                  \
@@ -120,7 +120,7 @@ enum sgc_node_state {
         i->end_ = (struct _p_##N##_node*)(m->data_) + S - 1;                   \
         i->curr_ = i->end_;                                                    \
         i->valid_ = 1;                                                         \
-        if (i->curr_->state_ != SGC_NODE_STATE_USED) {                         \
+        if (i->curr_->state_ != _SGC_NODE_STATE_USED) {                        \
             N##_it_go_prev(i);                                                 \
         }                                                                      \
     }                                                                          \
