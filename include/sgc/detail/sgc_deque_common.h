@@ -225,6 +225,9 @@
     }                                                                          \
                                                                                \
     void N##_it_go_next(N##_it* i) {                                           \
+        if (i->curr_ == i->deque_->back_) {                                    \
+            i->valid_ = false;                                                 \
+        }                                                                      \
         if (i->curr_ + 1 == _p_##N##_max(i->deque_)) {                         \
             i->curr_ = 0;                                                      \
         } else {                                                               \
@@ -233,6 +236,9 @@
     }                                                                          \
                                                                                \
     void N##_it_go_prev(N##_it* i) {                                           \
+        if (i->curr_ == i->deque_->front_) {                                   \
+            i->valid_ = false;                                                 \
+        }                                                                      \
         if (i->curr_ == 0) {                                                   \
             i->curr_ = _p_##N##_max(i->deque_) - 1;                            \
         } else {                                                               \

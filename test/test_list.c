@@ -76,48 +76,11 @@ void list_erase(list* l, int at) {
 }
 
 void test_list_insert_erase_combinations(void) {
-    TEST_INSERT_ERASE_COMBINATIONS(list);
-}
-
-void test_list_push_pop_front_back(void) {
-}
-
-void test_list_copy(void) {
-}
-
-void test_list_insert_set_at(void) {
-}
-
-void test_list_erase(void) {
-}
-
-void test_list_sort(void) {
-}
-
-SGC_INIT_LIST(al, alist)
-
-void test_alist(void) {
-}
-
-SGC_INIT_LIST(list, llist)
-
-void test_list_list(void) {
-}
-
-void test_list_it(void) {
+    TEST_INSERT_ERASE_COMBINATIONS_ARRAY(list);
 }
 
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_list_insert_erase_combinations);
-    RUN_TEST(test_list_push_pop_front_back);
-    RUN_TEST(test_list_copy);
-    RUN_TEST(test_list_insert_set_at);
-    RUN_TEST(test_list_erase);
-    RUN_TEST(test_list_sort);
-    RUN_TEST(test_alist);
-    RUN_TEST(test_list_list);
-    RUN_TEST(test_list_it);
-
     return UNITY_END();
 }
