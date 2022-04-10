@@ -12,7 +12,7 @@
 #include "../lib/list.h"
 #include "../lib/map.h"
 #include "../lib/priority_queue.h"
-#include "../lib/static_unordered_map.h"
+#include "../lib/fs_unordered_map.h"
 #include "../lib/unordered_map.h"
 #include "../lib/vector.h"
 

@@ -1,10 +1,10 @@
 #include "test_common.h"
-#include <sgc/static_unordered_map.h>
+#include <sgc/fs_unordered_map.h>
 
 #define TEST_ELEMENTS_NUM 50
 #define MAP_MAX 128
 
-SGC_INIT_SUNORDERED_MAP(int, int, MAP_MAX, map)
+SGC_INIT_FS_UNORDERED_MAP(int, int, MAP_MAX, map)
 
 void test_map_insert_erase_combinations(void) {
     TEST_TM(map);
@@ -49,7 +49,7 @@ void test_map_copy(void) {
     map_free(&v_cp);
 }
 
-SGC_INIT_SUNORDERED_MAP(al, al, MAP_MAX, amap)
+SGC_INIT_FS_UNORDERED_MAP(al, al, MAP_MAX, amap)
 
 void test_amap(void) {
     amap v;
@@ -86,7 +86,7 @@ size_t map_hash(const map* const first) {
 }
 
 /* TODO update
-SGC_INIT_SUNORDERED_MAP(map, map, MAP_MAX, vmap)
+SGC_INIT_FS_UNORDERED_MAP(map, map, MAP_MAX, vmap)
 
 void test_map_map(void) {
 vmap v;

@@ -15,7 +15,7 @@ int main(void)
         map m;
         map_init(&m);
 
-        static_string buff;
+        fs_string buff;
 
         FILE *fin = fopen(FILE_NAME, "r");
 	if(!fin)

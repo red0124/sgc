@@ -54,7 +54,7 @@ int main(void)
 	list l;
 	list_init(&l);
 
-	static_string buff;
+	fs_string buff;
 	while(string_buffer_read_until(buff, stdin, "\n "))
 	{
 		list_push_back(&l, buff);

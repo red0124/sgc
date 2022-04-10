@@ -1,16 +1,16 @@
 #pragma once
 
-#include "detail/sgc_basic_types.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_utils.h"
 #include "detail/sgc_vector_common.h"
 #include <stdbool.h>
 
-#define _SGC_INIT_PP_SVECTOR(T, N)                                             \
+#define _SGC_INIT_PP_FS_VECTOR(T, N)                                           \
     static void _p_##N##_resize(const N* const v);
 
-#define SGC_INIT_HEADER_SVECTOR(T, S, N)                                       \
+#define SGC_INIT_HEADER_FS_VECTOR(T, S, N)                                     \
     struct N {                                                                 \
         size_t size_;                                                          \
         bool sharing_;                                                         \
@@ -50,7 +50,7 @@
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_RA_IT_PROTOTIPES(N)
 
-#define _SGC_INIT_UNIQUE_SVECTOR(T, S, N)                                      \
+#define _SGC_INIT_UNIQUE_FS_VECTOR(T, S, N)                                    \
     static void _p_##N##_resize(const N* const v) {                            \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
@@ -82,9 +82,9 @@
         }                                                                      \
     }
 
-#define SGC_INIT_SVECTOR(T, S, N)                                              \
-    SGC_INIT_HEADER_SVECTOR(T, S, N)                                           \
-    _SGC_INIT_PP_SVECTOR(T, N)                                                 \
-    _SGC_INIT_UNIQUE_SVECTOR(T, S, N)                                          \
+#define SGC_INIT_FS_VECTOR(T, S, N)                                            \
+    SGC_INIT_HEADER_FS_VECTOR(T, S, N)                                         \
+    _SGC_INIT_PP_FS_VECTOR(T, N)                                               \
+    _SGC_INIT_UNIQUE_FS_VECTOR(T, S, N)                                        \
     _SGC_INIT_COMMON_VECTOR(T, N)                                              \
     _SGC_INIT_COMMON(N)

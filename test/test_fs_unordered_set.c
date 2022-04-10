@@ -1,10 +1,10 @@
 #include "test_common.h"
-#include <sgc/static_unordered_set.h>
+#include <sgc/fs_unordered_set.h>
 
 #define TEST_ELEMENTS_NUM 50
 #define SET_MAX 127
 
-SGC_INIT_SUNORDERED_SET(int, SET_MAX, set)
+SGC_INIT_FS_UNORDERED_SET(int, SET_MAX, set)
 
 void test_set_insert_erase_combinations(void) {
     TEST_TS(set);
@@ -48,7 +48,7 @@ void test_set_copy(void) {
     set_free(&v_cp);
 }
 
-SGC_INIT_SUNORDERED_SET(al, SET_MAX, aset)
+SGC_INIT_FS_UNORDERED_SET(al, SET_MAX, aset)
 
 void test_aset(void) {
     aset v;
@@ -87,7 +87,7 @@ size_t set_hash(const set* const s) {
 }
 
 /* TODO update
-SGC_INIT_SUNORDERED_SET(set, SET_MAX, vset)
+SGC_INIT_FS_UNORDERED_SET(set, SET_MAX, vset)
 
 void test_set_set(void) {
     vset v;

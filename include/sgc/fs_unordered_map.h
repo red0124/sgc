@@ -1,15 +1,15 @@
 #pragma once
 
-#include "detail/sgc_basic_types.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
-#include "detail/sgc_dictionary_ocmmon.h"
+#include "detail/sgc_dictionary_common.h"
+#include "detail/sgc_fs_hash_map_common.h"
 #include "detail/sgc_hash_node_state.h"
 #include "detail/sgc_iterator.h"
-#include "detail/sgc_static_hash_map_common.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define _SGC_INIT_PP_SUNORDERED_MAP(K, V, S, N)                                \
+#define _SGC_INIT_PP_FS_UNORDERED_MAP(K, V, S, N)                              \
     static N##_it _p_##N##_find_by_hash(N* u, const K* const k, size_t hash);  \
     static N##_it N##_it_at(const N* const u, size_t at);                      \
     static void _p_##N##_node_free(const N* const m, struct _p_##N##_node* n); \
@@ -20,7 +20,7 @@
     static bool _p_##N##_node_eq_key(const struct _p_##N##_node* const n,      \
                                      const K* const key);
 
-#define SGC_INIT_HEADERS_SUNORDERED_MAP(K, V, S, N)                            \
+#define SGC_INIT_HEADERS_FS_UNORDERED_MAP(K, V, S, N)                          \
     struct N##_pair {                                                          \
         K key;                                                                 \
         V value;                                                               \
@@ -69,7 +69,7 @@
     void N##_erase(N* u, const K k);                                           \
     bool N##_empty(const N* const u);
 
-#define _SGC_INIT_UNIQUE_SUNORDERED_MAP(K, V, S, N)                            \
+#define _SGC_INIT_UNIQUE_FS_UNORDERED_MAP(K, V, S, N)                          \
     size_t N##_max(void) {                                                     \
         return S;                                                              \
     }                                                                          \
@@ -151,10 +151,10 @@
         }                                                                      \
     }
 
-#define SGC_INIT_SUNORDERED_MAP(K, V, S, N)                                    \
-    SGC_INIT_HEADERS_SUNORDERED_MAP(K, V, S, N)                                \
-    _SGC_INIT_PP_SUNORDERED_MAP(K, V, S, N)                                    \
-    _SGC_INIT_UNIQUE_SUNORDERED_MAP(K, V, S, N)                                \
+#define SGC_INIT_FS_UNORDERED_MAP(K, V, S, N)                                  \
+    SGC_INIT_HEADERS_FS_UNORDERED_MAP(K, V, S, N)                              \
+    _SGC_INIT_PP_FS_UNORDERED_MAP(K, V, S, N)                                  \
+    _SGC_INIT_UNIQUE_FS_UNORDERED_MAP(K, V, S, N)                              \
     _SGC_INIT_COMMON_DICT_PAIR(K, V, N)                                        \
     _SGC_INIT_COMMON_SHASH_MAP(K, S, N)                                        \
     _SGC_INIT_COMMON(N)

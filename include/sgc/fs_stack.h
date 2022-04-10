@@ -1,14 +1,15 @@
 #pragma once
 
-#include "detail/sgc_basic_types.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_stack_common.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define _SGC_INIT_PP_SSTACK(T, N) static void _p_##N##_resize(const N* const s);
+#define _SGC_INIT_PP_FS_STACK(T, N)                                            \
+    static void _p_##N##_resize(const N* const s);
 
-#define SGC_INIT_HEADERS_SSTACK(T, S, N)                                       \
+#define SGC_INIT_HEADERS_FS_STACK(T, S, N)                                     \
     struct N {                                                                 \
         size_t size_;                                                          \
         bool sharing_;                                                         \
@@ -31,7 +32,7 @@
     void N##_set_top(N* s, T new_el);                                          \
     bool N##_empty(const N* const s);
 
-#define _SGC_INIT_UNIQUE_SSTACK(T, S, N)                                       \
+#define _SGC_INIT_UNIQUE_FS_STACK(T, S, N)                                     \
     static void _p_##N##_resize(const N* const v) {                            \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
@@ -63,9 +64,9 @@
         }                                                                      \
     }
 
-#define SGC_INIT_SSTACK(T, S, N)                                               \
-    SGC_INIT_HEADERS_SSTACK(T, S, N)                                           \
-    _SGC_INIT_PP_SSTACK(T, N)                                                  \
-    _SGC_INIT_UNIQUE_SSTACK(T, S, N)                                           \
+#define SGC_INIT_FS_STACK(T, S, N)                                             \
+    SGC_INIT_HEADERS_FS_STACK(T, S, N)                                         \
+    _SGC_INIT_PP_FS_STACK(T, N)                                                \
+    _SGC_INIT_UNIQUE_FS_STACK(T, S, N)                                         \
     _SGC_INIT_COMMON_STACK(T, N)                                               \
     _SGC_INIT_COMMON(N)

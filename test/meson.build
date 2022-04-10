@@ -15,13 +15,13 @@ tests = [
   ['UNORDERED_MAP', 'unordered_map'],
   ['UNORDERED_SET', 'unordered_set'],
   ['VECTOR', 'vector'],
-  ['STATIC_DEQUE', 'static_deque'],
-  ['STATIC_PRIORITY QUEUE', 'static_priority_queue'],
-  ['STATIC_QUEUE', 'static_queue'],
-  ['STATIC_STACK', 'static_stack'],
-  ['STATIC_UNORDERED_MAP', 'static_unordered_map'],
-  ['STATIC_UNORDERED_SET', 'static_unordered_set'],
-  ['STATIC_VECTOR', 'static_vector'],
+  ['FS_DEQUE', 'fs_deque'],
+  ['FS_PRIORITY QUEUE', 'fs_priority_queue'],
+  ['FS_QUEUE', 'fs_queue'],
+  ['FS_STACK', 'fs_stack'],
+  ['FS_UNORDERED_MAP', 'fs_unordered_map'],
+  ['FS_UNORDERED_SET', 'fs_unordered_set'],
+  ['FS_VECTOR', 'fs_vector'],
   ]
 
 foreach name_file : tests

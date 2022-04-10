@@ -1,13 +1,13 @@
 #pragma once
 
-#include "detail/sgc_basic_types.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_deque_common.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define _SGC_INIT_PP_SDEQUE(T, S, N)                                           \
+#define _SGC_INIT_PP_FS_DEQUE(T, S, N)                                         \
     static void _p_##N##_resize(const N* const q);                             \
     static void _p_##N##_free_data(N* d);                                      \
     static void _p_##N##_copy_data(N* dst, const N* const src);                \
@@ -15,7 +15,7 @@
     static void _p_##N##_go_next(size_t* pos, size_t max);                     \
     static void _p_##N##_go_prev(size_t* pos, size_t max);
 
-#define SGC_INIT_HEADERS_SDEQUE(T, S, N)                                       \
+#define SGC_INIT_HEADERS_FS_DEQUE(T, S, N)                                     \
                                                                                \
     struct N {                                                                 \
         size_t size_;                                                          \
@@ -59,7 +59,7 @@
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_RA_IT_PROTOTIPES(N)
 
-#define _SGC_INIT_UNIQUE_SDEQUE(T, S, N)                                       \
+#define _SGC_INIT_UNIQUE_FS_DEQUE(T, S, N)                                     \
     static void _p_##N##_resize(const N* const v) {                            \
         /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
@@ -97,9 +97,9 @@
         }                                                                      \
     }
 
-#define SGC_INIT_SDEQUE(T, S, N)                                               \
-    SGC_INIT_HEADERS_SDEQUE(T, S, N)                                           \
-    _SGC_INIT_PP_SDEQUE(T, S, N)                                               \
-    _SGC_INIT_UNIQUE_SDEQUE(T, S, N)                                           \
+#define SGC_INIT_FS_DEQUE(T, S, N)                                             \
+    SGC_INIT_HEADERS_FS_DEQUE(T, S, N)                                         \
+    _SGC_INIT_PP_FS_DEQUE(T, S, N)                                             \
+    _SGC_INIT_UNIQUE_FS_DEQUE(T, S, N)                                         \
     _SGC_INIT_COMMON_DEQUE(T, N)                                               \
     _SGC_INIT_COMMON(N)

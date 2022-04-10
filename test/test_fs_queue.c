@@ -1,10 +1,10 @@
 #include "test_common.h"
-#include <sgc/static_queue.h>
+#include <sgc/fs_queue.h>
 
 #define TEST_ELEMENTS_NUM 50
 #define QUEUE_MAX 512
 
-SGC_INIT_SQUEUE(int, QUEUE_MAX, queue)
+SGC_INIT_FS_QUEUE(int, QUEUE_MAX, queue)
 
 void test_queue_insert_erase_combinations(void) {
     TEST_TQ(queue);
@@ -48,7 +48,7 @@ void test_queue_front_back(void) {
     queue_free(&q);
 }
 
-SGC_INIT_SQUEUE(al, QUEUE_MAX, aqueue)
+SGC_INIT_FS_QUEUE(al, QUEUE_MAX, aqueue)
 
 void test_aqueue(void) {
     aqueue v;
@@ -74,7 +74,7 @@ void test_aqueue(void) {
     // no memory should be left dealocated
 }
 
-SGC_INIT_SQUEUE(queue, QUEUE_MAX, vqueue)
+SGC_INIT_FS_QUEUE(queue, QUEUE_MAX, vqueue)
 
 const int* vqueue_front_pair(vqueue* l) {
     return queue_front(vqueue_front(l));
@@ -131,8 +131,8 @@ void test_queue_queue(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_queue_insert_erase_combinations);
     RUN_TEST(test_queue_copy);
+    RUN_TEST(test_queue_insert_erase_combinations);
     RUN_TEST(test_queue_front_back);
     RUN_TEST(test_aqueue);
     RUN_TEST(test_queue_queue);

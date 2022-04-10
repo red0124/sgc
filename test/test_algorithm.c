@@ -4,7 +4,7 @@
 #include <sgc/list.h>
 #include <sgc/map.h>
 #include <sgc/set.h>
-#include <sgc/static_unordered_map.h>
+#include <sgc/fs_unordered_map.h>
 #include <sgc/vector.h>
 
 #define TEST_ELEMENTS_NUM 50

@@ -1,6 +1,6 @@
 #pragma once
 #include "detail/sgc_allocator.h"
-#include "detail/sgc_basic_types.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_deque_common.h"
 #include "detail/sgc_iterator.h"

@@ -1,5 +1,5 @@
 #include "test_common.h"
-#include <sgc/static_priority_queue.h>
+#include <sgc/fs_priority_queue.h>
 
 #define TEST_ELEMENTS_NUM 50
 #define PQUEUE_MAX 512

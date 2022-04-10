@@ -1,10 +1,10 @@
 #include "test_common.h"
-#include <sgc/static_stack.h>
+#include <sgc/fs_stack.h>
 
 #define TEST_ELEMENTS_NUM 50
 #define STACK_MAX 512
 
-SGC_INIT_SSTACK(int, STACK_MAX, stack)
+SGC_INIT_FS_STACK(int, STACK_MAX, stack)
 
 void test_stack_insert_erase_combinations(void) {
     TEST_TSTK(stack);
@@ -45,7 +45,7 @@ void test_stack_front_back(void) {
     stack_free(&v);
 }
 
-SGC_INIT_SSTACK(al, STACK_MAX, astack)
+SGC_INIT_FS_STACK(al, STACK_MAX, astack)
 
 void test_astack(void) {
     astack v;
@@ -71,7 +71,7 @@ void test_astack(void) {
     // no memory should be left dealocated
 }
 
-SGC_INIT_SSTACK(stack, STACK_MAX, vstack)
+SGC_INIT_FS_STACK(stack, STACK_MAX, vstack)
 
 int* vstack_top_pair(vstack* l) {
     return stack_top(vstack_top(l));
