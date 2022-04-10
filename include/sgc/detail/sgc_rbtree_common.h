@@ -12,7 +12,7 @@ enum _sgc_map_color {
     bool N##_erase(N* m, const K key) {                                        \
         struct _p_##N##_node* n = _p_##N##_node_find(m, key);                  \
         if (n) {                                                               \
-            sgc_free(_p_##N##_node_erase(m, n));                               \
+            _p_##N##_node_erase(m, n);                                         \
         }                                                                      \
         return (bool)n;                                                        \
     }                                                                          \
@@ -22,7 +22,7 @@ enum _sgc_map_color {
         N##_it_go_next(&tmp);                                                  \
         bool valid = i->valid_;                                                \
         if (valid) {                                                           \
-            sgc_free(_p_##N##_node_erase(m, i->curr_));                        \
+            _p_##N##_node_erase(m, i->curr_);                                  \
         }                                                                      \
         i->curr_ = tmp.curr_;                                                  \
         i->next_ = tmp.next_;                                                  \

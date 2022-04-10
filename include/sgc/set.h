@@ -45,8 +45,7 @@
     static struct _p_##N##_node* _p_##N##_node_find(N* s, KV v);               \
     static void _p_##N##_erase_rebalanse(N* m, struct _p_##N##_node* n,        \
                                          struct _p_##N##_node* p);             \
-    static struct _p_##N##_node* _p_##N##_node_erase(N* m,                     \
-                                                     struct _p_##N##_node* n); \
+    static void _p_##N##_node_erase(N* m, struct _p_##N##_node* n);            \
     static void                                                                \
         _p_##N##_node_copy_values(const N* const m, struct _p_##N##_node* dst, \
                                   const struct _p_##N##_node* const src);      \
@@ -155,8 +154,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static struct _p_##N##_node*                                               \
-        _p_##N##_node_erase(N* m, struct _p_##N##_node* n) {                   \
+    static void _p_##N##_node_erase(N* m, struct _p_##N##_node* n) {           \
         struct _p_##N##_node* succ;                                            \
         struct _p_##N##_node* succ_p;                                          \
         struct _p_##N##_node* succ_c = _SGC_MAP_LEAF;                          \
@@ -204,7 +202,7 @@
             m->root_->color_ = _SGC_MAP_COLOR_BLACK;                           \
         }                                                                      \
         --m->size_;                                                            \
-        return succ;                                                           \
+        free(succ);                                                            \
     }                                                                          \
                                                                                \
     void N##_init(N* s) {                                                      \
