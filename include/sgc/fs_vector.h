@@ -51,7 +51,7 @@
     _SGC_INIT_RA_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_FS_VECTOR(T, S, N)                                    \
-    _SGC_INIT_FS_RESIZE(T, S, N)                                              \
+    _SGC_INIT_FS_RESIZE(T, S, N)                                               \
                                                                                \
     void N##_init(N* v) {                                                      \
         v->size_ = 0;                                                          \

@@ -60,7 +60,7 @@
     _SGC_INIT_RA_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_FS_DEQUE(T, S, N)                                     \
-    _SGC_INIT_FS_RESIZE(T, S, N)                                              \
+    _SGC_INIT_FS_RESIZE(T, S, N)                                               \
                                                                                \
     static size_t _p_##N##_max(const N* const v) {                             \
         (void)(v);                                                             \

@@ -76,8 +76,8 @@
                 }                                                              \
                 tmp_dst = _p_##N##_node_alloc(dst);                            \
                 if (!tmp_dst) {                                                \
-                    _p_##N##_free_nodes(dst->head_);\
-                    N##_init(dst);\
+                    _p_##N##_free_nodes(dst->head_);                           \
+                    N##_init(dst);                                             \
                     return;                                                    \
                 }                                                              \
                 _SGC_COPY(T, tmp_dst->data_, tmp_src->data_, src->sharing_)    \

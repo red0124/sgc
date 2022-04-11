@@ -33,7 +33,7 @@
     bool N##_empty(const N* const s);
 
 #define _SGC_INIT_UNIQUE_FS_STACK(T, S, N)                                     \
-    _SGC_INIT_FS_RESIZE(T, S, N)                                              \
+    _SGC_INIT_FS_RESIZE(T, S, N)                                               \
                                                                                \
     void N##_init(N* s) {                                                      \
         s->size_ = 0;                                                          \
