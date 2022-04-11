@@ -414,11 +414,16 @@ enum _sgc_map_color {
                                     const N* __restrict__ const src) {         \
         if (src->size_ != 0) {                                                 \
             dst->root_ = _p_##N##_node_duplicate(src, src->root_);             \
+            if (!dst->root_) {                                                 \
+                N##_init(dst);                                                 \
+                return;                                                        \
+            }                                                                  \
                                                                                \
             struct _p_##N##_node** stack_src =                                 \
                 (struct _p_##N##_node**)sgc_malloc(                            \
                     _p_##N##_stack_size(src->size_));                          \
             if (!stack_src) {                                                  \
+                N##_free(dst);\
                 N##_init(dst);                                                 \
                 return;                                                        \
             }                                                                  \
@@ -429,8 +434,8 @@ enum _sgc_map_color {
                 (struct _p_##N##_node**)sgc_malloc(                            \
                     _p_##N##_stack_size(dst->size_));                          \
             if (!stack_dst) {                                                  \
-                N##_init(dst);                                                 \
                 sgc_free(stack_src);                                           \
+                N##_init(dst);                                                 \
                 return;                                                        \
             }                                                                  \
                                                                                \
