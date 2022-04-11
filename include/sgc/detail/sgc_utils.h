@@ -160,7 +160,7 @@
 
 #define SGC_INIT_PAIR(...)                                                     \
     _SGC_INIT_PAIR_N(__VA_ARGS__, _SGC_INIT_PAIR8, _SGC_INIT_PAIR7,            \
-                     _SGC_INIT_PAIR6, _SGC_INIT_PAIR5, _SGC_INIT_PAIR4)        \
+                     _SGC_INIT_PAIR6, _SGC_INIT_PAIR5, _SGC_INIT_PAIR4, )        \
     (__VA_ARGS__)
 
 #define _SGC_INIT_PAIR4(C, K, V, N) SGC_INIT_##C(K, V, N)
