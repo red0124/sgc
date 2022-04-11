@@ -1,12 +1,12 @@
 #include "test_common.h"
-#include <sgc/static_queue.h>
+#include <sgc/fs_queue.h>
 
 #define TEST_ELEMENTS_NUM 50
 #define QUEUE_MAX 512
 
-SGC_INIT_STATIC_QUEUE(int, QUEUE_MAX, queue)
+SGC_INIT_FS_QUEUE(int, QUEUE_MAX, queue)
 
-void test_queue_xxx(void) {
+void test_queue_insert_erase_combinations(void) {
     TEST_TQ(queue);
 }
 
@@ -48,7 +48,7 @@ void test_queue_front_back(void) {
     queue_free(&q);
 }
 
-SGC_INIT_STATIC_QUEUE(al, QUEUE_MAX, aqueue)
+SGC_INIT_FS_QUEUE(al, QUEUE_MAX, aqueue)
 
 void test_aqueue(void) {
     aqueue v;
@@ -63,10 +63,10 @@ void test_aqueue(void) {
 
     aqueue_pop(&v);
 
-    aqueue_set_share(&v, 1);
+    aqueue_set_shareing(&v);
     ++allocation_count;
     aqueue_push(&v, (al){(int*)malloc(sizeof(int))});
-    aqueue_set_share(&v, 0);
+    aqueue_set_owning(&v);
 
     aqueue_free(&v);
 
@@ -74,21 +74,21 @@ void test_aqueue(void) {
     // no memory should be left dealocated
 }
 
-SGC_INIT_STATIC_QUEUE(queue, QUEUE_MAX, vqueue)
+SGC_INIT_FS_QUEUE(queue, QUEUE_MAX, vqueue)
 
-int* vqueue_front_pair(vqueue* l) {
+const int* vqueue_front_pair(vqueue* l) {
     return queue_front(vqueue_front(l));
 }
 
-int* vqueue_back_pair(vqueue* l) {
+const int* vqueue_back_pair(vqueue* l) {
     return queue_back(vqueue_back(l));
 }
 
-int* vqueue_back_front_pair(vqueue* l) {
+const int* vqueue_back_front_pair(vqueue* l) {
     return queue_back(vqueue_front(l));
 }
 
-int* vqueue_front_back_pair(vqueue* l) {
+const int* vqueue_front_back_pair(vqueue* l) {
     return queue_front(vqueue_back(l));
 }
 
@@ -113,9 +113,9 @@ void test_queue_queue(void) {
     queue_push(&tmp, 2);
     // {0, 1, 2}
 
-    vqueue_set_share(&v, 1);
+    vqueue_set_shareing(&v);
     vqueue_push(&v, tmp);
-    vqueue_set_share(&v, 0);
+    vqueue_set_owning(&v);
     // pushed queue into vqueue, it will use the original
 
     // {{0}, {0, 1}, {0, 1, 2}}
@@ -131,8 +131,8 @@ void test_queue_queue(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_queue_xxx);
     RUN_TEST(test_queue_copy);
+    RUN_TEST(test_queue_insert_erase_combinations);
     RUN_TEST(test_queue_front_back);
     RUN_TEST(test_aqueue);
     RUN_TEST(test_queue_queue);

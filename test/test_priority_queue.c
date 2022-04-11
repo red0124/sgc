@@ -5,7 +5,7 @@
 
 SGC_INIT_PRIORITY_QUEUE(int, pqueue)
 
-void test_pqueue_xxx(void) {
+void test_pqueue_insert_erase_combinations(void) {
     TEST_TPQ(pqueue);
 }
 
@@ -59,12 +59,12 @@ void test_apqueue(void) {
 
     apqueue_pop(&v);
 
-    apqueue_set_share(&v, 1);
+    apqueue_set_shareing(&v);
     ++allocation_count;
     al new_el = (al){(int*)malloc(sizeof(int))};
     *(new_el.el) = 3;
     apqueue_push(&v, new_el);
-    apqueue_set_share(&v, 0);
+    apqueue_set_owning(&v);
 
     apqueue_free(&v);
 
@@ -103,9 +103,9 @@ void test_pqueue_pqueue(void) {
     pqueue_push(&tmp, 2);
     // {0, 1, 2}
 
-    vpqueue_set_share(&v, 1);
+    vpqueue_set_shareing(&v);
     vpqueue_push(&v, tmp);
-    vpqueue_set_share(&v, 0);
+    vpqueue_set_owning(&v);
     // pushed pqueue into vpqueue, it will use the original
 
     // {{0}, {0, 1}, {0, 1, 2}}
@@ -118,7 +118,7 @@ void test_pqueue_pqueue(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_pqueue_xxx);
+    RUN_TEST(test_pqueue_insert_erase_combinations);
     RUN_TEST(test_pqueue_push_pop);
     RUN_TEST(test_pqueue_copy);
     RUN_TEST(test_apqueue);

@@ -2,8 +2,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define _SGC_INIT_PRIORITY_QUEUE_TYPE_FUNCTIONS(T, N)                          \
-    static void _m_##N##_stack_size(T* i, T* j) {                              \
+#define _SGC_INIT_COMMON_PRIORITY_QUEUE(T, N)                                  \
+    static void _p_##N##_swap(T* i, T* j) {                                    \
         char* tmp[sizeof(T)];                                                  \
                                                                                \
         memcpy(tmp, i, sizeof(T));                                             \
@@ -11,14 +11,14 @@
         memcpy(j, tmp, sizeof(T));                                             \
     }                                                                          \
                                                                                \
-    static void _m_##N##_is_left_child(struct N* p) {                          \
+    static void _p_##N##_fix_insert(N* p) {                                    \
         size_t curr = p->size_;                                                \
         while (curr > 0) {                                                     \
-            size_t parent = (curr - 1) >> 1;                                   \
+            size_t parent = (curr - 1) / 2;                                    \
             T* parent_data = &p->data_[parent];                                \
             T* curr_data = &p->data_[curr];                                    \
             if (T##_compare(parent_data, curr_data) < 0) {                     \
-                _m_##N##_stack_size(parent_data, curr_data);                   \
+                _p_##N##_swap(parent_data, curr_data);                         \
                 curr = parent;                                                 \
             } else {                                                           \
                 break;                                                         \
@@ -26,14 +26,14 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_push(struct N* p, T el) {                                         \
-        N##_node(p);                                                           \
-        SGC_COPY(T##_copy, p->data_[p->size_], el, p->shared_);                \
-        _m_##N##_is_left_child(p);                                             \
+    void N##_push(N* p, T el) {                                                \
+        _p_##N##_resize(p);                                                    \
+        _SGC_COPY(T, p->data_[p->size_], el, p->sharing_);                     \
+        _p_##N##_fix_insert(p);                                                \
         ++p->size_;                                                            \
     }                                                                          \
                                                                                \
-    static void _m_##N##_resize(struct N* p) {                                 \
+    static void _p_##N##_fix_erase(N* p) {                                     \
         size_t curr = 0;                                                       \
         while ((curr + 1) * 2 <= p->size_) {                                   \
             size_t right = (curr + 1) * 2;                                     \
@@ -44,7 +44,7 @@
                 tmp = left;                                                    \
             }                                                                  \
             if (T##_compare(&p->data_[tmp], &p->data_[curr]) > 0) {            \
-                _m_##N##_stack_size(&p->data_[curr], &p->data_[tmp]);          \
+                _p_##N##_swap(&p->data_[curr], &p->data_[tmp]);                \
                 curr = tmp;                                                    \
             } else {                                                           \
                 break;                                                         \
@@ -52,38 +52,33 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_pop(struct N* p) {                                                \
+    void N##_pop(N* p) {                                                       \
         if (p->size_) {                                                        \
-            _m_##N##_stack_size(&p->data_[0], &p->data_[--p->size_]);          \
-            if (!p->shared_) {                                                 \
-                T##_free(&p->data_[p->size_]);                                 \
-            }                                                                  \
-            _m_##N##_resize(p);                                                \
+            _p_##N##_swap(&p->data_[0], &p->data_[--p->size_]);                \
+            _SGC_FREE(T, p->data_[p->size_], p->sharing_)                      \
+            _p_##N##_fix_erase(p);                                             \
         }                                                                      \
     }                                                                          \
                                                                                \
-    const T* N##_top(const struct N* const p) {                                \
+    const T* N##_top(const N* const p) {                                       \
         if (p->size_) {                                                        \
             return &p->data_[0];                                               \
         }                                                                      \
         return NULL;                                                           \
     }                                                                          \
                                                                                \
-    T* N##_array(struct N* d) {                                                \
-        T* ret = NULL;                                                         \
+    T* N##_array(N* d) {                                                       \
         if (d->size_) {                                                        \
-            ret = d->data_;                                                    \
+            return d->data_;                                                   \
         }                                                                      \
-        return ret;                                                            \
+        return NULL;                                                           \
     }                                                                          \
                                                                                \
-    void N##_from_array(struct N* p, const T* const arr, const size_t size) {  \
+    void N##_from_array(N* p, const T* const arr, size_t size) {               \
         N##_init(p);                                                           \
         if (size) {                                                            \
             for (size_t i = 0; i < size; ++i) {                                \
                 N##_push(p, arr[i]);                                           \
             }                                                                  \
-        } else {                                                               \
-            p->size_ = 0;                                                      \
         }                                                                      \
     }

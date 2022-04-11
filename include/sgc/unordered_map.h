@@ -1,43 +1,45 @@
 #pragma once
 
 #include "detail/sgc_allocator.h"
-#include "detail/sgc_basic_types.h"
 #include "detail/sgc_common.h"
-#include "detail/sgc_dictionary_ocmmon.h"
+#include "detail/sgc_dictionary_common.h"
 #include "detail/sgc_hash_map_common.h"
+#include "detail/sgc_iterator.h"
 #include "detail/sgc_prime.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define SGC_INIT_STATIC_FUNCTIONS_UNORDERED_MAP(K, V, N)                       \
-    static void _m_##N##_bucket_sgc_free(const struct N* const u,              \
-                                         struct N##_node* bucket);             \
-    static void _m_##N##_bucket_insert(struct N##_node* bucket,                \
-                                       struct N##_node* new_node);             \
-    static size_t _m_##N##_bucket_node_size(struct N##_node* bucket);          \
-    static struct N##_node* _m_##N##_bucket_remove(struct N* u,                \
-                                                   struct N##_node* bucket,    \
-                                                   const K* const key);        \
-    static struct N##_node* _m_##N##_bucket_end(struct N##_node* bucket);      \
-    static struct N##_iterator _m_##N##_find_by_hash(struct N* u,              \
-                                                     const K* const k,         \
-                                                     size_t hash);             \
-    static void _m_##N##_rehash_size(const struct N* const u, size_t* max,     \
+#define _SGC_INIT_PP_UNORDERED_MAP(K, V, N)                                    \
+    static void _p_##N##_bucket_free_nodes(const N* const u,                   \
+                                           struct _p_##N##_node* bucket);      \
+    static void _p_##N##_bucket_insert(struct _p_##N##_node* bucket,           \
+                                       struct _p_##N##_node* new_node);        \
+    static size_t _p_##N##_bucket_node_size(struct _p_##N##_node* bucket);     \
+    static struct _p_##N##_node*                                               \
+        _p_##N##_bucket_remove(N* u, struct _p_##N##_node* bucket,             \
+                               const K* const key);                            \
+    static struct _p_##N##_node* _p_##N##_bucket_end(                          \
+        struct _p_##N##_node* bucket);                                         \
+    static struct N##_it _p_##N##_find_by_hash(N* u, const K* const k,         \
+                                               size_t hash);                   \
+    static void _p_##N##_rehash_size(const N* const u, size_t* max,            \
                                      size_t* new_max);                         \
-    static void _m_##N##_resize(struct N* u);                                  \
+    static bool _p_##N##_resize(N* u);                                         \
+    static void _p_##N##_copy_base_data(N* __restrict__ dst,                   \
+                                        const N* __restrict__ const src);      \
+    static void _p_##N##_copy_nodes(N* __restrict__ dst,                       \
+                                    const N* __restrict__ const src);          \
+    static void _p_##N##_node_free(const N* const m, struct _p_##N##_node* n); \
     static void                                                                \
-        _m_##N##_copy_base_data(struct N* __restrict__ dst,                    \
-                                const struct N* __restrict__ const src);       \
-    static void _m_##N##_copy_nodes(struct N* __restrict__ dst,                \
-                                    const struct N* __restrict__ const src);   \
-    static void _m_##N##_node_free(const struct N* const m,                    \
-                                   struct N##_node* n);                        \
-    static void _m_##N##_node_copy_values(const struct N* const m,             \
-                                          struct N##_node* dst,                \
-                                          const struct N##_node* const src);   \
-    static size_t _m_##N##_node_hash_value(const struct N##_node* n);          \
-    static bool _m_##N##_node_equal_key(const struct N##_node* const n,        \
-                                        const K* const key);
+        _p_##N##_node_copy_values(const N* const m, struct _p_##N##_node* dst, \
+                                  const struct _p_##N##_node* const src);      \
+    static size_t _p_##N##_node_hash_value(const struct _p_##N##_node* n);     \
+    static bool _p_##N##_node_eq_key(const struct _p_##N##_node* const n,      \
+                                     const K* const key);                      \
+    struct _p_##N##_node* _p_##N##_node_new(const K* key,                      \
+                                            const V* const value,              \
+                                            bool sharing_key, bool shared);
 
 #define SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                \
                                                                                \
@@ -46,93 +48,80 @@
         V value;                                                               \
     };                                                                         \
                                                                                \
-    struct N##_node {                                                          \
+    struct _p_##N##_node {                                                     \
         struct N##_pair data_;                                                 \
-        struct N##_node* next_;                                                \
+        struct _p_##N##_node* next_;                                           \
     };                                                                         \
                                                                                \
     struct N {                                                                 \
         size_t size_;                                                          \
         size_t max_;                                                           \
-        size_t shared_;                                                        \
-        size_t shared_key_;                                                    \
-        struct N##_node** data_;                                               \
+        bool sharing_;                                                         \
+        bool sharing_key_;                                                     \
+        struct _p_##N##_node** data_;                                          \
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
+    typedef struct N##_pair N##_pair;                                          \
     typedef struct N##_pair N##_type;                                          \
     typedef V N##_value;                                                       \
     typedef K N##_key;                                                         \
+    size_t N##_bucket_count(const N* const u);                                 \
+    size_t N##_bucket_size(const N* const u, size_t n);                        \
+    size_t N##_buckets_used(const N* const u);                                 \
                                                                                \
-    struct N##_node* _m_##N##_node_new(const K* key, const V* const value,     \
-                                       size_t is_shared_key,                   \
-                                       size_t is_shared);                      \
-    size_t N##_bucket_count(const struct N* const u);                          \
-    size_t N##_bucket_size(const struct N* const u, size_t n);                 \
-    size_t N##_buckets_used(const struct N* const u);                          \
-                                                                               \
-    struct N##_iterator {                                                      \
-        struct N##_node** data_;                                               \
-        struct N##_node* curr_;                                                \
+    struct N##_it {                                                            \
+        struct _p_##N##_node** data_;                                          \
+        struct _p_##N##_node* curr_;                                           \
         size_t curr_bucket_;                                                   \
         size_t max_;                                                           \
-        int is_valid_;                                                         \
+        bool valid_;                                                           \
     };                                                                         \
                                                                                \
-    typedef struct N##_iterator N##_iterator;                                  \
+    typedef struct N##_it N##_it;                                              \
+    _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
                                                                                \
-    struct N##_pair* N##_iterator_data(struct N##_iterator i);                 \
-    const struct N##_pair* N##_iterator_cdata(struct N##_iterator i);          \
-    void N##_iterator_next(struct N##_iterator* i);                            \
-    void N##_iterator_begin(struct N* m, struct N##_iterator* i);              \
-    void N##_iterator_cbegin(const struct N* const m, struct N##_iterator* i); \
-    void N##_iterator_prev(struct N##_iterator* i);                            \
-    void N##_iterator_end(struct N* m, struct N##_iterator* i);                \
-    void N##_iterator_cend(const struct N* const m, struct N##_iterator* i);   \
-    struct N##_iterator N##_begin(struct N* m);                                \
-    struct N##_iterator N##_cbegin(const struct N* const m);                   \
-    struct N##_iterator N##_end(struct N* m);                                  \
-    struct N##_iterator N##_cend(const struct N* const m);                     \
-    bool N##_iterator_equal(const struct N##_iterator first,                   \
-                            const struct N##_iterator second);                 \
-    bool N##_iterator_valid(const struct N##_iterator i);                      \
-                                                                               \
-    void N##_set_share(N* u, int is_shared);                                   \
-    void N##_set_share_key(N* u, int is_shared_key);                           \
-    size_t N##_size(const struct N* const u);                                  \
-    void N##_init(struct N* u);                                                \
+    void N##_set_shareing(N* u);                                               \
+    void N##_set_owning(N* u);                                                 \
+    void N##_set_shareing_key(N* u);                                           \
+    void N##_set_owning_key(N* u);                                             \
+    size_t N##_size(const N* const u);                                         \
+    void N##_init(N* u);                                                       \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
-    void N##_free(struct N* u);                                                \
-    struct N##_iterator N##_find(struct N* u, const K k);                      \
-    void N##_rehash(struct N* u, size_t new_max);                              \
-    void N##_set_at(struct N* u, const K k, const V v);                        \
-    V* N##_at(struct N* u, K k);                                               \
-    void N##_erase(struct N* u, const K k);                                    \
-    void N##_iterator_erase(struct N* u, struct N##_iterator* i);              \
-    bool N##_empty(const struct N* const u);
+    void N##_free(N* u);                                                       \
+    struct N##_it N##_find(N* u, const K k);                                   \
+    void N##_rehash(N* u, size_t new_max);                                     \
+    void N##_set(N* u, const K k, const V v);                                  \
+    V* N##_at(N* u, K k);                                                      \
+    void N##_erase(N* u, const K k);                                           \
+    void N##_it_erase(N* u, struct N##_it* i);                                 \
+    bool N##_empty(const N* const u);
 
-#define _SGC_INIT_UNIQUE_UNORDERED_MAP_FUNCTIONS(K, V, N)                      \
-    struct N##_node* _m_##N##_node_new(const K* key, const V* const value,     \
-                                       size_t is_shared_key,                   \
-                                       size_t is_shared) {                     \
-        struct N##_node* new_node =                                            \
-            (struct N##_node*)sgc_malloc(sizeof(struct N##_node));             \
-        SGC_COPY(K##_copy, new_node->data_.key, *key, is_shared_key);          \
-        SGC_COPY(V##_copy, new_node->data_.value, *value, is_shared);          \
+#define _SGC_INIT_UNIQUE_UNORDERED_MAP(K, V, N)                                \
+    struct _p_##N##_node* _p_##N##_node_new(const K* key,                      \
+                                            const V* const value,              \
+                                            bool sharing_key, bool shared) {   \
+        struct _p_##N##_node* new_node =                                       \
+            (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
+        if (!new_node) {                                                       \
+            return NULL;                                                       \
+        }                                                                      \
+        _SGC_COPY(K, new_node->data_.key, *key, sharing_key);                  \
+        _SGC_COPY(V, new_node->data_.value, *value, shared);                   \
         new_node->next_ = NULL;                                                \
         return new_node;                                                       \
     }                                                                          \
                                                                                \
-    void N##_init(struct N* u) {                                               \
+    void N##_init(N* u) {                                                      \
+        u->sharing_ = u->sharing_key_ = false;                                 \
         u->size_ = u->max_ = 0;                                                \
         u->data_ = NULL;                                                       \
-        u->shared_ = u->shared_key_ = 0;                                       \
     }                                                                          \
                                                                                \
-    void N##_free(struct N* u) {                                               \
+    void N##_free(N* u) {                                                      \
         if (u->size_) {                                                        \
             for (size_t i = 0; i < u->max_; ++i) {                             \
-                _m_##N##_bucket_sgc_free(u, u->data_[i]);                      \
+                _p_##N##_bucket_free_nodes(u, u->data_[i]);                    \
             }                                                                  \
         }                                                                      \
         if (u->data_) {                                                        \
@@ -140,17 +129,14 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static struct N##_iterator _m_##N##_find_by_hash(struct N* u,              \
-                                                     const K* const k,         \
-                                                     size_t hash) {            \
-        struct N##_iterator ret = {NULL, NULL, 0, 0, 0};                       \
+    static N##_it _p_##N##_find_by_hash(N* u, const K* const k, size_t hash) { \
+        N##_it ret = {NULL, NULL, 0, 0, false};                                \
         if (u->max_) {                                                         \
             size_t position = hash % u->max_;                                  \
-            struct N##_node* tmp = u->data_[position];                         \
+            struct _p_##N##_node* tmp = u->data_[position];                    \
             while (tmp) {                                                      \
-                if (K##_equal(&tmp->data_.key, k)) {                           \
-                    ret = (struct N##_iterator){u->data_, tmp, position,       \
-                                                u->max_, 1};                   \
+                if (K##_eq(&tmp->data_.key, k)) {                              \
+                    ret = (N##_it){u->data_, tmp, position, u->max_, 1};       \
                     break;                                                     \
                 }                                                              \
                 tmp = tmp->next_;                                              \
@@ -159,23 +145,28 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    struct N##_iterator N##_find(struct N* u, const K k) {                     \
+    N##_it N##_find(N* u, const K k) {                                         \
         size_t hash = K##_hash(&k);                                            \
-        return _m_##N##_find_by_hash(u, &k, hash);                             \
+        return _p_##N##_find_by_hash(u, &k, hash);                             \
     }                                                                          \
                                                                                \
-    void N##_set_at(struct N* u, const K k, const V v) {                       \
+    void N##_set(N* u, const K k, const V v) {                                 \
         size_t hash = K##_hash(&k);                                            \
-        struct N##_iterator i = _m_##N##_find_by_hash(u, &k, hash);            \
-        if (i.curr_) {                                                         \
-            SGC_REPLACE(V##_copy, V##_free, i.curr_->data_.value, v, i.curr_); \
+        N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
+        if (i.valid_) {                                                        \
+            _SGC_REPLACE(V, i.curr_->data_.value, v, u->sharing_);             \
         } else {                                                               \
-            _m_##N##_resize(u);                                                \
-            struct N##_node* new_node =                                        \
-                _m_##N##_node_new(&k, &v, u->shared_key_, u->shared_);         \
+            if (!_p_##N##_resize(u)) {                                         \
+                return;                                                        \
+            }                                                                  \
+            struct _p_##N##_node* new_node =                                   \
+                _p_##N##_node_new(&k, &v, u->sharing_key_, u->sharing_);       \
+            if (!new_node) {                                                   \
+                return;                                                        \
+            }                                                                  \
             size_t position = hash % u->max_;                                  \
             if (u->data_[position]) {                                          \
-                _m_##N##_bucket_insert(u->data_[position], new_node);          \
+                _p_##N##_bucket_insert(u->data_[position], new_node);          \
             } else {                                                           \
                 u->data_[position] = new_node;                                 \
             }                                                                  \
@@ -183,21 +174,26 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    V* N##_at(struct N* u, K k) {                                              \
+    V* N##_at(N* u, K k) {                                                     \
         size_t hash = K##_hash(&k);                                            \
-        struct N##_iterator i = _m_##N##_find_by_hash(u, &k, hash);            \
+        N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
         V* ret;                                                                \
         if (i.curr_) {                                                         \
             ret = &i.curr_->data_.value;                                       \
         } else {                                                               \
             V v;                                                               \
-            _m_##N##_resize(u);                                                \
+            if (!_p_##N##_resize(u)) {                                         \
+                return NULL;                                                   \
+            }                                                                  \
             V##_init(&v);                                                      \
-            struct N##_node* new_node =                                        \
-                _m_##N##_node_new(&k, &v, u->shared_key_, u->shared_);         \
+            struct _p_##N##_node* new_node =                                   \
+                _p_##N##_node_new(&k, &v, u->sharing_key_, u->sharing_);       \
+            if (!new_node) {                                                   \
+                return NULL;                                                   \
+            }                                                                  \
             size_t position = hash % u->max_;                                  \
             if (u->data_[position]) {                                          \
-                _m_##N##_bucket_insert(u->data_[position], new_node);          \
+                _p_##N##_bucket_insert(u->data_[position], new_node);          \
             } else {                                                           \
                 u->data_[position] = new_node;                                 \
             }                                                                  \
@@ -207,27 +203,26 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    void N##_iterator_erase(struct N* u, struct N##_iterator* i) {             \
-        if (N##_iterator_valid(*i)) {                                          \
+    void N##_it_erase(N* u, N##_it* i) {                                       \
+        if (N##_it_valid(*i)) {                                                \
             K key = i->curr_->data_.key;                                       \
-            N##_iterator_next(i);                                              \
+            N##_it_go_next(i);                                                 \
             N##_erase(u, key);                                                 \
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void                                                                \
-        _m_##N##_copy_base_data(struct N* __restrict__ dst,                    \
-                                const struct N* __restrict__ const src) {      \
+    static void _p_##N##_copy_base_data(N* __restrict__ dst,                   \
+                                        const N* __restrict__ const src) {     \
         dst->size_ = src->size_;                                               \
         dst->max_ = src->max_;                                                 \
-        dst->shared_key_ = src->shared_key_;                                   \
-        dst->shared_ = src->shared_;                                           \
+        dst->sharing_key_ = src->sharing_key_;                                 \
+        dst->sharing_ = src->sharing_;                                         \
     }
 
 #define SGC_INIT_UNORDERED_MAP(K, V, N)                                        \
     SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                    \
-    SGC_INIT_STATIC_FUNCTIONS_UNORDERED_MAP(K, V, N)                           \
-    _SGC_INIT_UNIQUE_UNORDERED_MAP_FUNCTIONS(K, V, N)                          \
-    _SGC_INIT_COMMON_DICTIONARY_PAIR_FUNCTIONS(K, V, N)                        \
-    _SGC_INIT_HASH_MAP_TYPE_FUNCTIONS(K, N)                                    \
-    _SGC_INIT_COMMON_FUNCTIONS(N)
+    _SGC_INIT_PP_UNORDERED_MAP(K, V, N)                                        \
+    _SGC_INIT_UNIQUE_UNORDERED_MAP(K, V, N)                                    \
+    _SGC_INIT_COMMON_DICT_PAIR_HASH(K, V, N)                                   \
+    _SGC_INIT_COMMON_HASH_MAP(K, N)                                            \
+    _SGC_INIT_COMMON(N)

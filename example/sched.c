@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <SGC/static_vector.h>
-#include <SGC/static_priority_queue.h>
+#include <SGC/fs_vector.h>
+#include <SGC/fs_priority_queue.h>
 
 struct task
 {

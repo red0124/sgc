@@ -36,8 +36,6 @@ jobs:
 
     env:
       CC: clang-${{ matrix.version }}
-      CXX: clang++-${{ matrix.version }}
-      CXXFLAGS: -stdlib=libc++
 
     steps:
       - uses: actions/checkout@v1

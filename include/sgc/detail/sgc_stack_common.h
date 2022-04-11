@@ -2,34 +2,32 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define _SGC_INIT_STACK_TYPE_FUNCTIONS(T, N)                                   \
-    void N##_push(struct N* s, T el) {                                         \
-        _m_##N##_resize(s);                                                    \
-        SGC_COPY(T##_copy, s->data_[s->size_], el, s->shared_);                \
+#define _SGC_INIT_COMMON_STACK(T, N)                                           \
+    void N##_push(N* s, T el) {                                                \
+        if (!_p_##N##_resize(s)) {                                             \
+            return;                                                            \
+        }                                                                      \
+        _SGC_COPY(T, s->data_[s->size_], el, s->sharing_);                     \
         ++s->size_;                                                            \
     }                                                                          \
                                                                                \
-    void N##_pop(struct N* s) {                                                \
+    void N##_pop(N* s) {                                                       \
         if (s->size_) {                                                        \
             T* el = &s->data_[s->size_ - 1];                                   \
-            if (!s->shared_) {                                                 \
-                T##_free(el);                                                  \
-            }                                                                  \
+            _SGC_FREE(T, *el, s->sharing_);                                    \
             --s->size_;                                                        \
         }                                                                      \
     }                                                                          \
                                                                                \
-    T* N##_top(struct N* s) {                                                  \
-        T* ret = NULL;                                                         \
+    T* N##_top(N* s) {                                                         \
         if (s->size_) {                                                        \
-            ret = &s->data_[s->size_ - 1];                                     \
+            return &s->data_[s->size_ - 1];                                    \
         }                                                                      \
-        return ret;                                                            \
+        return NULL;                                                           \
     }                                                                          \
                                                                                \
-    void N##_set_top(struct N* s, T new_el) {                                  \
+    void N##_set_top(N* s, T new_el) {                                         \
         if (s->size_) {                                                        \
-            SGC_REPLACE(T##_copy, T##_free, s->data_[s->size_ - 1], new_el,    \
-                        s->shared_);                                           \
+            _SGC_REPLACE(T, s->data_[s->size_ - 1], new_el, s->sharing_);      \
         }                                                                      \
     }

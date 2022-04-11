@@ -6,7 +6,7 @@
 #include <unity.h>
 
 #ifdef LOG
-#define log(...) printf(__VA_ARGS__)
+#define log(...) fprintf(stderr, __VA_ARGS__)
 #else
 #define log(...) (void)(NULL)
 #endif
@@ -17,6 +17,15 @@ inline void setUp(void) {
 inline void tearDown(void) {
 }
 
+size_t power(size_t base, size_t exp) {
+    size_t x = 1;
+    for (size_t i = 0; i < exp; ++i) {
+        x *= base;
+    }
+
+    return x;
+}
+
 struct alocated_element {
     int* el;
 };
@@ -25,7 +34,7 @@ typedef struct alocated_element al;
 
 size_t allocation_count = 0;
 
-inline void al_copy(al* dst, const al* const src) {
+static inline void al_copy(al* dst, const al* const src) {
     if (src->el) {
         dst->el = (int*)malloc(sizeof(int));
         *dst->el = *src->el;
@@ -35,7 +44,7 @@ inline void al_copy(al* dst, const al* const src) {
     ++allocation_count;
 }
 
-inline al al_new(int el) {
+static inline al al_new(int el) {
     al e;
     e.el = malloc(sizeof(int));
     *e.el = el;
@@ -43,24 +52,24 @@ inline al al_new(int el) {
     return e;
 }
 
-inline void al_free(al* a) {
+static inline void al_free(al* a) {
     --allocation_count;
     free(a->el);
 }
 
-inline int al_equal(const al* const first, const al* const second) {
+static inline int al_eq(const al* const first, const al* const second) {
     return *first->el == *second->el;
 }
 
-inline int al_compare(const al* const first, const al* const second) {
+static inline int al_compare(const al* const first, const al* const second) {
     return *first->el - *second->el;
 }
 
-inline void al_init(al* a) {
+static inline void al_init(al* a) {
     a->el = NULL;
 }
 
-inline size_t al_hash(const al* const a) {
+static inline size_t al_hash(const al* const a) {
     return *a->el;
 }
 
@@ -95,333 +104,6 @@ inline size_t al_hash(const al* const a) {
         }                                                                      \
     }
 
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_POP_BACK_AT_FRONT_BACK_EMPTY(N)                         \
-    N ds;                                                                      \
-    const size_t size = 100;                                                   \
-                                                                               \
-    N##_init(&ds);                                                             \
-    ASSERT_EQUAL(0, N##_size(&ds));                                            \
-                                                                               \
-    N##_push_back(&ds, 0);                                                     \
-    ASSERT_EQUAL(1, N##_size(&ds));                                            \
-    ASSERT_EQUAL(0, *N##_at(&ds, 0));                                          \
-    ASSERT_EQUAL(0, *N##_front(&ds));                                          \
-    ASSERT_EQUAL(0, *N##_back(&ds));                                           \
-                                                                               \
-    N##_push_back(&ds, 1);                                                     \
-    ASSERT_EQUAL(2, N##_size(&ds));                                            \
-    ASSERT_EQUAL(0, *N##_at(&ds, 0));                                          \
-    ASSERT_EQUAL(1, *N##_at(&ds, 1));                                          \
-    ASSERT_EQUAL(0, *N##_front(&ds));                                          \
-    ASSERT_EQUAL(1, *N##_back(&ds));                                           \
-                                                                               \
-    N##_pop_back(&ds);                                                         \
-    ASSERT_EQUAL(1, N##_size(&ds));                                            \
-    ASSERT_EQUAL(0, *N##_at(&ds, 0));                                          \
-    ASSERT_EQUAL(0, *N##_front(&ds));                                          \
-    ASSERT_EQUAL(0, *N##_back(&ds));                                           \
-                                                                               \
-    N##_pop_back(&ds);                                                         \
-    ASSERT_EQUAL(0, N##_size(&ds));                                            \
-    ASSERT_EQUAL(1, N##_empty(&ds));                                           \
-                                                                               \
-    for (size_t i = 0; i < size; ++i) {                                        \
-        N##_push_back(&ds, i);                                                 \
-        ASSERT_EQUAL(i + 1, N##_size(&ds));                                    \
-        ASSERT_EQUAL(0, *N##_front(&ds));                                      \
-        ASSERT_EQUAL(i, *N##_back(&ds));                                       \
-        for (size_t j = 0; j < N##_size(&ds); ++j) {                           \
-            ASSERT_EQUAL(j, *N##_at(&ds, j));                                  \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    for (size_t i = 1; i <= size; ++i) {                                       \
-        N##_pop_back(&ds);                                                     \
-        ASSERT_EQUAL(size - i, N##_size(&ds));                                 \
-                                                                               \
-        if (!N##_empty(&ds)) {                                                 \
-            ASSERT_EQUAL(0, *N##_front(&ds));                                  \
-            ASSERT_EQUAL(size - i - 1, *N##_back(&ds));                        \
-        }                                                                      \
-                                                                               \
-        for (size_t j = 0; j < N##_size(&ds); ++j) {                           \
-            ASSERT_EQUAL(j, *N##_at(&ds, j));                                  \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    ASSERT_EQUAL(0, N##_size(&ds));                                            \
-    ASSERT_EQUAL(1, N##_empty(&ds));                                           \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_COPY_EQUAL(N)                                           \
-    N ds;                                                                      \
-    const size_t size = 100;                                                   \
-                                                                               \
-    N##_init(&ds);                                                             \
-                                                                               \
-    for (size_t i = 0; i < size; ++i) {                                        \
-        N##_push_back(&ds, i);                                                 \
-        ASSERT_EQUAL(i + 1, N##_size(&ds));                                    \
-    }                                                                          \
-                                                                               \
-    N ds_copy;                                                                 \
-    N##_copy(&ds_copy, &ds);                                                   \
-    ASSERT_EQUAL(N##_size(&ds), N##_size(&ds_copy));                           \
-                                                                               \
-    for (size_t i = 0; i < size; ++i) {                                        \
-        ASSERT_EQUAL(i, *N##_at(&ds_copy, i));                                 \
-    }                                                                          \
-                                                                               \
-    N##_free(&ds);                                                             \
-    N##_free(&ds_copy);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_AT_INSERT(N)                                                      \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    /* {3} */                                                                  \
-    N##_insert(&ds, 0, 3);                                                     \
-    ASSERT_ARRAY(N, ds, {3});                                                  \
-                                                                               \
-    /* {1, 3} */                                                               \
-    N##_insert(&ds, 0, 1);                                                     \
-    ASSERT_ARRAY(N, ds, {1, 3});                                               \
-                                                                               \
-    /* {1, 3, 4} */                                                            \
-    N##_insert(&ds, 2, 4);                                                     \
-    ASSERT_ARRAY(N, ds, {1, 3, 4});                                            \
-                                                                               \
-    /* {0, 1, 3, 4} */                                                         \
-    N##_insert(&ds, 0, 0);                                                     \
-    ASSERT_ARRAY(N, ds, {0, 1, 3, 4});                                         \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    N##_insert(&ds, 2, 2);                                                     \
-    ASSERT_ARRAY(N, ds, {0, 1, 2, 3, 4});                                      \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_AT_ERASE_AT(N)                                          \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
-                                                                               \
-    /* {0, 2, 3, 4} */                                                         \
-    N##_erase_at(&ds, 1);                                                      \
-    ASSERT_EQUAL(4, N##_size(&ds));                                            \
-    ASSERT_ARRAY(N, ds, {0, 2, 3, 4});                                         \
-                                                                               \
-    /* {0, 2, 3} */                                                            \
-    N##_erase_at(&ds, 3);                                                      \
-    ASSERT_EQUAL(3, N##_size(&ds));                                            \
-    ASSERT_ARRAY(N, ds, {0, 2, 3});                                            \
-                                                                               \
-    /* {2, 3} */                                                               \
-    N##_erase_at(&ds, 0);                                                      \
-    ASSERT_EQUAL(2, N##_size(&ds));                                            \
-    ASSERT_ARRAY(N, ds, {2, 3});                                               \
-                                                                               \
-    /* {2} */                                                                  \
-    N##_erase_at(&ds, 1);                                                      \
-    ASSERT_EQUAL(1, N##_size(&ds));                                            \
-    ASSERT_ARRAY(N, ds, {2});                                                  \
-                                                                               \
-    /* {} */                                                                   \
-    N##_erase_at(&ds, 0);                                                      \
-    ASSERT_EQUAL(0, N##_size(&ds));                                            \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_AT_SET_SET_AT_SET_FRONT_SET_BACK(N)                     \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    *N##_at(&ds, 1) = 10;                                                      \
-    ASSERT_ARRAY(N, ds, {0, 10, 2, 3, 4});                                     \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    *N##_at(&ds, 0) = 1;                                                       \
-    ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 4});                                     \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    *N##_at(&ds, 4) = 40;                                                      \
-    ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 40});                                    \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set(&ds, 4, 44);                                                       \
-    ASSERT_ARRAY(N, ds, {1, 10, 2, 3, 44});                                    \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set(&ds, 0, 11);                                                       \
-    ASSERT_ARRAY(N, ds, {11, 10, 2, 3, 44});                                   \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set(&ds, 2, 22);                                                       \
-    ASSERT_ARRAY(N, ds, {11, 10, 22, 3, 44});                                  \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set_front(&ds, 111);                                                   \
-    ASSERT_ARRAY(N, ds, {111, 10, 22, 3, 44});                                 \
-                                                                               \
-    /* {0, 10, 2, 3, 4} */                                                     \
-    N##_set_back(&ds, 444);                                                    \
-    ASSERT_ARRAY(N, ds, {111, 10, 22, 3, 444});                                \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_ERASE_AT_ALLOCATIONS(N)                                 \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    int stack_element = 0;                                                     \
-    al tmp;                                                                    \
-    tmp.el = &stack_element;                                                   \
-                                                                               \
-    for (size_t i = 0; i < 100; ++i) {                                         \
-        N##_push_back(&ds, tmp);                                               \
-    }                                                                          \
-                                                                               \
-    N##_pop_back(&ds);                                                         \
-    N##_erase_at(&ds, N##_size(&ds) - 1);                                      \
-    N##_erase_at(&ds, 0);                                                      \
-                                                                               \
-    /* make collection the owner of the next element, it will not be copied */ \
-    /* in other words, move it */                                              \
-    N##_set_share(&ds, 1);                                                     \
-    N##_push_back(&ds, al_new(0));                                             \
-    N##_set_share(&ds, 0);                                                     \
-                                                                               \
-    N##_free(&ds);                                                             \
-                                                                               \
-    /* no memory should be left dealocated */                                  \
-    ASSERT_EQUAL(0, allocation_count);
-
-#define MATRIX_AT(NN, N, DS, P, Q) N##_at(NN##_at(&DS, P), Q)
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_ARRAY_OF_ARRAYS_PUSH_BACK_AT_SHARE(NN, N)                         \
-    NN ds;                                                                     \
-    NN##_init(&ds);                                                            \
-                                                                               \
-    N tmp;                                                                     \
-    N##_init(&tmp);                                                            \
-                                                                               \
-    /* {0} */                                                                  \
-    N##_push_back(&tmp, 0);                                                    \
-                                                                               \
-    /* push array into array of arrays, it will make a copy */                 \
-    /* {{0}} */                                                                \
-    NN##_push_back(&ds, tmp);                                                  \
-                                                                               \
-    /* {0, 1} */                                                               \
-    N##_push_back(&tmp, 1);                                                    \
-                                                                               \
-    /* {{0}, {0, 1}} */                                                        \
-    NN##_push_back(&ds, tmp);                                                  \
-                                                                               \
-    /* {0, 1, 2} */                                                            \
-    N##_push_back(&tmp, 2);                                                    \
-                                                                               \
-    /* push array into array of arrays, it will use the original, 'move' it */ \
-    /* {{0}, {0, 1}, {0, 1, 2}} */                                             \
-    NN##_set_share(&ds, 1);                                                    \
-    NN##_push_back(&ds, tmp);                                                  \
-    NN##_set_share(&ds, 0);                                                    \
-                                                                               \
-    ASSERT_EQUAL(0, *MATRIX_AT(NN, N, ds, 0, 0));                              \
-                                                                               \
-    ASSERT_EQUAL(0, *MATRIX_AT(NN, N, ds, 1, 0));                              \
-    ASSERT_EQUAL(1, *MATRIX_AT(NN, N, ds, 1, 1));                              \
-                                                                               \
-    ASSERT_EQUAL(0, *MATRIX_AT(NN, N, ds, 2, 0));                              \
-    ASSERT_EQUAL(1, *MATRIX_AT(NN, N, ds, 2, 1));                              \
-    ASSERT_EQUAL(2, *MATRIX_AT(NN, N, ds, 2, 2));                              \
-                                                                               \
-    /* no memory should be left dealocated */                                  \
-    NN##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_ITERATOR(N)                                             \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    size_t i = 0;                                                              \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
-                                                                               \
-    for (struct N##_iterator it = N##_begin(&ds);                              \
-         !N##_iterator_equal(it, N##_end(&ds)); N##_iterator_next(&it)) {      \
-        ASSERT_EQUAL(*N##_iterator_data(it), *N##_at(&ds, i));                 \
-        ++i;                                                                   \
-    }                                                                          \
-                                                                               \
-    ASSERT_EQUAL(*N##_iterator_data(N##_end(&ds)), *N##_at(&ds, i));           \
-                                                                               \
-    for (struct N##_iterator it = N##_end(&ds);                                \
-         !N##_iterator_equal(it, N##_begin(&ds)); N##_iterator_prev(&it)) {    \
-        ASSERT_EQUAL(*N##_iterator_data(it), *N##_at(&ds, i));                 \
-        --i;                                                                   \
-    }                                                                          \
-                                                                               \
-    ASSERT_EQUAL(*N##_iterator_data(N##_begin(&ds)), *N##_at(&ds, i));         \
-                                                                               \
-    N##_free(&ds);
-
-// VECTOR, STATIC VECTOR, DEQUE, STATIC DEQUE
-#define TEST_PUSH_BACK_ITERATOR_FROM(N)                                        \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    /* {0, 1, 2, 3, 4} */                                                      \
-    PUSH_ARRAY(N, ds, {0, 1, 2, 3, 4});                                        \
-                                                                               \
-    struct N##_iterator it4 = N##_from(&ds, 4);                                \
-    ASSERT_EQUAL(*N##_iterator_data(it4), *N##_at(&ds, 4));                    \
-                                                                               \
-    struct N##_iterator it2 = N##_from(&ds, 2);                                \
-    ASSERT_EQUAL(*N##_iterator_data(it2), *N##_at(&ds, 2));                    \
-                                                                               \
-    struct N##_iterator it0 = N##_from(&ds, 0);                                \
-    ASSERT_EQUAL(*N##_iterator_data(it0), *N##_at(&ds, 0));                    \
-                                                                               \
-    N##_free(&ds);
-
-// TODO update this LIST, FORWARD LIST
-#define TEST_LIST_SORT(N)                                                      \
-    N ds;                                                                      \
-    N##_init(&ds);                                                             \
-                                                                               \
-    for (size_t i = 0; i < 100; ++i) {                                         \
-        int el = i % 10;                                                       \
-        N##_push_back(&ds, el);                                                \
-    }                                                                          \
-                                                                               \
-    N##_sort(&ds, int_void_compare);                                           \
-                                                                               \
-    for (size_t i = 0; i < N##_size(&ds) - 1; ++i) {                           \
-        ASSERT_EQUAL(1, *N##_at(&ds, i) <= *N##_at(&ds, i + 1));               \
-    }                                                                          \
-                                                                               \
-    ASSERT_EQUAL(1, N##_equal(&ds, &ds_sorted));                               \
-                                                                               \
-    N##_free(&ds);
-
-#define TEST_COMBINATIONS(N) // nothing
-
 #define TA_MAX 1024
 
 struct test_array {
@@ -439,7 +121,6 @@ ta ta_new(void) {
 
 void ta_insert(ta* ta, size_t at, int el) {
     if (at >= TA_MAX || ta->size == TA_MAX) {
-        // TODO update this
         printf("Exiting...\n");
         exit(EXIT_FAILURE);
     }
@@ -453,7 +134,7 @@ void ta_insert(ta* ta, size_t at, int el) {
     ta->data[at] = el;
 }
 
-void ta_erase_at(ta* ta, size_t at) {
+void ta_erase(ta* ta, size_t at) {
     if (at >= ta->size) {
         return;
     }
@@ -479,11 +160,11 @@ void ta_sort(ta* ta) {
     qsort(ta->data, ta->size, sizeof(int), ta_int_compare);
 }
 
-#define TEST_TA(N)                                                             \
+#define TEST_INSERT_ERASE_COMBINATIONS_ARRAY(N)                                \
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 21;                                                         \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -534,44 +215,44 @@ void ta_sort(ta* ta) {
                     N##_insert(&ds, 0, i);                                     \
                     break;                                                     \
                 case (8):                                                      \
-                    log("pop_front %d\n", i);                                  \
-                    ta_erase_at(&ta, 0);                                       \
+                    log("pop_front\n");                                        \
+                    ta_erase(&ta, 0);                                          \
                     N##_pop_front(&ds);                                        \
                     break;                                                     \
                 case (9):                                                      \
                     log("pop_back \n");                                        \
-                    ta_erase_at(&ta, ta.size - 1);                             \
+                    ta_erase(&ta, ta.size - 1);                                \
                     N##_pop_back(&ds);                                         \
                     break;                                                     \
                 case (10):                                                     \
                     log("erase at 0 %d\n", i);                                 \
-                    ta_erase_at(&ta, 0);                                       \
-                    N##_erase_at(&ds, 0);                                      \
+                    ta_erase(&ta, 0);                                          \
+                    N##_erase(&ds, 0);                                         \
                     break;                                                     \
                 case (11):                                                     \
                     log("erase at 1 %d\n", i);                                 \
-                    ta_erase_at(&ta, 1);                                       \
-                    N##_erase_at(&ds, 1);                                      \
+                    ta_erase(&ta, 1);                                          \
+                    N##_erase(&ds, 1);                                         \
                     break;                                                     \
                 case (12):                                                     \
                     log("erase at 2 %d\n", i);                                 \
-                    ta_erase_at(&ta, 2);                                       \
-                    N##_erase_at(&ds, 2);                                      \
+                    ta_erase(&ta, 2);                                          \
+                    N##_erase(&ds, 2);                                         \
                     break;                                                     \
                 case (13):                                                     \
                     log("erase at 3 %d\n", i);                                 \
-                    ta_erase_at(&ta, 3);                                       \
-                    N##_erase_at(&ds, 3);                                      \
+                    ta_erase(&ta, 3);                                          \
+                    N##_erase(&ds, 3);                                         \
                     break;                                                     \
                 case (14):                                                     \
                     log("erase at 4 %d\n", i);                                 \
-                    ta_erase_at(&ta, 4);                                       \
-                    N##_erase_at(&ds, 4);                                      \
+                    ta_erase(&ta, 4);                                          \
+                    N##_erase(&ds, 4);                                         \
                     break;                                                     \
                 case (15):                                                     \
                     log("erase at 5 %d\n", i);                                 \
-                    ta_erase_at(&ta, 5);                                       \
-                    N##_erase_at(&ds, 5);                                      \
+                    ta_erase(&ta, 5);                                          \
+                    N##_erase(&ds, 5);                                         \
                     break;                                                     \
                 case (16):                                                     \
                     log("set at 0 %d\n", i);                                   \
@@ -612,11 +293,30 @@ void ta_sort(ta* ta) {
                     log("Unhandled digit %zu\n", digit);                       \
                     break;                                                     \
                 }                                                              \
-                ASSERT_EQUAL(ta.size, N##_size(&ds));                          \
                 ta_print(&ta);                                                 \
+                                                                               \
+                N ds_copy;                                                     \
+                N##_copy(&ds_copy, &ds);                                       \
+                                                                               \
+                ASSERT_EQUAL(ta.size, N##_size(&ds));                          \
+                ASSERT_EQUAL(ta.size, N##_size(&ds_copy));                     \
+                                                                               \
+                N##_it it = N##_begin(&ds);                                    \
                 for (size_t j = 0; j < ta.size; ++j) {                         \
                     ASSERT_EQUAL(ta.data[j], *N##_at(&ds, j));                 \
+                    ASSERT_EQUAL(ta.data[j], *N##_at(&ds_copy, j));            \
+                    ASSERT_EQUAL(ta.data[j], *N##_it_data(it));                \
+                    N##_it_go_next(&it);                                       \
                 }                                                              \
+                ASSERT_EQUAL(N##_it_valid(it), false);                         \
+                                                                               \
+                it = N##_end(&ds);                                             \
+                for (int j = ta.size - 1; j >= 0; --j) {                       \
+                    ASSERT_EQUAL(ta.data[j], *N##_it_data(it));                \
+                    N##_it_go_prev(&it);                                       \
+                }                                                              \
+                ASSERT_EQUAL(N##_it_valid(it), false);                         \
+                                                                               \
                 comb_copy /= m;                                                \
             }                                                                  \
             N##_free(&ds);                                                     \
@@ -666,7 +366,6 @@ void tm_set(tm* tm, int key, int value) {
         }
     }
 
-    // TODO update this
     printf("Exiting...\n");
     exit(EXIT_FAILURE);
 }
@@ -702,8 +401,8 @@ void tm_print(tm* tm) {
 #define TEST_TM(N)                                                             \
     {                                                                          \
         size_t n = 5;                                                          \
-        size_t m = 18;                                                         \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t m = 12;                                                         \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -716,89 +415,59 @@ void tm_print(tm* tm) {
                 case (0):                                                      \
                     log("set %d %d\n", i, i + 10);                             \
                     tm_set(&tm, i, i + 10);                                    \
-                    N##_set_at(&ds, i, i + 10);                                \
+                    N##_set(&ds, i, i + 10);                                   \
                     break;                                                     \
                 case (1):                                                      \
                     log("set 0 %d\n", i + 10);                                 \
                     tm_set(&tm, 0, i + 10);                                    \
-                    N##_set_at(&ds, 0, i + 10);                                \
+                    N##_set(&ds, 0, i + 10);                                   \
                     break;                                                     \
                 case (2):                                                      \
                     log("set 1 %d\n", i + 10);                                 \
                     tm_set(&tm, 1, i + 10);                                    \
-                    N##_set_at(&ds, 1, i + 10);                                \
+                    N##_set(&ds, 1, i + 10);                                   \
                     break;                                                     \
                 case (3):                                                      \
                     log("set 2 %d\n", i + 10);                                 \
                     tm_set(&tm, 2, i + 10);                                    \
-                    N##_set_at(&ds, 2, i + 10);                                \
+                    N##_set(&ds, 2, i + 10);                                   \
                     break;                                                     \
                 case (4):                                                      \
                     log("set 3 %d\n", i + 10);                                 \
                     tm_set(&tm, 3, i + 10);                                    \
-                    N##_set_at(&ds, 3, i + 10);                                \
+                    N##_set(&ds, 3, i + 10);                                   \
                     break;                                                     \
                 case (5):                                                      \
                     log("set 4 %d\n", i + 10);                                 \
                     tm_set(&tm, 4, i + 10);                                    \
-                    N##_set_at(&ds, 4, i + 10);                                \
+                    N##_set(&ds, 4, i + 10);                                   \
                     break;                                                     \
                 case (6):                                                      \
-                    log("at %d %d\n", i, i + 10);                              \
-                    tm_set(&tm, i, i + 10);                                    \
-                    *N##_at(&ds, i) = i + 10;                                  \
-                    break;                                                     \
-                case (7):                                                      \
-                    log("at 0 %d\n", i + 10);                                  \
-                    tm_set(&tm, 0, i + 10);                                    \
-                    *N##_at(&ds, 0) = i + 10;                                  \
-                    break;                                                     \
-                case (8):                                                      \
-                    log("at 1 %d\n", i + 10);                                  \
-                    tm_set(&tm, 1, i + 10);                                    \
-                    *N##_at(&ds, 1) = i + 10;                                  \
-                    break;                                                     \
-                case (9):                                                      \
-                    log("at 2 %d\n", i + 10);                                  \
-                    tm_set(&tm, 2, i + 10);                                    \
-                    *N##_at(&ds, 2) = i + 10;                                  \
-                    break;                                                     \
-                case (10):                                                     \
-                    log("at 3 %d\n", i + 10);                                  \
-                    tm_set(&tm, 3, i + 10);                                    \
-                    *N##_at(&ds, 3) = i + 10;                                  \
-                    break;                                                     \
-                case (11):                                                     \
-                    log("at 4 %d\n", i + 10);                                  \
-                    tm_set(&tm, 4, i + 10);                                    \
-                    *N##_at(&ds, 4) = i + 10;                                  \
-                    break;                                                     \
-                case (12):                                                     \
                     log("erase %d\n", i);                                      \
                     tm_erase(&tm, i);                                          \
                     N##_erase(&ds, i);                                         \
                     break;                                                     \
-                case (13):                                                     \
+                case (7):                                                      \
                     log("erase 0\n");                                          \
                     tm_erase(&tm, 0);                                          \
                     N##_erase(&ds, 0);                                         \
                     break;                                                     \
-                case (14):                                                     \
+                case (8):                                                      \
                     log("erase 1\n");                                          \
                     tm_erase(&tm, 1);                                          \
                     N##_erase(&ds, 1);                                         \
                     break;                                                     \
-                case (15):                                                     \
+                case (9):                                                      \
                     log("erase 2\n");                                          \
                     tm_erase(&tm, 2);                                          \
                     N##_erase(&ds, 2);                                         \
                     break;                                                     \
-                case (16):                                                     \
+                case (10):                                                     \
                     log("erase 3\n");                                          \
                     tm_erase(&tm, 3);                                          \
                     N##_erase(&ds, 3);                                         \
                     break;                                                     \
-                case (17):                                                     \
+                case (11):                                                     \
                     log("erase 4\n");                                          \
                     tm_erase(&tm, 4);                                          \
                     N##_erase(&ds, 4);                                         \
@@ -811,12 +480,12 @@ void tm_print(tm* tm) {
                 tm_print(&tm);                                                 \
                 for (size_t j = 0; j < tm.size; ++j) {                         \
                     int* value = tm_find(&tm, j);                              \
-                    N##_iterator it = N##_find(&ds, j);                        \
+                    N##_it it = N##_find(&ds, j);                              \
                     if (!value) {                                              \
-                        ASSERT_EQUAL(N##_iterator_valid(it), false);           \
+                        ASSERT_EQUAL(N##_it_valid(it), false);                 \
                     } else {                                                   \
-                        ASSERT_EQUAL(N##_iterator_valid(it), true);            \
-                        ASSERT_EQUAL(*value, N##_iterator_data(it)->value);    \
+                        ASSERT_EQUAL(N##_it_valid(it), true);                  \
+                        ASSERT_EQUAL(*value, N##_it_data(it)->value);          \
                     }                                                          \
                 }                                                              \
                 comb_copy /= m;                                                \
@@ -859,21 +528,6 @@ void ts_insert(ts* ts, int kv) {
         }
     }
 
-    // TODO update this
-    printf("Exiting...\n");
-    exit(EXIT_FAILURE);
-}
-
-void ts_insert_multiple(ts* ts, int kv) {
-    for (size_t i = 0; i < TS_MAX; ++i) {
-        if (ts->data[i] == TS_EMPTY) {
-            ts->data[i] = kv;
-            ts->size++;
-            return;
-        }
-    }
-
-    // TODO update this
     printf("Exiting...\n");
     exit(EXIT_FAILURE);
 }
@@ -917,8 +571,8 @@ void ts_print(ts* ts) {
 #define TEST_TS(N)                                                             \
     {                                                                          \
         size_t n = 5;                                                          \
-        size_t m = 15;                                                         \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t m = 10;                                                         \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -954,52 +608,29 @@ void ts_print(ts* ts) {
                     N##_insert(&ds, 3);                                        \
                     break;                                                     \
                 case (5):                                                      \
-                    log("insert multiple %d\n", i);                            \
-                    ts_insert_multiple(&ts, i);                                \
-                    N##_insert_multiple(&ds, i);                               \
-                    break;                                                     \
-                case (6):                                                      \
-                    log("insert multiple 0\n");                                \
-                    ts_insert_multiple(&ts, 0);                                \
-                    N##_insert_multiple(&ds, 0);                               \
-                    break;                                                     \
-                case (7):                                                      \
-                    log("insert multiple 1\n");                                \
-                    ts_insert_multiple(&ts, 1);                                \
-                    N##_insert_multiple(&ds, 1);                               \
-                    break;                                                     \
-                case (8):                                                      \
-                    log("insert multiple 2\n");                                \
-                    ts_insert_multiple(&ts, 2);                                \
-                    N##_insert_multiple(&ds, 2);                               \
-                    break;                                                     \
-                case (9):                                                      \
                     log("erase %d\n", i);                                      \
                     ts_erase(&ts, i);                                          \
                     N##_erase(&ds, i);                                         \
                     break;                                                     \
-                case (10):                                                     \
+                case (6):                                                      \
                     log("erase 0\n");                                          \
                     ts_erase(&ts, 0);                                          \
                     N##_erase(&ds, 0);                                         \
                     break;                                                     \
-                case (11):                                                     \
+                case (7):                                                      \
                     log("erase 1\n");                                          \
                     ts_erase(&ts, 1);                                          \
                     N##_erase(&ds, 1);                                         \
                     break;                                                     \
-                case (12):                                                     \
+                case (8):                                                      \
                     log("erase 2\n");                                          \
                     ts_erase(&ts, 2);                                          \
                     N##_erase(&ds, 2);                                         \
                     break;                                                     \
-                case (13):                                                     \
+                case (9):                                                      \
                     log("erase 3\n");                                          \
                     ts_erase(&ts, 3);                                          \
                     N##_erase(&ds, 3);                                         \
-                    break;                                                     \
-                case (14):                                                     \
-                    log("erase all (TODO) %d\n", i);                           \
                     break;                                                     \
                 default:                                                       \
                     log("Unhandled digit %zu\n", digit);                       \
@@ -1009,12 +640,12 @@ void ts_print(ts* ts) {
                 ts_print(&ts);                                                 \
                 for (size_t j = 0; j < ts.size; ++j) {                         \
                     int* value = ts_find(&ts, j);                              \
-                    N##_iterator it = N##_find(&ds, j);                        \
+                    N##_it it = N##_find(&ds, j);                              \
                     if (!value) {                                              \
-                        ASSERT_EQUAL(N##_iterator_valid(it), false);           \
+                        ASSERT_EQUAL(N##_it_valid(it), false);                 \
                     } else {                                                   \
-                        ASSERT_EQUAL(N##_iterator_valid(it), true);            \
-                        ASSERT_EQUAL(*value, *N##_iterator_data(it));          \
+                        ASSERT_EQUAL(N##_it_valid(it), true);                  \
+                        ASSERT_EQUAL(*value, *N##_it_data(it));                \
                     }                                                          \
                 }                                                              \
                 comb_copy /= m;                                                \
@@ -1027,7 +658,7 @@ void ts_print(ts* ts) {
     {                                                                          \
         size_t n = 12;                                                         \
         size_t m = 3;                                                          \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -1044,14 +675,14 @@ void ts_print(ts* ts) {
                     break;                                                     \
                 case (1):                                                      \
                     log("pop\n");                                              \
-                    ta_erase_at(&ta, ta.size - 1);                             \
+                    ta_erase(&ta, ta.size - 1);                                \
                     N##_pop(&ds);                                              \
                     break;                                                     \
                 case (2):                                                      \
                     log("set top %d\n", i);                                    \
                     if (!N##_empty(&ds)) {                                     \
                         ta.data[ta.size - 1] = i;                              \
-                        *N##_top(&ds) = i;                                     \
+                        N##_set_top(&ds, i);                                   \
                     }                                                          \
                     break;                                                     \
                 default:                                                       \
@@ -1075,7 +706,7 @@ void ts_print(ts* ts) {
     {                                                                          \
         size_t n = 10;                                                         \
         size_t m = 4;                                                          \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -1092,21 +723,21 @@ void ts_print(ts* ts) {
                     break;                                                     \
                 case (1):                                                      \
                     log("pop\n");                                              \
-                    ta_erase_at(&ta, 0);                                       \
+                    ta_erase(&ta, 0);                                          \
                     N##_pop(&ds);                                              \
                     break;                                                     \
                 case (2):                                                      \
                     log("set front %d\n", i);                                  \
                     if (!N##_empty(&ds)) {                                     \
                         ta.data[0] = i;                                        \
-                        *N##_front(&ds) = i;                                   \
+                        N##_set_front(&ds, i);                                 \
                     }                                                          \
                     break;                                                     \
                 case (3):                                                      \
                     log("set back %d\n", i);                                   \
                     if (!N##_empty(&ds)) {                                     \
                         ta.data[ta.size - 1] = i;                              \
-                        *N##_back(&ds) = i;                                    \
+                        N##_set_back(&ds, i);                                  \
                     }                                                          \
                     break;                                                     \
                 default:                                                       \
@@ -1132,7 +763,7 @@ void ts_print(ts* ts) {
     {                                                                          \
         size_t n = 7;                                                          \
         size_t m = 7;                                                          \
-        size_t comb_max = (size_t)pow(m, n);                                   \
+        size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
@@ -1180,7 +811,7 @@ void ts_print(ts* ts) {
                     break;                                                     \
                 case (6):                                                      \
                     log("pop\n");                                              \
-                    ta_erase_at(&ta, 0);                                       \
+                    ta_erase(&ta, 0);                                          \
                     ta_sort(&ta);                                              \
                     N##_pop(&ds);                                              \
                     break;                                                     \

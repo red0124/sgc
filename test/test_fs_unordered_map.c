@@ -1,12 +1,12 @@
 #include "test_common.h"
-#include <sgc/static_unordered_map.h>
+#include <sgc/fs_unordered_map.h>
 
 #define TEST_ELEMENTS_NUM 50
 #define MAP_MAX 128
 
-SGC_INIT_STATIC_UNORDERED_MAP(int, int, MAP_MAX, map)
+SGC_INIT_FS_UNORDERED_MAP(int, int, MAP_MAX, map)
 
-void test_map_xxx(void) {
+void test_map_insert_erase_combinations(void) {
     TEST_TM(map);
 }
 
@@ -15,7 +15,7 @@ void test_map_insert_erase(void) {
     map_init(&v);
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
-        map_set_at(&v, i, i);
+        map_set(&v, i, i);
     }
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; i++) {
@@ -36,7 +36,7 @@ void test_map_copy(void) {
     map_init(&v);
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        map_set_at(&v, 0, i);
+        map_set(&v, 0, i);
     }
 
     map v_cp;
@@ -49,7 +49,7 @@ void test_map_copy(void) {
     map_free(&v_cp);
 }
 
-SGC_INIT_STATIC_UNORDERED_MAP(al, al, MAP_MAX, amap)
+SGC_INIT_FS_UNORDERED_MAP(al, al, MAP_MAX, amap)
 
 void test_amap(void) {
     amap v;
@@ -71,9 +71,9 @@ void test_amap(void) {
     *new_el = TEST_ELEMENTS_NUM + 2;
     tmp.el = new_el;
 
-    amap_set_share_key(&v, 1);
+    amap_set_shareing_key(&v);
     amap_at(&v, tmp);
-    amap_set_share_key(&v, 0);
+    amap_set_owning_key(&v);
 
     amap_free(&v);
 
@@ -86,7 +86,7 @@ size_t map_hash(const map* const first) {
 }
 
 /* TODO update
-SGC_INIT_STATIC_UNORDERED_MAP(map, map, MAP_MAX, vmap)
+SGC_INIT_FS_UNORDERED_MAP(map, map, MAP_MAX, vmap)
 
 void test_map_map(void) {
 vmap v;
@@ -95,22 +95,22 @@ vmap_init(&v);
 map tmp;
 map_init(&tmp);
 
-map_set_at(&tmp, 0, 0);
+map_set(&tmp, 0, 0);
 // {(0, 0)}
 
-vmap_set_at(&v, tmp, tmp);
+vmap_set(&v, tmp, tmp);
 // pushed map into vmap, it will make a copy
 
-map_set_at(&tmp, 1, 1);
+map_set(&tmp, 1, 1);
 // {(0, 0) (1, 1)}
 
-vmap_set_at(&v, tmp, tmp);
+vmap_set(&v, tmp, tmp);
 
-map_set_at(&tmp, 2, 2);
+map_set(&tmp, 2, 2);
 // {(0, 0), (1, 1), (2, 2)}
 
 vmap_set_share(&v, 1);
-vmap_set_at(&v, tmp, tmp);
+vmap_set(&v, tmp, tmp);
 vmap_set_share(&v, 0);
 // pushed map into vmap, it will use the original
 
@@ -124,44 +124,44 @@ vmap_free(&v);
 // no memory should be left dealocated
 } */
 
-void test_map_iterator(void) {
+void test_map_it(void) {
     map v;
     map_init(&v);
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
-        map_set_at(&v, i, i);
+        map_set(&v, i, i);
     }
 
     size_t i = 0;
 
-    for (struct map_iterator it = map_begin(&v);
-         !map_iterator_equal(it, map_end(&v)); map_iterator_next(&it)) {
-        TEST_ASSERT_EQUAL_INT(map_iterator_data(it)->value, i);
+    for (struct map_it it = map_begin(&v); !map_it_eq(it, map_end(&v));
+         map_it_go_next(&it)) {
+        TEST_ASSERT_EQUAL_INT(map_it_data(it)->value, i);
         ++i;
     }
 
-    TEST_ASSERT_EQUAL_INT(map_iterator_data(map_end(&v))->value,
+    TEST_ASSERT_EQUAL_INT(map_it_data(map_end(&v))->value,
                           TEST_ELEMENTS_NUM - 1);
 
-    for (struct map_iterator it = map_end(&v);
-         !map_iterator_equal(it, map_begin(&v)); map_iterator_prev(&it)) {
-        TEST_ASSERT_EQUAL_INT(map_iterator_data(it)->value, i);
+    for (struct map_it it = map_end(&v); !map_it_eq(it, map_begin(&v));
+         map_it_go_prev(&it)) {
+        TEST_ASSERT_EQUAL_INT(map_it_data(it)->value, i);
         --i;
     }
 
-    TEST_ASSERT_EQUAL_INT(map_iterator_data(map_begin(&v))->value, 0);
+    TEST_ASSERT_EQUAL_INT(map_it_data(map_begin(&v))->value, 0);
 
     map_free(&v);
 }
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_map_xxx);
+    RUN_TEST(test_map_insert_erase_combinations);
     RUN_TEST(test_map_insert_erase);
     RUN_TEST(test_map_copy);
     RUN_TEST(test_amap);
     // TODO update RUN_TEST(test_map_map);
-    RUN_TEST(test_map_iterator);
+    RUN_TEST(test_map_it);
 
     return UNITY_END();
 }

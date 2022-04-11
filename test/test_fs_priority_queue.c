@@ -1,12 +1,12 @@
 #include "test_common.h"
-#include <sgc/static_priority_queue.h>
+#include <sgc/fs_priority_queue.h>
 
 #define TEST_ELEMENTS_NUM 50
 #define PQUEUE_MAX 512
 
-SGC_INIT_STATIC_PRIORITY_QUEUE(int, PQUEUE_MAX, pqueue)
+SGC_INIT_SPRIORITY_QUEUE(int, PQUEUE_MAX, pqueue)
 
-void test_pqueue_xxx(void) {
+void test_pqueue_insert_erase_combinations(void) {
     TEST_TPQ(pqueue);
 }
 
@@ -45,7 +45,7 @@ void test_pqueue_copy(void) {
     pqueue_free(&v_cp);
 }
 
-SGC_INIT_STATIC_PRIORITY_QUEUE(al, PQUEUE_MAX, apqueue)
+SGC_INIT_SPRIORITY_QUEUE(al, PQUEUE_MAX, apqueue)
 
 void test_apqueue(void) {
     apqueue v;
@@ -60,12 +60,12 @@ void test_apqueue(void) {
 
     apqueue_pop(&v);
 
-    apqueue_set_share(&v, 1);
+    apqueue_set_shareing(&v);
     ++allocation_count;
     al new_el = (al){(int*)malloc(sizeof(int))};
     *(new_el.el) = 3;
     apqueue_push(&v, new_el);
-    apqueue_set_share(&v, 0);
+    apqueue_set_owning(&v);
 
     apqueue_free(&v);
 
@@ -78,7 +78,7 @@ int pqueue_compare(const struct pqueue* const first,
     return pqueue_size(first) - pqueue_size(second);
 }
 
-SGC_INIT_STATIC_PRIORITY_QUEUE(pqueue, PQUEUE_MAX, vpqueue)
+SGC_INIT_SPRIORITY_QUEUE(pqueue, PQUEUE_MAX, vpqueue)
 const int* vpqueue_top_pair(struct vpqueue* const v) {
     return pqueue_top(vpqueue_top(v));
 }
@@ -104,9 +104,9 @@ void test_pqueue_pqueue(void) {
     pqueue_push(&tmp, 2);
     // {0, 1, 2}
 
-    vpqueue_set_share(&v, 1);
+    vpqueue_set_shareing(&v);
     vpqueue_push(&v, tmp);
-    vpqueue_set_share(&v, 0);
+    vpqueue_set_owning(&v);
     // pushed pqueue into vpqueue, it will use the original
 
     // {{0}, {0, 1}, {0, 1, 2}}
@@ -119,7 +119,7 @@ void test_pqueue_pqueue(void) {
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_pqueue_xxx);
+    RUN_TEST(test_pqueue_insert_erase_combinations);
     RUN_TEST(test_pqueue_push_pop);
     RUN_TEST(test_pqueue_copy);
     RUN_TEST(test_apqueue);
