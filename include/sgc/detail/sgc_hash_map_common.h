@@ -146,8 +146,8 @@
         return i.valid_;                                                       \
     }                                                                          \
                                                                                \
-    static void _p_##N##_bucket_sgc_free(const N* const u,                     \
-                                         struct _p_##N##_node* bucket) {       \
+    static void _p_##N##_bucket_free_nodes(const N* const u,                   \
+                                           struct _p_##N##_node* bucket) {     \
         if (bucket) {                                                          \
             struct _p_##N##_node* curr = bucket;                               \
             struct _p_##N##_node* next = bucket;                               \
@@ -223,13 +223,16 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_resize(N* u) {                                        \
+    static bool _p_##N##_resize(N* u) {                                        \
         size_t max, new_max;                                                   \
         _p_##N##_rehash_size(u, &max, &new_max);                               \
         if (u->size_ == max) {                                                 \
             struct _p_##N##_node** new_data =                                  \
                 (struct _p_##N##_node**)sgc_malloc(                            \
                     sizeof(struct _p_##N##_node*) * new_max);                  \
+            if (!new_data) {                                                   \
+                return false;                                                  \
+            }                                                                  \
             for (size_t i = 0; i < new_max; ++i) {                             \
                 new_data[i] = NULL;                                            \
             }                                                                  \
@@ -256,16 +259,31 @@
             u->data_ = new_data;                                               \
             u->max_ = new_max;                                                 \
         }                                                                      \
+        return true;                                                           \
     }                                                                          \
                                                                                \
     static void _p_##N##_copy_nodes(N* __restrict__ dst,                       \
                                     const N* __restrict__ const src) {         \
         dst->data_ = (struct _p_##N##_node**)sgc_malloc(                       \
             sizeof(struct _p_##N##_node*) * dst->max_);                        \
+        if (!dst->data_) {                                                     \
+            N##_init(dst);                                                     \
+            return;                                                            \
+        }                                                                      \
         for (size_t i = 0; i < src->max_; ++i) {                               \
             if (src->data_[i]) {                                               \
-                dst->data_[i] = (struct _p_##N##_node*)sgc_malloc(             \
-                    sizeof(struct _p_##N##_node));                             \
+                struct _p_##N##_node* new_data =                               \
+                    (struct _p_##N##_node*)sgc_malloc(                         \
+                        sizeof(struct _p_##N##_node));                         \
+                if (!new_data) {                                               \
+                    for (size_t j = 0; j < i; ++j) {                           \
+                        _p_##N##_bucket_free_nodes(dst, dst->data_[j]);        \
+                    }                                                          \
+                    sgc_free(dst->data_);                                      \
+                    N##_init(dst);                                             \
+                    return;                                                    \
+                }                                                              \
+                dst->data_[i] = new_data;                                      \
                 _p_##N##_node_copy_values(src, dst->data_[i], src->data_[i]);  \
                 struct _p_##N##_node* curr_src = src->data_[i];                \
                 struct _p_##N##_node* curr_dst = dst->data_[i];                \
@@ -278,6 +296,16 @@
                     }                                                          \
                     tmp_dst = (struct _p_##N##_node*)sgc_malloc(               \
                         sizeof(struct _p_##N##_node));                         \
+                    if (!tmp_dst) {                                            \
+                        for (size_t j = 0; j < i; ++j) {                       \
+                            _p_##N##_bucket_free_nodes(dst, dst->data_[j]);    \
+                        }                                                      \
+                        curr_dst->next_ = NULL;                                \
+                        _p_##N##_bucket_free_nodes(dst, dst->data_[i]);        \
+                        sgc_free(dst->data_);                                  \
+                        N##_init(dst);                                         \
+                        return;                                                \
+                    }                                                          \
                     _p_##N##_node_copy_values(src, tmp_dst, tmp_src);          \
                     curr_dst->next_ = tmp_dst;                                 \
                     curr_dst = tmp_dst;                                        \
@@ -301,6 +329,9 @@
     void N##_rehash(N* u, size_t new_max) {                                    \
         struct _p_##N##_node** new_data = (struct _p_##N##_node**)sgc_malloc(  \
             sizeof(struct _p_##N##_node*) * new_max);                          \
+        if (!new_data) {                                                       \
+            return;                                                            \
+        }                                                                      \
         for (size_t i = 0; i < new_max; ++i) {                                 \
             new_data[i] = NULL;                                                \
         }                                                                      \

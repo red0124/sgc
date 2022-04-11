@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define _SGC_INIT_PP_VECTOR(T, N) static void _p_##N##_resize(N* v);
+#define _SGC_INIT_PP_VECTOR(T, N) static bool _p_##N##_resize(N* v);
 
 #define SGC_INIT_HEADERS_VECTOR(T, N)                                          \
     struct N {                                                                 \
@@ -54,12 +54,7 @@
     _SGC_INIT_RA_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_VECTOR(T, N)                                          \
-    static void _p_##N##_resize(N* v) {                                        \
-        if (v->size_ == v->max_) {                                             \
-            v->max_ = (v->max_ == 0) ? 1 : v->max_ * 2;                        \
-            v->data_ = (T*)sgc_realloc(v->data_, sizeof(T) * v->max_);         \
-        }                                                                      \
-    }                                                                          \
+    _SGC_INIT_RESIZE(T, N)                                                     \
                                                                                \
     void N##_free(N* v) {                                                      \
         if (v->data_) {                                                        \
@@ -73,6 +68,10 @@
             dst->size_ = src->size_;                                           \
             dst->max_ = src->size_;                                            \
             dst->data_ = sgc_malloc(dst->max_ * sizeof(T));                    \
+            if (!dst->data_) {                                                 \
+                N##_init(dst);                                                 \
+                return;                                                        \
+            }                                                                  \
             dst->sharing_ = src->sharing_;                                     \
             _SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,             \
                             src->sharing_)                                     \
@@ -91,17 +90,15 @@
         if (size) {                                                            \
             v->max_ = v->size_ = size;                                         \
             v->data_ = (T*)sgc_malloc(sizeof(T) * size);                       \
+            if (!v->data_) {                                                   \
+                N##_init(v);                                                   \
+                return;                                                        \
+            }                                                                  \
             v->sharing_ = false;                                               \
             _SGC_ARRAY_COPY(T, v->data_, arr, size, true)                      \
         } else {                                                               \
             N##_init(v);                                                       \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_shrink(N* v) {                                                    \
-        _SGC_ARRAY_FREE(T, (&v->data_[v->size_]), (v->max_ - v->size_),        \
-                        v->sharing_)                                           \
-        v->data_ = (T*)sgc_realloc(v->data_, sizeof(T) * v->size_);            \
     }
 
 #define SGC_INIT_VECTOR(T, N)                                                  \

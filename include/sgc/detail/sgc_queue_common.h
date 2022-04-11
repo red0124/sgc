@@ -10,7 +10,9 @@
     }                                                                          \
                                                                                \
     void N##_push(N* q, T el) {                                                \
-        _p_##N##_resize(q);                                                    \
+        if (!_p_##N##_resize(q)) {                                             \
+            return;                                                            \
+        }                                                                      \
         if (!N##_empty(q)) {                                                   \
             _p_##N##_go_next(&q->back_, _p_##N##_max(q));                      \
         }                                                                      \

@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_SPRIORITY_QUEUE(T, S, N)                                  \
-    static void _p_##N##_resize(const N* const p);                             \
+    static bool _p_##N##_resize(const N* const p);                             \
     static void _p_##N##_swap(T* i, T* j);                                     \
     static void _p_##N##_fix_insert(N* p);                                     \
     static void _p_##N##_fix_erase(N* p);
@@ -38,14 +38,7 @@
     void N##_from_array(N* p, const T* const arr, size_t size);
 
 #define _SGC_INIT_UNIQUE_SPRIORITY_QUEUE(T, S, N)                              \
-    static void _p_##N##_resize(const N* const v) {                            \
-        /* TODO check if full and handle */                                    \
-        (void)(v);                                                             \
-    }                                                                          \
-                                                                               \
-    size_t N##_max(void) {                                                     \
-        return S;                                                              \
-    }                                                                          \
+    _SGC_INIT_FS_RESIZE(T, S, N)                                               \
                                                                                \
     void N##_init(N* p) {                                                      \
         p->size_ = 0;                                                          \
@@ -74,4 +67,4 @@
     _SGC_INIT_PP_SPRIORITY_QUEUE(T, S, N)                                      \
     _SGC_INIT_UNIQUE_SPRIORITY_QUEUE(T, S, N)                                  \
     _SGC_INIT_COMMON_PRIORITY_QUEUE(T, N)                                      \
-    _SGC_INIT_COMMON(N)
+    _SGC_INIT_FS_COMMON(S, N)

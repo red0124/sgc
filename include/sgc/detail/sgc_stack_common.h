@@ -4,7 +4,9 @@
 
 #define _SGC_INIT_COMMON_STACK(T, N)                                           \
     void N##_push(N* s, T el) {                                                \
-        _p_##N##_resize(s);                                                    \
+        if (!_p_##N##_resize(s)) {                                             \
+            return;                                                            \
+        }                                                                      \
         _SGC_COPY(T, s->data_[s->size_], el, s->sharing_);                     \
         ++s->size_;                                                            \
     }                                                                          \

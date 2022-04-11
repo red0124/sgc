@@ -9,7 +9,7 @@
 
 #define _SGC_INIT_PP_QUEUE(T, N)                                               \
     static void _p_##N##_go_next(size_t* pos, size_t max);                     \
-    static void _p_##N##_resize(N* q);                                         \
+    static bool _p_##N##_resize(N* q);                                         \
     static void _p_##N##_free_data(N* q);                                      \
     static void _p_##N##_copy_data(N* dst, const N* const src);                \
     static size_t _p_##N##_max(const N* const q);
@@ -43,6 +43,8 @@
     bool N##_empty(const N* const q);
 
 #define _SGC_INIT_UNIQUE_QUEUE(T, N)                                           \
+    _SGC_INIT_RESIZE_CIRCULAR_BUFFER(T, N)                                     \
+                                                                               \
     static size_t _p_##N##_max(const N* const q) {                             \
         return q->max_;                                                        \
     }                                                                          \
@@ -63,6 +65,10 @@
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
+            if (!dst->data_) {                                                 \
+                N##_init(dst);                                                 \
+                return;                                                        \
+            }                                                                  \
             dst->sharing_ = src->sharing_;                                     \
             dst->size_ = dst->max_ = src->size_;                               \
             dst->back_ = src->size_ - 1;                                       \
@@ -70,28 +76,6 @@
             _p_##N##_copy_data(dst, src);                                      \
         } else {                                                               \
             N##_init(dst);                                                     \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    static void _p_##N##_resize(N* q) {                                        \
-        if (q->size_ == q->max_) {                                             \
-            size_t max = q->max_;                                              \
-            q->max_ = (q->max_ == 0) ? 1 : q->max_ * 2;                        \
-            q->data_ = (T*)sgc_realloc(q->data_, sizeof(T) * q->max_);         \
-                                                                               \
-            if (q->front_ > q->back_) {                                        \
-                size_t first_part = q->back_;                                  \
-                size_t second_part = max - q->front_;                          \
-                if (first_part > second_part) {                                \
-                    memcpy(q->data_ + (q->max_ - second_part),                 \
-                           q->data_ + q->front_, second_part * sizeof(T));     \
-                    q->front_ = q->front_ + max;                               \
-                } else {                                                       \
-                    memcpy(q->data_ + max, q->data_,                           \
-                           (1 + first_part) * sizeof(T));                      \
-                    q->back_ = q->back_ + max;                                 \
-                }                                                              \
-            }                                                                  \
         }                                                                      \
     }
 

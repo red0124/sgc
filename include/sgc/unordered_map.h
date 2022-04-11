@@ -11,8 +11,8 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_UNORDERED_MAP(K, V, N)                                    \
-    static void _p_##N##_bucket_sgc_free(const N* const u,                     \
-                                         struct _p_##N##_node* bucket);        \
+    static void _p_##N##_bucket_free_nodes(const N* const u,                   \
+                                           struct _p_##N##_node* bucket);      \
     static void _p_##N##_bucket_insert(struct _p_##N##_node* bucket,           \
                                        struct _p_##N##_node* new_node);        \
     static size_t _p_##N##_bucket_node_size(struct _p_##N##_node* bucket);     \
@@ -25,7 +25,7 @@
                                                size_t hash);                   \
     static void _p_##N##_rehash_size(const N* const u, size_t* max,            \
                                      size_t* new_max);                         \
-    static void _p_##N##_resize(N* u);                                         \
+    static bool _p_##N##_resize(N* u);                                         \
     static void _p_##N##_copy_base_data(N* __restrict__ dst,                   \
                                         const N* __restrict__ const src);      \
     static void _p_##N##_copy_nodes(N* __restrict__ dst,                       \
@@ -36,7 +36,10 @@
                                   const struct _p_##N##_node* const src);      \
     static size_t _p_##N##_node_hash_value(const struct _p_##N##_node* n);     \
     static bool _p_##N##_node_eq_key(const struct _p_##N##_node* const n,      \
-                                     const K* const key);
+                                     const K* const key);                      \
+    struct _p_##N##_node* _p_##N##_node_new(const K* key,                      \
+                                            const V* const value,              \
+                                            bool sharing_key, bool shared);
 
 #define SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                \
                                                                                \
@@ -63,10 +66,6 @@
     typedef struct N##_pair N##_type;                                          \
     typedef V N##_value;                                                       \
     typedef K N##_key;                                                         \
-                                                                               \
-    struct _p_##N##_node* _p_##N##_node_new(const K* key,                      \
-                                            const V* const value,              \
-                                            bool sharing_key, bool shared);    \
     size_t N##_bucket_count(const N* const u);                                 \
     size_t N##_bucket_size(const N* const u, size_t n);                        \
     size_t N##_buckets_used(const N* const u);                                 \
@@ -104,6 +103,9 @@
                                             bool sharing_key, bool shared) {   \
         struct _p_##N##_node* new_node =                                       \
             (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
+        if (!new_node) {                                                       \
+            return NULL;                                                       \
+        }                                                                      \
         _SGC_COPY(K, new_node->data_.key, *key, sharing_key);                  \
         _SGC_COPY(V, new_node->data_.value, *value, shared);                   \
         new_node->next_ = NULL;                                                \
@@ -119,7 +121,7 @@
     void N##_free(N* u) {                                                      \
         if (u->size_) {                                                        \
             for (size_t i = 0; i < u->max_; ++i) {                             \
-                _p_##N##_bucket_sgc_free(u, u->data_[i]);                      \
+                _p_##N##_bucket_free_nodes(u, u->data_[i]);                    \
             }                                                                  \
         }                                                                      \
         if (u->data_) {                                                        \
@@ -154,9 +156,14 @@
         if (i.valid_) {                                                        \
             _SGC_REPLACE(V, i.curr_->data_.value, v, u->sharing_);             \
         } else {                                                               \
-            _p_##N##_resize(u);                                                \
+            if (!_p_##N##_resize(u)) {                                         \
+                return;                                                        \
+            }                                                                  \
             struct _p_##N##_node* new_node =                                   \
                 _p_##N##_node_new(&k, &v, u->sharing_key_, u->sharing_);       \
+            if (!new_node) {                                                   \
+                return;                                                        \
+            }                                                                  \
             size_t position = hash % u->max_;                                  \
             if (u->data_[position]) {                                          \
                 _p_##N##_bucket_insert(u->data_[position], new_node);          \
@@ -175,10 +182,15 @@
             ret = &i.curr_->data_.value;                                       \
         } else {                                                               \
             V v;                                                               \
-            _p_##N##_resize(u);                                                \
+            if (!_p_##N##_resize(u)) {                                         \
+                return NULL;                                                   \
+            }                                                                  \
             V##_init(&v);                                                      \
             struct _p_##N##_node* new_node =                                   \
                 _p_##N##_node_new(&k, &v, u->sharing_key_, u->sharing_);       \
+            if (!new_node) {                                                   \
+                return NULL;                                                   \
+            }                                                                  \
             size_t position = hash % u->max_;                                  \
             if (u->data_[position]) {                                          \
                 _p_##N##_bucket_insert(u->data_[position], new_node);          \

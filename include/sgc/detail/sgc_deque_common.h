@@ -90,7 +90,9 @@
     }                                                                          \
                                                                                \
     void N##_push_back(N* d, T el) {                                           \
-        _p_##N##_resize(d);                                                    \
+        if (!_p_##N##_resize(d)) {                                             \
+            return;                                                            \
+        }                                                                      \
         if (d->size_ != 0) {                                                   \
             _p_##N##_go_next(&d->back_, _p_##N##_max(d));                      \
         }                                                                      \
@@ -99,7 +101,9 @@
     }                                                                          \
                                                                                \
     void N##_push_front(N* d, T el) {                                          \
-        _p_##N##_resize(d);                                                    \
+        if (!_p_##N##_resize(d)) {                                             \
+            return;                                                            \
+        }                                                                      \
         if (d->size_ != 0) {                                                   \
             _p_##N##_go_prev(&d->front_, _p_##N##_max(d));                     \
         }                                                                      \
@@ -154,7 +158,9 @@
         } else if (at == d->size_) {                                           \
             N##_push_back(d, el);                                              \
         } else {                                                               \
-            _p_##N##_resize(d);                                                \
+            if (!_p_##N##_resize(d)) {                                         \
+                return;                                                        \
+            }                                                                  \
             size_t _at = (at + d->front_) % _p_##N##_max(d);                   \
             size_t shift_front = 0;                                            \
             size_t shift_back = 0;                                             \

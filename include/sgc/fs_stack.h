@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_FS_STACK(T, N)                                            \
-    static void _p_##N##_resize(const N* const s);
+    static bool _p_##N##_resize(const N* const s);
 
 #define SGC_INIT_HEADERS_FS_STACK(T, S, N)                                     \
     struct N {                                                                 \
@@ -33,14 +33,7 @@
     bool N##_empty(const N* const s);
 
 #define _SGC_INIT_UNIQUE_FS_STACK(T, S, N)                                     \
-    static void _p_##N##_resize(const N* const v) {                            \
-        /* TODO check if full and handle */                                    \
-        (void)(v);                                                             \
-    }                                                                          \
-                                                                               \
-    size_t N##_max(void) {                                                     \
-        return S;                                                              \
-    }                                                                          \
+    _SGC_INIT_FS_RESIZE(T, S, N)                                              \
                                                                                \
     void N##_init(N* s) {                                                      \
         s->size_ = 0;                                                          \
@@ -69,4 +62,4 @@
     _SGC_INIT_PP_FS_STACK(T, N)                                                \
     _SGC_INIT_UNIQUE_FS_STACK(T, S, N)                                         \
     _SGC_INIT_COMMON_STACK(T, N)                                               \
-    _SGC_INIT_COMMON(N)
+    _SGC_INIT_FS_COMMON(S, N)

@@ -7,7 +7,7 @@
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
 
-#define _SGC_INIT_PP_STACK(T, N) static void _p_##N##_resize(N* s);
+#define _SGC_INIT_PP_STACK(T, N) static bool _p_##N##_resize(N* s);
 
 #define SGC_INIT_HEADERS_STACK(T, N)                                           \
     struct N {                                                                 \
@@ -33,6 +33,8 @@
     bool N##_empty(const N* const s);
 
 #define _SGC_INIT_UNIQUE_STACK(T, N)                                           \
+    _SGC_INIT_RESIZE(T, N)                                                     \
+                                                                               \
     void N##_init(N* const s) {                                                \
         s->size_ = s->max_ = 0;                                                \
         s->data_ = NULL;                                                       \
@@ -52,17 +54,14 @@
             dst->max_ = src->size_;                                            \
             dst->sharing_ = src->sharing_;                                     \
             dst->data_ = (T*)sgc_malloc(dst->max_ * sizeof(T));                \
+            if (!dst->data_) {                                                 \
+                N##_init(dst);                                                 \
+                return;                                                        \
+            }                                                                  \
             _SGC_ARRAY_COPY(T, dst->data_, src->data_, src->size_,             \
                             src->sharing_)                                     \
         } else {                                                               \
             N##_init(dst);                                                     \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    static void _p_##N##_resize(N* s) {                                        \
-        if (s->size_ == s->max_) {                                             \
-            s->max_ = (s->max_ == 0) ? 1 : s->max_ * 2;                        \
-            s->data_ = (T*)sgc_realloc(s->data_, sizeof(T) * s->max_);         \
         }                                                                      \
     }
 

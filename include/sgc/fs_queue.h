@@ -8,7 +8,7 @@
 
 #define _SGC_INIT_PP_FS_QUEUE(T, S, N)                                         \
     static void _p_##N##_go_next(size_t* pos, size_t max);                     \
-    static void _p_##N##_resize(const N* const q);                             \
+    static bool _p_##N##_resize(const N* const q);                             \
     static void _p_##N##_free_data(N* q);                                      \
     static void _p_##N##_copy_data(N* dst, const N* const src);                \
     static size_t _p_##N##_max(const N* const q);
@@ -41,17 +41,10 @@
     bool N##_empty(const N* const q);
 
 #define _SGC_INIT_UNIQUE_FS_QUEUE(T, S, N)                                     \
-    static void _p_##N##_resize(const N* const v) {                            \
-        /* TODO check if full and handle */                                    \
-        (void)(v);                                                             \
-    }                                                                          \
+    _SGC_INIT_FS_RESIZE(T, S, N)                                               \
                                                                                \
     static size_t _p_##N##_max(const N* const v) {                             \
         (void)(v);                                                             \
-        return S;                                                              \
-    }                                                                          \
-                                                                               \
-    size_t N##_max(void) {                                                     \
         return S;                                                              \
     }                                                                          \
                                                                                \
@@ -83,4 +76,4 @@
     _SGC_INIT_PP_FS_QUEUE(T, S, N)                                             \
     _SGC_INIT_UNIQUE_FS_QUEUE(T, S, N)                                         \
     _SGC_INIT_COMMON_QUEUE(T, N)                                               \
-    _SGC_INIT_COMMON(N)
+    _SGC_INIT_FS_COMMON(S, N)

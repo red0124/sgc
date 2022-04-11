@@ -7,7 +7,10 @@
             return;                                                            \
         }                                                                      \
                                                                                \
-        _p_##N##_resize(v);                                                    \
+        if (!_p_##N##_resize(v)) {                                             \
+            return;                                                            \
+        }                                                                      \
+                                                                               \
         memmove(v->data_ + at + 1, v->data_ + at,                              \
                 (v->size_ - at) * sizeof(T));                                  \
         _SGC_COPY(T, v->data_[at], el, v->sharing_);                           \

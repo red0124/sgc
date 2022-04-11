@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_FS_VECTOR(T, N)                                           \
-    static void _p_##N##_resize(const N* const v);
+    static bool _p_##N##_resize(const N* const v);
 
 #define SGC_INIT_HEADERS_FS_VECTOR(T, S, N)                                    \
     struct N {                                                                 \
@@ -51,14 +51,7 @@
     _SGC_INIT_RA_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_FS_VECTOR(T, S, N)                                    \
-    static void _p_##N##_resize(const N* const v) {                            \
-        /* TODO check if full and handle */                                    \
-        (void)(v);                                                             \
-    }                                                                          \
-                                                                               \
-    size_t N##_max(void) {                                                     \
-        return S;                                                              \
-    }                                                                          \
+    _SGC_INIT_FS_RESIZE(T, S, N)                                              \
                                                                                \
     void N##_init(N* v) {                                                      \
         v->size_ = 0;                                                          \
@@ -87,4 +80,4 @@
     _SGC_INIT_PP_FS_VECTOR(T, N)                                               \
     _SGC_INIT_UNIQUE_FS_VECTOR(T, S, N)                                        \
     _SGC_INIT_COMMON_VECTOR(T, N)                                              \
-    _SGC_INIT_COMMON(N)
+    _SGC_INIT_FS_COMMON(S, N)
