@@ -9,7 +9,8 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_FORWARD_LIST(T, N)                                        \
-    static struct _p_##N##_node* _p_##N##_node_alloc();
+    static struct _p_##N##_node* _p_##N##_node_alloc();                        \
+    static void _p_##N##_free_nodes(struct _p_##N##_node* n);
 
 // TODO add iterator insert/erase, add sort
 #define SGC_INIT_HEADERS_FORWARD_LIST(T, N)                                    \
@@ -57,6 +58,10 @@
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \
             dst->head_ = _p_##N##_node_alloc(dst);                             \
+            if (!dst->head_) {                                                 \
+                N##_init(dst);                                                 \
+                return;                                                        \
+            }                                                                  \
             _SGC_COPY(T, dst->head_->data_, src->head_->data_, src->sharing_); \
             struct _p_##N##_node* curr_src = src->head_;                       \
             struct _p_##N##_node* curr_dst = dst->head_;                       \
@@ -68,6 +73,11 @@
                     break;                                                     \
                 }                                                              \
                 tmp_dst = _p_##N##_node_alloc(dst);                            \
+                if (!tmp_dst) {                                                \
+                    _p_##N##_free_nodes(dst->head_);                           \
+                    N##_init(dst);                                             \
+                    return;                                                    \
+                }                                                              \
                 _SGC_COPY(T, tmp_dst->data_, tmp_src->data_, src->sharing_);   \
                 curr_dst->next_ = tmp_dst;                                     \
                 curr_dst = tmp_dst;                                            \
@@ -82,6 +92,9 @@
                                                                                \
     void N##_push_back(N* l, T el) {                                           \
         struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
+        if (!new_el) {                                                         \
+            return;                                                            \
+        }                                                                      \
         _SGC_COPY(T, new_el->data_, el, l->sharing_);                          \
         new_el->next_ = NULL;                                                  \
         switch (l->size_) {                                                    \
@@ -102,6 +115,9 @@
                                                                                \
     void N##_push_front(N* l, const T el) {                                    \
         struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
+        if (!new_el) {                                                         \
+            return;                                                            \
+        }                                                                      \
         _SGC_COPY(T, new_el->data_, el, l->sharing_);                          \
         switch (l->size_) {                                                    \
         case 0:                                                                \

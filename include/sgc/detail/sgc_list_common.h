@@ -90,4 +90,15 @@
         N##_it i;                                                              \
         N##_it_cbegin(l, &i);                                                  \
         return i;                                                              \
+    }                                                                          \
+                                                                               \
+    static void _p_##N##_free_nodes(struct _p_##N##_node* n) {                 \
+        struct _p_##N##_node* curr = n;                                        \
+        struct _p_##N##_node* next;                                            \
+        while (curr) {                                                         \
+            next = curr->next_;                                                \
+            T##_free(&curr->data_);                                            \
+            sgc_free(curr);                                                    \
+            curr = next;                                                       \
+        }                                                                      \
     }

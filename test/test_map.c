@@ -67,10 +67,9 @@ void test_amap(void) {
 
     amap_set_shareing(&v);
     ++allocation_count;
-    int* new_el = (int*)malloc(sizeof(int));
-    *new_el = TEST_ELEMENTS_NUM + 2;
-    tmp.el = new_el;
-    amap_at(&v, tmp);
+    tmp.el = (int*)malloc(sizeof(int));
+    *tmp.el = TEST_ELEMENTS_NUM + 2;
+    amap_set(&v, tmp, tmp);
     amap_set_owning(&v);
 
     amap_free(&v);
