@@ -515,32 +515,22 @@ enum _sgc_map_color {
         if (!m->size_) {                                                       \
             return;                                                            \
         }                                                                      \
-        struct _p_##N##_node** stack =                                         \
-            (struct _p_##N##_node**)sgc_malloc(_p_##N##_stack_size(m->size_)); \
-        if (!stack) {                                                          \
-            return;                                                            \
-        }                                                                      \
                                                                                \
         struct _p_##N##_node* curr = m->root_;                                 \
-        struct _p_##N##_node* tmp = NULL;                                      \
-                                                                               \
-        size_t stack_size = 0;                                                 \
-        while (true) {                                                         \
-            if (curr != _SGC_MAP_LEAF) {                                       \
-                stack[stack_size++] = curr;                                    \
-                curr = curr->left_;                                            \
-            } else {                                                           \
-                if (stack_size == 0) {                                         \
-                    break;                                                     \
-                }                                                              \
-                curr = stack[--stack_size];                                    \
-                tmp = curr;                                                    \
-                curr = curr->right_;                                           \
-                _p_##N##_node_free(m, tmp);                                    \
-                sgc_free(tmp);                                                 \
-            }                                                                  \
+        while (curr != _SGC_MAP_LEAF && curr->left_ != _SGC_MAP_LEAF) {        \
+            curr = curr->left_;                                                \
         }                                                                      \
-        sgc_free(stack);                                                       \
+                                                                               \
+        while (m->root_ != _SGC_MAP_LEAF) {                                    \
+            curr->left_ = m->root_->right_;                                    \
+            while (curr != _SGC_MAP_LEAF && curr->left_ != _SGC_MAP_LEAF) {    \
+                curr = curr->left_;                                            \
+            }                                                                  \
+            struct _p_##N##_node* tmp = m->root_;                              \
+            m->root_ = m->root_->left_;                                        \
+            _p_##N##_node_free(m, tmp);                                        \
+            sgc_free(tmp);                                                     \
+        }                                                                      \
         m->root_ = _SGC_MAP_LEAF;                                              \
         m->size_ = 0;                                                          \
     }                                                                          \
