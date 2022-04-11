@@ -24,6 +24,7 @@
                                                                                \
     void N##_copy(N* first, const N* const second) {                           \
         if (*second) {                                                         \
+            /* TODO replace with sgc_malloc */                                 \
             *first = strdup(*second);                                          \
         } else {                                                               \
             *first = NULL;                                                     \

@@ -119,6 +119,9 @@
                                                    bool sharing_key,           \
                                                    bool sharing_value) {       \
         struct _p_##N##_node* n = sgc_malloc(sizeof(struct _p_##N##_node));    \
+        if (!n) {                                                              \
+            return NULL;                                                       \
+        }                                                                      \
                                                                                \
         _SGC_COPY(K, n->data_.key, *k, sharing_key);                           \
         _SGC_COPY(V, n->data_.value, *v, sharing_value);                       \
@@ -138,6 +141,9 @@
                 if (parent->left_ == _SGC_MAP_LEAF) {                          \
                     new_node =                                                 \
                         _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
+                    if (!new_node) {                                           \
+                        return;                                                \
+                    }                                                          \
                     parent->left_ = new_node;                                  \
                     m->size_++;                                                \
                     break;                                                     \
@@ -147,6 +153,9 @@
                 if (parent->right_ == _SGC_MAP_LEAF) {                         \
                     new_node =                                                 \
                         _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
+                    if (!new_node) {                                           \
+                        return;                                                \
+                    }                                                          \
                     parent->right_ = new_node;                                 \
                     m->size_++;                                                \
                     break;                                                     \
@@ -167,6 +176,9 @@
         if (m->root_ == _SGC_MAP_LEAF) {                                       \
             struct _p_##N##_node* new_node =                                   \
                 _p_##N##_node_new(&k, &v, m->sharing_key_, m->sharing_);       \
+            if (!new_node) {                                                   \
+                return;                                                        \
+            }                                                                  \
             new_node->color_ = _SGC_MAP_COLOR_BLACK;                           \
             new_node->parent_ = _SGC_MAP_LEAF;                                 \
             m->root_ = new_node;                                               \
@@ -190,6 +202,9 @@
                     V##_init(v);                                               \
                     new_node =                                                 \
                         _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
+                    if (!new_node) {                                           \
+                        return NULL;                                           \
+                    }                                                          \
                     v = &new_node->data_.value;                                \
                     parent->left_ = new_node;                                  \
                     m->size_++;                                                \
@@ -203,6 +218,9 @@
                     V##_init(v);                                               \
                     new_node =                                                 \
                         _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
+                    if (!new_node) {                                           \
+                        return NULL;                                           \
+                    }                                                          \
                     v = &new_node->data_.value;                                \
                     parent->right_ = new_node;                                 \
                     m->size_++;                                                \
@@ -226,6 +244,9 @@
             V##_init(&v);                                                      \
             struct _p_##N##_node* new_node =                                   \
                 _p_##N##_node_new(&k, &v, m->sharing_key_, m->sharing_);       \
+            if (!new_node) {                                                   \
+                return NULL;                                                   \
+            }                                                                  \
             new_node->color_ = _SGC_MAP_COLOR_BLACK;                           \
             new_node->parent_ = _SGC_MAP_LEAF;                                 \
             m->root_ = new_node;                                               \

@@ -418,12 +418,21 @@ enum _sgc_map_color {
             struct _p_##N##_node** stack_src =                                 \
                 (struct _p_##N##_node**)sgc_malloc(                            \
                     _p_##N##_stack_size(src->size_));                          \
+            if (!stack_src) {                                                  \
+                N##_init(dst);                                                 \
+                return;                                                        \
+            }                                                                  \
                                                                                \
             struct _p_##N##_node* curr_src = src->root_;                       \
                                                                                \
             struct _p_##N##_node** stack_dst =                                 \
                 (struct _p_##N##_node**)sgc_malloc(                            \
                     _p_##N##_stack_size(dst->size_));                          \
+            if (!stack_dst) {                                                  \
+                N##_init(dst);                                                 \
+                sgc_free(stack_src);                                           \
+                return;                                                        \
+            }                                                                  \
                                                                                \
             struct _p_##N##_node* curr_dst = dst->root_;                       \
                                                                                \
@@ -447,16 +456,26 @@ enum _sgc_map_color {
                     continue;                                                  \
                 }                                                              \
                                                                                \
+                struct _p_##N##_node* new_node =                               \
+                    (struct _p_##N##_node*)sgc_malloc(                         \
+                        sizeof(struct _p_##N##_node));                         \
+                                                                               \
+                if (!new_node) {                                               \
+                    sgc_free(stack_dst);                                       \
+                    sgc_free(stack_src);                                       \
+                    N##_free(dst);                                             \
+                    N##_init(dst);                                             \
+                    return;                                                    \
+                }                                                              \
+                                                                               \
                 if (curr_src->left_ != _SGC_MAP_LEAF &&                        \
                     curr_dst->left_ == _SGC_MAP_LEAF) {                        \
-                    curr_dst->left_ = (struct _p_##N##_node*)sgc_malloc(       \
-                        sizeof(struct _p_##N##_node));                         \
+                    curr_dst->left_ = new_node;                                \
                     tmp = curr_dst->left_;                                     \
                     tmp->parent_ = curr_dst;                                   \
                     curr_src = curr_src->left_;                                \
                 } else {                                                       \
-                    curr_dst->right_ = (struct _p_##N##_node*)sgc_malloc(      \
-                        sizeof(struct _p_##N##_node));                         \
+                    curr_dst->right_ = new_node;                               \
                     tmp = curr_dst->right_;                                    \
                     tmp->parent_ = curr_dst;                                   \
                     curr_src = curr_src->right_;                               \
@@ -480,6 +499,9 @@ enum _sgc_map_color {
                                 const struct _p_##N##_node* const n) {         \
         struct _p_##N##_node* new_node =                                       \
             (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
+        if (!new_node) {                                                       \
+            return NULL;                                                       \
+        }                                                                      \
                                                                                \
         new_node->left_ = new_node->right_ = new_node->parent_ =               \
             _SGC_MAP_LEAF;                                                     \
@@ -495,6 +517,9 @@ enum _sgc_map_color {
         }                                                                      \
         struct _p_##N##_node** stack =                                         \
             (struct _p_##N##_node**)sgc_malloc(_p_##N##_stack_size(m->size_)); \
+        if (!stack) {                                                          \
+            return;                                                            \
+        }                                                                      \
                                                                                \
         struct _p_##N##_node* curr = m->root_;                                 \
         struct _p_##N##_node* tmp = NULL;                                      \
