@@ -44,6 +44,9 @@ enum _sgc_node_state {
                     position = 0;                                              \
                 } else {                                                       \
                     ++position;                                                \
+                    if (position == hash % S) {                                \
+                        break;                                                 \
+                    }                                                          \
                 }                                                              \
             }                                                                  \
         }                                                                      \
