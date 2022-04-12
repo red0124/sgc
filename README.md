@@ -67,7 +67,7 @@ Dictionary data structures also have:
 Fixed size (fs) data structurs also have:
 - max
 
-Now follows a table showing which data stuctures have which functionalities defined:
+Now follows a table showing which data stuctures have which additional functionalities defined:
 
 |              | vector | deque | list | forward<br>list | queue | stack | priority<br>queue | map | unordered<br>map | set | unordered<br>set |
 | ------------ | :----: | :---: | :--: | :-------------: | :---: | :---: | :---------------: | :-: | :--------------: | :-: | :--------------: |
@@ -98,13 +98,13 @@ Now follows a table showing which data stuctures have which functionalities defi
 | from_array   | **x**      |       |      |                 |       |       | **x**                 |     |                  |     |                  |
 
 The functions are mostly identical to methods within the c++ STL with a few exceptions. The **`at`** functions correspond to **`operator[]`**.
-insert [1] For **`vector`** and **`deque`** used to insert element at specified position.
-erase [2] For **`vector`** **and `deque`** used to erase element at specified position.
-at [3] For **`vector`** **and `deque`** used to fetch element at specified position.
-set [4] For **`vector`** **and `deque`** used to set element at specified position.
+- insert [1] For **`vector`** and **`deque`** used to insert element at specified position.
+- erase [2] For **`vector`** **and `deque`** used to erase element at specified position.
+- at [3] For **`vector`** **and `deque`** used to fetch element at specified position.
+- set [4] For **`vector`** **and `deque`** used to set element at specified position.
 
 Some data structures have iterators binded to them, there is three types of iterators, 
-random access iterator, bidirectional iterator and forward iterator. The iterator
+random access iterator (RA), bidirectional (BD) iterator and forward (FWD) iterator. The iterator
 structure for the associated data structure had the same name as the data structure
 with **`_it`** attacked to the end of it.
 
@@ -137,6 +137,7 @@ Random access iterator is associated with all the function from bidirectional it
 - it_diff
 
 Now follows a table showing which data stuctures support which iterators:
+
 |               | random access iterator | bidirectional iterator | forward iterator |
 | ------------- | :--------------------: | :--------------------: | :--------------: |
 | vector        | **x**                      |                        |                  |
@@ -147,3 +148,23 @@ Now follows a table showing which data stuctures support which iterators:
 | unordered_map |                        | **x**                      |                  |
 | set           |                        | **x**                      |                  |
 | unordered_set |                        | **x**                      |                  |
+
+The library supports the some algorithms most of which require an iterator to be able to work:
+
+| Algorighm          | Required iterator |
+| ------------------ | :---------------: |
+| eq                 | **FWD**               |
+| foreach            | **FWD**               |
+| foreach_range      | **FWD**               |
+| accumulate         | **FWD**               |
+| accumulate_range   | **FWD**               |
+| find_el            | **FWD**               |
+| find_el_range      | **FWD**               |
+| find_el_index      | **FWD**               |
+| count              | **FWD**               |
+| find_it            | **FWD**               |
+| find_range_it      | **FWD**               |
+| binary_find        | **RA**                |
+| binary_find_index  | **RA**                |
+
+The sort algorithm does not require an iterator but an array function instead.

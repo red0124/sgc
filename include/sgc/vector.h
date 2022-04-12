@@ -29,7 +29,6 @@
     void N##_free(N* v);                                                       \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
     void N##_from_array(N* v, const T* const arr, size_t size);                \
-    void N##_shrink(N* v);                                                     \
     void N##_push_back(N* v, T el);                                            \
     void N##_pop_back(N* v);                                                   \
     void N##_insert(N* v, size_t at, T el);                                    \
