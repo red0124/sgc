@@ -137,13 +137,13 @@ Random access iterator is associated with all the function from bidirectional it
 - it_diff
 
 Now follows a table showing which data stuctures support which iterators:
-|               | random<br>access<br>iterator | bidirectional<br>iterator | forward<br>iterator |
-| ------------- | :--------------------------: | :-----------------------: | :-----------------: |
-| vector        | **x**                            |                           |                     |
-| deque         | **x**                            |                           |                     |
-| list          |                              | **x**                         |                     |
-| forward_list  |                              |                           | **x**                   |
-| map           |                              | **x**                         |                     |
-| unordered_map |                              | **x**                         |                     |
-| set           |                              | **x**                         |                     |
-| unordered_set |                              | **x**                         |                     |
+|               | random access iterator | bidirectional iterator | forward iterator |
+| ------------- | :--------------------: | :--------------------: | :--------------: |
+| vector        | **x**                      |                        |                  |
+| deque         | **x**                      |                        |                  |
+| list          |                        | **x**                      |                  |
+| forward_list  |                        |                        | **x**                |
+| map           |                        | **x**                      |                  |
+| unordered_map |                        | **x**                      |                  |
+| set           |                        | **x**                      |                  |
+| unordered_set |                        | **x**                      |                  |
