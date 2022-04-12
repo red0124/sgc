@@ -61,7 +61,7 @@ $
 ```
 # Supported functionalities
 
-|              | vector | deque | list | fw<br>list | queue | stack | priority<br>queue | set | uo<br>set | map | uo<br>map |
+|              | vector | deque | list | forward<br>list | queue | stack | priority<br>queue | set | unordered<br>set | map | unordered<br>map |
 | ------------ | :----: | :---: | :--: | :-------------: | :---: | :---: | :---------------: | :-: | :--------------: | :-: | :--------------: |
 | push_back    | **x**      | **x**     | **x**    | **x**               |       |       |                   |     |                  |     |                  |
 | push_forward |        | **x**     | **x**    | **x**               |       |       |                   |     |                  |     |                  |
