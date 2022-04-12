@@ -34,7 +34,6 @@
     void N##_pop(N* p);                                                        \
     const T* N##_top(const N* const p);                                        \
     bool N##_empty(const N* const d);                                          \
-    T* N##_array(N* d);                                                        \
     void N##_from_array(N* p, const T* const arr, size_t size);
 
 #define _SGC_INIT_UNIEUE_PRIORITY_QUEUE(T, N)                                  \

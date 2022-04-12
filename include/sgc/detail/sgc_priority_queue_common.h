@@ -67,13 +67,6 @@
         return NULL;                                                           \
     }                                                                          \
                                                                                \
-    T* N##_array(N* d) {                                                       \
-        if (d->size_) {                                                        \
-            return d->data_;                                                   \
-        }                                                                      \
-        return NULL;                                                           \
-    }                                                                          \
-                                                                               \
     void N##_from_array(N* p, const T* const arr, size_t size) {               \
         N##_init(p);                                                           \
         if (size) {                                                            \

@@ -1,9 +1,5 @@
+FLAGS=-O3 -flto -Wall -Wextra
+
 all:
-	gcc -O2 -flto c_src.c -o c_prog
-	g++ -O2 -flto cpp_src.cpp -o cpp_prog
-
-test:
-	./test.sh
-
-clean:
-	@rm c_prog cpp_prog output.txt input.txt
+	gcc sgc.c extern.c ${FLAGS} -o sgc
+	g++ std.cpp extern.c ${FLAGS} -o std
