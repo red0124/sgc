@@ -61,11 +61,11 @@ $
 ```
 # Supported functionalities
 
-|              | vector | deque | list | forward<br>list | queue | stack | priority<br>queue | set | unordered<br>set | map | unordered<br>map |
+|              | vector | deque | list | forward<br>list | queue | stack | priority<br>queue | map | unordered<br>map | set | unordered<br>set |
 | ------------ | :----: | :---: | :--: | :-------------: | :---: | :---: | :---------------: | :-: | :--------------: | :-: | :--------------: |
 | push_back    | **x**      | **x**     | **x**    | **x**               |       |       |                   |     |                  |     |                  |
 | push_forward |        | **x**     | **x**    | **x**               |       |       |                   |     |                  |     |                  |
-| insert [1]   | **x**      | **x**     |      |                 |       |       |                   | **x**   | **x**                |     |                  |
+| insert [1]   | **x**      | **x**     |      |                 |       |       |                   |     |                  | **x**   | **x**                |
 |              |        |       |      |                 |       |       |                   |     |                  |     |                  |
 | pop_back     | **x**      | **x**     | **x**    |                 |       |       |                   |     |                  |     |                  |
 | pop_front    |        | **x**     | **x**    | **x**               |       |       |                   |     |                  |     |                  |
@@ -73,11 +73,11 @@ $
 |              |        |       |      |                 |       |       |                   |     |                  |     |                  |
 | back         | **x**      | **x**     | **x**    | **x**               | **x**     |       |                   |     |                  |     |                  |
 | front        | **x**      | **x**     | **x**    | **x**               | **x**     |       |                   |     |                  |     |                  |
-| at [3]       | **x**      | **x**     |      |                 |       |       |                   |     |                  | **x**   | **x**                |
+| at [3]       | **x**      | **x**     |      |                 |       |       |                   | **x**   | **x**                |     |                  |
 |              |        |       |      |                 |       |       |                   |     |                  |     |                  |
 | set_back     | **x**      | **x**     | **x**    | **x**               | **x**     |       |                   |     |                  |     |                  |
 | set_front    | **x**      | **x**     | **x**    | **x**               | **x**     |       |                   |     |                  |     |                  |
-| set [4]      | **x**      | **x**     |      |                 |       |       |                   |     |                  | **x**   | **x**                |
+| set [4]      | **x**      | **x**     |      |                 |       |       |                   | **x**   | **x**                |     |                  |
 |              |        |       |      |                 |       |       |                   |     |                  |     |                  |
 | push         |        |       |      |                 | **x**     | **x**     | **x**                 |     |                  |     |                  |
 | pop          |        |       |      |                 | **x**     | **x**     | **x**                 |     |                  |     |                  |
