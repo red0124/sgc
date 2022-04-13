@@ -151,12 +151,12 @@ Now follows a table showing which data stuctures support which iterators:
 
 The library supports the some algorithms most of which require an iterator to be able to work:
 
-| Algorighm                                                                   | Group              |
-| --------------------------------------------------------------------------- | :----------------: |
-| eq                                                                          | EQ                 |
-| qsort<br>qsort_default<br>                                                  | QSORT              |
-| find_el<br>find_it<br>find_index<br>count                                   | FIND               |
-| foreach<br>accumulate                                                       | ITERATE            |
-| binary_find<br>binary_find_index<br>                                        | BINARY_FIND        |
+| Algorighm                                                                   | Group              | Minimal Requirements                   |
+| --------------------------------------------------------------------------- | :----------------: | -------------------------------------- |
+| eq                                                                          | EQ                 | forward iterator                       |
+| qsort<br>qsort_default<br>                                                  | QSORT              | array function                         |
+| find_el<br>find_it<br>find_index<br>count                                   | FIND               | forward iterator                       |
+| foreach<br>accumulate                                                       | ITERATE            | forward iterator                       |
+| binary_find<br>binary_find_index<br>                                        | BINARY_FIND        | random access iterator                 |
 
 The sort algorithm does not require an iterator but an array function instead.
