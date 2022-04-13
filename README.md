@@ -1,54 +1,89 @@
 ﻿Work In Progress
 
 # Semi-Generic C
-Algorithms and data structures written in **C** using macros. The data structures used are similar to the ones used in the **C++ STL** with little difference.
+Algorithms and data structures written in **`C`** using macros. The data structures used are similar to the ones present in the **`C++ STL`**. 
 
-# Simple Example 'intro.c'
+# Simple Example 'vector.c'
 
 ```c
+#include <sgc/vector.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#include <SGC/vector.h>
+SGC_INIT(VECTOR, int, vec)
 
-struct person
-{
-        char first_name[32];
-        char last_name[32];
-        int age;
-};
+int main() {
+    vec v;
+    vec_init(&v);
 
-SGC_INIT(STATIC_STRUCT, struct person, person);
-SGC_INIT(VECTOR, person, vec);
+    for (size_t i = 0; i < 5; ++i) {
+        vec_push_back(&v, i);
+    }
 
-int main(void)
-{
-        vec v;
-        vec_init(&v);
+    printf("size: %zu\n", vec_size(&v));
 
-        vec_push_back(&v, (person){"a", "a", 10});
-        vec_push_back(&v, (person){"b", "b", 20});
-        vec_push_back(&v, (person){"c", "c", 30});
+    for_each(i IN v AS vec) {
+        printf("%d \n", *i);
+    }
 
-        for_each(i in v as vec)
-        {
-                printf("%s %s %d\n", i->first_name, i->last_name, i->age);
-        }
-
-        vec_free(&v);
-        return 0;
+    vec_free(&v);
+    return 0;
 }
 ```
 
 Output:
 ```bash
-$ ./program
-a a 10
-b b 20
-c c 30
-$ 
+$ ./vector
+size: 5
+0
+1
+2
+3
+4
 ```
+
+TODO content
+
+TODO how does SGC_INIT work
+
+```c
+#include <sgc/map.h>
+#include <stdio.h>
+
+SGC_INIT_DICT(MAP, char, double, map)
+
+int main(void) {
+    map m;
+    map_init(&m);
+
+    map_set(&m, 'a', 10.0);
+    *map_at(&m, 'b') = 11.1;
+
+    map_it it = map_find(&m, 'c');
+    if (map_it_valid(it)) {
+        return 1;
+    }
+
+    it = map_find(&m, 'a');
+    if (map_it_valid(it)) {
+        printf("value for 'a': %.2f\n", map_it_data(it)->value);
+    }
+
+    for_each(i IN m AS map) {
+        printf("%c -> %.2f\n", i->key, i->value);
+    }
+
+    map_free(&m);
+    return 0;
+}
+```
+Output:
+```bash
+$ ./map
+value for 'a': 10.00
+a -> 10.00
+b -> 11.10
+```
+
 # Supported functionalities
 
 Every data structure defines the following functions:

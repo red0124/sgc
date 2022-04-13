@@ -156,51 +156,51 @@
 // ==============
 // INIT PAIR
 // ==============
-#define _SGC_INIT_PAIR_N(_1, _2, _3, _4, _5, _6, _7, _8, NAME, ...) NAME
+#define _SGC_INIT_DICT_N(_1, _2, _3, _4, _5, _6, _7, _8, NAME, ...) NAME
 
-#define SGC_INIT_PAIR(...)                                                     \
-    _SGC_INIT_PAIR_N(__VA_ARGS__, _SGC_INIT_PAIR8, _SGC_INIT_PAIR7,            \
-                     _SGC_INIT_PAIR6, _SGC_INIT_PAIR5, _SGC_INIT_PAIR4, )      \
+#define SGC_INIT_DICT(...)                                                     \
+    _SGC_INIT_DICT_N(__VA_ARGS__, _SGC_INIT_DICT8, _SGC_INIT_DICT7,            \
+                     _SGC_INIT_DICT6, _SGC_INIT_DICT5, _SGC_INIT_DICT4, )      \
     (__VA_ARGS__)
 
-#define _SGC_INIT_PAIR4(C, K, V, N) SGC_INIT_##C(K, V, N)
+#define _SGC_INIT_DICT4(C, K, V, N) SGC_INIT_##C(K, V, N)
 
-#define _SGC_INIT_PAIR5(C, K, V, N, A1)                                        \
-    _SGC_INIT_PAIR4(C, K, V, N) SGC_INIT_##A1(V, N)
+#define _SGC_INIT_DICT5(C, K, V, N, A1)                                        \
+    _SGC_INIT_DICT4(C, K, V, N) SGC_INIT_##A1(V, N)
 
-#define _SGC_INIT_PAIR6(C, K, V, N, A1, A2)                                    \
-    _SGC_INIT_PAIR5(C, K, V, N, A1) SGC_INIT_##A2(V, N)
+#define _SGC_INIT_DICT6(C, K, V, N, A1, A2)                                    \
+    _SGC_INIT_DICT5(C, K, V, N, A1) SGC_INIT_##A2(V, N)
 
-#define _SGC_INIT_PAIR7(C, K, V, N, A1, A2, A3)                                \
-    _SGC_INIT_PAIR6(C, K, V, N, A1, A2) SGC_INIT_##A3(V, N)
+#define _SGC_INIT_DICT7(C, K, V, N, A1, A2, A3)                                \
+    _SGC_INIT_DICT6(C, K, V, N, A1, A2) SGC_INIT_##A3(V, N)
 
-#define _SGC_INIT_PAIR8(C, K, V, N, A1, A2, A3, A4)                            \
-    _SGC_INIT_PAIR7(C, K, V, N, A1, A2, A3) SGC_INIT_##A4(V, N)
+#define _SGC_INIT_DICT8(C, K, V, N, A1, A2, A3, A4)                            \
+    _SGC_INIT_DICT7(C, K, V, N, A1, A2, A3) SGC_INIT_##A4(V, N)
 
 // ==============
 // INIT FS_PAIR
 // ==============
-#define _SGC_INIT_FS_PAIR_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, NAME, ...) NAME
+#define _SGC_INIT_FS_DICT_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, NAME, ...) NAME
 
-#define SGC_INIT_FS_PAIR(...)                                                  \
-    _SGC_INIT_FS_PAIR_N(__VA_ARGS__, _SGC_INIT_FS_PAIR9, _SGC_INIT_FS_PAIR8,   \
-                        _SGC_INIT_FS_PAIR7, _SGC_INIT_FS_PAIR6,                \
-                        _SGC_INIT_FS_PAIR5, )                                  \
+#define SGC_INIT_FS_DICT(...)                                                  \
+    _SGC_INIT_FS_DICT_N(__VA_ARGS__, _SGC_INIT_FS_DICT9, _SGC_INIT_FS_DICT8,   \
+                        _SGC_INIT_FS_DICT7, _SGC_INIT_FS_DICT6,                \
+                        _SGC_INIT_FS_DICT5, )                                  \
     (__VA_ARGS__)
 
-#define _SGC_INIT_FS_PAIR5(C, K, V, S, N) SGC_INIT_##C(K, V, S, N)
+#define _SGC_INIT_FS_DICT5(C, K, V, S, N) SGC_INIT_##C(K, V, S, N)
 
-#define _SGC_INIT_FS_PAIR6(C, K, V, S, N, A1)                                  \
-    _SGC_INIT_FS_PAIR5(C, K, V, S, N) SGC_INIT_##A1(V, N)
+#define _SGC_INIT_FS_DICT6(C, K, V, S, N, A1)                                  \
+    _SGC_INIT_FS_DICT5(C, K, V, S, N) SGC_INIT_##A1(V, N)
 
-#define _SGC_INIT_FS_PAIR7(C, K, V, S, N, A1, A2)                              \
-    _SGC_INIT_FS_PAIR6(C, K, V, S, N, A1) SGC_INIT_##A2(V, N)
+#define _SGC_INIT_FS_DICT7(C, K, V, S, N, A1, A2)                              \
+    _SGC_INIT_FS_DICT6(C, K, V, S, N, A1) SGC_INIT_##A2(V, N)
 
-#define _SGC_INIT_FS_PAIR8(C, K, V, S, N, A1, A2, A3)                          \
-    _SGC_INIT_FS_PAIR7(C, K, V, S, N, A1, A2) SGC_INIT_##A3(V, N)
+#define _SGC_INIT_FS_DICT8(C, K, V, S, N, A1, A2, A3)                          \
+    _SGC_INIT_FS_DICT7(C, K, V, S, N, A1, A2) SGC_INIT_##A3(V, N)
 
-#define _SGC_INIT_FS_PAIR9(C, K, V, S, N, A1, A2, A3, A4)                      \
-    _SGC_INIT_FS_PAIR8(C, K, V, S, N, A1, A2, A3) SGC_INIT_##A4(V, N)
+#define _SGC_INIT_FS_DICT9(C, K, V, S, N, A1, A2, A3, A4)                      \
+    _SGC_INIT_FS_DICT8(C, K, V, S, N, A1, A2, A3) SGC_INIT_##A4(V, N)
 
 // ==============
 // COMMON MACROS

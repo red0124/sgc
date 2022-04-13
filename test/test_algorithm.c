@@ -17,7 +17,7 @@ SGC_INIT_HEADERS_DEQUE(int, hdeque)
 SGC_INIT_DEQUE(int, deque)
 
 SGC_INIT_HEADERS_FS_PAIR(FS_UNORDERED_MAP, int, int, 100, hfs_map)
-SGC_INIT_FS_PAIR(FS_UNORDERED_MAP, int, int, 100, fs_map)
+SGC_INIT_FS_DICT(FS_UNORDERED_MAP, int, int, 100, fs_map)
 
 SGC_INIT_HEADERS_FS(FS_VECTOR, int, 100, hfs_vector)
 SGC_INIT_FS(FS_VECTOR, int, 100, fs_vector)
@@ -157,7 +157,7 @@ void test_sort(void) {
     vector_free(&v);
 }
 
-SGC_INIT_PAIR(MAP, int, int, map, ITERATE)
+SGC_INIT_DICT(MAP, int, int, map, ITERATE)
 
 void accumulate_sum_pair(const struct map_pair* const p, void* acc) {
     *(int*)acc += p->value;
