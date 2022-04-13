@@ -153,8 +153,8 @@ The library supports the some algorithms most of which require an iterator to be
 
 | Algorighm          | Required iterator |
 | ------------------ | :---------------: |
-| eq                 | **FWD**               |
-| foreach            | **FWD**               |
+| eq                 | ^^ **FWD**            |
+| foreach            |                   |
 | foreach_range      | **FWD**               |
 | accumulate         | **FWD**               |
 | accumulate_range   | **FWD**               |
