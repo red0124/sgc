@@ -15,24 +15,17 @@ typedef struct sgc_index sgc_index;
 
 // ITERATE HEADERS
 #define SGC_INIT_HEADERS_ITERATE(T, N)                                         \
-    void N##_accumulate_range(N##_it begin, N##_it end,                        \
-                              void (*fun)(const N##_type* const, void*),       \
-                              void* argout);                                   \
     void N##_accumulate(const N* const ds,                                     \
                         void (*fun)(const N##_type* const, void*),             \
                         void* argout);                                         \
-    void N##_foreach_range(N##_it begin, N##_it end,                           \
-                           void (*fun)(const N##_type* const));                \
     void N##_foreach(const N* const ds, void (*fun)(const N##_type* const));
 
 // FIND HEADERS
 #define SGC_INIT_HEADERS_FIND(T, N)                                            \
-    N##_type* N##_find_el_range(N##_it begin, N##_it end, const N##_type el);  \
     N##_type* N##_find_el(const N* const ds, const N##_type el);               \
+    N##_it N##_find_it(const N* const c, const N##_type el);                   \
     sgc_index N##_find_index(const N* const ds, const N##_type el);            \
-    size_t N##_count(const N* const ds, const N##_type el);                    \
-    N##_it N##_find_range_it(N##_it begin, N##_it end, const N##_type el);     \
-    N##_it N##_find_it(const N* const c, const N##_type el);
+    size_t N##_count(const N* const ds, const N##_type el);
 
 // BINARY SEARCH HEADERS
 #define SGC_INIT_HEADERS_BINARY_FIND(T, N)                                     \
@@ -51,120 +44,61 @@ typedef struct sgc_index sgc_index;
 // ITERATE IMPLEMENTATION
 #define SGC_INIT_ITERATE(T, N)                                                 \
     SGC_INIT_HEADERS_ITERATE(T, N)                                             \
-    void N##_accumulate_range(N##_it begin, N##_it end,                        \
-                              void (*fun)(const N##_type* const, void*),       \
-                              void* argout) {                                  \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
-            return;                                                            \
-        }                                                                      \
-        for (; !N##_it_eq(begin, end); N##_it_go_next(&begin)) {               \
-            fun(N##_it_data(begin), argout);                                   \
-        }                                                                      \
-        fun(N##_it_data(end), argout);                                         \
-    }                                                                          \
-                                                                               \
     void N##_accumulate(const N* const ds,                                     \
                         void (*fun)(const N##_type* const, void*),             \
-                        void* argout) {                                        \
-        N##_accumulate_range(N##_cbegin(ds), N##_cend(ds), fun, argout);       \
-    }                                                                          \
-                                                                               \
-    void N##_foreach_range(N##_it begin, N##_it end,                           \
-                           void (*fun)(const N##_type* const)) {               \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
-            return;                                                            \
+                        void* acc) {                                           \
+        for (N##_it curr = N##_cbegin(ds); N##_it_valid(curr);                 \
+             N##_it_go_next(&curr)) {                                          \
+            fun(N##_it_data(curr), acc);                                       \
         }                                                                      \
-        for (; !N##_it_eq(begin, end); N##_it_go_next(&begin)) {               \
-            fun(N##_it_data(begin));                                           \
-        }                                                                      \
-        fun(N##_it_data(end));                                                 \
     }                                                                          \
                                                                                \
     void N##_foreach(const N* const ds, void (*fun)(const N##_type* const)) {  \
-        N##_foreach_range(N##_cbegin(ds), N##_cend(ds), fun);                  \
+        for (N##_it curr = N##_cbegin(ds); N##_it_valid(curr);                 \
+             N##_it_go_next(&curr)) {                                          \
+            fun(N##_it_data(curr));                                            \
+        }                                                                      \
     }
 
 // FIND IMPLEMENTATION
 #define SGC_INIT_FIND(T, N)                                                    \
     SGC_INIT_HEADERS_FIND(T, N)                                                \
-    N##_type* N##_find_el_range(N##_it begin, N##_it end, const N##_type el) { \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
-            return NULL;                                                       \
-        }                                                                      \
-        for (; !N##_it_eq(begin, end); N##_it_go_next(&begin)) {               \
-            if (T##_eq(&el, N##_it_data(begin))) {                             \
-                return N##_it_data(begin);                                     \
-            }                                                                  \
-        }                                                                      \
-        if (T##_eq(&el, N##_it_data(end))) {                                   \
-            return N##_it_data(begin);                                         \
-        }                                                                      \
-        return NULL;                                                           \
+                                                                               \
+    N##_it N##_find_it(const N* const ds, const N##_type el) {                 \
+        N##_it curr;                                                           \
+        for (curr = N##_cbegin(ds);                                            \
+             N##_it_valid(curr) && !T##_eq(N##_it_data(curr), &el);            \
+             N##_it_go_next(&curr))                                            \
+            ;                                                                  \
+        return curr;                                                           \
     }                                                                          \
                                                                                \
     N##_type* N##_find_el(const N* const ds, const N##_type el) {              \
-        return N##_find_el_range(N##_cbegin(ds), N##_cend(ds), el);            \
+        N##_it it = N##_find_it(ds, el);                                       \
+        return N##_it_valid(it) ? N##_it_data(it) : NULL;                      \
     }                                                                          \
                                                                                \
     sgc_index N##_find_index(const N* const ds, const N##_type el) {           \
         sgc_index index = {0, false};                                          \
-        if (N##_empty(ds)) {                                                   \
-            return index;                                                      \
-        }                                                                      \
-        N##_it begin = N##_cbegin(ds);                                         \
-        N##_it end = N##_cend(ds);                                             \
-        for (; !N##_it_eq(begin, end);                                         \
-             N##_it_go_next(&begin), ++index.value) {                          \
-            if (T##_eq(&el, N##_it_data(begin))) {                             \
+        for (N##_it curr = N##_cbegin(ds);                                     \
+             N##_it_valid(curr) && !T##_eq(N##_it_data(curr), &el);            \
+             N##_it_go_next(&curr), ++index.value) {                           \
+            if (T##_eq(N##_it_data(curr), &el)) {                              \
                 index.valid = true;                                            \
-                return index;                                                  \
             }                                                                  \
-        }                                                                      \
-        if (T##_eq(&el, N##_it_data(end))) {                                   \
-            index.valid = true;                                                \
-            return index;                                                      \
         }                                                                      \
         return index;                                                          \
     }                                                                          \
                                                                                \
     size_t N##_count(const N* const ds, const N##_type el) {                   \
-        if (N##_empty(ds)) {                                                   \
-            return 0;                                                          \
-        }                                                                      \
-        size_t ret = 0;                                                        \
-        N##_it begin = N##_cbegin(ds);                                         \
-        N##_it end = N##_cend(ds);                                             \
-        for (; !N##_it_eq(begin, end); N##_it_go_next(&begin)) {               \
-            if (T##_eq(&el, N##_it_data(begin))) {                             \
-                ++ret;                                                         \
+        size_t count = 0;                                                      \
+        for (N##_it curr = N##_cbegin(ds); N##_it_valid(curr);                 \
+             N##_it_go_next(&curr)) {                                          \
+            if (T##_eq(N##_it_data(curr), &el)) {                              \
+                ++count;                                                       \
             }                                                                  \
         }                                                                      \
-        if (T##_eq(&el, N##_it_data(end))) {                                   \
-            ++ret;                                                             \
-        }                                                                      \
-        return ret;                                                            \
-    }                                                                          \
-                                                                               \
-    N##_it N##_find_range_it(N##_it begin, N##_it end, const N##_type el) {    \
-        /* Next after end should be invalid */                                 \
-        if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
-            N##_it_go_next(&end);                                              \
-            return end;                                                        \
-        }                                                                      \
-        for (; !N##_it_eq(begin, end); N##_it_go_next(&begin)) {               \
-            if (T##_eq(&el, N##_it_data(begin))) {                             \
-                return begin;                                                  \
-            }                                                                  \
-        }                                                                      \
-        if (T##_eq(&el, N##_it_data(end))) {                                   \
-            return end;                                                        \
-        }                                                                      \
-        N##_it_go_next(&end);                                                  \
-        return end;                                                            \
-    }                                                                          \
-                                                                               \
-    N##_it N##_find_it(const N* const ds, const N##_type el) {                 \
-        return N##_find_range_it(N##_cbegin(ds), N##_cend(ds), el);            \
+        return count;                                                          \
     }
 
 // BINARY FIND IMPLEMENTATION
@@ -218,25 +152,21 @@ typedef struct sgc_index sgc_index;
         N##_sort(ds, T##_void_compare);                                        \
     }
 
-// EQ IMPLEMENTATION
+// EQ IMPLEMENTATION (TODO test)
 #define SGC_INIT_EQ(T, N)                                                      \
     SGC_INIT_HEADERS_EQ(T, N)                                                  \
     bool N##_eq(const N* const ds1, const N* const ds2) {                      \
         if (N##_size(ds1) != N##_size(ds2)) {                                  \
             return false;                                                      \
         }                                                                      \
-        if (N##_empty(ds1) && N##_empty(ds2)) {                                \
-            return true;                                                       \
-        }                                                                      \
                                                                                \
-        N##_it it1 = N##_begin(ds1);                                           \
-        N##_it it2 = N##_begin(ds2);                                           \
-        for (size_t i = 0; i < N##_size(ds1); ++i) {                           \
+        for (N##_it it1 = N##_begin(ds1), N##_it it2 = N##_begin(ds2),         \
+                    size_t i = 0;                                              \
+             i < N##_size(ds1);                                                \
+             N##_it_go_next(&it1), N##_it_go_next(&it2), ++i) {                \
             if (!N##_it_eq(it1, it2)) {                                        \
                 return false;                                                  \
             }                                                                  \
-            N##_it_go_next(&it1);                                              \
-            N##_it_go_next(&it2);                                              \
         }                                                                      \
         return true;                                                           \
     }

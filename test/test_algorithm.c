@@ -41,18 +41,6 @@ void test_accumulate(void) {
     vector_accumulate(&v, accumulate_sum, &sum);
     TEST_ASSERT_EQUAL_INT(SUM(m - 1), sum);
 
-    sum = 0;
-    const int n = 10;
-    vector_accumulate_range(vector_begin(&v), vector_from(&v, n),
-                            accumulate_sum, &sum);
-    TEST_ASSERT_EQUAL_INT(SUM(n), sum);
-
-    const int o = 5;
-    sum = 0;
-    vector_accumulate_range(vector_from(&v, o), vector_from(&v, n),
-                            accumulate_sum, &sum);
-    TEST_ASSERT_EQUAL_INT(SUM(n) - SUM(o - 1), sum);
-
     vector_free(&v);
 }
 
@@ -74,16 +62,6 @@ void test_foreach(void) {
     call = 0;
     vector_foreach(&v, call_fun);
     TEST_ASSERT_EQUAL_INT(vector_size(&v), call);
-
-    call = 0;
-    const int n = 10;
-    vector_foreach_range(vector_begin(&v), vector_from(&v, n), call_fun);
-    TEST_ASSERT_EQUAL_INT(n + 1, call);
-
-    const int o = 5;
-    call = 0;
-    vector_foreach_range(vector_from(&v, o), vector_from(&v, n), call_fun);
-    TEST_ASSERT_EQUAL_INT(n - o + 1, call);
 
     vector_free(&v);
 }
@@ -198,10 +176,6 @@ void test_accumulate_map(void) {
     map_accumulate(&m, accumulate_sum_pair, &sum);
     TEST_ASSERT_EQUAL_INT(SUM(q - 1), sum);
 
-    sum = 0;
-    map_accumulate_range(map_begin(&m), map_end(&m), accumulate_sum_pair, &sum);
-    TEST_ASSERT_EQUAL_INT(SUM(q - 1), sum);
-
     map_free(&m);
 }
 
@@ -224,10 +198,6 @@ void test_foreach_map(void) {
 
     call = 0;
     map_foreach(&m, foreach_pair);
-    TEST_ASSERT_EQUAL_INT(map_size(&m), call);
-
-    call = 0;
-    map_foreach_range(map_begin(&m), map_end(&m), foreach_pair);
     TEST_ASSERT_EQUAL_INT(map_size(&m), call);
 
     map_free(&m);

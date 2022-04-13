@@ -155,8 +155,8 @@ The library supports the some algorithms most of which require an iterator to be
 | --------------------------------------------------------------------------- | :----------------: |
 | eq                                                                          | EQ                 |
 | qsort<br>qsort_default<br>                                                  | QSORT              |
-| foreach<br>foreach_range<br>accumulate<br>accumulate_range                  | ITERATE            |
-| find_el<br>find_el_range<br>find_index<br>count<br>find_it<br>find_range_it | FIND               |
+| find_el<br>find_it<br>find_index<br>count                                   | FIND               |
+| foreach<br>accumulate                                                       | ITERATE            |
 | binary_find<br>binary_find_index<br>                                        | BINARY_FIND        |
 
 The sort algorithm does not require an iterator but an array function instead.
