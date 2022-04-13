@@ -30,10 +30,7 @@ typedef struct sgc_index sgc_index;
     N##_type* N##_find_el_range(N##_it begin, N##_it end, const N##_type el);  \
     N##_type* N##_find_el(const N* const ds, const N##_type el);               \
     sgc_index N##_find_index(const N* const ds, const N##_type el);            \
-    size_t N##_count(const N* const ds, const N##_type el);
-
-// FIND IT HEADERS
-#define SGC_INIT_HEADERS_FIND_IT(T, N)                                         \
+    size_t N##_count(const N* const ds, const N##_type el);                    \
     N##_it N##_find_range_it(N##_it begin, N##_it end, const N##_type el);     \
     N##_it N##_find_it(const N* const c, const N##_type el);
 
@@ -146,11 +143,8 @@ typedef struct sgc_index sgc_index;
             ++ret;                                                             \
         }                                                                      \
         return ret;                                                            \
-    }
-
-// FIND IT IMPLEMENTATION
-#define SGC_INIT_FIND_IT(T, N)                                                 \
-    SGC_INIT_HEADERS_FIND_IT(T, N)                                             \
+    }                                                                          \
+                                                                               \
     N##_it N##_find_range_it(N##_it begin, N##_it end, const N##_type el) {    \
         /* Next after end should be invalid */                                 \
         if (!N##_it_valid(begin) || !N##_it_valid(end)) {                      \
