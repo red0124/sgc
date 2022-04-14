@@ -6,42 +6,16 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-struct sgc_index {
-    size_t value;
-    bool valid;
-};
-
-typedef struct sgc_index sgc_index;
-
-// ITERATE HEADERS
+// ==============
+// ITERATE
+// ==============
 #define SGC_INIT_HEADERS_ITERATE(T, N)                                         \
     void N##_accumulate(const N* const ds,                                     \
                         void (*fun)(const N##_type* const, void*),             \
                         void* argout);                                         \
     void N##_foreach(const N* const ds, void (*fun)(const N##_type* const));
 
-// FIND HEADERS
-#define SGC_INIT_HEADERS_FIND(T, N)                                            \
-    N##_type* N##_find_el(const N* const ds, const N##_type el);               \
-    N##_it N##_find_it(const N* const c, const N##_type el);                   \
-    sgc_index N##_find_index(const N* const ds, const N##_type el);            \
-    size_t N##_count(const N* const ds, const N##_type el);
-
-// BINARY SEARCH HEADERS
-#define SGC_INIT_HEADERS_BINARY_FIND(T, N)                                     \
-    N##_type* N##_binary_find(const N* const ds, const N##_type el);           \
-    sgc_index N##_binary_find_index(const N* const ds, const N##_type el);
-
-// SORT HEADERS
-#define SGC_INIT_HEADERS_QSORT(T, N)                                           \
-    void N##_sort(N* ds, int (*comp)(const void*, const void*));               \
-    void N##_sort_default(N* ds);
-
-// EQ HEADERS
-#define SGC_INIT_HEADERS_EQ(T, N)                                              \
-    bool N##_eq(const N* const ds1, const N* const ds2);
-
-// ITERATE IMPLEMENTATION
+// IMPLEMENTATION
 #define SGC_INIT_ITERATE(T, N)                                                 \
     SGC_INIT_HEADERS_ITERATE(T, N)                                             \
     void N##_accumulate(const N* const ds,                                     \
@@ -60,7 +34,14 @@ typedef struct sgc_index sgc_index;
         }                                                                      \
     }
 
-// FIND IMPLEMENTATION
+// ==============
+// FIND
+// ==============
+#define SGC_INIT_HEADERS_FIND(T, N)                                            \
+    N##_type* N##_find_el(const N* const ds, const N##_type el);               \
+    N##_it N##_find_it(const N* const c, const N##_type el);
+
+// IMPLEMENTATION
 #define SGC_INIT_FIND(T, N)                                                    \
     SGC_INIT_HEADERS_FIND(T, N)                                                \
                                                                                \
@@ -76,69 +57,56 @@ typedef struct sgc_index sgc_index;
     N##_type* N##_find_el(const N* const ds, const N##_type el) {              \
         N##_it it = N##_find_it(ds, el);                                       \
         return N##_it_valid(it) ? N##_it_data(it) : NULL;                      \
-    }                                                                          \
-                                                                               \
-    sgc_index N##_find_index(const N* const ds, const N##_type el) {           \
-        sgc_index index = {0, false};                                          \
-        for (N##_it curr = N##_cbegin(ds);                                     \
-             N##_it_valid(curr) && !T##_eq(N##_it_data(curr), &el);            \
-             N##_it_go_next(&curr), ++index.value) {                           \
-            if (T##_eq(N##_it_data(curr), &el)) {                              \
-                index.valid = true;                                            \
-            }                                                                  \
-        }                                                                      \
-        return index;                                                          \
-    }                                                                          \
-                                                                               \
-    size_t N##_count(const N* const ds, const N##_type el) {                   \
-        size_t count = 0;                                                      \
-        for (N##_it curr = N##_cbegin(ds); N##_it_valid(curr);                 \
-             N##_it_go_next(&curr)) {                                          \
-            if (T##_eq(N##_it_data(curr), &el)) {                              \
-                ++count;                                                       \
-            }                                                                  \
-        }                                                                      \
-        return count;                                                          \
     }
 
-// BINARY FIND IMPLEMENTATION
+// ==============
+// BINARY FIND
+// ==============
+#define SGC_INIT_HEADERS_BINARY_FIND(T, N)                                     \
+    N##_type* N##_binary_find_el(const N* const ds, const N##_type el);        \
+    N##_it N##_binary_find_it(const N* const ds, const N##_type el);
+
+// IMPLEMENTATION (TODO replace long long)
 #define SGC_INIT_BINARY_FIND(T, N)                                             \
     SGC_INIT_HEADERS_BINARY_FIND(T, N)                                         \
-    sgc_index N##_binary_find_index(const N* const ds, const N##_type el) {    \
-        sgc_index ret = {N##_size(ds) + 1, false};                             \
+    N##_it N##_binary_find_it(const N* const ds, const N##_type el) {          \
         if (!N##_empty(ds)) {                                                  \
-            int l = 0;                                                         \
-            int r = N##_size(ds) - 1;                                          \
-            int m;                                                             \
+            long long l = 0;                                                   \
+            long long r = N##_size(ds) - 1;                                    \
+            long long m;                                                       \
             while (l <= r) {                                                   \
                 m = l + (r - l) / 2;                                           \
                 N##_type* curr = N##_at((N*)ds, m);                            \
-                if (T##_eq(curr, &el)) {                                       \
-                    ret.value = m;                                             \
-                    ret.valid = true;                                          \
-                    break;                                                     \
+                int compare_result = T##_compare(curr, &el);                   \
+                if (compare_result == 0) {                                     \
+                    N##_it it = N##_cfrom(ds, m);                              \
+                    return it;                                                 \
                 }                                                              \
                                                                                \
-                if (T##_compare(curr, &el) < 0) {                              \
+                if (compare_result < 0) {                                      \
                     l = m + 1;                                                 \
                 } else {                                                       \
                     r = m - 1;                                                 \
                 }                                                              \
             }                                                                  \
         }                                                                      \
+        N##_it ret = N##_cfrom(ds, N##_size(ds));                              \
         return ret;                                                            \
     }                                                                          \
                                                                                \
     N##_type* N##_binary_find_el(const N* const ds, const N##_type el) {       \
-        sgc_index index = N##_binary_find_index(ds, el);                       \
-        if (index.valid) {                                                     \
-            return N##_at((N*)ds, index.value);                                \
-        } else {                                                               \
-            return NULL;                                                       \
-        }                                                                      \
+        N##_it it = N##_binary_find_it(ds, el);                                \
+        return N##_it_valid(it) ? N##_it_data(it) : NULL;                      \
     }
 
-// SORT IMPLEMENTATION
+// ==============
+// QSORT
+// ==============
+#define SGC_INIT_HEADERS_QSORT(T, N)                                           \
+    void N##_sort(N* ds, int (*comp)(const void*, const void*));               \
+    void N##_sort_default(N* ds);
+
+// IMPLEMENTATION
 #define SGC_INIT_QSORT(T, N)                                                   \
     SGC_INIT_HEADERS_QSORT(T, N)                                               \
     void N##_sort(N* ds, int (*comp)(const void*, const void*)) {              \
@@ -152,21 +120,59 @@ typedef struct sgc_index sgc_index;
         N##_sort(ds, T##_void_compare);                                        \
     }
 
-// EQ IMPLEMENTATION (TODO test)
+// ==============
+// EQ
+// ==============
+#define SGC_INIT_HEADERS_EQ(T, N)                                              \
+    bool N##_eq(const N* const ds1, const N* const ds2);                       \
+    size_t N##_count(const N* const ds, const N##_type el);
+
+// IMPLEMENTATION (TODO test)
 #define SGC_INIT_EQ(T, N)                                                      \
     SGC_INIT_HEADERS_EQ(T, N)                                                  \
     bool N##_eq(const N* const ds1, const N* const ds2) {                      \
-        if (N##_size(ds1) != N##_size(ds2)) {                                  \
-            return false;                                                      \
-        }                                                                      \
-                                                                               \
-        for (N##_it it1 = N##_begin(ds1), N##_it it2 = N##_begin(ds2),         \
-                    size_t i = 0;                                              \
-             i < N##_size(ds1);                                                \
-             N##_it_go_next(&it1), N##_it_go_next(&it2), ++i) {                \
-            if (!N##_it_eq(it1, it2)) {                                        \
+        for (N##_it it1 = N##_cbegin(ds1), it2 = N##_cbegin(ds2);              \
+             N##_it_valid(it1) && N##_it_valid(it2);                           \
+             N##_it_go_next(&it1), N##_it_go_next(&it2)) {                     \
+            if (!T##_eq(N##_it_data(it1), N##_it_data(it2))) {                 \
                 return false;                                                  \
             }                                                                  \
         }                                                                      \
-        return true;                                                           \
+                                                                               \
+        return N##_size(ds1) == N##_size(ds2);                                 \
+    }                                                                          \
+                                                                               \
+    size_t N##_count(const N* const ds, const N##_type el) {                   \
+        size_t count = 0;                                                      \
+        for (N##_it curr = N##_cbegin(ds); N##_it_valid(curr);                 \
+             N##_it_go_next(&curr)) {                                          \
+            if (T##_eq(N##_it_data(curr), &el)) {                              \
+                ++count;                                                       \
+            }                                                                  \
+        }                                                                      \
+        return count;                                                          \
+    }
+
+// ==============
+// COMPARE
+// ==============
+#define SGC_INIT_HEADERS_COMPARE(T, N)                                         \
+    int N##_compare(const N* const ds1, const N* const ds2);
+
+#define SGC_INIT_COMPARE(T, N)                                                 \
+    int N##_compare(const N* const ds1, const N* const ds2) {                  \
+        for (N##_it it1 = N##_cbegin(ds1), it2 = N##_cbegin(ds2);              \
+             N##_it_valid(it1) && N##_it_valid(it2);                           \
+             N##_it_go_next(&it1), N##_it_go_next(&it2)) {                     \
+            int compare_value =                                                \
+                T##_compare(N##_it_data(it1), N##_it_data(it2));               \
+            if (compare_value != 0) {                                          \
+                return compare_value;                                          \
+            }                                                                  \
+        }                                                                      \
+                                                                               \
+        if (N##_size(ds1) == N##_size(ds2)) {                                  \
+            return 0;                                                          \
+        }                                                                      \
+        return (N##_size(ds1) > N##_size(ds2)) ? -1 : 1;                       \
     }

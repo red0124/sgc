@@ -11,7 +11,7 @@
 #define TEST_ELEMENTS_NUM 50
 
 SGC_INIT_HEADERS(VECTOR, int, hvector, ITERATE, FIND)
-SGC_INIT(VECTOR, int, vector, ITERATE, FIND)
+SGC_INIT(VECTOR, int, vector, ITERATE, FIND, EQ)
 
 SGC_INIT_HEADERS_DEQUE(int, hdeque)
 SGC_INIT_DEQUE(int, deque)
@@ -84,14 +84,15 @@ void test_find(void) {
     TEST_ASSERT_EQUAL_INT(NULL, vector_find_el(&v, TEST_ELEMENTS_NUM));
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        vector_it it = vector_find_it(&v, i);
+        TEST_ASSERT_EQUAL(vector_it_valid(it), true);
+        TEST_ASSERT_EQUAL_INT(i, *vector_it_data(it));
+
+        TEST_ASSERT_NOT_EQUAL(NULL, vector_find_el(&v, i));
         TEST_ASSERT_EQUAL_INT(i, *vector_find_el(&v, i));
         if (i != TEST_ELEMENTS_NUM - 1) {
             it = vector_find_it(&v, i);
             TEST_ASSERT_EQUAL_INT(0, vector_it_eq(it, vector_end(&v)));
-        }
-        sgc_index index = vector_find_index(&v, i);
-        if (index.valid) {
-            TEST_ASSERT_EQUAL_INT(i, *vector_at(&v, index.value));
         }
     }
 
@@ -121,8 +122,10 @@ void test_binary_find(void) {
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         TEST_ASSERT_EQUAL_INT(i, *vector_binary_find_el(&v, i));
-        sgc_index index = vector_binary_find_index(&v, i);
-        TEST_ASSERT_EQUAL_INT(i, *vector_at(&v, index.value));
+        vector_it it = vector_binary_find_it(&v, i);
+        if (vector_it_valid(it)) {
+            TEST_ASSERT_EQUAL_INT(i, *vector_it_data(it));
+        }
     }
 
     vector_free(&v);

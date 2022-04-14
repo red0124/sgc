@@ -186,12 +186,13 @@ Now follows a table showing which data stuctures support which iterators:
 
 The library supports the some algorithms most of which require an iterator to be able to work:
 
-| Algorighm                                                                   | Group              | Minimal Requirements                   |
-| --------------------------------------------------------------------------- | :----------------: | -------------------------------------- |
-| eq                                                                          | EQ                 | forward iterator                       |
-| qsort<br>qsort_default<br>                                                  | QSORT              | array function                         |
-| find_el<br>find_it<br>find_index<br>count                                   | FIND               | forward iterator                       |
-| foreach<br>accumulate                                                       | ITERATE            | forward iterator                       |
-| binary_find<br>binary_find_index<br>                                        | BINARY_FIND        | random access iterator                 |
+| Algorighm                                                                   | Group              | Minimal Requirements                    |
+| --------------------------------------------------------------------------- | :----------------: | --------------------------------------- |
+| eq<br>count                                                                 | EQ                 | forward iterator                        |
+| compare                                                                     | EQ                 | forward iterator, element compare       |
+| qsort<br>qsort_default<br>                                                  | QSORT              | container array function                |
+| foreach<br>accumulate                                                       | ITERATE            | forward iterator                        |
+| find_el<br>find_it                                                          | FIND               | forward iterator                        |
+| binary_find_el<br>binary_find_it                                            | BINARY_FIND        | random access iterator, element compare |
 
 The sort algorithm does not require an iterator but an array function instead.
