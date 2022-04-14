@@ -11,10 +11,8 @@ int main(void) {
         vec_push_back(&v, i);
     }
 
-    printf("size: %zu\n", vec_size(&v));
-
     for_each(i IN v AS vec) {
-        printf("%d \n", *i);
+        printf("%d ", *i);
     }
 
     vec_free(&v);
