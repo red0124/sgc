@@ -189,7 +189,7 @@ The library supports the some algorithms most of which require an iterator to be
 | Algorighm                                                                   | Group              | Minimal Requirements                    |
 | --------------------------------------------------------------------------- | :----------------: | --------------------------------------- |
 | eq<br>count                                                                 | EQ                 | forward iterator                        |
-| compare                                                                     | EQ                 | forward iterator, element compare       |
+| compare                                                                     | COMPARE            | forward iterator, element compare       |
 | qsort<br>qsort_default<br>                                                  | QSORT              | container array function                |
 | foreach<br>accumulate                                                       | ITERATE            | forward iterator                        |
 | find_el<br>find_it                                                          | FIND               | forward iterator                        |
