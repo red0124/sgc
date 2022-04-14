@@ -15,11 +15,6 @@ int main(void) {
         return 1;
     }
 
-    it = map_find(&m, 'a');
-    if (map_it_valid(it)) {
-        printf("value for 'a': %.2f\n", map_it_data(it)->value);
-    }
-
     for_each(i IN m AS map) {
         printf("%c -> %.2f\n", i->key, i->value);
     }

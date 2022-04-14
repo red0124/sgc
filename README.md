@@ -4,10 +4,27 @@
 Algorithms and data structures written in **`C`** using macros. The data structures used are similar to the ones present in the **`C++ STL`**. 
 
 # Simple Example 'vector.c'
-
 ```c
-{r engine='bash', comment=''}
-cat examples/vector.c
+#include <sgc/vector.h>
+#include <stdio.h>
+
+SGC_INIT(VECTOR, int, vec)
+
+int main(void) {
+    vec v;
+    vec_init(&v);
+
+    for (size_t i = 0; i < 5; ++i) {
+        vec_push_back(&v, i);
+    }
+
+    for_each(i IN v AS vec) {
+        printf("%d ", *i);
+    }
+
+    vec_free(&v);
+    return 0;
+}
 ```
 
 Output:
@@ -16,11 +33,23 @@ $ ./vector
 size: 5
 0 1 2 3 4
 ```
-
 TODO content
 
-TODO how does SGC_INIT work
+To initialize the vector we simply used the **`SGC_INIT`** macro. The first parameter 
+of the macro is the data structure, **`VECTOR`** in our case, the second, **`int`**, is the element 
+type of the vector and the third, **`vec`** is how our vector will be named. All the funcions
+generated will start with **`vec`**. The macro accepts a few additional arguments which may
+be used to initialize algorithms(TODO link) for our data structure.
 
+*Note: there macro will generate some functions with the \_p\_ prefix. Those funcions are
+ment as private and should not be called.*
+
+To initialize key-value type containers the **`SGC_INIT_DICT`** macro should be used. Similar to 
+**`SGC_INIT`** the first parameter is the name of the data structure, the second is the type of the key,
+the thrid is the type of the value, the fourth is the name of the generated data structure and all
+additional arguments are algorithm initializers.
+
+# Map Example 'map.c'
 ```c
 #include <sgc/map.h>
 #include <stdio.h>
@@ -39,11 +68,6 @@ int main(void) {
         return 1;
     }
 
-    it = map_find(&m, 'a');
-    if (map_it_valid(it)) {
-        printf("value for 'a': %.2f\n", map_it_data(it)->value);
-    }
-
     for_each(i IN m AS map) {
         printf("%c -> %.2f\n", i->key, i->value);
     }
@@ -55,7 +79,6 @@ int main(void) {
 Output:
 ```bash
 $ ./map
-value for 'a': 10.00
 a -> 10.00
 b -> 11.10
 ```
