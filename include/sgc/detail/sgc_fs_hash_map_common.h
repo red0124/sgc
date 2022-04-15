@@ -34,7 +34,7 @@ enum _sgc_node_state {
                                                size_t hash) {                  \
         if (ds->size_) {                                                       \
             size_t position = hash % S;                                        \
-            /* TODO test with various map sizes */                              \
+            /* TODO test with various map sizes */                             \
             size_t starting_position = S;                                      \
             struct _p_##N##_node* data = ds->data_;                            \
             while (data[position].state_ != _SGC_NODE_STATE_OPEN) {            \

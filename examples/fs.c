@@ -39,6 +39,9 @@ void fs_unordered_map_example(void) {
     // will not be inserted since the map is full
     umap_set(&u, "full", -1);
 
+    // will update key0 from 0 to -2
+    umap_set(&u, "key0", -2);
+
     for_each(i IN u AS umap) {
         printf("%s -> %.2f\n", i->key, i->value);
     }

@@ -84,6 +84,26 @@ additional arguments are algorithm initializers.
 
 # Fixed Size Data Structures 'fixed_size.c'
 
+The library supports a few fixed size containers. Most have identical implementations to their dynamic
+counterparts, only fixed size unordered map and set are different since they are implemented using 
+closed hashing.
+
+All fixed size containers are named with the **`fs_`** prefix. To use a fixed size vector identical to the one above the
+**`SGC_INIT_FS`** macro can be called:
+```c
+#include <sgc/fs_vector.h>
+SGC_INIT_FS(FS_VECTOR, int, 100, vec)
+```
+This will initialize a fixed size vector of ints named vec with the capacity of 100.
+
+Similar to the fixed size vector, a fixed size unordered map can be initialized usin the
+**`SGC_INIT_FS_DICT`** macro:
+```c
+#include <sgc/fs_unordered_map.h>
+SGC_INIT_FS_DICT(FS_UNORDERED_MAP, char, double, 100, umap)
+```
+Fixed size containers ignore insertions if they are already full.
+This behavior can be modified, see *allocators.c* within the examples directory.
 
 # Supported functionalities
 
