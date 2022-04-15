@@ -69,7 +69,9 @@
 
 #define _SGC_INIT_FS_RESIZE(T, S, N)                                           \
     static bool _p_##N##_resize(const N* const v) {                            \
-        /* TODO check if full and handle */                                    \
         (void)(v);                                                             \
+        if (v->size_ >= N##_max()) {                                            \
+            return false;                                                      \
+        }                                                                      \
         return true;                                                           \
     }

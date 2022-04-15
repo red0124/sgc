@@ -85,7 +85,7 @@
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
         if (i.valid_) {                                                        \
             _SGC_REPLACE(V, i.curr_->data_.value, v, u->sharing_);             \
-        } else if (u->size_ < S - 1) {                                         \
+        } else if (u->size_ < S) {                                             \
             size_t position = hash % S;                                        \
             while (u->data_[position].state_ == _SGC_NODE_STATE_USED) {        \
                 if (position == S - 1) {                                       \

@@ -44,11 +44,6 @@ be used to initialize algorithms(TODO link) for our data structure.
 *Note: there macro will generate some functions with the \_p\_ prefix. Those funcions are
 ment as private and should not be called.*
 
-To initialize key-value type containers the **`SGC_INIT_DICT`** macro should be used. Similar to 
-**`SGC_INIT`** the first parameter is the name of the data structure, the second is the type of the key,
-the thrid is the type of the value, the fourth is the name of the generated data structure and all
-additional arguments are algorithm initializers.
-
 # Map Example 'map.c'
 ```c
 #include <sgc/map.h>
@@ -82,6 +77,13 @@ $ ./map
 a -> 10.00
 b -> 11.10
 ```
+To initialize key-value type containers the **`SGC_INIT_DICT`** macro should be used. Similar to 
+**`SGC_INIT`** the first parameter is the name of the data structure, the second is the type of the key,
+the thrid is the type of the value, the fourth is the name of the generated data structure and all
+additional arguments are algorithm initializers.
+
+# Fixed Size Data Structures 'fixed_size.c'
+
 
 # Supported functionalities
 
