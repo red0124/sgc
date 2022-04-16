@@ -108,20 +108,13 @@ This behavior can be modified, see *allocators.c* within the examples directory.
 # Supported functionalities
 
 Every data structure defines the following functions:
-- init
-- copy
-- free
-- size
-- empty
-- set_shareing
-- set_owning
+**`init`** **`copy`** **`free`** **`size`** **`empty`** **`set_shareing`** and **`set_owning`**
 
 Dictionary data structures also have:
-- set_shareing_key
-- set_owning_key
+**`set_shareing_key`** and **`set_owning_key`**
 
-Fixed size (fs) data structurs also have:
-- max
+Fixed size data structurs also have:
+**`max`**
 
 Now follows a table showing which data stuctures have which additional functionalities defined:
 
@@ -159,6 +152,8 @@ The functions are mostly identical to methods within the c++ STL with a few exce
 - at [3] For **`vector`** **and `deque`** used to fetch element at specified position.
 - set [4] For **`vector`** **and `deque`** used to set element at specified position.
 
+# Iterators
+
 Some data structures have iterators binded to them, there is three types of iterators, 
 random access iterator (RA), bidirectional (BD) iterator and forward (FWD) iterator. The iterator
 structure for the associated data structure had the same name as the data structure
@@ -168,29 +163,13 @@ with **`_it`** attacked to the end of it.
 Functions starting with **`it`** take the iterator as input parameter instead of the data structure
 
 Forward iterator is associated with the following functions:
-- begin
-- cbegin
-- end
-- cend
-- it_data
-- it_go_next
-- it_begin
-- it_cbegin
-- it_end
-- it_cend
-- it_eq
-- it_valid
+**`begin`** **`cbegin`** **`end`** **`cend`** **`it_data`** **`it_go_next`** **`it_begin`** **`it_cbegin`** **`it_end`** **`it_cend`** **`it_eq`** and **`it_valid`**
 
 Bidirectional iterator is associated with all the function from forward iterator and also the following:
-- it_go_prev
+**`it_go_prev`**
 
 Random access iterator is associated with all the function from bidirectional iterator and also the following:
-- from
-- cfrom
-- it_from
-- it_cfrom
-- it_jump
-- it_diff
+**`from`** **`cfrom`** **`it_from`** **`it_cfrom`** **`it_jump`** and **`it_diff`**
 
 Now follows a table showing which data stuctures support which iterators:
 
@@ -204,6 +183,8 @@ Now follows a table showing which data stuctures support which iterators:
 | unordered_map |                        | **x**                      |                  |
 | set           |                        | **x**                      |                  |
 | unordered_set |                        | **x**                      |                  |
+
+# Algorithms
 
 The library supports the some algorithms most of which require an iterator to be able to work:
 
