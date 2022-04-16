@@ -230,7 +230,7 @@
         return &i.deque_->data_[i.curr_];                                      \
     }                                                                          \
                                                                                \
-    T* N##_it_value(N##_it i) {                                                 \
+    T* N##_it_value(N##_it i) {                                                \
         return &i.deque_->data_[i.curr_];                                      \
     }                                                                          \
                                                                                \
@@ -258,37 +258,25 @@
                                                                                \
     N##_it N##_begin(N* d) {                                                   \
         N##_it i;                                                              \
-        N##_it_begin(d, &i);                                                   \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cbegin(const N* const d) {                                      \
-        N##_it i;                                                              \
-        N##_it_cbegin(d, &i);                                                  \
+        i.deque_ = (N*)d;                                                      \
+        i.curr_ = d->front_;                                                   \
+        i.valid_ = (d->size_ > 0);                                             \
         return i;                                                              \
     }                                                                          \
                                                                                \
     N##_it N##_end(N* d) {                                                     \
         N##_it i;                                                              \
-        N##_it_end(d, &i);                                                     \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cend(const N* const d) {                                        \
-        N##_it i;                                                              \
-        N##_it_cend(d, &i);                                                    \
+        i.deque_ = (N*)d;                                                      \
+        i.curr_ = d->back_;                                                    \
+        i.valid_ = (d->size_ > 0);                                             \
         return i;                                                              \
     }                                                                          \
                                                                                \
     N##_it N##_from(N* d, size_t at) {                                         \
         N##_it i;                                                              \
-        N##_it_from(d, &i, at);                                                \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cfrom(const N* const d, size_t at) {                            \
-        N##_it i;                                                              \
-        N##_it_cfrom(d, &i, at);                                               \
+        i.deque_ = (N*)d;                                                      \
+        i.curr_ = (d->front_ + at) % _p_##N##_max(d);                          \
+        i.valid_ = (d->size_ > at);                                            \
         return i;                                                              \
     }                                                                          \
                                                                                \
@@ -340,34 +328,4 @@
             }                                                                  \
             T##_free(&d->data_[i]);                                            \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_it_begin(N* d, N##_it* i) {                                       \
-        N##_it_cbegin(d, i);                                                   \
-    }                                                                          \
-                                                                               \
-    void N##_it_cbegin(const N* const d, N##_it* i) {                          \
-        i->deque_ = (N*)d;                                                     \
-        i->curr_ = d->front_;                                                  \
-        i->valid_ = (d->size_ > 0);                                            \
-    }                                                                          \
-                                                                               \
-    void N##_it_end(N* d, N##_it* i) {                                         \
-        N##_it_cend(d, i);                                                     \
-    }                                                                          \
-                                                                               \
-    void N##_it_cend(const N* const d, N##_it* i) {                            \
-        i->deque_ = (N*)d;                                                     \
-        i->curr_ = d->back_;                                                   \
-        i->valid_ = (d->size_ > 0);                                            \
-    }                                                                          \
-                                                                               \
-    void N##_it_from(N* d, N##_it* i, size_t at) {                             \
-        N##_it_cfrom(d, i, at);                                                \
-    }                                                                          \
-                                                                               \
-    void N##_it_cfrom(const N* const d, N##_it* i, size_t at) {                \
-        i->deque_ = (N*)d;                                                     \
-        i->curr_ = (d->front_ + at) % _p_##N##_max(d);                         \
-        i->valid_ = (d->size_ > at);                                           \
     }

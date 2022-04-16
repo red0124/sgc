@@ -95,14 +95,9 @@ static inline size_t al_hash(const al* const a) {
         }                                                                      \
     }
 
-#define PUSH_ARRAY(N, DS, ...)                                                 \
-    {                                                                          \
-        int array[] = __VA_ARGS__;                                             \
-        size_t size = sizeof(array) / sizeof(array[0]);                        \
-        for (size_t i = 0; i < size; ++i) {                                    \
-            N##_push_back(&DS, array[i]);                                      \
-        }                                                                      \
-    }
+/* ========================= */
+// Test Array
+/* ========================= */
 
 #define TA_MAX 1024
 
@@ -159,6 +154,33 @@ int ta_int_compare(const void* const i1, const void* const i2) {
 void ta_sort(ta* ta) {
     qsort(ta->data, ta->size, sizeof(int), ta_int_compare);
 }
+
+#define TEST_FORWARD_ITERATOR(N, TA, DS)                                       \
+    {                                                                          \
+        N##_it it = N##_begin(&DS);                                            \
+        for (size_t i = 0; i < TA.size; ++i) {                                 \
+            ASSERT_EQUAL(TA.data[i], *N##_it_data(it));                        \
+            N##_it_go_next(&it);                                               \
+        }                                                                      \
+        ASSERT_EQUAL(N##_it_valid(it), false);                                 \
+    }
+
+#define TEST_BIDIRECTIONAL_ITERATOR(N, TA, DS)                                 \
+    {                                                                          \
+        N##_it it = N##_begin(&DS);                                            \
+        for (size_t i = 0; i < TA.size; ++i) {                                 \
+            ASSERT_EQUAL(TA.data[i], *N##_it_data(it));                        \
+            N##_it_go_next(&it);                                               \
+        }                                                                      \
+        ASSERT_EQUAL(N##_it_valid(it), false);                                 \
+                                                                               \
+        it = N##_end(&ds);                                                     \
+        for (int j = ta.size - 1; j >= 0; --j) {                               \
+            ASSERT_EQUAL(ta.data[j], *N##_it_data(it));                        \
+            N##_it_go_prev(&it);                                               \
+        }                                                                      \
+        ASSERT_EQUAL(N##_it_valid(it), false);                                 \
+    }
 
 #define TEST_INSERT_ERASE_COMBINATIONS_ARRAY(N)                                \
     {                                                                          \
@@ -322,6 +344,10 @@ void ta_sort(ta* ta) {
             N##_free(&ds);                                                     \
         }                                                                      \
     }
+
+/* ========================= */
+// Test Map
+/* ========================= */
 
 #define TM_MAX 32
 #define TM_EMPTY -1
@@ -494,6 +520,10 @@ void tm_print(tm* tm) {
         }                                                                      \
     }
 
+/* ========================= */
+// Test Set
+/* ========================= */
+
 #define TS_MAX 32
 #define TS_EMPTY -1
 
@@ -654,6 +684,10 @@ void ts_print(ts* ts) {
         }                                                                      \
     }
 
+/* ========================= */
+// Test Stack
+/* ========================= */
+
 #define TEST_TSTK(N)                                                           \
     {                                                                          \
         size_t n = 12;                                                         \
@@ -701,6 +735,10 @@ void ts_print(ts* ts) {
             N##_free(&ds);                                                     \
         }                                                                      \
     }
+
+/* ========================= */
+// Test Queue
+/* ========================= */
 
 #define TEST_TQ(N)                                                             \
     {                                                                          \
@@ -758,6 +796,10 @@ void ts_print(ts* ts) {
             N##_free(&ds);                                                     \
         }                                                                      \
     }
+
+/* ========================= */
+// Test Priority Queue
+/* ========================= */
 
 #define TEST_TPQ(N)                                                            \
     {                                                                          \

@@ -161,11 +161,11 @@ with **_it** attacked to the end of it, eg for **vec** it would be **vec_it**.
 
 Functions starting with **`it`** take the iterator as input parameter instead of the data structure
 - **Forward iterator** is associated with the following functions:
-**`begin`** **`cbegin`** **`end`** **`cend`** **`it_data`** **`it_go_next`** **`it_begin`** **`it_cbegin`** **`it_end`** **`it_cend`** **`it_eq`** and **`it_valid`**
+**`begin`** **`cbegin`** **`end`** **`cend`** **`it_data`** **`it_go_next`** **`it_eq`** and **`it_valid`**
 - **Bidirectional iterator** is associated with all the function from forward iterator and also the following:
 **`it_go_prev`**
 - **Random access iterator** is associated with all the function from bidirectional iterator and also the following:
-**`from`** **`cfrom`** **`it_from`** **`it_cfrom`** **`it_move`** and **`it_diff`**
+**`from`** **`cfrom`** **`it_move`** and **`it_diff`**
 
 This table shows which data stucture has access to which iterator:
 
@@ -185,6 +185,14 @@ This table shows which data stucture has access to which iterator:
 The library gives access some algorithms most of which require an iterator to be able to work.
 If we for example wanted to initialize the vector to have access to **`qsort`** and **`eq`** functions they could be initialized like this:
 
+```c
+#include <sgc/vector.h>
+#include <sgc/algorithm.h>
+SGC_INIT(VECTOR, int, vec, QSORT, EQ)
+```
+
+This will generate functions such as **`vec_qsort`** and **`vec_eq`** among others.
+This table shows which algorithms are generated with which initializer group:
 
 
 | Algorighm                                                                   | Group              | Minimal Requirements                    |

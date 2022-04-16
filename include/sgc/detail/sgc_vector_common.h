@@ -79,8 +79,8 @@
     T* N##_it_data(N##_it i) {                                                 \
         return i.curr_;                                                        \
     }                                                                          \
-    \
-    T* N##_it_value(N##_it i) {                                                 \
+                                                                               \
+    T* N##_it_value(N##_it i) {                                                \
         return i.curr_;                                                        \
     }                                                                          \
                                                                                \
@@ -92,76 +92,27 @@
         --i->curr_;                                                            \
     }                                                                          \
                                                                                \
-    /* TODO check if those are needed */                                       \
-    void N##_it_begin(N* v, N##_it* i) {                                       \
-        i->curr_ = (T*)v->data_;                                               \
-        i->begin_ = (T*)v->data_;                                              \
-        i->end_ = (T*)v->data_ + v->size_ - 1;                                 \
-    }                                                                          \
-                                                                               \
-    void N##_it_cbegin(const N* const v, N##_it* i) {                          \
-        i->curr_ = (T*)v->data_;                                               \
-        i->begin_ = (T*)v->data_;                                              \
-        i->end_ = (T*)v->data_ + v->size_ - 1;                                 \
-    }                                                                          \
-                                                                               \
     N##_it N##_begin(N* v) {                                                   \
         N##_it i;                                                              \
-        N##_it_begin(v, &i);                                                   \
+        i.curr_ = (T*)v->data_;                                                \
+        i.begin_ = (T*)v->data_;                                               \
+        i.end_ = (T*)v->data_ + v->size_ - 1;                                  \
         return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cbegin(const N* const v) {                                      \
-        N##_it i;                                                              \
-        N##_it_cbegin(v, &i);                                                  \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    void N##_it_end(N* v, N##_it* i) {                                         \
-        i->curr_ = (T*)v->data_ + v->size_ - 1;                                \
-        i->begin_ = (T*)v->data_;                                              \
-        i->end_ = (T*)v->data_ + v->size_ - 1;                                 \
-    }                                                                          \
-                                                                               \
-    void N##_it_cend(const N* const v, N##_it* i) {                            \
-        i->curr_ = (T*)v->data_ + v->size_ - 1;                                \
-        i->begin_ = (T*)v->data_;                                              \
-        i->end_ = (T*)v->data_ + v->size_ - 1;                                 \
     }                                                                          \
                                                                                \
     N##_it N##_end(N* v) {                                                     \
         N##_it i;                                                              \
-        N##_it_end(v, &i);                                                     \
+        i.curr_ = (T*)v->data_ + v->size_ - 1;                                 \
+        i.begin_ = (T*)v->data_;                                               \
+        i.end_ = (T*)v->data_ + v->size_ - 1;                                  \
         return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cend(const N* const v) {                                        \
-        N##_it i;                                                              \
-        N##_it_cend(v, &i);                                                    \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    void N##_it_from(N* v, N##_it* i, size_t at) {                             \
-        i->curr_ = (T*)v->data_ + at;                                          \
-        i->begin_ = (T*)v->data_;                                              \
-        i->end_ = (T*)v->data_ + v->size_ - 1;                                 \
-    }                                                                          \
-                                                                               \
-    void N##_it_cfrom(const N* const v, N##_it* i, size_t at) {                \
-        i->curr_ = (T*)v->data_ + at;                                          \
-        i->begin_ = (T*)v->data_;                                              \
-        i->end_ = (T*)v->data_ + v->size_ - 1;                                 \
     }                                                                          \
                                                                                \
     N##_it N##_from(N* v, size_t at) {                                         \
         N##_it i;                                                              \
-        N##_it_from(v, &i, at);                                                \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cfrom(const N* const v, size_t at) {                            \
-        N##_it i;                                                              \
-        N##_it_cfrom(v, &i, at);                                               \
+        i.curr_ = (T*)v->data_ + at;                                           \
+        i.begin_ = (T*)v->data_;                                               \
+        i.end_ = (T*)v->data_ + v->size_ - 1;                                  \
         return i;                                                              \
     }                                                                          \
                                                                                \

@@ -81,4 +81,5 @@
     _SGC_INIT_PP_FS_VECTOR(T, N)                                               \
     _SGC_INIT_UNIQUE_FS_VECTOR(T, S, N)                                        \
     _SGC_INIT_COMMON_VECTOR(T, N)                                              \
+    _SGC_INIT_IT_CBEGIN_CEND_CFROM(N)                                          \
     _SGC_INIT_FS_COMMON(S, N)
