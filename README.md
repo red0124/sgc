@@ -165,7 +165,7 @@ Functions starting with **`it`** take the iterator as input parameter instead of
 - **Bidirectional iterator** is associated with all the function from forward iterator and also the following:
 **`it_go_prev`**
 - **Random access iterator** is associated with all the function from bidirectional iterator and also the following:
-**`from`** **`cfrom`** **`it_from`** **`it_cfrom`** **`it_jump`** and **`it_diff`**
+**`from`** **`cfrom`** **`it_from`** **`it_cfrom`** **`it_move`** and **`it_diff`**
 
 This table shows which data stucture has access to which iterator:
 

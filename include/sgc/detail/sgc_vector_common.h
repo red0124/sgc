@@ -165,7 +165,7 @@
         return i;                                                              \
     }                                                                          \
                                                                                \
-    void N##_it_jump(N##_it* i, int range) {                                   \
+    void N##_it_move(N##_it* i, int range) {                                   \
         i->curr_ = i->curr_ + range;                                           \
     }                                                                          \
                                                                                \

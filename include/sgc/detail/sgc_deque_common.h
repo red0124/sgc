@@ -292,7 +292,7 @@
         return i;                                                              \
     }                                                                          \
                                                                                \
-    void N##_it_jump(N##_it* i, int range) {                                   \
+    void N##_it_move(N##_it* i, int range) {                                   \
         i->curr_ = (_p_##N##_max(i->deque_) + i->curr_ + range) %              \
                    _p_##N##_max(i->deque_);                                    \
     }                                                                          \
