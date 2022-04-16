@@ -141,7 +141,7 @@ Now follows a table showing which data stuctures have which additional functiona
 | top          |        |       |      |                 |       | **x**     | **x**                 |     |                  |     |                  |
 |              |        |       |      |                 |       |       |                   |     |                  |     |                  |
 | find         |        |       |      |                 |       |       |                   | **x**   | **x**                | **x**   | **x**                |
-| it_erase     |        |       |      |                 |       |       |                   | **x**   | **x**                | **x**   | **x**                |
+| erase_it     |        |       |      |                 |       |       |                   | **x**   | **x**                | **x**   | **x**                |
 |              |        |       |      |                 |       |       |                   |     |                  |     |                  |
 | array        | **x**      | **x**     |      |                 |       |       |                   |     |                  |     |                  |
 | from_array   | **x**      |       |      |                 |       |       | **x**                 |     |                  |     |                  |
@@ -155,23 +155,19 @@ The functions are mostly identical to methods within the c++ STL with a few exce
 # Iterators
 
 Some data structures have iterators binded to them, there is three types of iterators, 
-random access iterator (RA), bidirectional (BD) iterator and forward (FWD) iterator. The iterator
+**random access iterator**, **bidirectional iterator** and **forward iterator**. The iterator
 structure for the associated data structure had the same name as the data structure
-with **`_it`** attacked to the end of it.
+with **_it** attacked to the end of it, eg for **vec** it would be **vec_it**.
 
-(TODO update it_erase)
 Functions starting with **`it`** take the iterator as input parameter instead of the data structure
-
-Forward iterator is associated with the following functions:
+- **Forward iterator** is associated with the following functions:
 **`begin`** **`cbegin`** **`end`** **`cend`** **`it_data`** **`it_go_next`** **`it_begin`** **`it_cbegin`** **`it_end`** **`it_cend`** **`it_eq`** and **`it_valid`**
-
-Bidirectional iterator is associated with all the function from forward iterator and also the following:
+- **Bidirectional iterator** is associated with all the function from forward iterator and also the following:
 **`it_go_prev`**
-
-Random access iterator is associated with all the function from bidirectional iterator and also the following:
+- **Random access iterator** is associated with all the function from bidirectional iterator and also the following:
 **`from`** **`cfrom`** **`it_from`** **`it_cfrom`** **`it_jump`** and **`it_diff`**
 
-Now follows a table showing which data stuctures support which iterators:
+This table shows which data stucture has access to which iterator:
 
 |               | random access iterator | bidirectional iterator | forward iterator |
 | ------------- | :--------------------: | :--------------------: | :--------------: |
@@ -186,7 +182,10 @@ Now follows a table showing which data stuctures support which iterators:
 
 # Algorithms
 
-The library supports the some algorithms most of which require an iterator to be able to work:
+The library gives access some algorithms most of which require an iterator to be able to work.
+If we for example wanted to initialize the vector to have access to **`qsort`** and **`eq`** functions they could be initialized like this:
+
+
 
 | Algorighm                                                                   | Group              | Minimal Requirements                    |
 | --------------------------------------------------------------------------- | :----------------: | --------------------------------------- |

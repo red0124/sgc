@@ -55,6 +55,7 @@
                                                                                \
     typedef struct N N;                                                        \
     typedef KV N##_type;                                                       \
+    typedef KV N##_value;                                                      \
                                                                                \
     size_t N##_bucket_count(const N* const u);                                 \
     size_t N##_bucket_size(const N* const u, size_t n);                        \
@@ -80,7 +81,7 @@
     void N##_rehash(N* u, size_t new_max);                                     \
     void N##_insert(N* u, const KV v);                                         \
     void N##_erase(N* u, const KV v);                                          \
-    void N##_it_erase(N* u, struct N##_it* i);                                 \
+    void N##_erase_it(N* u, struct N##_it* i);                                 \
     bool N##_empty(const N* const u);
 
 #define _SGC_INIT_UNIQUE_UNORDERED_SET(KV, N)                                  \
@@ -156,7 +157,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_erase(N* u, N##_it* i) {                                       \
+    void N##_erase_it(N* u, N##_it* i) {                                       \
         if (N##_it_valid(*i)) {                                                \
             KV value = i->curr_->value_;                                       \
             N##_it_go_next(i);                                                 \

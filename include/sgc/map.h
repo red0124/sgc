@@ -110,7 +110,7 @@
     V* N##_at(N* m, K k);                                                      \
     N##_it N##_find(N* m, const K k);                                          \
     bool N##_erase(N* m, const K key);                                         \
-    bool N##_it_erase(N* m, N##_it* i);                                        \
+    bool N##_erase_it(N* m, N##_it* i);                                        \
     bool N##_empty(const N* const m);
 
 #define _SGC_INIT_UNIQUE_MAP(K, V, N)                                          \

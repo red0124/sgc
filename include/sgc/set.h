@@ -72,6 +72,7 @@
                                                                                \
     typedef struct N N;                                                        \
     typedef KV N##_type;                                                       \
+    typedef KV N##_value;                                                      \
                                                                                \
     struct N {                                                                 \
         size_t size_;                                                          \
@@ -97,7 +98,7 @@
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
     void N##_insert(N* s, KV v);                                               \
     bool N##_erase(N* m, const KV value);                                      \
-    bool N##_it_erase(N* m, N##_it* i);                                        \
+    bool N##_erase_it(N* m, N##_it* i);                                        \
     bool N##_empty(const N* const m);
 
 #define _SGC_INIT_UNIQUE_SET(KV, N)                                            \

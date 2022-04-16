@@ -94,7 +94,7 @@
     void N##_set(N* u, const K k, const V v);                                  \
     V* N##_at(N* u, K k);                                                      \
     void N##_erase(N* u, const K k);                                           \
-    void N##_it_erase(N* u, struct N##_it* i);                                 \
+    void N##_erase_it(N* u, struct N##_it* i);                                 \
     bool N##_empty(const N* const u);
 
 #define _SGC_INIT_UNIQUE_UNORDERED_MAP(K, V, N)                                \
@@ -203,7 +203,7 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    void N##_it_erase(N* u, N##_it* i) {                                       \
+    void N##_erase_it(N* u, N##_it* i) {                                       \
         if (N##_it_valid(*i)) {                                                \
             K key = i->curr_->data_.key;                                       \
             N##_it_go_next(i);                                                 \

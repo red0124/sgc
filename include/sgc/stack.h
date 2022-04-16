@@ -19,6 +19,7 @@
                                                                                \
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
+    typedef T N##_value;                                                       \
                                                                                \
     void N##_set_shareing(N* s);                                               \
     void N##_set_owning(N* s);                                                 \

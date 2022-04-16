@@ -9,7 +9,7 @@ enum _sgc_node_state {
 };
 
 #define _SGC_INIT_COMMON_FS_HASH_MAP(T, S, N)                                  \
-    void N##_it_erase(N* ds, struct N##_it* it) {                              \
+    void N##_erase_it(N* ds, struct N##_it* it) {                              \
         if (N##_it_valid(*it)) {                                               \
             _p_##N##_node_free(ds, it->curr_);                                 \
             it->curr_->state_ = _SGC_NODE_STATE_ERASED;                        \
@@ -21,7 +21,7 @@ enum _sgc_node_state {
     void N##_erase(N* ds, const T key) {                                       \
         struct N##_it it = N##_find(ds, key);                                  \
         if (it.valid_) {                                                       \
-            N##_it_erase(ds, &it);                                             \
+            N##_erase_it(ds, &it);                                             \
         }                                                                      \
     }                                                                          \
                                                                                \

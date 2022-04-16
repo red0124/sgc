@@ -63,7 +63,7 @@
     N##_it N##_find(N* u, const K k);                                          \
     void N##_set(N* u, const K k, const V v);                                  \
     V* N##_at(N* u, K k);                                                      \
-    void N##_it_erase(N* u, N##_it* i);                                        \
+    void N##_erase_it(N* u, N##_it* i);                                        \
     void N##_erase(N* u, const K k);                                           \
     bool N##_empty(const N* const u);
 

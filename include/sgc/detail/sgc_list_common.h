@@ -56,6 +56,10 @@
         return &i.curr_->data_;                                                \
     }                                                                          \
                                                                                \
+    T* N##_it_value(N##_it i) {                                                \
+        return &i.curr_->data_;                                                \
+    }                                                                          \
+                                                                               \
     void N##_it_go_next(N##_it* i) {                                           \
         i->curr_ = i->curr_->next_;                                            \
     }                                                                          \

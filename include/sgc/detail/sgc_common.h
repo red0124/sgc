@@ -70,7 +70,7 @@
 #define _SGC_INIT_FS_RESIZE(T, S, N)                                           \
     static bool _p_##N##_resize(const N* const v) {                            \
         (void)(v);                                                             \
-        if (v->size_ >= N##_max()) {                                            \
+        if (v->size_ >= N##_max()) {                                           \
             return false;                                                      \
         }                                                                      \
         return true;                                                           \

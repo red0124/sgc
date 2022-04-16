@@ -27,6 +27,7 @@
                                                                                \
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
+    typedef T N##_value;                                                       \
                                                                                \
     size_t N##_max(void);                                                      \
     void N##_set_shareing(N* d);                                               \

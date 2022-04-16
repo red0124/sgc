@@ -21,6 +21,10 @@
         return &i.curr_->data_;                                                \
     }                                                                          \
                                                                                \
+    N##_value* N##_it_value(N##_it i) {                                        \
+        return &i.curr_->data_.value;                                          \
+    }                                                                          \
+                                                                               \
     void N##_set_shareing_key(N* m) {                                          \
         m->sharing_key_ = true;                                                \
     }                                                                          \
@@ -69,6 +73,10 @@
     }                                                                          \
                                                                                \
     KV* N##_it_data(N##_it i) {                                                \
+        return &i.curr_->value_;                                               \
+    }                                                                          \
+                                                                               \
+    KV* N##_it_value(N##_it i) {                                               \
         return &i.curr_->value_;                                               \
     }
 

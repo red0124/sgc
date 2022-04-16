@@ -4,6 +4,7 @@
 // FORWARD ITERATOR
 #define _SGC_INIT_FWD_IT_PROTOTIPES(N)                                         \
     N##_type* N##_it_data(N##_it i);                                           \
+    N##_value* N##_it_value(N##_it i);                                         \
     void N##_it_go_next(N##_it* i);                                            \
     void N##_it_begin(N* ds, N##_it* i);                                       \
     void N##_it_cbegin(const N* const ds, N##_it* i);                          \

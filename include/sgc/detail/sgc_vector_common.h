@@ -79,6 +79,10 @@
     T* N##_it_data(N##_it i) {                                                 \
         return i.curr_;                                                        \
     }                                                                          \
+    \
+    T* N##_it_value(N##_it i) {                                                 \
+        return i.curr_;                                                        \
+    }                                                                          \
                                                                                \
     void N##_it_go_next(N##_it* i) {                                           \
         ++i->curr_;                                                            \

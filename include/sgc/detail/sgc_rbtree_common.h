@@ -17,7 +17,7 @@ enum _sgc_map_color {
         return (bool)n;                                                        \
     }                                                                          \
                                                                                \
-    bool N##_it_erase(N* m, N##_it* i) {                                       \
+    bool N##_erase_it(N* m, N##_it* i) {                                       \
         N##_it tmp = {i->curr_, i->next_, i->valid_};                          \
         N##_it_go_next(&tmp);                                                  \
         bool valid = i->valid_;                                                \

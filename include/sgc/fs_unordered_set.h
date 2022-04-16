@@ -19,9 +19,9 @@
     static bool _p_##N##_node_eq_key(const struct _p_##N##_node* const n,      \
                                      const KV* const key);
 
-#define SGC_INIT_HEADERS_FS_UNORDERED_SET(V, S, N)                             \
+#define SGC_INIT_HEADERS_FS_UNORDERED_SET(KV, S, N)                            \
     struct _p_##N##_node {                                                     \
-        V value_;                                                              \
+        KV value_;                                                             \
         enum _sgc_node_state state_;                                           \
     };                                                                         \
                                                                                \
@@ -32,7 +32,8 @@
     };                                                                         \
                                                                                \
     typedef struct N N;                                                        \
-    typedef V N##_type;                                                        \
+    typedef KV N##_type;                                                       \
+    typedef KV N##_value;                                                      \
                                                                                \
     size_t N##_max(void);                                                      \
                                                                                \
@@ -52,13 +53,13 @@
     void N##_init(N* u);                                                       \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
     void N##_free(N* u);                                                       \
-    struct N##_it N##_find(N* u, const V v);                                   \
-    void N##_insert(N* u, const V v);                                          \
-    void N##_it_erase(N* u, struct N##_it* i);                                 \
-    void N##_erase(N* u, const V v);                                           \
+    struct N##_it N##_find(N* u, const KV v);                                  \
+    void N##_insert(N* u, const KV v);                                         \
+    void N##_erase_it(N* u, struct N##_it* i);                                 \
+    void N##_erase(N* u, const KV v);                                          \
     bool N##_empty(const N* const u);
 
-#define _SGC_INIT_UNIQUE_FS_UNORDERED_SET(V, S, N)                             \
+#define _SGC_INIT_UNIQUE_FS_UNORDERED_SET(KV, S, N)                            \
     size_t N##_max(void) {                                                     \
         return S;                                                              \
     }                                                                          \
@@ -71,8 +72,8 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_insert(N* u, const V v) {                                         \
-        size_t hash = V##_hash(&v);                                            \
+    void N##_insert(N* u, const KV v) {                                        \
+        size_t hash = KV##_hash(&v);                                           \
         struct N##_it i = _p_##N##_find_by_hash(u, &v, hash);                  \
         if (!i.valid_ && u->size_ < S - 1) {                                   \
             size_t position = hash % S;                                        \
@@ -83,7 +84,7 @@
                     ++position;                                                \
                 }                                                              \
             }                                                                  \
-            _SGC_COPY(V, u->data_[position].value_, v, u->sharing_);           \
+            _SGC_COPY(KV, u->data_[position].value_, v, u->sharing_);          \
             u->data_[position].state_ = _SGC_NODE_STATE_USED;                  \
             ++u->size_;                                                        \
         }                                                                      \
@@ -105,10 +106,10 @@
         }                                                                      \
     }
 
-#define SGC_INIT_FS_UNORDERED_SET(V, S, N)                                     \
-    SGC_INIT_HEADERS_FS_UNORDERED_SET(V, S, N)                                 \
-    _SGC_INIT_PP_FS_UNORDERED_SET(V, S, N)                                     \
-    _SGC_INIT_UNIQUE_FS_UNORDERED_SET(V, S, N)                                 \
-    _SGC_INIT_COMMON_DICT_NONE_PAIR_FS_HASH(V, N)                              \
-    _SGC_INIT_COMMON_FS_HASH_MAP(V, S, N)                                      \
+#define SGC_INIT_FS_UNORDERED_SET(KV, S, N)                                    \
+    SGC_INIT_HEADERS_FS_UNORDERED_SET(KV, S, N)                                \
+    _SGC_INIT_PP_FS_UNORDERED_SET(KV, S, N)                                    \
+    _SGC_INIT_UNIQUE_FS_UNORDERED_SET(KV, S, N)                                \
+    _SGC_INIT_COMMON_DICT_NONE_PAIR_FS_HASH(KV, N)                             \
+    _SGC_INIT_COMMON_FS_HASH_MAP(KV, S, N)                                     \
     _SGC_INIT_COMMON(N)

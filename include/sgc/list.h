@@ -30,6 +30,7 @@
                                                                                \
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
+    typedef T N##_value;                                                       \
                                                                                \
     void N##_set_share(N* l, bool shared);                                     \
     size_t N##_size(const N* const l);                                         \
