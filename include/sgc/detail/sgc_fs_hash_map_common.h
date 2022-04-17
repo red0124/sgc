@@ -92,20 +92,6 @@ enum _sgc_node_state {
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_cbegin(const N* const m, struct N##_it* i) {                   \
-        i->begin_ = (struct _p_##N##_node*)(m->data_);                         \
-        i->curr_ = i->begin_;                                                  \
-        i->end_ = i->begin_ + S - 1;                                           \
-        i->valid_ = 1;                                                         \
-        if (i->curr_->state_ != _SGC_NODE_STATE_USED) {                        \
-            N##_it_go_next(i);                                                 \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_it_begin(N* m, struct N##_it* i) {                                \
-        N##_it_cbegin(m, i);                                                   \
-    }                                                                          \
-                                                                               \
     void N##_it_go_prev(struct N##_it* i) {                                    \
         i->valid_ = 0;                                                         \
         if (i->curr_ <= i->begin_) {                                           \
@@ -121,41 +107,27 @@ enum _sgc_node_state {
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_cend(const N* const m, struct N##_it* i) {                     \
-        i->begin_ = (struct _p_##N##_node*)(m->data_);                         \
-        i->end_ = (struct _p_##N##_node*)(m->data_) + S - 1;                   \
-        i->curr_ = i->end_;                                                    \
-        i->valid_ = 1;                                                         \
-        if (i->curr_->state_ != _SGC_NODE_STATE_USED) {                        \
-            N##_it_go_prev(i);                                                 \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_it_end(N* m, struct N##_it* i) {                                  \
-        N##_it_cend(m, i);                                                     \
-    }                                                                          \
-                                                                               \
     struct N##_it N##_begin(N* m) {                                            \
         struct N##_it i;                                                       \
-        N##_it_begin(m, &i);                                                   \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    struct N##_it N##_cbegin(const N* const m) {                               \
-        struct N##_it i;                                                       \
-        N##_it_cbegin(m, &i);                                                  \
+        i.begin_ = (struct _p_##N##_node*)(m->data_);                          \
+        i.curr_ = i.begin_;                                                    \
+        i.end_ = i.begin_ + S - 1;                                             \
+        i.valid_ = true;                                                       \
+        if (i.curr_->state_ != _SGC_NODE_STATE_USED) {                         \
+            N##_it_go_next(&i);                                                \
+        }                                                                      \
         return i;                                                              \
     }                                                                          \
                                                                                \
     struct N##_it N##_end(N* m) {                                              \
         struct N##_it i;                                                       \
-        N##_it_end(m, &i);                                                     \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    struct N##_it N##_cend(const N* const m) {                                 \
-        struct N##_it i;                                                       \
-        N##_it_cend(m, &i);                                                    \
+        i.begin_ = (struct _p_##N##_node*)(m->data_);                          \
+        i.end_ = (struct _p_##N##_node*)(m->data_) + S - 1;                    \
+        i.curr_ = i.end_;                                                      \
+        i.valid_ = 1;                                                          \
+        if (i.curr_->state_ != _SGC_NODE_STATE_USED) {                         \
+            N##_it_go_prev(&i);                                                \
+        }                                                                      \
         return i;                                                              \
     }                                                                          \
                                                                                \

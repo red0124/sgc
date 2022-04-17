@@ -331,7 +331,7 @@ enum _sgc_map_color {
                                                                                \
     void N##_it_go_prev(N##_it* i) {                                           \
         if (!i->curr_) {                                                       \
-            i->valid_ = 0;                                                     \
+            i->valid_ = false;                                                 \
             return;                                                            \
         }                                                                      \
         i->next_ = i->curr_;                                                   \
@@ -343,10 +343,12 @@ enum _sgc_map_color {
                 i->curr_ = parent;                                             \
                 parent = parent->parent_;                                      \
             }                                                                  \
-            if (i->curr_->right_ != parent) {                                  \
+            if (parent == _SGC_MAP_LEAF) {                                     \
+                i->valid_ = false;                                             \
+                return;                                                        \
+            }                                                                  \
+            if (i->curr_->left_ != parent) {                                   \
                 i->curr_ = parent;                                             \
-            } else {                                                           \
-                i->curr_ = _SGC_MAP_LEAF;                                      \
             }                                                                  \
         }                                                                      \
     }                                                                          \

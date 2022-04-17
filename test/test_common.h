@@ -540,7 +540,25 @@ void tm_print(tm* tm) {
         }                                                                      \
         ASSERT_EQUAL(false, N##_it_valid(it));                                 \
     }                                                                          \
-    {}
+    {                                                                          \
+        N##_it it = N##_end(&DS);                                              \
+        N##_it begin = N##_begin(&DS);                                         \
+        for (size_t i = TM.size; i > 0; --i) {                                 \
+            ASSERT_EQUAL(true, N##_it_valid(it));                              \
+            N##_pair* pair = N##_it_data(it);                                  \
+            TEST_ASSERT_NOT_EQUAL(NULL, pair);                                 \
+            int* value = tm_find(&TM, pair->key);                              \
+            TEST_ASSERT_NOT_EQUAL(NULL, value);                                \
+            ASSERT_EQUAL(pair->value, *value);                                 \
+            if (i == 1) {                                                      \
+                ASSERT_EQUAL(true, N##_it_eq(begin, it));                      \
+            } else {                                                           \
+                ASSERT_EQUAL(false, N##_it_eq(begin, it));                     \
+            }                                                                  \
+            N##_it_go_prev(&it);                                               \
+        }                                                                      \
+        ASSERT_EQUAL(false, N##_it_valid(it));                                 \
+    }
 
 #define TEST_TM(N)                                                             \
     {                                                                          \
