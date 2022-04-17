@@ -5,10 +5,10 @@
 #define _SGC_INIT_COMMON_DEQUE(T, N)                                           \
     void N##_erase(N* d, size_t at) {                                          \
         if (at < d->size_ && d->size_ > 0) {                                   \
-            if (!d->sharing_) {                                                \
-                T##_free(&d->data_[at]);                                       \
-            }                                                                  \
             size_t _at = (at + d->front_) % _p_##N##_max(d);                   \
+            if (!d->sharing_) {                                                \
+                T##_free(&d->data_[_at]);                                      \
+            }                                                                  \
             size_t shift_back = 0;                                             \
             size_t shift_end = 0;                                              \
             size_t shift_begin = 0;                                            \
@@ -237,23 +237,17 @@
     void N##_it_go_next(N##_it* it) {                                          \
         if (it->curr_ == it->deque_->back_) {                                  \
             it->valid_ = false;                                                \
+            return;                                                            \
         }                                                                      \
-        if (it->curr_ + 1 == _p_##N##_max(it->deque_)) {                       \
-            it->curr_ = 0;                                                     \
-        } else {                                                               \
-            ++it->curr_;                                                       \
-        }                                                                      \
+        _p_##N##_go_next(&it->curr_, _p_##N##_max(it->deque_));                \
     }                                                                          \
                                                                                \
     void N##_it_go_prev(N##_it* it) {                                          \
         if (it->curr_ == it->deque_->front_) {                                 \
             it->valid_ = false;                                                \
+            return;                                                            \
         }                                                                      \
-        if (it->curr_ == 0) {                                                  \
-            it->curr_ = _p_##N##_max(it->deque_) - 1;                          \
-        } else {                                                               \
-            --it->curr_;                                                       \
-        }                                                                      \
+        _p_##N##_go_prev(&it->curr_, _p_##N##_max(it->deque_));                \
     }                                                                          \
                                                                                \
     N##_it N##_begin(N* d) {                                                   \
@@ -290,7 +284,7 @@
                                                                                \
     /* TODO replace int with something else */                                 \
     void N##_it_move(N##_it* it, int range) {                                  \
-        size_t index = _p_##N##_it_index(*it);                                  \
+        size_t index = _p_##N##_it_index(*it);                                 \
         if (range > 0) {                                                       \
             if (index + range >= it->deque_->size_) {                          \
                 it->valid_ = false;                                            \
@@ -342,7 +336,7 @@
     }                                                                          \
                                                                                \
     static void _p_##N##_free_data(N* d) {                                     \
-        if (!d->sharing_) {                                                    \
+        if (d->size_ > 0 && !d->sharing_) {                                    \
             size_t i;                                                          \
             for (i = d->front_; i != d->back_;) {                              \
                 T##_free(&d->data_[i]);                                        \

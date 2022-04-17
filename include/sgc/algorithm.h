@@ -38,14 +38,14 @@
 // FIND
 // ==============
 #define SGC_INIT_HEADERS_FIND(T, N)                                            \
-    N##_type* N##_find_el(const N* const ds, const N##_value el);                      \
+    N##_type* N##_find_el(const N* const ds, const N##_value el);              \
     N##_it N##_find_it(const N* const c, const N##_value el);
 
 // IMPLEMENTATION
 #define SGC_INIT_FIND(T, N)                                                    \
     SGC_INIT_HEADERS_FIND(T, N)                                                \
                                                                                \
-    N##_it N##_find_it(const N* const ds, const N##_value el) {                        \
+    N##_it N##_find_it(const N* const ds, const N##_value el) {                \
         N##_it curr;                                                           \
         for (curr = N##_cbegin(ds);                                            \
              N##_it_valid(curr) && !T##_eq(N##_it_value(curr), &el);           \
@@ -54,7 +54,7 @@
         return curr;                                                           \
     }                                                                          \
                                                                                \
-    N##_type* N##_find_el(const N* const ds, const N##_value el) {                     \
+    N##_type* N##_find_el(const N* const ds, const N##_value el) {             \
         N##_it it = N##_find_it(ds, el);                                       \
         return N##_it_valid(it) ? N##_it_data(it) : NULL;                      \
     }

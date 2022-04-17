@@ -226,7 +226,7 @@
     }
 
 #define _SGC_ARRAY_COPY(T, DST, SRC, SIZE, SHARED)                             \
-    if (!SHARED) {                                                             \
+    if (SHARED) {                                                             \
         memcpy(DST, SRC, SIZE * sizeof(T));                                    \
     } else {                                                                   \
         for (size_t i = 0; i < SIZE; ++i) {                                    \
@@ -246,7 +246,7 @@
 // ==============
 #define _SGC_TOKENPASTE(x, y) x##y
 #define _SGC_TOKENPASTE2(x, y) _SGC_TOKENPASTE(x, y)
-#define _SGC_UNIQUE(x) _SGC_TOKENPASTE2(__sgc_unique_##x, __LINE__)
+#define _SGC_UNIQUE(x) _SGC_TOKENPASTE2(_sgc_unique_##x, __LINE__)
 
 #define _SGC_NONE() (void*)NULL;
 
@@ -257,17 +257,9 @@
     (__VA_ARGS__)
 
 #define _SGC_FOR_EACH(EL, C, N)                                                \
-    int _SGC_UNIQUE(valid) = 0;                                                \
-    int _SGC_UNIQUE(tmp) = 0;                                                  \
     N##_it _SGC_UNIQUE(curr) = N##_begin(&C);                                  \
-    N##_it _SGC_UNIQUE(end) = N##_end(&C);                                     \
-    _SGC_UNIQUE(valid) =                                                       \
-        N##_it_valid(_SGC_UNIQUE(curr)) && N##_it_valid(_SGC_UNIQUE(end));     \
     for (N##_type* EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr));             \
-         _SGC_UNIQUE(valid);                                                   \
-         _SGC_UNIQUE(tmp) = !N##_it_eq(_SGC_UNIQUE(curr), _SGC_UNIQUE(end)),   \
-                   _SGC_UNIQUE(valid) = _SGC_UNIQUE(tmp),                      \
-                   N##_it_go_next(&_SGC_UNIQUE(curr)),                         \
+         N##_it_valid(_SGC_UNIQUE(curr)); N##_it_go_next(&_SGC_UNIQUE(curr)),  \
                    EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr)))
 
 #define _SGC_FOR_EACH_REVERSE_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
@@ -276,6 +268,7 @@
                             _SGC_NONE, _SGC_FOR_EACH_REVERSE, )                \
     (__VA_ARGS__)
 
+// TODO update
 #define _SGC_FOR_EACH_REVERSE(EL, C, N)                                        \
     int _SGC_UNIQUE(valid) = 0;                                                \
     int _SGC_UNIQUE(tmp) = 0;                                                  \

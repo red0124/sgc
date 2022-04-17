@@ -106,5 +106,5 @@
     _SGC_INIT_PP_VECTOR(T, N)                                                  \
     _SGC_INIT_UNIQUE_VECTOR(T, N)                                              \
     _SGC_INIT_COMMON_VECTOR(T, N)                                              \
-    _SGC_INIT_IT_CBEGIN_CEND_CFROM(N)\
+    _SGC_INIT_IT_CBEGIN_CEND_CFROM(N)                                          \
     _SGC_INIT_COMMON(N)

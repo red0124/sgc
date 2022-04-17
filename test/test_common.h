@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +11,28 @@
 #else
 #define log(...) (void)(NULL)
 #endif
+
+#define STRINGIZE(x) STRINGIZE2(x)
+#define STRINGIZE2(x) #x
+#define LINE_STRING STRINGIZE(__LINE__)
+
+#define ASSERT_EQUAL(EXPECTED, VALUE)                                          \
+    TEST_ASSERT_EQUAL_MESSAGE(EXPECTED, VALUE,                                 \
+                              STRINGIZE(EXPECTED) " != " STRINGIZE(VALUE))
+
+#define ASSERT_NOT_EQUAL(EXPECTED, VALUE)                                      \
+    TEST_ASSERT_NOT_EQUAL_MESSAGE(EXPECTED, VALUE,                             \
+                                  STRINGIZE(EXPECTED) " == " STRINGIZE(VALUE))
+
+#define ASSERT_ARRAY(N, DS, ...)                                               \
+    {                                                                          \
+        int array[] = __VA_ARGS__;                                             \
+        size_t size = sizeof(array) / sizeof(array[0]);                        \
+        ASSERT_EQUAL(size, N##_size(&ds));                                     \
+        for (size_t i = 0; i < size; ++i) {                                    \
+            ASSERT_EQUAL(array[i], *N##_at(&ds, i));                           \
+        }                                                                      \
+    }
 
 inline void setUp(void) {
 }
@@ -25,6 +48,53 @@ size_t power(size_t base, size_t exp) {
 
     return x;
 }
+
+/* ========================= */
+// Observed int
+/* ========================= */
+
+typedef int oint;
+int oint_allocation_count = 0;
+int oint_deallocation_count = 0;
+#define OINT_DANGLING -1
+
+static inline void oint_copy(oint* dst, const oint* const src) {
+    ASSERT_NOT_EQUAL(OINT_DANGLING, *src);
+    *dst = *src;
+    ++oint_allocation_count;
+}
+
+static inline void oint_init(oint* o) {
+    *o = 0;
+}
+
+static inline void oint_free(oint* o) {
+    ASSERT_NOT_EQUAL(OINT_DANGLING, *o);
+    *o = -1;
+    ++oint_deallocation_count;
+}
+
+static inline bool oint_eq(const oint* const first, const oint* const second) {
+    ASSERT_NOT_EQUAL(OINT_DANGLING, *first);
+    ASSERT_NOT_EQUAL(OINT_DANGLING, *second);
+    return *first == *second;
+}
+
+static inline int oint_compare(const oint* const first,
+                               const oint* const second) {
+    ASSERT_NOT_EQUAL(OINT_DANGLING, *first);
+    ASSERT_NOT_EQUAL(OINT_DANGLING, *second);
+    return *first - *second;
+}
+
+static inline size_t oint_hash(const oint* const o) {
+    ASSERT_NOT_EQUAL(OINT_DANGLING, *o);
+    return *o;
+}
+
+/* ========================= */
+// Allocated element
+/* ========================= */
 
 struct alocated_element {
     int* el;
@@ -73,30 +143,8 @@ static inline size_t al_hash(const al* const a) {
     return *a->el;
 }
 
-#define STRINGIZE(x) STRINGIZE2(x)
-#define STRINGIZE2(x) #x
-#define LINE_STRING STRINGIZE(__LINE__)
-
-#define ASSERT_EQUAL(EXPECTED, VALUE)                                          \
-    TEST_ASSERT_EQUAL_MESSAGE(EXPECTED, VALUE,                                 \
-                              STRINGIZE(EXPECTED) " != " STRINGIZE(VALUE))
-
-#define ASSERT_NOT_EQUAL(EXPECTED, VALUE)                                      \
-    TEST_ASSERT_NOT_EQUAL_MESSAGE(EXPECTED, VALUE,                             \
-                                  STRINGIZE(EXPECTED) " == " STRINGIZE(VALUE))
-
-#define ASSERT_ARRAY(N, DS, ...)                                               \
-    {                                                                          \
-        int array[] = __VA_ARGS__;                                             \
-        size_t size = sizeof(array) / sizeof(array[0]);                        \
-        ASSERT_EQUAL(size, N##_size(&ds));                                     \
-        for (size_t i = 0; i < size; ++i) {                                    \
-            ASSERT_EQUAL(array[i], *N##_at(&ds, i));                           \
-        }                                                                      \
-    }
-
 /* ========================= */
-// Test Array
+// Test Array Int
 /* ========================= */
 
 #define TA_MAX 1024
@@ -154,6 +202,10 @@ int ta_int_compare(const void* const i1, const void* const i2) {
 void ta_sort(ta* ta) {
     qsort(ta->data, ta->size, sizeof(int), ta_int_compare);
 }
+
+/* ========================= */
+// Test Array Iterators
+/* ========================= */
 
 #define TEST_FORWARD_ITERATOR(N, TA, DS)                                       \
     {                                                                          \
@@ -230,6 +282,10 @@ void ta_sort(ta* ta) {
         ASSERT_EQUAL(false, N##_it_valid(it));                                 \
     }
 
+/* ========================= */
+// Test Array
+/* ========================= */
+
 #define TEST_INSERT_ERASE_COMBINATIONS_ARRAY(N, TEST_ITERATOR)                 \
     {                                                                          \
         size_t n = 5;                                                          \
@@ -295,32 +351,32 @@ void ta_sort(ta* ta) {
                     N##_pop_back(&ds);                                         \
                     break;                                                     \
                 case (10):                                                     \
-                    log("erase at 0 %d\n", i);                                 \
+                    log("erase at 0\n");                                       \
                     ta_erase(&ta, 0);                                          \
                     N##_erase(&ds, 0);                                         \
                     break;                                                     \
                 case (11):                                                     \
-                    log("erase at 1 %d\n", i);                                 \
+                    log("erase at 1\n");                                       \
                     ta_erase(&ta, 1);                                          \
                     N##_erase(&ds, 1);                                         \
                     break;                                                     \
                 case (12):                                                     \
-                    log("erase at 2 %d\n", i);                                 \
+                    log("erase at 2\n");                                       \
                     ta_erase(&ta, 2);                                          \
                     N##_erase(&ds, 2);                                         \
                     break;                                                     \
                 case (13):                                                     \
-                    log("erase at 3 %d\n", i);                                 \
+                    log("erase at 3\n");                                       \
                     ta_erase(&ta, 3);                                          \
                     N##_erase(&ds, 3);                                         \
                     break;                                                     \
                 case (14):                                                     \
-                    log("erase at 4 %d\n", i);                                 \
+                    log("erase at 4\n");                                       \
                     ta_erase(&ta, 4);                                          \
                     N##_erase(&ds, 4);                                         \
                     break;                                                     \
                 case (15):                                                     \
-                    log("erase at 5 %d\n", i);                                 \
+                    log("erase at 5\n");                                       \
                     ta_erase(&ta, 5);                                          \
                     N##_erase(&ds, 5);                                         \
                     break;                                                     \
@@ -378,6 +434,7 @@ void ta_sort(ta* ta) {
                                                                                \
                 TEST_ITERATOR(N, ta, ds)                                       \
                                                                                \
+                N##_free(&ds_copy);                                        \
                 comb_copy /= m;                                                \
             }                                                                  \
             N##_free(&ds);                                                     \
