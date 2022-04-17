@@ -150,5 +150,5 @@
     _SGC_INIT_UNIQUE_FS_UNORDERED_MAP(K, V, S, N)                              \
     _SGC_INIT_COMMON_DICT_PAIR_FS_HASH(K, V, N)                                \
     _SGC_INIT_COMMON_FS_HASH_MAP(K, S, N)                                      \
-    _SGC_INIT_IT_CBEGIN_CEND(N)\
+    _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)

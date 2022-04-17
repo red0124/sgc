@@ -178,4 +178,5 @@
     _SGC_INIT_UNIQUE_UNORDERED_SET(KV, N)                                      \
     _SGC_INIT_COMMON_DICT_NONE_PAIR_HASH(KV, N)                                \
     _SGC_INIT_COMMON_HASH_MAP(KV, N)                                           \
+    _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)
