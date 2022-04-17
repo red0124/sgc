@@ -434,7 +434,7 @@ void ta_sort(ta* ta) {
                                                                                \
                 TEST_ITERATOR(N, ta, ds)                                       \
                                                                                \
-                N##_free(&ds_copy);                                        \
+                N##_free(&ds_copy);                                            \
                 comb_copy /= m;                                                \
             }                                                                  \
             N##_free(&ds);                                                     \

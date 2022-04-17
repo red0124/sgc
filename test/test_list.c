@@ -5,82 +5,95 @@
 
 SGC_INIT_LIST(int, list)
 
-const int* list_at(list* l, size_t at) {
-    list_it curr = list_begin(l);
-
-    while (list_it_valid(curr)) {
-        if (at == 0) {
-            return list_it_data(curr);
-        }
-        list_it_go_next(&curr);
-        --at;
+#define INIT_ADDITIONAL_LIST_FUNCTIONS(T, N)                                   \
+    const T* N##_at(N* l, size_t at) {                                         \
+        N##_it curr = N##_begin(l);                                            \
+                                                                               \
+        while (N##_it_valid(curr)) {                                           \
+            if (at == 0) {                                                     \
+                return N##_it_data(curr);                                      \
+            }                                                                  \
+            N##_it_go_next(&curr);                                             \
+            --at;                                                              \
+        }                                                                      \
+                                                                               \
+        if (at == 0) {                                                         \
+            return N##_it_data(curr);                                          \
+        }                                                                      \
+                                                                               \
+        return NULL;                                                           \
+    }                                                                          \
+                                                                               \
+    void N##_set(N* l, size_t at, T el) {                                      \
+        int* curr_el = (T*)N##_at(l, at);                                      \
+        if (curr_el != NULL) {                                                 \
+            *curr_el = el;                                                     \
+        }                                                                      \
+    }                                                                          \
+                                                                               \
+    void N##_insert(N* l, int at, T el) {                                      \
+        if (at > (int)N##_size(l)) {                                           \
+            return;                                                            \
+        }                                                                      \
+                                                                               \
+        N new_list;                                                            \
+        N##_init(&new_list);                                                   \
+                                                                               \
+        for (N##_it curr = N##_begin(l); N##_it_valid(curr);                   \
+             N##_it_go_next(&curr)) {                                          \
+            if (at == 0) {                                                     \
+                N##_push_back(&new_list, el);                                  \
+            }                                                                  \
+            N##_push_back(&new_list, *N##_it_data(curr));                      \
+            --at;                                                              \
+        }                                                                      \
+                                                                               \
+        if (at == 0) {                                                         \
+            N##_push_back(&new_list, el);                                      \
+        }                                                                      \
+                                                                               \
+        N##_free(l);                                                           \
+        *l = new_list;                                                         \
+    }                                                                          \
+                                                                               \
+    void N##_erase(N* l, int at) {                                             \
+        if (at >= (int)N##_size(l)) {                                          \
+            return;                                                            \
+        }                                                                      \
+                                                                               \
+        N new_list;                                                            \
+        N##_init(&new_list);                                                   \
+                                                                               \
+        for (N##_it curr = N##_begin(l); N##_it_valid(curr);                   \
+             N##_it_go_next(&curr)) {                                          \
+            if (at != 0) {                                                     \
+                N##_push_back(&new_list, *N##_it_data(curr));                  \
+            }                                                                  \
+            --at;                                                              \
+        }                                                                      \
+                                                                               \
+        N##_free(l);                                                           \
+        *l = new_list;                                                         \
     }
 
-    if (at == 0) {
-        return list_it_data(curr);
-    }
-
-    return NULL;
-}
-
-void list_set(list* l, size_t at, int el) {
-    int* curr_el = (int*)list_at(l, at);
-    if (curr_el != NULL) {
-        *curr_el = el;
-    }
-}
-
-void list_insert(list* l, int at, int el) {
-    if (at > (int)list_size(l)) {
-        return;
-    }
-
-    list new_list;
-    list_init(&new_list);
-
-    for (list_it curr = list_begin(l); list_it_valid(curr);
-         list_it_go_next(&curr)) {
-        if (at == 0) {
-            list_push_back(&new_list, el);
-        }
-        list_push_back(&new_list, *list_it_data(curr));
-        --at;
-    }
-
-    if (at == 0) {
-        list_push_back(&new_list, el);
-    }
-
-    list_free(l);
-    *l = new_list;
-}
-
-void list_erase(list* l, int at) {
-    if (at >= (int)list_size(l)) {
-        return;
-    }
-
-    list new_list;
-    list_init(&new_list);
-
-    for (list_it curr = list_begin(l); list_it_valid(curr);
-         list_it_go_next(&curr)) {
-        if (at != 0) {
-            list_push_back(&new_list, *list_it_data(curr));
-        }
-        --at;
-    }
-
-    list_free(l);
-    *l = new_list;
-}
+INIT_ADDITIONAL_LIST_FUNCTIONS(int, list)
 
 void test_list_insert_erase_combinations(void) {
     TEST_INSERT_ERASE_COMBINATIONS_ARRAY(list, TEST_BIDIRECTIONAL_ITERATOR);
 }
 
+SGC_INIT_LIST(oint, olist)
+INIT_ADDITIONAL_LIST_FUNCTIONS(oint, olist)
+
+void test_list_insert_erase_combinations_observed(void) {
+    TEST_INSERT_ERASE_COMBINATIONS_ARRAY(olist, TEST_BIDIRECTIONAL_ITERATOR);
+    TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
+    ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_list_insert_erase_combinations);
+    RUN_TEST(test_list_insert_erase_combinations_observed);
     return UNITY_END();
 }

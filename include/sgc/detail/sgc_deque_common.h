@@ -282,7 +282,6 @@
         return index;                                                          \
     }                                                                          \
                                                                                \
-    /* TODO replace int with something else */                                 \
     void N##_it_move(N##_it* it, int range) {                                  \
         size_t index = _p_##N##_it_index(*it);                                 \
         if (range > 0) {                                                       \

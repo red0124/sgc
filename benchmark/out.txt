@@ -1,45 +1,45 @@
 [35mMAP INSERT SMALL[0m
-c sgc: [32m24.1 [ms][0m -- c++ stl: [33m26.3 [ms][0m
+c sgc: [32m23.7 [ms][0m -- c++ stl: [33m26.7 [ms][0m
 
 [35mMAP INSERT MEDIUM[0m
-c sgc: [32m29.3 [ms][0m -- c++ stl: [32m28.5 [ms][0m
+c sgc: [33m29.8 [ms][0m -- c++ stl: [32m28.2 [ms][0m
 
 [35mMAP INSERT LARGE[0m
-c sgc: [32m114.8 [ms][0m -- c++ stl: [32m114.4 [ms][0m
+c sgc: [32m116.2 [ms][0m -- c++ stl: [32m116.1 [ms][0m
 
 [35mMAP ITERATE[0m
-c sgc: [32m886.4 [ms][0m -- c++ stl: [32m872.4 [ms][0m
+c sgc: [32m834.4 [ms][0m -- c++ stl: [33m890.9 [ms][0m
 
 [35mUNORDERED MAP INSERT SMALL[0m
-c sgc: [32m35.3 [ms][0m -- c++ stl: [31m57.1 [ms][0m
+c sgc: [32m35.6 [ms][0m -- c++ stl: [31m57.6 [ms][0m
 
 [35mUNORDERED MAP INSERT MEDIUM[0m
-c sgc: [32m35.7 [ms][0m -- c++ stl: [31m58.2 [ms][0m
+c sgc: [32m36.0 [ms][0m -- c++ stl: [31m57.6 [ms][0m
 
 [35mUNORDERED MAP INSERT LARGE[0m
-c sgc: [32m36.1 [ms][0m -- c++ stl: [31m58.3 [ms][0m
+c sgc: [32m36.6 [ms][0m -- c++ stl: [31m59.5 [ms][0m
 
 [35mUNORDERED MAP ITERATE[0m
-c sgc: [32m209.0 [ms][0m -- c++ stl: [33m225.9 [ms][0m
+c sgc: [32m207.8 [ms][0m -- c++ stl: [33m228.3 [ms][0m
 
 [35mVECTOR ITERATE[0m
-c sgc: [32m539.1 [ms][0m -- c++ stl: [32m517.4 [ms][0m
+c sgc: [32m547.3 [ms][0m -- c++ stl: [33m595.5 [ms][0m
 
 [35mDEQUE INSERT SMALL[0m
-c sgc: [33m32.0 [ms][0m -- c++ stl: [32m24.7 [ms][0m
+c sgc: [31m32.6 [ms][0m -- c++ stl: [32m24.5 [ms][0m
 
 [35mDEQUE INSERT LARGE[0m
-c sgc: [32m1235.5 [ms][0m -- c++ stl: [31m2571.1 [ms][0m
+c sgc: [32m1241.5 [ms][0m -- c++ stl: [31m2595.2 [ms][0m
 
 [35mDEQUE ITERATE[0m
-c sgc: [32m1199.2 [ms][0m -- c++ stl: [32m1253.9 [ms][0m
+c sgc: [32m1214.8 [ms][0m -- c++ stl: [33m1279.5 [ms][0m
 
 [35mUNORDERED MAP OF VECTORS[0m
-c sgc: [32m3079.9 [ms][0m -- c++ stl: [32m3211.5 [ms][0m
+c sgc: [32m3184.7 [ms][0m -- c++ stl: [32m3254.6 [ms][0m
 
 [35mPRIORITY QUEUE PUSH POP SMALL[0m
-c sgc: [32m67.9 [ms][0m -- c++ stl: [33m78.0 [ms][0m
+c sgc: [32m69.2 [ms][0m -- c++ stl: [33m83.4 [ms][0m
 
 [35mPRIORITY QUEUE PUSH POP LARGE[0m
-c sgc: [32m446.5 [ms][0m -- c++ stl: [33m475.3 [ms][0m
+c sgc: [32m452.7 [ms][0m -- c++ stl: [33m486.8 [ms][0m
 

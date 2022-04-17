@@ -66,14 +66,13 @@
     N##_type* N##_binary_find_el(const N* const ds, const N##_type el);        \
     N##_it N##_binary_find_it(const N* const ds, const N##_type el);
 
-// IMPLEMENTATION (TODO replace long long)
 #define SGC_INIT_BINARY_FIND(T, N)                                             \
     SGC_INIT_HEADERS_BINARY_FIND(T, N)                                         \
     N##_it N##_binary_find_it(const N* const ds, const N##_type el) {          \
         if (!N##_empty(ds)) {                                                  \
-            long long l = 0;                                                   \
-            long long r = N##_size(ds) - 1;                                    \
-            long long m;                                                       \
+            int l = 0;                                                   \
+            int r = N##_size(ds) - 1;                                    \
+            int m;                                                       \
             while (l <= r) {                                                   \
                 m = l + (r - l) / 2;                                           \
                 N##_type* curr = N##_at((N*)ds, m);                            \

@@ -79,7 +79,7 @@
     }                                                                          \
                                                                                \
     static void _p_##N##_free_data(N* q) {                                     \
-        if (!q->sharing_) {                                                    \
+        if (q->size_ > 0 && !q->sharing_) {                                    \
             size_t i;                                                          \
             for (i = q->front_; i != q->back_;) {                              \
                 T##_free(&q->data_[i]);                                        \
