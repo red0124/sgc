@@ -520,6 +520,28 @@ void tm_print(tm* tm) {
     log("\n");
 }
 
+#define TEST_BIDIRECTIONAL_PAIR_ITERATOR(N, TM, DS)                            \
+    {                                                                          \
+        N##_it it = N##_begin(&DS);                                            \
+        N##_it end = N##_end(&DS);                                             \
+        for (size_t i = 0; i < TM.size; ++i) {                                 \
+            ASSERT_EQUAL(true, N##_it_valid(it));                              \
+            N##_pair* pair = N##_it_data(it);                                  \
+            TEST_ASSERT_NOT_EQUAL(NULL, pair);                                 \
+            int* value = tm_find(&TM, pair->key);                              \
+            TEST_ASSERT_NOT_EQUAL(NULL, value);                                \
+            ASSERT_EQUAL(pair->value, *value);                                 \
+            if (i == TM.size - 1) {                                            \
+                ASSERT_EQUAL(true, N##_it_eq(end, it));                        \
+            } else {                                                           \
+                ASSERT_EQUAL(false, N##_it_eq(end, it));                       \
+            }                                                                  \
+            N##_it_go_next(&it);                                               \
+        }                                                                      \
+        ASSERT_EQUAL(false, N##_it_valid(it));                                 \
+    }                                                                          \
+    {}
+
 #define TEST_TM(N)                                                             \
     {                                                                          \
         size_t n = 5;                                                          \
@@ -598,18 +620,30 @@ void tm_print(tm* tm) {
                     log("Unhandled digit %zu\n", digit);                       \
                     break;                                                     \
                 }                                                              \
-                ASSERT_EQUAL(tm.size, N##_size(&ds));                          \
                 tm_print(&tm);                                                 \
+                ASSERT_EQUAL(tm.size, N##_size(&ds));                          \
+                                                                               \
+                N ds_copy;                                                     \
+                N##_copy(&ds_copy, &ds);                                       \
+                                                                               \
                 for (size_t j = 0; j < tm.size; ++j) {                         \
                     int* value = tm_find(&tm, j);                              \
                     N##_it it = N##_find(&ds, j);                              \
+                    N##_it it_copy = N##_find(&ds_copy, j);                    \
                     if (!value) {                                              \
-                        ASSERT_EQUAL(N##_it_valid(it), false);                 \
+                        ASSERT_EQUAL(false, N##_it_valid(it));                 \
+                        ASSERT_EQUAL(false, N##_it_valid(it_copy));            \
                     } else {                                                   \
-                        ASSERT_EQUAL(N##_it_valid(it), true);                  \
+                        ASSERT_EQUAL(true, N##_it_valid(it));                  \
+                        ASSERT_EQUAL(true, N##_it_valid(it_copy));             \
                         ASSERT_EQUAL(*value, N##_it_data(it)->value);          \
+                        ASSERT_EQUAL(*value, N##_it_data(it_copy)->value);     \
                     }                                                          \
                 }                                                              \
+                                                                               \
+                TEST_BIDIRECTIONAL_PAIR_ITERATOR(N, tm, ds);                   \
+                                                                               \
+                N##_free(&ds_copy);                                            \
                 comb_copy /= m;                                                \
             }                                                                  \
             N##_free(&ds);                                                     \

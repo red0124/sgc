@@ -300,7 +300,7 @@ enum _sgc_map_color {
                                                                                \
     void N##_it_go_next(N##_it* i) {                                           \
         if (!i->next_) {                                                       \
-            i->valid_ = 0;                                                     \
+            i->valid_ = false;                                                 \
             return;                                                            \
         }                                                                      \
         i->curr_ = i->next_;                                                   \
@@ -314,22 +314,19 @@ enum _sgc_map_color {
             }                                                                  \
             if (i->next_->right_ != parent) {                                  \
                 i->next_ = parent;                                             \
+            } else {                                                           \
+                i->next_ = _SGC_MAP_LEAF;                                      \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_begin(N* m, N##_it* i) {                                       \
-        i->curr_ = _SGC_MAP_LEAF;                                              \
-        i->next_ = (m->root_) ? _p_##N##_node_begin(m->root_) : _SGC_MAP_LEAF; \
-        i->valid_ = 1;                                                         \
-        N##_it_go_next(i);                                                     \
-    }                                                                          \
-                                                                               \
-    void N##_it_cbegin(const N* const m, N##_it* i) {                          \
-        i->curr_ = _SGC_MAP_LEAF;                                              \
-        i->next_ = (m->root_) ? _p_##N##_node_begin(m->root_) : _SGC_MAP_LEAF; \
-        i->valid_ = 1;                                                         \
-        N##_it_go_next(i);                                                     \
+    N##_it N##_begin(N* m) {                                                   \
+        N##_it i;                                                              \
+        i.curr_ = _SGC_MAP_LEAF;                                               \
+        i.next_ = (m->root_) ? _p_##N##_node_begin(m->root_) : _SGC_MAP_LEAF;  \
+        i.valid_ = true;                                                       \
+        N##_it_go_next(&i);                                                    \
+        return i;                                                              \
     }                                                                          \
                                                                                \
     void N##_it_go_prev(N##_it* i) {                                           \
@@ -348,43 +345,17 @@ enum _sgc_map_color {
             }                                                                  \
             if (i->curr_->right_ != parent) {                                  \
                 i->curr_ = parent;                                             \
+            } else {                                                           \
+                i->curr_ = _SGC_MAP_LEAF;                                      \
             }                                                                  \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_end(N* m, N##_it* i) {                                         \
-        i->curr_ = (m->root_) ? _p_##N##_node_end(m->root_) : _SGC_MAP_LEAF;   \
-        i->next_ = _SGC_MAP_LEAF;                                              \
-        i->valid_ = (i->curr_) ? 1 : 0;                                        \
-    }                                                                          \
-                                                                               \
-    void N##_it_cend(const N* const m, N##_it* i) {                            \
-        i->curr_ = (m->root_) ? _p_##N##_node_end(m->root_) : _SGC_MAP_LEAF;   \
-        i->next_ = _SGC_MAP_LEAF;                                              \
-        i->valid_ = (i->curr_) ? 1 : 0;                                        \
-    }                                                                          \
-                                                                               \
-    N##_it N##_begin(N* m) {                                                   \
-        N##_it i;                                                              \
-        N##_it_begin(m, &i);                                                   \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cbegin(const N* const m) {                                      \
-        N##_it i;                                                              \
-        N##_it_cbegin(m, &i);                                                  \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
     N##_it N##_end(N* m) {                                                     \
         N##_it i;                                                              \
-        N##_it_end(m, &i);                                                     \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cend(const N* const m) {                                        \
-        N##_it i;                                                              \
-        N##_it_cend(m, &i);                                                    \
+        i.curr_ = (m->root_) ? _p_##N##_node_end(m->root_) : _SGC_MAP_LEAF;    \
+        i.next_ = _SGC_MAP_LEAF;                                               \
+        i.valid_ = (i.curr_) ? 1 : 0;                                          \
         return i;                                                              \
     }                                                                          \
                                                                                \
@@ -423,7 +394,7 @@ enum _sgc_map_color {
                 (struct _p_##N##_node**)sgc_malloc(                            \
                     _p_##N##_stack_size(src->size_));                          \
             if (!stack_src) {                                                  \
-                N##_free(dst);\
+                N##_free(dst);                                                 \
                 N##_init(dst);                                                 \
                 return;                                                        \
             }                                                                  \

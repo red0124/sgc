@@ -287,4 +287,5 @@
     _SGC_INIT_UNIQUE_MAP(K, V, N)                                              \
     _SGC_INIT_COMMON_DICT_PAIR_BST(K, V, N)                                    \
     _SGC_INIT_COMMON_RBTREE(K, N)                                              \
+    _SGC_INIT_IT_CBEGIN_CEND(N)                                              \
     _SGC_INIT_COMMON(N)

@@ -195,4 +195,5 @@
     _SGC_INIT_UNIQUE_SET(KV, N)                                                \
     _SGC_INIT_COMMON_DICT_NONE_PAIR_BST(KV, N)                                 \
     _SGC_INIT_COMMON_RBTREE(KV, N)                                             \
+    _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)

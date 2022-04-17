@@ -7,51 +7,37 @@
         if (i->curr_ && i->curr_->next_) {                                     \
             i->curr_ = i->curr_->next_;                                        \
         } else {                                                               \
-            struct _p_##N##_node* tmp = i->curr_;                              \
             ++i->curr_bucket_;                                                 \
-            i->valid_ = (i->curr_bucket_ != i->max_);                          \
+            if (i->curr_bucket_ == i->max_) {                                  \
+                i->valid_ = false;                                             \
+                return;                                                        \
+            }                                                                  \
             while (i->curr_bucket_ < i->max_) {                                \
                 i->curr_ = i->data_[i->curr_bucket_];                          \
                 if (i->curr_) {                                                \
-                    break;                                                     \
+                    return;                                                    \
                 }                                                              \
                 ++i->curr_bucket_;                                             \
             }                                                                  \
-            if (!i->curr_) {                                                   \
-                i->valid_ = 0;                                                 \
-                i->curr_ = tmp;                                                \
-            }                                                                  \
+            i->valid_ = false;                                                 \
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_it_begin(N* m, N##_it* i) {                                       \
-        if (m->data_) {                                                        \
-            i->data_ = m->data_;                                               \
-            i->curr_ = m->data_[0];                                            \
-            i->curr_bucket_ = 0;                                               \
-            i->max_ = m->max_;                                                 \
-            if (!i->curr_) {                                                   \
-                N##_it_go_next(i);                                             \
+    N##_it N##_begin(N* m) {                                                   \
+        N##_it i;                                                              \
+        if (m->size_ > 0) {                                                    \
+            i.data_ = m->data_;                                                \
+            i.curr_ = m->data_[0];                                             \
+            i.curr_bucket_ = 0;                                                \
+            i.max_ = m->max_;                                                  \
+            if (!i.curr_) {                                                    \
+                N##_it_go_next(&i);                                            \
             }                                                                  \
-            i->valid_ = 1;                                                     \
+            i.valid_ = true;                                                   \
         } else {                                                               \
-            *i = (N##_it){NULL, NULL, 0, 0, 0};                                \
+            i = (N##_it){NULL, NULL, 0, 0, 0};                                 \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_it_cbegin(const N* const m, N##_it* i) {                          \
-        if (m->data_) {                                                        \
-            i->data_ = m->data_;                                               \
-            i->curr_ = m->data_[0];                                            \
-            i->curr_bucket_ = 0;                                               \
-            i->max_ = m->max_;                                                 \
-            if (!i->curr_) {                                                   \
-                N##_it_go_next(i);                                             \
-            }                                                                  \
-            i->valid_ = 1;                                                     \
-        } else {                                                               \
-            *i = (N##_it){NULL, NULL, 0, 0, 0};                                \
-        }                                                                      \
+        return i;                                                              \
     }                                                                          \
                                                                                \
     void N##_it_go_prev(N##_it* i) {                                           \
@@ -64,77 +50,39 @@
             }                                                                  \
             i->curr_ = curr;                                                   \
         } else {                                                               \
-            struct _p_##N##_node* tmp = i->curr_;                              \
-            --i->curr_bucket_;                                                 \
-            while (1) {                                                        \
-                i->curr_ = i->data_[i->curr_bucket_];                          \
-                if (i->curr_) {                                                \
-                    break;                                                     \
+            do {                                                               \
+                if (i->curr_bucket_ == 0) {                                    \
+                    i->valid_ = false;                                         \
+                    return;                                                    \
                 }                                                              \
                 --i->curr_bucket_;                                             \
-            }                                                                  \
-            if (!i->curr_) {                                                   \
-                i->valid_ = 0;                                                 \
-                i->curr_ = tmp;                                                \
-            }                                                                  \
+                i->curr_ = i->data_[i->curr_bucket_];                          \
+                if (i->curr_) {                                                \
+                    while (i->curr_->next_) {                                  \
+                        i->curr_ = i->curr_->next_;                            \
+                    }                                                          \
+                    return;                                                    \
+                }                                                              \
+            } while (true);                                                    \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_it_end(N* m, N##_it* i) {                                         \
-        if (m->data_) {                                                        \
-            i->data_ = m->data_;                                               \
-            i->curr_ = m->data_[m->max_ - 1];                                  \
-            i->max_ = m->max_;                                                 \
-            i->curr_bucket_ = m->max_ - 1;                                     \
-            if (i->curr_) {                                                    \
-                i->curr_ = _p_##N##_bucket_end(i->curr_);                      \
-            } else {                                                           \
-                N##_it_go_prev(i);                                             \
-            }                                                                  \
-            i->valid_ = 1;                                                     \
-        } else {                                                               \
-            *i = (N##_it){NULL, NULL, 0, 0, 0};                                \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_it_cend(const N* const m, N##_it* i) {                            \
-        if (m->data_) {                                                        \
-            i->data_ = m->data_;                                               \
-            i->curr_ = m->data_[m->max_ - 1];                                  \
-            i->max_ = m->max_;                                                 \
-            i->curr_bucket_ = m->max_ - 1;                                     \
-            if (i->curr_) {                                                    \
-                i->curr_ = _p_##N##_bucket_end(i->curr_);                      \
-            } else {                                                           \
-                N##_it_go_prev(i);                                             \
-            }                                                                  \
-            i->valid_ = 1;                                                     \
-        } else {                                                               \
-            *i = (N##_it){NULL, NULL, 0, 0, 0};                                \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    N##_it N##_begin(N* m) {                                                   \
-        N##_it i;                                                              \
-        N##_it_begin(m, &i);                                                   \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cbegin(const N* const m) {                                      \
-        N##_it i;                                                              \
-        N##_it_cbegin(m, &i);                                                  \
-        return i;                                                              \
     }                                                                          \
                                                                                \
     N##_it N##_end(N* m) {                                                     \
         N##_it i;                                                              \
-        N##_it_end(m, &i);                                                     \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cend(const N* const m) {                                        \
-        N##_it i;                                                              \
-        N##_it_cend(m, &i);                                                    \
+        if (m->size_ > 0) {                                                    \
+            i.data_ = m->data_;                                                \
+            i.curr_ = m->data_[m->max_ - 1];                                   \
+            i.max_ = m->max_;                                                  \
+            i.curr_bucket_ = m->max_ - 1;                                      \
+            if (i.curr_) {                                                     \
+                i.curr_ = _p_##N##_bucket_end(i.curr_);                        \
+            } else {                                                           \
+                N##_it_go_prev(&i);                                            \
+            }                                                                  \
+            i.valid_ = 1;                                                      \
+        } else {                                                               \
+            i = (N##_it){NULL, NULL, 0, 0, 0};                                 \
+        }                                                                      \
         return i;                                                              \
     }                                                                          \
                                                                                \
