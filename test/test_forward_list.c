@@ -82,19 +82,12 @@ void list_pop_back(list* l) {
 }
 
 void list_it_go_prev(list_it* it) {
-    struct _p_list_node* curr = it->head_;
-    if (curr == it->curr_) {
-        it->curr_ = NULL;
-        return;
-    }
-    while (curr->next_ && curr->next_ != it->curr_) {
-        curr = curr->next_;
-    }
-    it->curr_ = curr;
+    (void)it;
+    return;
 }
 
 void test_list_insert_erase_combinations(void) {
-    TEST_INSERT_ERASE_COMBINATIONS_ARRAY(list);
+    TEST_INSERT_ERASE_COMBINATIONS_ARRAY(list, TEST_FORWARD_ITERATOR);
 }
 
 int main(void) {

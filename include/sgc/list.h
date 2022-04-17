@@ -180,22 +180,6 @@
                                                                                \
     void N##_it_go_prev(N##_it* i) {                                           \
         i->curr_ = i->curr_->prev_;                                            \
-    }                                                                          \
-                                                                               \
-    void N##_it_begin(N* l, N##_it* i) {                                       \
-        i->curr_ = l->head_;                                                   \
-    }                                                                          \
-                                                                               \
-    void N##_it_cbegin(const N* const l, N##_it* i) {                          \
-        i->curr_ = l->head_;                                                   \
-    }                                                                          \
-                                                                               \
-    void N##_it_end(N* l, N##_it* i) {                                         \
-        i->curr_ = l->tail_;                                                   \
-    }                                                                          \
-                                                                               \
-    void N##_it_cend(const N* const l, N##_it* i) {                            \
-        i->curr_ = l->tail_;                                                   \
     }
 
 #define SGC_INIT_LIST(T, N)                                                    \
@@ -203,4 +187,5 @@
     _SGC_INIT_PP_LIST(T, N)                                                    \
     _SGC_INIT_UNIQUE_LIST(T, N)                                                \
     _SGC_INIT_COMMON_LIST(T, N)                                                \
+    _SGC_INIT_IT_CBEGIN_CEND(N)                                             \
     _SGC_INIT_COMMON(N)

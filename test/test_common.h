@@ -158,8 +158,16 @@ void ta_sort(ta* ta) {
 #define TEST_FORWARD_ITERATOR(N, TA, DS)                                       \
     {                                                                          \
         N##_it it = N##_begin(&DS);                                            \
+        N##_it end = N##_end(&DS);                                             \
         for (size_t i = 0; i < TA.size; ++i) {                                 \
+            ASSERT_EQUAL(N##_it_valid(it), true);                              \
             ASSERT_EQUAL(TA.data[i], *N##_it_data(it));                        \
+            if (i == TA.size - 1) {                                            \
+                ASSERT_EQUAL(TA.data[i], *N##_it_data(end));                   \
+                ASSERT_EQUAL(N##_it_eq(end, it), true);                        \
+            } else {                                                           \
+                ASSERT_EQUAL(N##_it_eq(end, it), false);                       \
+            }                                                                  \
             N##_it_go_next(&it);                                               \
         }                                                                      \
         ASSERT_EQUAL(N##_it_valid(it), false);                                 \
@@ -167,22 +175,62 @@ void ta_sort(ta* ta) {
 
 #define TEST_BIDIRECTIONAL_ITERATOR(N, TA, DS)                                 \
     {                                                                          \
-        N##_it it = N##_begin(&DS);                                            \
-        for (size_t i = 0; i < TA.size; ++i) {                                 \
-            ASSERT_EQUAL(TA.data[i], *N##_it_data(it));                        \
-            N##_it_go_next(&it);                                               \
-        }                                                                      \
-        ASSERT_EQUAL(N##_it_valid(it), false);                                 \
-                                                                               \
-        it = N##_end(&ds);                                                     \
-        for (int j = ta.size - 1; j >= 0; --j) {                               \
-            ASSERT_EQUAL(ta.data[j], *N##_it_data(it));                        \
+        TEST_FORWARD_ITERATOR(N, TA, DS)                                       \
+        N##_it it = N##_end(&DS);                                              \
+        N##_it begin = N##_begin(&DS);                                         \
+        for (size_t i = TA.size; i > 0; --i) {                                 \
+            ASSERT_EQUAL(N##_it_valid(it), true);                              \
+            ASSERT_EQUAL(TA.data[i - 1], *N##_it_data(it));                    \
+            if (i == 1) {                                                      \
+                ASSERT_EQUAL(TA.data[i - 1], *N##_it_data(begin));             \
+                ASSERT_EQUAL(N##_it_eq(begin, it), true);                      \
+            } else {                                                           \
+                ASSERT_EQUAL(N##_it_eq(begin, it), false);                     \
+            }                                                                  \
             N##_it_go_prev(&it);                                               \
         }                                                                      \
         ASSERT_EQUAL(N##_it_valid(it), false);                                 \
     }
 
-#define TEST_INSERT_ERASE_COMBINATIONS_ARRAY(N)                                \
+#define TEST_RANDOM_ACCESS_ITERATOR(N, TA, DS)                                 \
+    {                                                                          \
+        TEST_BIDIRECTIONAL_ITERATOR(N, TA, DS)                                 \
+        N##_it it = N##_begin(&DS);                                            \
+        for (size_t i = 0; i < TA.size; ++i) {                                 \
+            N##_it curr_it = N##_from(&DS, i);                                 \
+            ASSERT_EQUAL(true, N##_it_eq(it, curr_it));                        \
+            ASSERT_EQUAL(true, N##_it_valid(it));                              \
+            ASSERT_EQUAL(true, N##_it_valid(curr_it));                         \
+            ASSERT_EQUAL(TA.data[i], *N##_it_data(it));                        \
+            ASSERT_EQUAL(TA.data[i], *N##_it_data(curr_it));                   \
+            ASSERT_EQUAL(0, N##_it_diff(it, curr_it));                         \
+            ASSERT_EQUAL(-i, N##_it_diff(it, N##_begin(&DS)));                 \
+            ASSERT_EQUAL(i, N##_it_diff(N##_begin(&DS), it));                  \
+            ASSERT_EQUAL(TA.size - i - 1, N##_it_diff(it, N##_end(&DS)));      \
+            ASSERT_EQUAL(i + 1 - TA.size, N##_it_diff(N##_end(&DS), it));      \
+            N##_it_move(&it, 1);                                               \
+        }                                                                      \
+        ASSERT_EQUAL(false, N##_it_valid(it));                                 \
+                                                                               \
+        it = N##_end(&DS);                                                     \
+        for (size_t i = TA.size; i > 0; --i) {                                 \
+            N##_it curr_it = N##_from(&DS, i - 1);                             \
+            ASSERT_EQUAL(true, N##_it_eq(it, curr_it));                        \
+            ASSERT_EQUAL(true, N##_it_valid(it));                              \
+            ASSERT_EQUAL(true, N##_it_valid(curr_it));                         \
+            ASSERT_EQUAL(TA.data[i - 1], *N##_it_data(it));                    \
+            ASSERT_EQUAL(TA.data[i - 1], *N##_it_data(curr_it));               \
+            ASSERT_EQUAL(0, N##_it_diff(it, curr_it));                         \
+            ASSERT_EQUAL(1 - i, N##_it_diff(it, N##_begin(&DS)));              \
+            ASSERT_EQUAL(i - 1, N##_it_diff(N##_begin(&DS), it));              \
+            ASSERT_EQUAL(TA.size - i, N##_it_diff(it, N##_end(&DS)));          \
+            ASSERT_EQUAL(i - TA.size, N##_it_diff(N##_end(&DS), it));          \
+            N##_it_move(&it, -1);                                              \
+        }                                                                      \
+        ASSERT_EQUAL(false, N##_it_valid(it));                                 \
+    }
+
+#define TEST_INSERT_ERASE_COMBINATIONS_ARRAY(N, TEST_ITERATOR)                 \
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 21;                                                         \
@@ -323,21 +371,12 @@ void ta_sort(ta* ta) {
                 ASSERT_EQUAL(ta.size, N##_size(&ds));                          \
                 ASSERT_EQUAL(ta.size, N##_size(&ds_copy));                     \
                                                                                \
-                N##_it it = N##_begin(&ds);                                    \
                 for (size_t j = 0; j < ta.size; ++j) {                         \
                     ASSERT_EQUAL(ta.data[j], *N##_at(&ds, j));                 \
                     ASSERT_EQUAL(ta.data[j], *N##_at(&ds_copy, j));            \
-                    ASSERT_EQUAL(ta.data[j], *N##_it_data(it));                \
-                    N##_it_go_next(&it);                                       \
                 }                                                              \
-                ASSERT_EQUAL(N##_it_valid(it), false);                         \
                                                                                \
-                it = N##_end(&ds);                                             \
-                for (int j = ta.size - 1; j >= 0; --j) {                       \
-                    ASSERT_EQUAL(ta.data[j], *N##_it_data(it));                \
-                    N##_it_go_prev(&it);                                       \
-                }                                                              \
-                ASSERT_EQUAL(N##_it_valid(it), false);                         \
+                TEST_ITERATOR(N, ta, ds)                                       \
                                                                                \
                 comb_copy /= m;                                                \
             }                                                                  \

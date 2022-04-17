@@ -10,7 +10,7 @@ void vector_pop_front(vector* v) {
 }
 
 void test_fs_vector_insert_erase_combinations(void) {
-    TEST_INSERT_ERASE_COMBINATIONS_ARRAY(vector);
+    TEST_INSERT_ERASE_COMBINATIONS_ARRAY(vector, TEST_RANDOM_ACCESS_ITERATOR);
 }
 
 int main(void) {

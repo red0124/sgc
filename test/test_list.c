@@ -76,7 +76,7 @@ void list_erase(list* l, int at) {
 }
 
 void test_list_insert_erase_combinations(void) {
-    TEST_INSERT_ERASE_COMBINATIONS_ARRAY(list);
+    TEST_INSERT_ERASE_COMBINATIONS_ARRAY(list, TEST_BIDIRECTIONAL_ITERATOR);
 }
 
 int main(void) {

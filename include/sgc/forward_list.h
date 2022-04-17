@@ -47,7 +47,6 @@
                                                                                \
     struct N##_it {                                                            \
         struct _p_##N##_node* curr_;                                           \
-        struct _p_##N##_node* head_;                                           \
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
@@ -148,26 +147,6 @@
                 l->tail_ = NULL;                                               \
             }                                                                  \
         }                                                                      \
-    }                                                                          \
-                                                                               \
-    void N##_it_begin(N* l, N##_it* i) {                                       \
-        i->curr_ = l->head_;                                                   \
-        i->head_ = l->head_;                                                   \
-    }                                                                          \
-                                                                               \
-    void N##_it_cbegin(const N* const l, N##_it* i) {                          \
-        i->curr_ = l->head_;                                                   \
-        i->head_ = l->head_;                                                   \
-    }                                                                          \
-                                                                               \
-    void N##_it_end(N* l, N##_it* i) {                                         \
-        i->curr_ = l->tail_;                                                   \
-        i->head_ = l->head_;                                                   \
-    }                                                                          \
-                                                                               \
-    void N##_it_cend(const N* const l, N##_it* i) {                            \
-        i->curr_ = l->tail_;                                                   \
-        i->head_ = l->head_;                                                   \
     }
 
 #define SGC_INIT_FORWARD_LIST(T, N)                                            \
@@ -175,4 +154,5 @@
     _SGC_INIT_PP_FORWARD_LIST(T, N)                                            \
     _SGC_INIT_UNIQUE_FORWARD_LIST(T, N)                                        \
     _SGC_INIT_COMMON_LIST(T, N)                                                \
+    _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)

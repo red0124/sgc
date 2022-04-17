@@ -74,25 +74,13 @@
                                                                                \
     N##_it N##_end(N* l) {                                                     \
         N##_it i;                                                              \
-        N##_it_end(l, &i);                                                     \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cend(const N* const l) {                                        \
-        N##_it i;                                                              \
-        N##_it_cend(l, &i);                                                    \
+        i.curr_ = l->tail_;                                                    \
         return i;                                                              \
     }                                                                          \
                                                                                \
     N##_it N##_begin(N* l) {                                                   \
         N##_it i;                                                              \
-        N##_it_begin(l, &i);                                                   \
-        return i;                                                              \
-    }                                                                          \
-                                                                               \
-    N##_it N##_cbegin(const N* const l) {                                      \
-        N##_it i;                                                              \
-        N##_it_cbegin(l, &i);                                                  \
+        i.curr_ = l->head_;                                                    \
         return i;                                                              \
     }                                                                          \
                                                                                \
@@ -104,5 +92,5 @@
             T##_free(&curr->data_);                                            \
             sgc_free(curr);                                                    \
             curr = next;                                                       \
-        }                                                                      \
+        }\
     }
