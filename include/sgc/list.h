@@ -12,7 +12,7 @@
     static struct _p_##N##_node* _p_##N##_node_alloc();                        \
     static void _p_##N##_free_nodes(struct _p_##N##_node* n);
 
-// TODO add iterator insert/erase, add sort
+/* TODO add iterator insert/erase, add sort */
 #define SGC_INIT_HEADERS_LIST(T, N)                                            \
                                                                                \
     struct _p_##N##_node {                                                     \

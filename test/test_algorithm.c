@@ -8,6 +8,7 @@
 #include <sgc/set.h>
 #include <sgc/vector.h>
 
+/* TODO add more algorithm test cases and use different data structures */
 #define TEST_ELEMENTS_NUM 50
 
 SGC_INIT_HEADERS(VECTOR, int, hvector, ITERATE, FIND)
@@ -137,27 +138,52 @@ int compare_reverse(const void* const first, const void* const second) {
     return *(int*)second - *(int*)first;
 }
 
-void test_sort(void) {
+void test_vector_sort(void) {
     vector v;
     vector_init(&v);
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         vector_push_back(&v, i % TEST_ELEMENTS_NUM / 4);
-    }
 
-    vector_sort(&v, NULL);
+        vector_sort_default(&v);
+        for (size_t j = 1; j < vector_size(&v); ++j) {
+            TEST_ASSERT_EQUAL_INT(1,
+                                  *vector_at(&v, j - 1) <= *vector_at(&v, j));
+        }
 
-    for (size_t i = 1; i < TEST_ELEMENTS_NUM; ++i) {
-        TEST_ASSERT_EQUAL_INT(1, *vector_at(&v, i - 1) <= *vector_at(&v, i));
-    }
+        vector_sort(&v, compare_reverse);
 
-    vector_sort(&v, compare_reverse);
-
-    for (size_t i = 1; i < TEST_ELEMENTS_NUM; ++i) {
-        TEST_ASSERT_EQUAL_INT(1, *vector_at(&v, i) <= *vector_at(&v, i - 1));
+        for (size_t j = 1; j < vector_size(&v); ++j) {
+            TEST_ASSERT_EQUAL_INT(1,
+                                  *vector_at(&v, j) <= *vector_at(&v, j - 1));
+        }
     }
 
     vector_free(&v);
+}
+
+SGC_INIT_QSORT(int, deque)
+
+void test_deque_sort(void) {
+    deque d;
+    deque_init(&d);
+
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        deque_push_back(&d, i % TEST_ELEMENTS_NUM / 4);
+
+        deque_sort_default(&d);
+        for (size_t j = 1; j < deque_size(&d); ++j) {
+            TEST_ASSERT_EQUAL_INT(1, *deque_at(&d, j - 1) <= *deque_at(&d, j));
+        }
+
+        deque_sort(&d, compare_reverse);
+
+        for (size_t j = 1; j < deque_size(&d); ++j) {
+            TEST_ASSERT_EQUAL_INT(1, *deque_at(&d, j) <= *deque_at(&d, j - 1));
+        }
+    }
+
+    deque_free(&d);
 }
 
 SGC_INIT_DICT(MAP, int, int, map, ITERATE)
@@ -248,6 +274,82 @@ void test_for_each_reverse(void) {
     vector_free(&v);
 }
 
+void test_eq(void) {
+    vector v;
+    vector_init(&v);
+
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        vector_push_back(&v, i);
+
+        vector v_copy;
+        vector_copy(&v_copy, &v);
+
+        TEST_ASSERT_TRUE(vector_eq(&v, &v_copy));
+
+        vector_free(&v_copy);
+    }
+
+    vector_free(&v);
+}
+
+void test_count(void) {
+    vector v;
+    vector_init(&v);
+
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        vector_push_back(&v, i);
+
+        for (size_t j = 0; j <= i; ++j) {
+            ASSERT_EQUAL(1, vector_count(&v, j));
+        }
+    }
+
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        vector_push_back(&v, i);
+        for (size_t j = 0; j <= i; ++j) {
+            ASSERT_EQUAL(2, vector_count(&v, j));
+        }
+        for (size_t j = i + 1; j < TEST_ELEMENTS_NUM; ++j) {
+            ASSERT_EQUAL(1, vector_count(&v, j));
+        }
+    }
+
+    vector_free(&v);
+}
+
+SGC_INIT_COMPARE(int, vector)
+
+void test_compare(void) {
+    vector v;
+    vector_init(&v);
+
+    for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
+        vector_push_back(&v, i);
+
+        vector v_copy;
+        vector_copy(&v_copy, &v);
+
+        ASSERT_EQUAL(0, vector_compare(&v, &v_copy));
+
+        *vector_at(&v_copy, 0) = -1;
+        ASSERT_EQUAL(1, vector_compare(&v, &v_copy));
+
+        *vector_at(&v_copy, 0) = 1;
+        ASSERT_EQUAL(-1, vector_compare(&v, &v_copy));
+
+        *vector_at(&v_copy, 0) = 0;
+
+        vector_push_back(&v_copy, 0);
+        ASSERT_EQUAL(-1, vector_compare(&v, &v_copy));
+
+        vector_pop_back(&v_copy);
+        vector_pop_back(&v_copy);
+        ASSERT_EQUAL(1, vector_compare(&v, &v_copy));
+    }
+
+    vector_free(&v);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -255,11 +357,15 @@ int main(void) {
     RUN_TEST(test_foreach);
     RUN_TEST(test_find);
     RUN_TEST(test_binary_find);
-    RUN_TEST(test_sort);
+    RUN_TEST(test_vector_sort);
+    RUN_TEST(test_deque_sort);
     RUN_TEST(test_accumulate_map);
     RUN_TEST(test_foreach_map);
     RUN_TEST(test_for_each);
     RUN_TEST(test_for_each_reverse);
+    RUN_TEST(test_eq);
+    RUN_TEST(test_count);
+    RUN_TEST(test_compare);
 
     return UNITY_END();
 }

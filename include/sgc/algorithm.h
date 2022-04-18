@@ -70,9 +70,9 @@
     SGC_INIT_HEADERS_BINARY_FIND(T, N)                                         \
     N##_it N##_binary_find_it(const N* const ds, const N##_type el) {          \
         if (!N##_empty(ds)) {                                                  \
-            int l = 0;                                                   \
-            int r = N##_size(ds) - 1;                                    \
-            int m;                                                       \
+            int l = 0;                                                         \
+            int r = N##_size(ds) - 1;                                          \
+            int m;                                                             \
             while (l <= r) {                                                   \
                 m = l + (r - l) / 2;                                           \
                 N##_type* curr = N##_at((N*)ds, m);                            \
@@ -126,7 +126,6 @@
     bool N##_eq(const N* const ds1, const N* const ds2);                       \
     size_t N##_count(const N* const ds, const N##_type el);
 
-// IMPLEMENTATION (TODO test)
 #define SGC_INIT_EQ(T, N)                                                      \
     SGC_INIT_HEADERS_EQ(T, N)                                                  \
     bool N##_eq(const N* const ds1, const N* const ds2) {                      \
@@ -173,5 +172,5 @@
         if (N##_size(ds1) == N##_size(ds2)) {                                  \
             return 0;                                                          \
         }                                                                      \
-        return (N##_size(ds1) > N##_size(ds2)) ? -1 : 1;                       \
+        return (N##_size(ds1) > N##_size(ds2)) ? 1 : -1;                       \
     }
