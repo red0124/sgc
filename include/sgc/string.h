@@ -12,9 +12,9 @@
     void N##_copy(N* first, const N* const second);                            \
     void N##_init(N* s);                                                       \
     void N##_free(N* s);                                                       \
-    size_t N##_size(N* s);                                                     \
+    size_t N##_size(const N* const s);                                         \
     bool N##_eq(const N* const first, const N* const second);                  \
-    bool N##_compare(const N* const first, const N* const second);             \
+    int N##_compare(const N* const first, const N* const second);              \
     int N##_void_compare(const void* const first, const void* const second);   \
     size_t N##_hash(const N* const s);                                         \
     N##_type* N##_array(N*);
@@ -39,7 +39,7 @@
         sgc_free(*s);                                                          \
     }                                                                          \
                                                                                \
-    size_t N##_size(N* s) {                                                    \
+    size_t N##_size(const N* const s) {                                        \
         return strlen(*s);                                                     \
     }                                                                          \
                                                                                \
@@ -50,18 +50,18 @@
         return false;                                                          \
     }                                                                          \
                                                                                \
-    bool N##_compare(const N* const first, const N* const second) {            \
+    int N##_compare(const N* const first, const N* const second) {             \
         if (first && second && *first && *second) {                            \
             return strcmp(*first, *second);                                    \
         }                                                                      \
-        return false;                                                          \
+        return 0;                                                              \
     }                                                                          \
                                                                                \
     int N##_void_compare(const void* const first, const void* const second) {  \
         if (first && second && *(N*)first && *(N*)second) {                    \
             return strcmp(*(N*)first, *(N*)second);                            \
         }                                                                      \
-        return -1;                                                             \
+        return 0;                                                              \
     }                                                                          \
                                                                                \
     size_t N##_hash(const N* const s) {                                        \
