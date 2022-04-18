@@ -26,8 +26,8 @@ void test_string_copy_eq_compare(void) {
 
     string_sort_default(&s);
     ASSERT_EQUAL(false, string_eq(&msg, &s));
-    TEST_ASSERT_GREATER_THAN(1, string_compare(&msg, &s));
-    TEST_ASSERT_LESS_THAN(-1, string_compare(&s, &msg));
+    TEST_ASSERT_GREATER_THAN(0, string_compare(&msg, &s));
+    TEST_ASSERT_LESS_THAN(0, string_compare(&s, &msg));
 
     string sorted_msg = "ehllo";
     ASSERT_EQUAL(true, string_eq(&sorted_msg, &s));
