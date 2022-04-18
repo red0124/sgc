@@ -643,6 +643,7 @@ void tm_print(tm* tm) {
                                                                                \
                 N ds_copy;                                                     \
                 N##_copy(&ds_copy, &ds);                                       \
+                ASSERT_EQUAL(N##_size(&ds_copy), N##_size(&ds));               \
                                                                                \
                 for (size_t j = 0; j < tm.size; ++j) {                         \
                     int* value = tm_find(&tm, j);                              \
@@ -746,6 +747,44 @@ void ts_print(ts* ts) {
     log("\n");
 }
 
+#define TEST_BIDIRECTIONAL_SET_ITERATOR(N, TM, DS)                             \
+    {                                                                          \
+        N##_it it = N##_begin(&DS);                                            \
+        N##_it end = N##_end(&DS);                                             \
+        for (size_t i = 0; i < TM.size; ++i) {                                 \
+            ASSERT_EQUAL(true, N##_it_valid(it));                              \
+            int* key_value = N##_it_data(it);                                  \
+            TEST_ASSERT_NOT_EQUAL(NULL, key_value);                            \
+            int* value = ts_find(&TM, *key_value);                             \
+            TEST_ASSERT_NOT_EQUAL(NULL, value);                                \
+            if (i == TM.size - 1) {                                            \
+                ASSERT_EQUAL(true, N##_it_eq(end, it));                        \
+            } else {                                                           \
+                ASSERT_EQUAL(false, N##_it_eq(end, it));                       \
+            }                                                                  \
+            N##_it_go_next(&it);                                               \
+        }                                                                      \
+        ASSERT_EQUAL(false, N##_it_valid(it));                                 \
+    }                                                                          \
+    {                                                                          \
+        N##_it it = N##_end(&DS);                                              \
+        N##_it begin = N##_begin(&DS);                                         \
+        for (size_t i = TM.size; i > 0; --i) {                                 \
+            ASSERT_EQUAL(true, N##_it_valid(it));                              \
+            int* key_value = N##_it_data(it);                                  \
+            TEST_ASSERT_NOT_EQUAL(NULL, key_value);                            \
+            int* value = ts_find(&TM, *key_value);                             \
+            TEST_ASSERT_NOT_EQUAL(NULL, value);                                \
+            if (i == 1) {                                                      \
+                ASSERT_EQUAL(true, N##_it_eq(begin, it));                      \
+            } else {                                                           \
+                ASSERT_EQUAL(false, N##_it_eq(begin, it));                     \
+            }                                                                  \
+            N##_it_go_prev(&it);                                               \
+        }                                                                      \
+        ASSERT_EQUAL(false, N##_it_valid(it));                                 \
+    }
+
 #define TEST_TS(N)                                                             \
     {                                                                          \
         size_t n = 5;                                                          \
@@ -816,16 +855,30 @@ void ts_print(ts* ts) {
                 }                                                              \
                 ASSERT_EQUAL(ts.size, N##_size(&ds));                          \
                 ts_print(&ts);                                                 \
+                                                                               \
+                N ds_copy;                                                     \
+                N##_copy(&ds_copy, &ds);                                       \
+                ASSERT_EQUAL(N##_size(&ds_copy), N##_size(&ds));               \
+                                                                               \
                 for (size_t j = 0; j < ts.size; ++j) {                         \
                     int* value = ts_find(&ts, j);                              \
                     N##_it it = N##_find(&ds, j);                              \
+                    N##_it it_copy = N##_find(&ds_copy, j);                    \
                     if (!value) {                                              \
                         ASSERT_EQUAL(N##_it_valid(it), false);                 \
+                        ASSERT_EQUAL(N##_it_valid(it_copy), false);            \
                     } else {                                                   \
                         ASSERT_EQUAL(N##_it_valid(it), true);                  \
+                        ASSERT_EQUAL(N##_it_valid(it_copy), true);             \
                         ASSERT_EQUAL(*value, *N##_it_data(it));                \
+                        ASSERT_EQUAL(*value, *N##_it_data(it_copy));           \
                     }                                                          \
                 }                                                              \
+                                                                               \
+                TEST_BIDIRECTIONAL_SET_ITERATOR(N, ts, ds);                    \
+                                                                               \
+                N##_free(&ds_copy);                                            \
+                                                                               \
                 comb_copy /= m;                                                \
             }                                                                  \
             N##_free(&ds);                                                     \
@@ -838,7 +891,7 @@ void ts_print(ts* ts) {
 
 #define TEST_TSTK(N)                                                           \
     {                                                                          \
-        size_t n = 12;                                                         \
+        size_t n = 13;                                                         \
         size_t m = 3;                                                          \
         size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
@@ -873,11 +926,19 @@ void ts_print(ts* ts) {
                 }                                                              \
                 ta_print(&ta);                                                 \
                 ASSERT_EQUAL(ta.size, N##_size(&ds));                          \
+                                                                               \
+                N ds_copy;                                                     \
+                N##_copy(&ds_copy, &ds);                                       \
+                ASSERT_EQUAL(N##_size(&ds_copy), N##_size(&ds));               \
+                                                                               \
                 if (ta.size > 0) {                                             \
                     ASSERT_NOT_EQUAL(N##_top(&ds), NULL);                      \
+                    ASSERT_NOT_EQUAL(N##_top(&ds_copy), NULL);                 \
                     ASSERT_EQUAL(ta.data[ta.size - 1], *N##_top(&ds));         \
+                    ASSERT_EQUAL(ta.data[ta.size - 1], *N##_top(&ds_copy));    \
                 }                                                              \
                                                                                \
+                N##_free(&ds_copy);                                            \
                 comb_copy /= m;                                                \
             }                                                                  \
             N##_free(&ds);                                                     \
@@ -932,13 +993,23 @@ void ts_print(ts* ts) {
                 }                                                              \
                 ASSERT_EQUAL(ta.size, N##_size(&ds));                          \
                 ta_print(&ta);                                                 \
+                                                                               \
+                N ds_copy;                                                     \
+                N##_copy(&ds_copy, &ds);                                       \
+                ASSERT_EQUAL(ta.size, N##_size(&ds_copy));                     \
+                                                                               \
                 if (ta.size > 0) {                                             \
                     ASSERT_NOT_EQUAL(N##_back(&ds), NULL);                     \
+                    ASSERT_NOT_EQUAL(N##_back(&ds_copy), NULL);                \
                     ASSERT_EQUAL(ta.data[ta.size - 1], *N##_back(&ds));        \
+                    ASSERT_EQUAL(ta.data[ta.size - 1], *N##_back(&ds_copy));   \
                     ASSERT_NOT_EQUAL(N##_front(&ds), NULL);                    \
+                    ASSERT_NOT_EQUAL(N##_front(&ds_copy), NULL);               \
                     ASSERT_EQUAL(ta.data[0], *N##_front(&ds));                 \
+                    ASSERT_EQUAL(ta.data[0], *N##_front(&ds_copy));            \
                 }                                                              \
                                                                                \
+                N##_free(&ds_copy);                                            \
                 comb_copy /= m;                                                \
             }                                                                  \
             N##_free(&ds);                                                     \
@@ -1011,11 +1082,19 @@ void ts_print(ts* ts) {
                 }                                                              \
                 ASSERT_EQUAL(ta.size, N##_size(&ds));                          \
                 ta_print(&ta);                                                 \
+                                                                               \
+                N ds_copy;                                                     \
+                N##_copy(&ds_copy, &ds);                                       \
+                ASSERT_EQUAL(ta.size, N##_size(&ds_copy));                     \
+                                                                               \
                 if (ta.size > 0) {                                             \
                     ASSERT_NOT_EQUAL(N##_top(&ds), NULL);                      \
+                    ASSERT_NOT_EQUAL(N##_top(&ds_copy), NULL);                 \
                     ASSERT_EQUAL(ta.data[0], *N##_top(&ds));                   \
+                    ASSERT_EQUAL(ta.data[0], *N##_top(&ds_copy));              \
                 }                                                              \
                                                                                \
+                N##_free(&ds_copy);                                            \
                 comb_copy /= m;                                                \
             }                                                                  \
             N##_free(&ds);                                                     \
