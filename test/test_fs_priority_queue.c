@@ -7,13 +7,13 @@
 SGC_INIT_FS_PRIORITY_QUEUE(int, PQUEUE_MAX, pqueue)
 
 void test_fs_pqueue_push_pop_combinations(void) {
-    TEST_TPQ(pqueue);
+    TEST_INSERT_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE(pqueue);
 }
 
 SGC_INIT_FS_PRIORITY_QUEUE(oint, PQUEUE_MAX, opqueue)
 
 void test_fs_pqueue_push_pop_combinations_observed(void) {
-    TEST_TPQ(opqueue);
+    TEST_INSERT_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE(opqueue);
     TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
     ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
 }

@@ -6,13 +6,13 @@
 SGC_INIT_FS_STACK(int, STACK_MAX, stack)
 
 void test_stack_push_pop_combinations(void) {
-    TEST_TSTK(stack);
+    TEST_PUSH_POP_COMBINATIONS_STACK(stack);
 }
 
 SGC_INIT_FS_STACK(oint, STACK_MAX, ostack)
 
 void test_stack_push_pop_combinations_observed(void) {
-    TEST_TSTK(ostack);
+    TEST_PUSH_POP_COMBINATIONS_STACK(ostack);
     TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
     ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
 }

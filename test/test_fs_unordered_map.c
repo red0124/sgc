@@ -6,13 +6,13 @@
 SGC_INIT_FS_UNORDERED_MAP(int, int, MAP_MAX, map)
 
 void test_fs_unordered_map_insert_erase_combinations(void) {
-    TEST_TM(map);
+    TEST_INSERT_ERASE_COMBINATIONS_MAP(map);
 }
 
 SGC_INIT_FS_UNORDERED_MAP(oint, oint, MAP_MAX, omap)
 
 void test_fs_unordered_map_insert_erase_combinations_observed(void) {
-    TEST_TM(omap);
+    TEST_INSERT_ERASE_COMBINATIONS_MAP(omap);
     TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
     ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
 }
@@ -20,7 +20,7 @@ void test_fs_unordered_map_insert_erase_combinations_observed(void) {
 SGC_INIT_FS_UNORDERED_MAP(oint, int, MAP_MAX, oint_int_map)
 
 void test_fs_unordered_map_insert_erase_combinations_observed_key(void) {
-    TEST_TM(oint_int_map);
+    TEST_INSERT_ERASE_COMBINATIONS_MAP(oint_int_map);
     TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
     ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
 }
@@ -28,7 +28,7 @@ void test_fs_unordered_map_insert_erase_combinations_observed_key(void) {
 SGC_INIT_FS_UNORDERED_MAP(int, oint, MAP_MAX, int_oint_map)
 
 void test_fs_unordered_map_insert_erase_combinations_observed_value(void) {
-    TEST_TM(int_oint_map);
+    TEST_INSERT_ERASE_COMBINATIONS_MAP(int_oint_map);
     TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
     ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
 }

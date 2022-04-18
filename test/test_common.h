@@ -93,57 +93,6 @@ static inline size_t oint_hash(const oint* const o) {
 }
 
 /* ========================= */
-// Allocated element
-/* ========================= */
-
-struct alocated_element {
-    int* el;
-};
-
-typedef struct alocated_element al;
-
-size_t allocation_count = 0;
-
-static inline void al_copy(al* dst, const al* const src) {
-    if (src->el) {
-        dst->el = (int*)malloc(sizeof(int));
-        *dst->el = *src->el;
-    } else {
-        dst->el = NULL;
-    }
-    ++allocation_count;
-}
-
-static inline al al_new(int el) {
-    al e;
-    e.el = malloc(sizeof(int));
-    *e.el = el;
-    ++allocation_count;
-    return e;
-}
-
-static inline void al_free(al* a) {
-    --allocation_count;
-    free(a->el);
-}
-
-static inline int al_eq(const al* const first, const al* const second) {
-    return *first->el == *second->el;
-}
-
-static inline int al_compare(const al* const first, const al* const second) {
-    return *first->el - *second->el;
-}
-
-static inline void al_init(al* a) {
-    a->el = NULL;
-}
-
-static inline size_t al_hash(const al* const a) {
-    return *a->el;
-}
-
-/* ========================= */
 // Test Array Int
 /* ========================= */
 
@@ -560,7 +509,7 @@ void tm_print(tm* tm) {
         ASSERT_EQUAL(false, N##_it_valid(it));                                 \
     }
 
-#define TEST_TM(N)                                                             \
+#define TEST_INSERT_ERASE_COMBINATIONS_MAP(N)                                  \
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 12;                                                         \
@@ -785,7 +734,7 @@ void ts_print(ts* ts) {
         ASSERT_EQUAL(false, N##_it_valid(it));                                 \
     }
 
-#define TEST_TS(N)                                                             \
+#define TEST_INSERT_ERASE_COMBINATIONS_SET(N)                                  \
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 10;                                                         \
@@ -889,7 +838,7 @@ void ts_print(ts* ts) {
 // Test Stack
 /* ========================= */
 
-#define TEST_TSTK(N)                                                           \
+#define TEST_PUSH_POP_COMBINATIONS_STACK(N)                                    \
     {                                                                          \
         size_t n = 13;                                                         \
         size_t m = 3;                                                          \
@@ -949,7 +898,7 @@ void ts_print(ts* ts) {
 // Test Queue
 /* ========================= */
 
-#define TEST_TQ(N)                                                             \
+#define TEST_INSERT_PUSH_POP_COMBINATIONS_QUEUE(N)                             \
     {                                                                          \
         size_t n = 10;                                                         \
         size_t m = 4;                                                          \
@@ -1020,7 +969,7 @@ void ts_print(ts* ts) {
 // Test Priority Queue
 /* ========================= */
 
-#define TEST_TPQ(N)                                                            \
+#define TEST_INSERT_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE(N)                    \
     {                                                                          \
         size_t n = 7;                                                          \
         size_t m = 7;                                                          \
