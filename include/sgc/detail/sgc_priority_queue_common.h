@@ -27,7 +27,9 @@
     }                                                                          \
                                                                                \
     void N##_push(N* p, T el) {                                                \
-        _p_##N##_resize(p);                                                    \
+        if (!_p_##N##_resize(p)) {                                             \
+            return;                                                            \
+        }                                                                      \
         _SGC_COPY(T, p->data_[p->size_], el, p->sharing_);                     \
         _p_##N##_fix_insert(p);                                                \
         ++p->size_;                                                            \

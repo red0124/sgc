@@ -16,7 +16,7 @@ tests = [
   ['UNORDERED_SET', 'unordered_set'],
   ['VECTOR', 'vector'],
   ['FS_DEQUE', 'fs_deque'],
-  ['FS_PRIORITY QUEUE', 'fs_priority_queue'],
+  ['FS_PRIORITY_QUEUE', 'fs_priority_queue'],
   ['FS_QUEUE', 'fs_queue'],
   ['FS_STACK', 'fs_stack'],
   ['FS_UNORDERED_MAP', 'fs_unordered_map'],

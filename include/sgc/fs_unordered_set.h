@@ -2,8 +2,8 @@
 
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_common.h"
-#include "detail/sgc_fs_hash_map_common.h"
 #include "detail/sgc_error_handlers.h"
+#include "detail/sgc_fs_hash_map_common.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
@@ -76,7 +76,7 @@
     void N##_insert(N* u, const KV v) {                                        \
         size_t hash = KV##_hash(&v);                                           \
         struct N##_it i = _p_##N##_find_by_hash(u, &v, hash);                  \
-        if (!i.valid_ && u->size_ < S - 1) {                                   \
+        if (!i.valid_ && u->size_ < S) {                                       \
             size_t position = hash % S;                                        \
             while (u->data_[position].state_ == _SGC_NODE_STATE_USED) {        \
                 if (position == S - 1) {                                       \

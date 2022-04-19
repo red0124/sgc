@@ -49,6 +49,14 @@ size_t power(size_t base, size_t exp) {
     return x;
 }
 
+// used to supress out of array bounds warning
+size_t _0 = 0;
+size_t _1 = 1;
+size_t _2 = 2;
+size_t _3 = 3;
+size_t _4 = 4;
+size_t _5 = 5;
+
 /* ========================= */
 // Observed int
 /* ========================= */
@@ -111,7 +119,11 @@ ta ta_new(void) {
     return ta;
 }
 
-void ta_insert(ta* ta, size_t at, int el) {
+void ta_insert(ta* ta, size_t at, int el, size_t max) {
+    if (ta->size == max) {
+        return;
+    }
+
     if (at >= TA_MAX || ta->size == TA_MAX) {
         printf("Exiting...\n");
         exit(EXIT_FAILURE);
@@ -235,7 +247,7 @@ void ta_sort(ta* ta) {
 // Test Array
 /* ========================= */
 
-#define TEST_INSERT_ERASE_COMBINATIONS_ARRAY(N, TEST_ITERATOR)                 \
+#define TEST_INSERT_ERASE_COMBINATIONS_ARRAY_MAX(N, TEST_ITERATOR, MAX)        \
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 21;                                                         \
@@ -251,43 +263,43 @@ void ta_sort(ta* ta) {
                 switch (digit) {                                               \
                 case (0):                                                      \
                     log("push_back %d\n", i);                                  \
-                    ta_insert(&ta, ta.size, i);                                \
+                    ta_insert(&ta, ta.size, i, MAX);                           \
                     N##_push_back(&ds, i);                                     \
                     break;                                                     \
                 case (1):                                                      \
                     log("push_front %d\n", i);                                 \
-                    ta_insert(&ta, 0, i);                                      \
+                    ta_insert(&ta, 0, i, MAX);                                 \
                     N##_push_front(&ds, i);                                    \
                     break;                                                     \
                 case (2):                                                      \
                     log("push at 1 %d\n", i);                                  \
-                    ta_insert(&ta, 1, i);                                      \
-                    N##_insert(&ds, 1, i);                                     \
+                    ta_insert(&ta, 1, i, MAX);                                 \
+                    N##_insert(&ds, _1, i);                                    \
                     break;                                                     \
                 case (3):                                                      \
                     log("push at 2 %d\n", i);                                  \
-                    ta_insert(&ta, 2, i);                                      \
-                    N##_insert(&ds, 2, i);                                     \
+                    ta_insert(&ta, 2, i, MAX);                                 \
+                    N##_insert(&ds, _2, i);                                    \
                     break;                                                     \
                 case (4):                                                      \
                     log("push at 3 %d\n", i);                                  \
-                    ta_insert(&ta, 3, i);                                      \
-                    N##_insert(&ds, 3, i);                                     \
+                    ta_insert(&ta, 3, i, MAX);                                 \
+                    N##_insert(&ds, _3, i);                                    \
                     break;                                                     \
                 case (5):                                                      \
                     log("push at 4 %d\n", i);                                  \
-                    ta_insert(&ta, 4, i);                                      \
-                    N##_insert(&ds, 4, i);                                     \
+                    ta_insert(&ta, 4, i, MAX);                                 \
+                    N##_insert(&ds, _4, i);                                    \
                     break;                                                     \
                 case (6):                                                      \
                     log("push at 5 %d\n", i);                                  \
-                    ta_insert(&ta, 5, i);                                      \
-                    N##_insert(&ds, 5, i);                                     \
+                    ta_insert(&ta, 5, i, MAX);                                 \
+                    N##_insert(&ds, _5, i);                                    \
                     break;                                                     \
                 case (7):                                                      \
                     log("push at 0 %d\n", i);                                  \
-                    ta_insert(&ta, 0, i);                                      \
-                    N##_insert(&ds, 0, i);                                     \
+                    ta_insert(&ta, 0, i, MAX);                                 \
+                    N##_insert(&ds, _0, i);                                    \
                     break;                                                     \
                 case (8):                                                      \
                     log("pop_front\n");                                        \
@@ -302,66 +314,66 @@ void ta_sort(ta* ta) {
                 case (10):                                                     \
                     log("erase at 0\n");                                       \
                     ta_erase(&ta, 0);                                          \
-                    N##_erase(&ds, 0);                                         \
+                    N##_erase(&ds, _0);                                        \
                     break;                                                     \
                 case (11):                                                     \
                     log("erase at 1\n");                                       \
                     ta_erase(&ta, 1);                                          \
-                    N##_erase(&ds, 1);                                         \
+                    N##_erase(&ds, _1);                                        \
                     break;                                                     \
                 case (12):                                                     \
                     log("erase at 2\n");                                       \
                     ta_erase(&ta, 2);                                          \
-                    N##_erase(&ds, 2);                                         \
+                    N##_erase(&ds, _2);                                        \
                     break;                                                     \
                 case (13):                                                     \
                     log("erase at 3\n");                                       \
                     ta_erase(&ta, 3);                                          \
-                    N##_erase(&ds, 3);                                         \
+                    N##_erase(&ds, _3);                                        \
                     break;                                                     \
                 case (14):                                                     \
                     log("erase at 4\n");                                       \
                     ta_erase(&ta, 4);                                          \
-                    N##_erase(&ds, 4);                                         \
+                    N##_erase(&ds, _4);                                        \
                     break;                                                     \
                 case (15):                                                     \
                     log("erase at 5\n");                                       \
                     ta_erase(&ta, 5);                                          \
-                    N##_erase(&ds, 5);                                         \
+                    N##_erase(&ds, _5);                                        \
                     break;                                                     \
                 case (16):                                                     \
                     log("set at 0 %d\n", i);                                   \
                     if (ta.size > 0) {                                         \
                         ta.data[0] = i;                                        \
-                        N##_set(&ds, 0, i);                                    \
+                        N##_set(&ds, _0, i);                                   \
                     }                                                          \
                     break;                                                     \
                 case (17):                                                     \
                     log("set at 1 %d\n", i);                                   \
                     if (ta.size > 1) {                                         \
                         ta.data[1] = i;                                        \
-                        N##_set(&ds, 1, i);                                    \
+                        N##_set(&ds, _1, i);                                   \
                     }                                                          \
                     break;                                                     \
                 case (18):                                                     \
                     log("set at 2 %d\n", i);                                   \
                     if (ta.size > 2) {                                         \
                         ta.data[2] = i;                                        \
-                        N##_set(&ds, 2, i);                                    \
+                        N##_set(&ds, _2, i);                                   \
                     }                                                          \
                     break;                                                     \
                 case (19):                                                     \
                     log("set at 3 %d\n", i);                                   \
                     if (ta.size > 3) {                                         \
                         ta.data[3] = i;                                        \
-                        N##_set(&ds, 3, i);                                    \
+                        N##_set(&ds, _3, i);                                   \
                     }                                                          \
                     break;                                                     \
                 case (20):                                                     \
                     log("set at 4 %d\n", i);                                   \
                     if (ta.size > 4) {                                         \
                         ta.data[4] = i;                                        \
-                        N##_set(&ds, 4, i);                                    \
+                        N##_set(&ds, _4, i);                                   \
                     }                                                          \
                     break;                                                     \
                 default:                                                       \
@@ -389,6 +401,9 @@ void ta_sort(ta* ta) {
             N##_free(&ds);                                                     \
         }                                                                      \
     }
+
+#define TEST_INSERT_ERASE_COMBINATIONS_ARRAY(N, TEST_ITERATOR)                 \
+    TEST_INSERT_ERASE_COMBINATIONS_ARRAY_MAX(N, TEST_ITERATOR, 999)
 
 /* ========================= */
 // Test Map
@@ -421,12 +436,15 @@ tm tm_new(void) {
     return tm;
 }
 
-void tm_set(tm* tm, int key, int value) {
+void tm_set(tm* tm, int key, int value, size_t max) {
     for (size_t i = 0; i < TM_MAX; ++i) {
         if (tm->data[i].key == key) {
             tm->data[i].value = value;
             return;
         }
+    }
+    if (tm->size == max) {
+        return;
     }
     for (size_t i = 0; i < TM_MAX; ++i) {
         if (tm->data[i].key == TM_EMPTY) {
@@ -509,7 +527,7 @@ void tm_print(tm* tm) {
         ASSERT_EQUAL(false, N##_it_valid(it));                                 \
     }
 
-#define TEST_INSERT_ERASE_COMBINATIONS_MAP(N)                                  \
+#define TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(N, MAX)                         \
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 12;                                                         \
@@ -525,32 +543,32 @@ void tm_print(tm* tm) {
                 switch (digit) {                                               \
                 case (0):                                                      \
                     log("set %d %d\n", i, i + 10);                             \
-                    tm_set(&tm, i, i + 10);                                    \
+                    tm_set(&tm, i, i + 10, MAX);                               \
                     N##_set(&ds, i, i + 10);                                   \
                     break;                                                     \
                 case (1):                                                      \
                     log("set 0 %d\n", i + 10);                                 \
-                    tm_set(&tm, 0, i + 10);                                    \
+                    tm_set(&tm, 0, i + 10, MAX);                               \
                     N##_set(&ds, 0, i + 10);                                   \
                     break;                                                     \
                 case (2):                                                      \
                     log("set 1 %d\n", i + 10);                                 \
-                    tm_set(&tm, 1, i + 10);                                    \
+                    tm_set(&tm, 1, i + 10, MAX);                               \
                     N##_set(&ds, 1, i + 10);                                   \
                     break;                                                     \
                 case (3):                                                      \
                     log("set 2 %d\n", i + 10);                                 \
-                    tm_set(&tm, 2, i + 10);                                    \
+                    tm_set(&tm, 2, i + 10, MAX);                               \
                     N##_set(&ds, 2, i + 10);                                   \
                     break;                                                     \
                 case (4):                                                      \
                     log("set 3 %d\n", i + 10);                                 \
-                    tm_set(&tm, 3, i + 10);                                    \
+                    tm_set(&tm, 3, i + 10, MAX);                               \
                     N##_set(&ds, 3, i + 10);                                   \
                     break;                                                     \
                 case (5):                                                      \
                     log("set 4 %d\n", i + 10);                                 \
-                    tm_set(&tm, 4, i + 10);                                    \
+                    tm_set(&tm, 4, i + 10, MAX);                               \
                     N##_set(&ds, 4, i + 10);                                   \
                     break;                                                     \
                 case (6):                                                      \
@@ -618,6 +636,9 @@ void tm_print(tm* tm) {
         }                                                                      \
     }
 
+#define TEST_INSERT_ERASE_COMBINATIONS_MAP(N)                                  \
+    TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(N, 999)
+
 /* ========================= */
 // Test Set
 /* ========================= */
@@ -641,7 +662,10 @@ ts ts_new(void) {
     return ts;
 }
 
-void ts_insert(ts* ts, int kv) {
+void ts_insert(ts* ts, int kv, size_t max) {
+    if (ts->size == max) {
+        return;
+    }
     for (size_t i = 0; i < TS_MAX; ++i) {
         if (ts->data[i] == kv) {
             return;
@@ -734,7 +758,7 @@ void ts_print(ts* ts) {
         ASSERT_EQUAL(false, N##_it_valid(it));                                 \
     }
 
-#define TEST_INSERT_ERASE_COMBINATIONS_SET(N)                                  \
+#define TEST_INSERT_ERASE_COMBINATIONS_SET_MAX(N, MAX)                         \
     {                                                                          \
         size_t n = 5;                                                          \
         size_t m = 10;                                                         \
@@ -750,28 +774,28 @@ void ts_print(ts* ts) {
                 switch (digit) {                                               \
                 case (0):                                                      \
                     log("insert %d\n", i);                                     \
-                    ts_insert(&ts, i);                                         \
+                    ts_insert(&ts, i, MAX);                                    \
                     N##_insert(&ds, i);                                        \
                     break;                                                     \
                 case (1):                                                      \
                     log("insert 0\n");                                         \
-                    ts_insert(&ts, 0);                                         \
-                    N##_insert(&ds, 0);                                        \
+                    ts_insert(&ts, 0, MAX);                                    \
+                    N##_insert(&ds, _0);                                       \
                     break;                                                     \
                 case (2):                                                      \
                     log("insert 1\n");                                         \
-                    ts_insert(&ts, 1);                                         \
-                    N##_insert(&ds, 1);                                        \
+                    ts_insert(&ts, 1, MAX);                                    \
+                    N##_insert(&ds, _1);                                       \
                     break;                                                     \
                 case (3):                                                      \
                     log("insert 2\n");                                         \
-                    ts_insert(&ts, 2);                                         \
-                    N##_insert(&ds, 2);                                        \
+                    ts_insert(&ts, 2, MAX);                                    \
+                    N##_insert(&ds, _2);                                       \
                     break;                                                     \
                 case (4):                                                      \
                     log("insert 3\n");                                         \
-                    ts_insert(&ts, 3);                                         \
-                    N##_insert(&ds, 3);                                        \
+                    ts_insert(&ts, 3, MAX);                                    \
+                    N##_insert(&ds, _3);                                       \
                     break;                                                     \
                 case (5):                                                      \
                     log("erase %d\n", i);                                      \
@@ -781,22 +805,22 @@ void ts_print(ts* ts) {
                 case (6):                                                      \
                     log("erase 0\n");                                          \
                     ts_erase(&ts, 0);                                          \
-                    N##_erase(&ds, 0);                                         \
+                    N##_erase(&ds, _0);                                        \
                     break;                                                     \
                 case (7):                                                      \
                     log("erase 1\n");                                          \
                     ts_erase(&ts, 1);                                          \
-                    N##_erase(&ds, 1);                                         \
+                    N##_erase(&ds, _1);                                        \
                     break;                                                     \
                 case (8):                                                      \
                     log("erase 2\n");                                          \
                     ts_erase(&ts, 2);                                          \
-                    N##_erase(&ds, 2);                                         \
+                    N##_erase(&ds, _2);                                        \
                     break;                                                     \
                 case (9):                                                      \
                     log("erase 3\n");                                          \
                     ts_erase(&ts, 3);                                          \
-                    N##_erase(&ds, 3);                                         \
+                    N##_erase(&ds, _3);                                        \
                     break;                                                     \
                 default:                                                       \
                     log("Unhandled digit %zu\n", digit);                       \
@@ -834,11 +858,14 @@ void ts_print(ts* ts) {
         }                                                                      \
     }
 
+#define TEST_INSERT_ERASE_COMBINATIONS_SET(N)                                  \
+    TEST_INSERT_ERASE_COMBINATIONS_SET_MAX(N, 999)
+
 /* ========================= */
 // Test Stack
 /* ========================= */
 
-#define TEST_PUSH_POP_COMBINATIONS_STACK(N)                                    \
+#define TEST_PUSH_POP_COMBINATIONS_STACK_MAX(N, MAX)                           \
     {                                                                          \
         size_t n = 13;                                                         \
         size_t m = 3;                                                          \
@@ -854,7 +881,7 @@ void ts_print(ts* ts) {
                 switch (digit) {                                               \
                 case (0):                                                      \
                     log("push %d\n", i);                                       \
-                    ta_insert(&ta, ta.size, i);                                \
+                    ta_insert(&ta, ta.size, i, MAX);                           \
                     N##_push(&ds, i);                                          \
                     break;                                                     \
                 case (1):                                                      \
@@ -894,11 +921,14 @@ void ts_print(ts* ts) {
         }                                                                      \
     }
 
+#define TEST_PUSH_POP_COMBINATIONS_STACK(N)                                    \
+    TEST_PUSH_POP_COMBINATIONS_STACK_MAX(N, 999)
+
 /* ========================= */
 // Test Queue
 /* ========================= */
 
-#define TEST_INSERT_PUSH_POP_COMBINATIONS_QUEUE(N)                             \
+#define TEST_PUSH_POP_COMBINATIONS_QUEUE_MAX(N, MAX)                           \
     {                                                                          \
         size_t n = 10;                                                         \
         size_t m = 4;                                                          \
@@ -914,7 +944,7 @@ void ts_print(ts* ts) {
                 switch (digit) {                                               \
                 case (0):                                                      \
                     log("push %d\n", i);                                       \
-                    ta_insert(&ta, ta.size, i);                                \
+                    ta_insert(&ta, ta.size, i, MAX);                           \
                     N##_push(&ds, i);                                          \
                     break;                                                     \
                 case (1):                                                      \
@@ -965,11 +995,14 @@ void ts_print(ts* ts) {
         }                                                                      \
     }
 
+#define TEST_PUSH_POP_COMBINATIONS_QUEUE(N)                                    \
+    TEST_PUSH_POP_COMBINATIONS_QUEUE_MAX(N, 999)
+
 /* ========================= */
 // Test Priority Queue
 /* ========================= */
 
-#define TEST_INSERT_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE(N)                    \
+#define TEST_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE_MAX(N, MAX)                  \
     {                                                                          \
         size_t n = 7;                                                          \
         size_t m = 7;                                                          \
@@ -985,37 +1018,37 @@ void ts_print(ts* ts) {
                 switch (digit) {                                               \
                 case (0):                                                      \
                     log("push %d\n", i);                                       \
-                    ta_insert(&ta, ta.size, i);                                \
+                    ta_insert(&ta, ta.size, i, MAX);                           \
                     ta_sort(&ta);                                              \
                     N##_push(&ds, i);                                          \
                     break;                                                     \
                 case (1):                                                      \
                     log("push 1\n");                                           \
-                    ta_insert(&ta, ta.size, 1);                                \
+                    ta_insert(&ta, ta.size, 1, MAX);                           \
                     ta_sort(&ta);                                              \
                     N##_push(&ds, 1);                                          \
                     break;                                                     \
                 case (2):                                                      \
                     log("push 2\n");                                           \
-                    ta_insert(&ta, ta.size, 2);                                \
+                    ta_insert(&ta, ta.size, 2, MAX);                           \
                     ta_sort(&ta);                                              \
                     N##_push(&ds, 2);                                          \
                     break;                                                     \
                 case (3):                                                      \
                     log("push 3\n");                                           \
-                    ta_insert(&ta, ta.size, 3);                                \
+                    ta_insert(&ta, ta.size, 3, MAX);                           \
                     ta_sort(&ta);                                              \
                     N##_push(&ds, 3);                                          \
                     break;                                                     \
                 case (4):                                                      \
                     log("push 4\n");                                           \
-                    ta_insert(&ta, ta.size, 4);                                \
+                    ta_insert(&ta, ta.size, 4, MAX);                           \
                     ta_sort(&ta);                                              \
                     N##_push(&ds, 4);                                          \
                     break;                                                     \
                 case (5):                                                      \
                     log("push 0\n");                                           \
-                    ta_insert(&ta, ta.size, 0);                                \
+                    ta_insert(&ta, ta.size, 0, MAX);                           \
                     ta_sort(&ta);                                              \
                     N##_push(&ds, 0);                                          \
                     break;                                                     \
@@ -1049,3 +1082,6 @@ void ts_print(ts* ts) {
             N##_free(&ds);                                                     \
         }                                                                      \
     }
+
+#define TEST_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE(N)                           \
+    TEST_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE_MAX(N, 999)

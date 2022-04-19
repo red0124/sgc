@@ -6,13 +6,13 @@
 SGC_INIT_QUEUE(int, queue)
 
 void test_queue_push_pop_combinations(void) {
-    TEST_INSERT_PUSH_POP_COMBINATIONS_QUEUE(queue);
+    TEST_PUSH_POP_COMBINATIONS_QUEUE(queue);
 }
 
 SGC_INIT_QUEUE(oint, oqueue)
 
 void test_queue_push_pop_combinations_observed(void) {
-    TEST_INSERT_PUSH_POP_COMBINATIONS_QUEUE(oqueue);
+    TEST_PUSH_POP_COMBINATIONS_QUEUE(oqueue);
     TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
     ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
 }

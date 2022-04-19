@@ -107,7 +107,7 @@
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
         if (i.valid_) {                                                        \
             return &i.curr_->data_.value;                                      \
-        } else if (u->size_ < S - 1) {                                         \
+        } else if (u->size_ + 1 < S) {                                         \
             V v;                                                               \
             V##_init(&v);                                                      \
             size_t position = hash % S;                                        \

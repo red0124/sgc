@@ -1,43 +1,82 @@
 #include "test_common.h"
 #include <sgc/fs_unordered_map.h>
 
-#define MAP_MAX 128
+#define GENERATE_FS_UNORDERED_MAP_TESTS(S)                                     \
+    SGC_INIT_FS_UNORDERED_MAP(int, int, S, map##S)                             \
+                                                                               \
+    void test_fs_unordered_map_insert_erase_combinations##S(void) {            \
+        TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(map##S, S);                     \
+    }                                                                          \
+                                                                               \
+    SGC_INIT_FS_UNORDERED_MAP(oint, oint, S, omap##S)                          \
+                                                                               \
+    void test_fs_unordered_map_insert_erase_combinations_observed##S(void) {   \
+        TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(omap##S, S);                    \
+        TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                    \
+        ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);          \
+    }                                                                          \
+                                                                               \
+    SGC_INIT_FS_UNORDERED_MAP(oint, int, S, oint_int_map##S)                   \
+                                                                               \
+    void test_fs_unordered_map_insert_erase_combinations_observed_key##S(      \
+        void) {                                                                \
+        TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(oint_int_map##S, S);            \
+        TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                    \
+        ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);          \
+    }                                                                          \
+                                                                               \
+    SGC_INIT_FS_UNORDERED_MAP(int, oint, S, int_oint_map##S)                   \
+                                                                               \
+    void test_fs_unordered_map_insert_erase_combinations_observed_value##S(    \
+        void) {                                                                \
+        TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(int_oint_map##S, S);            \
+        TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                    \
+        ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);          \
+    }
 
-SGC_INIT_FS_UNORDERED_MAP(int, int, MAP_MAX, map)
-
-void test_fs_unordered_map_insert_erase_combinations(void) {
-    TEST_INSERT_ERASE_COMBINATIONS_MAP(map);
-}
-
-SGC_INIT_FS_UNORDERED_MAP(oint, oint, MAP_MAX, omap)
-
-void test_fs_unordered_map_insert_erase_combinations_observed(void) {
-    TEST_INSERT_ERASE_COMBINATIONS_MAP(omap);
-    TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
-    ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
-}
-
-SGC_INIT_FS_UNORDERED_MAP(oint, int, MAP_MAX, oint_int_map)
-
-void test_fs_unordered_map_insert_erase_combinations_observed_key(void) {
-    TEST_INSERT_ERASE_COMBINATIONS_MAP(oint_int_map);
-    TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
-    ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
-}
-
-SGC_INIT_FS_UNORDERED_MAP(int, oint, MAP_MAX, int_oint_map)
-
-void test_fs_unordered_map_insert_erase_combinations_observed_value(void) {
-    TEST_INSERT_ERASE_COMBINATIONS_MAP(int_oint_map);
-    TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
-    ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
-}
+GENERATE_FS_UNORDERED_MAP_TESTS(1)
+GENERATE_FS_UNORDERED_MAP_TESTS(2)
+GENERATE_FS_UNORDERED_MAP_TESTS(3)
+GENERATE_FS_UNORDERED_MAP_TESTS(4)
+GENERATE_FS_UNORDERED_MAP_TESTS(5)
+GENERATE_FS_UNORDERED_MAP_TESTS(6)
+GENERATE_FS_UNORDERED_MAP_TESTS(256)
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_fs_unordered_map_insert_erase_combinations);
-    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed);
-    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key);
-    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations1);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed1);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key1);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value1);
+
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations2);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed2);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key2);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value2);
+
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations3);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed3);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key3);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value3);
+
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations4);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed4);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key4);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value4);
+
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations5);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed5);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key5);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value5);
+
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations6);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed6);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key6);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value6);
+
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations256);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed256);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key256);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value256);
     return UNITY_END();
 }

@@ -1,26 +1,50 @@
 #include "test_common.h"
 #include <sgc/fs_priority_queue.h>
 
-#define TEST_ELEMENTS_NUM 50
-#define PQUEUE_MAX 512
+#define GENERATE_FS_PRIORITY_QUEUE_TESTS(S)                                    \
+    SGC_INIT_FS_PRIORITY_QUEUE(int, S, priority_queue##S)                      \
+                                                                               \
+    void test_fs_priority_queue_push_pop_combinations##S(void) {               \
+        TEST_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE_MAX(priority_queue##S, S);   \
+    }                                                                          \
+                                                                               \
+    SGC_INIT_FS_PRIORITY_QUEUE(oint, S, opriority_queue##S)                    \
+                                                                               \
+    void test_fs_priority_queue_push_pop_combinations_observed##S(void) {      \
+        TEST_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE_MAX(opriority_queue##S, S);  \
+        TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                    \
+        ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);          \
+    }
 
-SGC_INIT_FS_PRIORITY_QUEUE(int, PQUEUE_MAX, pqueue)
-
-void test_fs_pqueue_push_pop_combinations(void) {
-    TEST_INSERT_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE(pqueue);
-}
-
-SGC_INIT_FS_PRIORITY_QUEUE(oint, PQUEUE_MAX, opqueue)
-
-void test_fs_pqueue_push_pop_combinations_observed(void) {
-    TEST_INSERT_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE(opqueue);
-    TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);
-    ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);
-}
+GENERATE_FS_PRIORITY_QUEUE_TESTS(1)
+GENERATE_FS_PRIORITY_QUEUE_TESTS(2)
+GENERATE_FS_PRIORITY_QUEUE_TESTS(3)
+GENERATE_FS_PRIORITY_QUEUE_TESTS(4)
+GENERATE_FS_PRIORITY_QUEUE_TESTS(5)
+GENERATE_FS_PRIORITY_QUEUE_TESTS(6)
+GENERATE_FS_PRIORITY_QUEUE_TESTS(256)
 
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_fs_pqueue_push_pop_combinations);
-    RUN_TEST(test_fs_pqueue_push_pop_combinations_observed);
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations1);
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations_observed1);
+
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations2);
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations_observed2);
+
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations3);
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations_observed3);
+
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations4);
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations_observed4);
+
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations5);
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations_observed5);
+
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations6);
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations_observed6);
+
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations256);
+    RUN_TEST(test_fs_priority_queue_push_pop_combinations_observed256);
     return UNITY_END();
 }
