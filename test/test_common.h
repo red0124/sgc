@@ -6,6 +6,61 @@
 #include <time.h>
 #include <unity.h>
 
+static bool _disable_allocation = false;
+int oint_allocation_count = 0;
+int oint_deallocation_count = 0;
+#define OINT_DANGLING -1
+
+void disable_allocation() {
+    _disable_allocation = true;
+    oint_allocation_count = 0;
+    oint_deallocation_count = 0;
+}
+
+void enable_allocation() {
+    _disable_allocation = false;
+    oint_allocation_count = 0;
+    oint_deallocation_count = 0;
+}
+
+bool allocation_enabled() {
+    return _disable_allocation == false;
+}
+
+#define ASSERT_ALLOCATION_COUNT                                                \
+    {                                                                          \
+        if (allocation_enabled()) {                                            \
+            TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                \
+        } else {                                                               \
+            TEST_ASSERT_EQUAL(0, oint_allocation_count);                       \
+        }                                                                      \
+        ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);          \
+    }
+
+void* test_malloc(size_t size) {
+    if (!allocation_enabled()) {
+        return NULL;
+    }
+
+    return malloc(size);
+}
+
+void* test_realloc(void* ptr, size_t size) {
+    if (!allocation_enabled()) {
+        return NULL;
+    }
+
+    return realloc(ptr, size);
+}
+
+void test_free(void* ptr) {
+    free(ptr);
+}
+
+#define SGC_USE_CUSTOM_ALLOCATOR
+#include <sgc/detail/sgc_allocator.h>
+SGC_SET_ALLOCATOR(test_malloc, test_realloc, test_free)
+
 #ifdef LOG
 #define log(...) fprintf(stderr, __VA_ARGS__)
 #else
@@ -62,10 +117,6 @@ size_t _5 = 5;
 /* ========================= */
 
 typedef int oint;
-int oint_allocation_count = 0;
-int oint_deallocation_count = 0;
-#define OINT_DANGLING -1
-
 static inline void oint_copy(oint* dst, const oint* const src) {
     ASSERT_NOT_EQUAL(OINT_DANGLING, *src);
     *dst = *src;
@@ -120,7 +171,7 @@ ta ta_new(void) {
 }
 
 void ta_insert(ta* ta, size_t at, int el, size_t max) {
-    if (ta->size == max) {
+    if (ta->size == max || !allocation_enabled()) {
         return;
     }
 
@@ -443,7 +494,7 @@ void tm_set(tm* tm, int key, int value, size_t max) {
             return;
         }
     }
-    if (tm->size == max) {
+    if (tm->size == max || !allocation_enabled()) {
         return;
     }
     for (size_t i = 0; i < TM_MAX; ++i) {
@@ -663,9 +714,10 @@ ts ts_new(void) {
 }
 
 void ts_insert(ts* ts, int kv, size_t max) {
-    if (ts->size == max) {
+    if (ts->size == max || !allocation_enabled()) {
         return;
     }
+
     for (size_t i = 0; i < TS_MAX; ++i) {
         if (ts->data[i] == kv) {
             return;

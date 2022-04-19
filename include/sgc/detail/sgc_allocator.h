@@ -1,6 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdlib.h>
+#include "sgc_utils.h"
 
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
 #define _MAYBE_UNUSED __attribute__((unused))
@@ -97,5 +98,3 @@ SGC_SET_ALLOCATOR(malloc, realloc, free)
 #endif /* ifdef SGC_FLAG_ALLOCATOR */
 #endif /* ifdef SGC_STRICT_ALLOCATOR */
 #endif /* ifndef SGC_USE_CUSTOM_ALLOCATOR */
-
-#undef _MAYBE_UNUSED

@@ -3,6 +3,30 @@
 #include <string.h>
 
 // ==============
+// _MAYBE_UNUSED
+// ==============
+/* TODO check without clang or gcc */
+#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+#define _MAYBE_UNUSED __attribute__((unused))
+#else
+#define _MAYBE_UNUSED
+#endif
+
+#define SGC_SET_ALLOCATOR(MALLOC, REALLOC, FREE)                               \
+    _MAYBE_UNUSED static inline void* sgc_malloc(size_t size) {                \
+        return MALLOC(size);                                                   \
+    }                                                                          \
+                                                                               \
+    _MAYBE_UNUSED static inline void* sgc_realloc(void* ptr, size_t size) {    \
+        return REALLOC(ptr, size);                                             \
+    }                                                                          \
+                                                                               \
+    _MAYBE_UNUSED static inline void sgc_free(void* ptr) {                     \
+        FREE(ptr);                                                             \
+    }
+
+
+// ==============
 // INIT HEADERS
 // ==============
 #define _SGC_INIT_HEADERS_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME

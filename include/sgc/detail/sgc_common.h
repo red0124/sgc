@@ -32,6 +32,7 @@
             v->max_ = (v->max_ == 0) ? 1 : v->max_ * 2;                        \
             T* tmp_data_ = (T*)sgc_realloc(v->data_, sizeof(T) * v->max_);     \
             if (!tmp_data_) {                                                  \
+                v->max_ = v->size_;                                            \
                 return false;                                                  \
             }                                                                  \
             v->data_ = tmp_data_;                                              \
@@ -46,6 +47,7 @@
             d->max_ = (d->max_ == 0) ? 1 : d->max_ * 2;                        \
             T* tmp_data = (T*)sgc_realloc(d->data_, sizeof(T) * d->max_);      \
             if (!tmp_data) {                                                   \
+                d->max_ = d->size_;                                            \
                 return false;                                                  \
             }                                                                  \
             d->data_ = tmp_data;                                               \

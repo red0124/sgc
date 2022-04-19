@@ -1,12 +1,7 @@
 #pragma once
+#include "sgc_utils.h"
 #include <stdbool.h>
 #include <stdlib.h>
-
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-#define _MAYBE_UNUSED __attribute__((unused))
-#else
-#define _MAYBE_UNUSED
-#endif
 
 #define SGC_SET_NO_SPACE_LEFT_HANDLER(HANDLER)                                 \
     _MAYBE_UNUSED static inline void _sgc_no_space_left_handler(size_t size,   \
