@@ -2,6 +2,7 @@
 
 #include "detail/sgc_common.h"
 #include "detail/sgc_primitive_types.h"
+#include "detail/sgc_error_handlers.h"
 #include "detail/sgc_priority_queue_common.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>

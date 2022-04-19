@@ -97,3 +97,5 @@ SGC_SET_ALLOCATOR(malloc, realloc, free)
 #endif /* ifdef SGC_FLAG_ALLOCATOR */
 #endif /* ifdef SGC_STRICT_ALLOCATOR */
 #endif /* ifndef SGC_USE_CUSTOM_ALLOCATOR */
+
+#undef _MAYBE_UNUSED

@@ -2,6 +2,7 @@
 
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_common.h"
+#include "detail/sgc_error_handlers.h"
 #include "detail/sgc_fs_hash_map_common.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_primitive_types.h"
@@ -104,9 +105,8 @@
     V* N##_at(N* u, K k) {                                                     \
         size_t hash = K##_hash(&k);                                            \
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
-        V* ret = NULL;                                                         \
         if (i.valid_) {                                                        \
-            ret = &i.curr_->data_.value;                                       \
+            return &i.curr_->data_.value;                                      \
         } else if (u->size_ < S - 1) {                                         \
             V v;                                                               \
             V##_init(&v);                                                      \
@@ -122,9 +122,11 @@
             _SGC_COPY(V, u->data_[position].data_.value, v, u->sharing_);      \
             u->data_[position].state_ = _SGC_NODE_STATE_USED;                  \
             ++u->size_;                                                        \
-            ret = &u->data_[position].data_.value;                             \
+            return &u->data_[position].data_.value;                            \
+        } else {                                                               \
+            _sgc_no_space_left_handler(u->size_, N##_max());                   \
         }                                                                      \
-        return ret;                                                            \
+        return NULL;                                                           \
     }                                                                          \
                                                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \

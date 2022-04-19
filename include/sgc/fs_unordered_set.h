@@ -3,6 +3,7 @@
 #include "detail/sgc_common.h"
 #include "detail/sgc_dictionary_common.h"
 #include "detail/sgc_fs_hash_map_common.h"
+#include "detail/sgc_error_handlers.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
@@ -87,6 +88,8 @@
             _SGC_COPY(KV, u->data_[position].value_, v, u->sharing_);          \
             u->data_[position].state_ = _SGC_NODE_STATE_USED;                  \
             ++u->size_;                                                        \
+        } else {                                                               \
+            _sgc_no_space_left_handler(u->size_, N##_max());                   \
         }                                                                      \
     }                                                                          \
                                                                                \

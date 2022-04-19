@@ -71,6 +71,7 @@
     static bool _p_##N##_resize(const N* const v) {                            \
         (void)(v);                                                             \
         if (v->size_ >= N##_max()) {                                           \
+            _sgc_no_space_left_handler(v->size_, N##_max());                   \
             return false;                                                      \
         }                                                                      \
         return true;                                                           \

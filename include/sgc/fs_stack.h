@@ -4,6 +4,7 @@
 #include "detail/sgc_primitive_types.h"
 #include "detail/sgc_stack_common.h"
 #include "detail/sgc_utils.h"
+#include "detail/sgc_error_handlers.h"
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_FS_STACK(T, N)                                            \
