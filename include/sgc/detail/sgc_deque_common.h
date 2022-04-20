@@ -1,8 +1,11 @@
 #pragma once
+#include "sgc_circular_buffer_common.h"
 #include <stdbool.h>
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON_DEQUE(T, N)                                           \
+    _SGC_INIT_COMMON_CIRCULAR_BUFFER(T, N)                                     \
+                                                                               \
     void N##_erase(N* d, size_t at) {                                          \
         if (at < d->size_ && d->size_ > 0) {                                   \
             size_t _at = (at + d->front_) % _p_##N##_max(d);                   \
@@ -73,14 +76,6 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_go_next(size_t* flag, size_t max) {                   \
-        if (*flag + 1 == max) {                                                \
-            *flag = 0;                                                         \
-        } else {                                                               \
-            ++*flag;                                                           \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
     static void _p_##N##_go_prev(size_t* flag, size_t max) {                   \
         if (*flag == 0) {                                                      \
             *flag = max - 1;                                                   \
@@ -109,34 +104,6 @@
         }                                                                      \
         _SGC_COPY(T, d->data_[d->front_], el, d->sharing_);                    \
         ++d->size_;                                                            \
-    }                                                                          \
-                                                                               \
-    T* N##_front(N* d) {                                                       \
-        if (!d->size_) {                                                       \
-            return NULL;                                                       \
-        }                                                                      \
-        return &d->data_[d->front_];                                           \
-    }                                                                          \
-                                                                               \
-    void N##_set_front(N* d, T new_el) {                                       \
-        if (d->size_) {                                                        \
-            T* el = &d->data_[d->front_];                                      \
-            _SGC_REPLACE(T, *el, new_el, d->sharing_);                         \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    T* N##_back(N* d) {                                                        \
-        if (!d->size_) {                                                       \
-            return NULL;                                                       \
-        }                                                                      \
-        return &d->data_[d->back_];                                            \
-    }                                                                          \
-                                                                               \
-    void N##_set_back(N* d, T new_el) {                                        \
-        if (d->size_) {                                                        \
-            T* el = &d->data_[d->back_];                                       \
-            _SGC_REPLACE(T, *el, new_el, d->sharing_);                         \
-        }                                                                      \
     }                                                                          \
                                                                                \
     void N##_pop_front(N* d) {                                                 \
@@ -310,37 +277,4 @@
                                                                                \
     bool N##_it_valid(const N##_it it) {                                       \
         return it.valid_;                                                      \
-    }                                                                          \
-                                                                               \
-    static void _p_##N##_copy_data(N* dst, const N* const src) {               \
-        if (dst->sharing_) {                                                   \
-            if (src->front_ < src->back_) {                                    \
-                memcpy(dst->data_, src->data_ + src->front_,                   \
-                       src->size_ * sizeof(T));                                \
-            } else {                                                           \
-                size_t first_part = src->back_;                                \
-                size_t second_part = _p_##N##_max(src) - src->front_;          \
-                memcpy(dst->data_, src->data_ + src->front_,                   \
-                       second_part * sizeof(T));                               \
-                memcpy(dst->data_ + second_part, src->data_,                   \
-                       (1 + first_part) * sizeof(T));                          \
-            }                                                                  \
-        } else {                                                               \
-            size_t i = src->front_;                                            \
-            for (size_t j = 0; j < src->size_; ++j) {                          \
-                T##_copy(&dst->data_[j], &src->data_[i]);                      \
-                _p_##N##_go_next(&i, _p_##N##_max(src));                       \
-            }                                                                  \
-        }                                                                      \
-    }                                                                          \
-                                                                               \
-    static void _p_##N##_free_data(N* d) {                                     \
-        if (d->size_ > 0 && !d->sharing_) {                                    \
-            size_t i;                                                          \
-            for (i = d->front_; i != d->back_;) {                              \
-                T##_free(&d->data_[i]);                                        \
-                _p_##N##_go_next(&i, _p_##N##_max(d));                         \
-            }                                                                  \
-            T##_free(&d->data_[i]);                                            \
-        }                                                                      \
     }

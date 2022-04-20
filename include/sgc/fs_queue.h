@@ -28,7 +28,7 @@
     typedef T N##_value;                                                       \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_shareing(N* q);                                               \
+    void N##_set_sharing(N* q);                                               \
     void N##_set_owning(N* q);                                                 \
     size_t N##_size(const N* const q);                                         \
     void N##_init(N* q);                                                       \

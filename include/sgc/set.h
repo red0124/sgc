@@ -89,7 +89,7 @@
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
                                                                                \
-    void N##_set_shareing(N* s);                                               \
+    void N##_set_sharing(N* s);                                               \
     void N##_set_owning(N* s);                                                 \
     struct N##_it N##_find(N* s, const KV v);                                  \
     size_t N##_size(const N* const s);                                         \

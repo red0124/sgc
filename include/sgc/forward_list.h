@@ -10,7 +10,7 @@
 
 #define _SGC_INIT_PP_FORWARD_LIST(T, N)                                        \
     static struct _p_##N##_node* _p_##N##_node_alloc();                        \
-    static void _p_##N##_free_nodes(struct _p_##N##_node* n);
+    static void _p_##N##_free_nodes(struct _p_##N##_node* n, bool sharing);
 
 /* TODO add iterator insert/erase, add sort */
 #define SGC_INIT_HEADERS_FORWARD_LIST(T, N)                                    \
@@ -74,7 +74,7 @@
                 }                                                              \
                 tmp_dst = _p_##N##_node_alloc(dst);                            \
                 if (!tmp_dst) {                                                \
-                    _p_##N##_free_nodes(dst->head_);                           \
+                    _p_##N##_free_nodes(dst->head_, src->sharing_);            \
                     N##_init(dst);                                             \
                     return;                                                    \
                 }                                                              \

@@ -21,7 +21,7 @@
     typedef T N##_type;                                                        \
     typedef T N##_value;                                                       \
                                                                                \
-    void N##_set_shareing(N* s);                                               \
+    void N##_set_sharing(N* s);                                               \
     void N##_set_owning(N* s);                                                 \
     size_t N##_size(const N* const s);                                         \
     void N##_init(N* const s);                                                 \

@@ -293,7 +293,7 @@
 // ==============
 
 #define SGC_MOVE(N, DS, ...)                                                   \
-    N##_set_shareing(&DS);                                                     \
+    N##_set_sharing(&DS);                                                     \
     __VA_ARGS__;                                                               \
     N##_set_owning(&DS);
 

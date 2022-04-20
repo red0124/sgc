@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON(N)                                                    \
-    void N##_set_shareing(N* c) {                                              \
+    void N##_set_sharing(N* c) {                                              \
         c->sharing_ = true;                                                    \
     }                                                                          \
                                                                                \

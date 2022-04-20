@@ -32,7 +32,7 @@
     typedef T N##_value;                                                       \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_shareing(N* d);                                               \
+    void N##_set_sharing(N* d);                                               \
     void N##_set_owning(N* d);                                                 \
     size_t N##_size(const N* const d);                                         \
     void N##_init(N* d);                                                       \

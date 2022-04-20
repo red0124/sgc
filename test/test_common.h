@@ -8,7 +8,7 @@
 
 static bool _disable_allocation = false;
 static bool _enable_moveing = false;
-static bool _enable_shareing = false;
+static bool _enable_sharing = false;
 int oint_allocation_count = 0;
 int oint_deallocation_count = 0;
 #define OINT_DANGLING -1
@@ -45,26 +45,26 @@ bool moveing_enabled() {
     return _enable_moveing;
 }
 
-void enable_shareing() {
-    _enable_shareing = true;
+void enable_sharing() {
+    _enable_sharing = true;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
-void disable_shareing() {
-    _enable_shareing = false;
+void disable_sharing() {
+    _enable_sharing = false;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
-bool shareing_enabled() {
-    return _enable_shareing;
+bool sharing_enabled() {
+    return _enable_sharing;
 }
 
 #define ASSERT_ALLOCATION_COUNT                                                \
     {                                                                          \
         if (allocation_enabled() && !moveing_enabled() &&                      \
-            !shareing_enabled()) {                                             \
+            !sharing_enabled()) {                                              \
             TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                \
         } else {                                                               \
             ASSERT_EQUAL(0, oint_allocation_count);                            \
@@ -72,7 +72,7 @@ bool shareing_enabled() {
                                                                                \
         if (moveing_enabled()) {                                               \
             TEST_ASSERT_GREATER_THAN(0, oint_deallocation_count);              \
-        } else if (shareing_enabled()) {                                       \
+        } else if (sharing_enabled()) {                                        \
             ASSERT_EQUAL(0, oint_deallocation_count);                          \
         } else {                                                               \
             ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);      \
@@ -80,12 +80,10 @@ bool shareing_enabled() {
     }
 
 void* test_malloc(size_t size) {
-    printf("hmm3\n");
     if (!allocation_enabled()) {
         return NULL;
     }
 
-    printf("hmm4\n");
     return malloc(size);
 }
 
@@ -163,7 +161,7 @@ size_t _5 = 5;
 typedef int oint;
 static inline void oint_copy(oint* dst, const oint* const src) {
     ASSERT_EQUAL(false, moveing_enabled());
-    ASSERT_EQUAL(false, shareing_enabled());
+    ASSERT_EQUAL(false, sharing_enabled());
     ASSERT_NOT_EQUAL(OINT_DANGLING, *src);
     *dst = *src;
     ++oint_allocation_count;
@@ -175,6 +173,7 @@ static inline void oint_init(oint* o) {
 
 static inline void oint_free(oint* o) {
     ASSERT_NOT_EQUAL(OINT_DANGLING, *o);
+    ASSERT_EQUAL(false, sharing_enabled());
     *o = -1;
     ++oint_deallocation_count;
 }
@@ -355,8 +354,8 @@ void ta_sort(ta* ta) {
             ta ta = ta_new();                                                  \
             N ds;                                                              \
             N##_init(&ds);                                                     \
-            if (moveing_enabled() || shareing_enabled()) {                     \
-                N##_set_shareing(&ds);                                         \
+            if (moveing_enabled() || sharing_enabled()) {                      \
+                N##_set_sharing(&ds);                                          \
             }                                                                  \
             for (int i = 0; (size_t)i < n; ++i) {                              \
                 size_t digit = comb_copy % m;                                  \
@@ -495,9 +494,7 @@ void ta_sort(ta* ta) {
                                                                                \
                 TEST_ITERATOR(N, ta, ds)                                       \
                                                                                \
-                if (!moveing_enabled() && !shareing_enabled()) {               \
-                    N##_free(&ds_copy);                                        \
-                }                                                              \
+                N##_free(&ds_copy);                                            \
                 comb_copy /= m;                                                \
             }                                                                  \
             if (moveing_enabled()) {                                           \
@@ -1045,8 +1042,8 @@ void ts_print(ts* ts) {
             ta ta = ta_new();                                                  \
             N ds;                                                              \
             N##_init(&ds);                                                     \
-            if (moveing_enabled() || shareing_enabled()) {                     \
-                N##_set_shareing(&ds);                                         \
+            if (moveing_enabled() || sharing_enabled()) {                      \
+                N##_set_sharing(&ds);                                          \
             }                                                                  \
             for (int i = 0; (size_t)i < n; ++i) {                              \
                 size_t digit = comb_copy % m;                                  \
@@ -1083,9 +1080,7 @@ void ts_print(ts* ts) {
                 ta_print(&ta);                                                 \
                                                                                \
                 N ds_copy;                                                     \
-                printf("xmm\n");                                               \
                 N##_copy(&ds_copy, &ds);                                       \
-                printf("omm\n");                                               \
                 ASSERT_EQUAL(ta.size, N##_size(&ds_copy));                     \
                                                                                \
                 if (ta.size > 0) {                                             \
@@ -1099,9 +1094,7 @@ void ts_print(ts* ts) {
                     ASSERT_EQUAL(ta.data[0], *N##_front(&ds_copy));            \
                 }                                                              \
                                                                                \
-                if (!moveing_enabled() && !shareing_enabled()) {               \
-                    N##_free(&ds_copy);                                        \
-                }                                                              \
+                N##_free(&ds_copy);                                            \
                 comb_copy /= m;                                                \
             }                                                                  \
             if (moveing_enabled()) {                                           \
@@ -1128,10 +1121,10 @@ void ts_print(ts* ts) {
             size_t comb_copy = comb;                                           \
             ta ta = ta_new();                                                  \
             N ds;                                                              \
-            if (moveing_enabled() || shareing_enabled()) {                     \
-                N##_set_shareing(&ds);                                         \
-            }                                                                  \
             N##_init(&ds);                                                     \
+            if (moveing_enabled() || sharing_enabled()) {                      \
+                N##_set_sharing(&ds);                                          \
+            }                                                                  \
             for (int i = 0; (size_t)i < n; ++i) {                              \
                 size_t digit = comb_copy % m;                                  \
                 switch (digit) {                                               \

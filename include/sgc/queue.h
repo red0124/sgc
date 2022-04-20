@@ -5,6 +5,7 @@
 #include "detail/sgc_primitive_types.h"
 #include "detail/sgc_queue_common.h"
 #include "detail/sgc_utils.h"
+#include "detail/sgc_circular_buffer_common.h"
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_QUEUE(T, N)                                               \
@@ -27,9 +28,9 @@
                                                                                \
     typedef struct N N;                                                        \
     typedef T N##_type;                                                        \
-    typedef T N##_value;                                                        \
+    typedef T N##_value;                                                       \
                                                                                \
-    void N##_set_shareing(N* q);                                               \
+    void N##_set_sharing(N* q);                                               \
     void N##_set_owning(N* q);                                                 \
     size_t N##_size(const N* const q);                                         \
     void N##_init(N* q);                                                       \
@@ -65,14 +66,11 @@
                                                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
-            printf("hmm0\n");\
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
-            printf("hmm1\n");\
             if (!dst->data_) {                                                 \
                 N##_init(dst);                                                 \
                 return;                                                        \
             }                                                                  \
-            printf("hmm\n");\
             dst->sharing_ = src->sharing_;                                     \
             dst->size_ = dst->max_ = src->size_;                               \
             dst->back_ = src->size_ - 1;                                       \

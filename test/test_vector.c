@@ -37,7 +37,7 @@ int main(void) {
     RUN_TEST(test_vector_insert_erase_combinations_observed);
 
     disable_moveing();
-    enable_shareing();
+    enable_sharing();
     RUN_TEST(test_vector_insert_erase_combinations_observed);
     return UNITY_END();
 }

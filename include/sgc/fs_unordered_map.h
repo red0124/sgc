@@ -54,7 +54,7 @@
                                                                                \
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
-    void N##_set_shareing(N* u);                                               \
+    void N##_set_sharing(N* u);                                               \
     void N##_set_owning(N* u);                                                 \
     void N##_set_share_key(N* u, bool shared);                                 \
     size_t N##_size(const N* const u);                                         \

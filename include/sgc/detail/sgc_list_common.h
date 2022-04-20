@@ -84,13 +84,13 @@
         return i;                                                              \
     }                                                                          \
                                                                                \
-    static void _p_##N##_free_nodes(struct _p_##N##_node* n) {                 \
+    static void _p_##N##_free_nodes(struct _p_##N##_node* n, bool sharing) {  \
         struct _p_##N##_node* curr = n;                                        \
         struct _p_##N##_node* next;                                            \
         while (curr) {                                                         \
             next = curr->next_;                                                \
-            T##_free(&curr->data_);                                            \
+            _SGC_FREE(T, curr->data_, sharing);                               \
             sgc_free(curr);                                                    \
             curr = next;                                                       \
-        }\
+        }                                                                      \
     }

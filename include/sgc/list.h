@@ -10,7 +10,7 @@
 
 #define _SGC_INIT_PP_LIST(T, N)                                                \
     static struct _p_##N##_node* _p_##N##_node_alloc();                        \
-    static void _p_##N##_free_nodes(struct _p_##N##_node* n);
+    static void _p_##N##_free_nodes(struct _p_##N##_node* n, bool sharing);
 
 /* TODO add iterator insert/erase, add sort */
 #define SGC_INIT_HEADERS_LIST(T, N)                                            \
@@ -32,7 +32,8 @@
     typedef T N##_type;                                                        \
     typedef T N##_value;                                                       \
                                                                                \
-    void N##_set_share(N* l, bool shared);                                     \
+    void N##_set_sharing(N* v);                                               \
+    void N##_set_owning(N* v);                                                 \
     size_t N##_size(const N* const l);                                         \
     void N##_init(N* l);                                                       \
     void N##_free(N* l);                                                       \
@@ -77,7 +78,7 @@
                 }                                                              \
                 tmp_dst = _p_##N##_node_alloc(dst);                            \
                 if (!tmp_dst) {                                                \
-                    _p_##N##_free_nodes(dst->head_);                           \
+                    _p_##N##_free_nodes(dst->head_, src->sharing_);            \
                     N##_init(dst);                                             \
                     return;                                                    \
                 }                                                              \

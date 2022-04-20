@@ -25,7 +25,7 @@
         return &i.curr_->data_.value;                                          \
     }                                                                          \
                                                                                \
-    void N##_set_shareing_key(N* m) {                                          \
+    void N##_set_sharing_key(N* m) {                                          \
         m->sharing_key_ = true;                                                \
     }                                                                          \
                                                                                \

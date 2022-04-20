@@ -108,10 +108,10 @@ This behavior can be modified, see *allocators.c* within the examples directory.
 # Supported functionalities
 
 Every data structure defines the following functions:
-**`init`** **`copy`** **`free`** **`size`** **`empty`** **`set_shareing`** and **`set_owning`**
+**`init`** **`copy`** **`free`** **`size`** **`empty`** **`set_sharing`** and **`set_owning`**
 
 Dictionary data structures also have:
-**`set_shareing_key`** and **`set_owning_key`**
+**`set_sharing_key`** and **`set_owning_key`**
 
 Fixed size data structurs also have:
 **`max`**
