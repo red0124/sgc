@@ -3,25 +3,6 @@
 #include <stdlib.h>
 #include "sgc_utils.h"
 
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-#define _MAYBE_UNUSED __attribute__((unused))
-#else
-#define _MAYBE_UNUSED
-#endif
-
-#define SGC_SET_ALLOCATOR(MALLOC, REALLOC, FREE)                               \
-    _MAYBE_UNUSED static inline void* sgc_malloc(size_t size) {                \
-        return MALLOC(size);                                                   \
-    }                                                                          \
-                                                                               \
-    _MAYBE_UNUSED static inline void* sgc_realloc(void* ptr, size_t size) {    \
-        return REALLOC(ptr, size);                                             \
-    }                                                                          \
-                                                                               \
-    _MAYBE_UNUSED static inline void sgc_free(void* ptr) {                     \
-        FREE(ptr);                                                             \
-    }
-
 #ifndef SGC_USE_CUSTOM_ALLOCATOR
 #ifdef SGC_STRICT_ALLOCATOR
 
