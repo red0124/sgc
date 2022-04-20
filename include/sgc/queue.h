@@ -65,11 +65,14 @@
                                                                                \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
+            printf("hmm0\n");\
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
+            printf("hmm1\n");\
             if (!dst->data_) {                                                 \
                 N##_init(dst);                                                 \
                 return;                                                        \
             }                                                                  \
+            printf("hmm\n");\
             dst->sharing_ = src->sharing_;                                     \
             dst->size_ = dst->max_ = src->size_;                               \
             dst->back_ = src->size_ - 1;                                       \

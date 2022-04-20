@@ -57,7 +57,9 @@
     }                                                                          \
                                                                                \
     static void _p_##N##_copy_data(N* dst, const N* const src) {               \
+                printf("h0\n");\
         if (dst->sharing_) {                                                   \
+                printf("hi\n");\
             if (src->front_ < src->back_) {                                    \
                 memcpy(dst->data_, src->data_ + src->front_,                   \
                        src->size_ * sizeof(T));                                \

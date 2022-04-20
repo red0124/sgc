@@ -31,5 +31,13 @@ int main(void) {
     disable_allocation();
     RUN_TEST(test_vector_insert_erase_combinations);
     RUN_TEST(test_vector_insert_erase_combinations_observed);
+
+    enable_allocation();
+    enable_moveing();
+    RUN_TEST(test_vector_insert_erase_combinations_observed);
+
+    disable_moveing();
+    enable_shareing();
+    RUN_TEST(test_vector_insert_erase_combinations_observed);
     return UNITY_END();
 }
