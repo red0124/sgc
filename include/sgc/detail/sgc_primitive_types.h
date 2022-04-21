@@ -68,10 +68,6 @@
                                                                                \
     void N##_copy(T* dst, const T* const src) {                                \
         *dst = *src;                                                           \
-    }                                                                          \
-                                                                               \
-    int N##_eq(const T* const first, const T* const second) {                  \
-        return memcmp(first, second, sizeof(T)) == 0;                          \
     }
 
 #ifndef SGC_NO_PRIMITIVE_TYPES

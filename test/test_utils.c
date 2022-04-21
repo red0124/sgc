@@ -21,12 +21,10 @@ static void test_struct_generator_without_padding(void) {
 
     ASSERT_NOT_EQUAL(f.i, f2.i);
     ASSERT_NOT_EQUAL(f.j, f2.j);
-    ASSERT_NOT_EQUAL(true, foo_eq(&f, &f2));
 
     foo_copy(&f, &f2);
     ASSERT_EQUAL(f.i, f2.i);
     ASSERT_EQUAL(f.j, f2.j);
-    ASSERT_EQUAL(true, foo_eq(&f, &f2));
 
     foo_free(&f2);
     foo_free(&f);
@@ -51,12 +49,10 @@ static void test_struct_generator_with_padding(void) {
 
     ASSERT_NOT_EQUAL(b.i, b2.i);
     ASSERT_NOT_EQUAL(b.j, b2.j);
-    ASSERT_NOT_EQUAL(true, bar_eq(&b, &b2));
 
     bar_copy(&b, &b2);
     ASSERT_EQUAL(b.i, b2.i);
     ASSERT_EQUAL(b.j, b2.j);
-    ASSERT_EQUAL(true, bar_eq(&b, &b2));
 
     bar_free(&b2);
     bar_free(&b);
@@ -83,7 +79,6 @@ static void test_struct_with_array(void) {
     for (size_t i = 0; i < sizeof(t.array) / sizeof(uint8_t); ++i) {
         ASSERT_NOT_EQUAL(t.array[i], t2.array[i]);
     }
-    ASSERT_NOT_EQUAL(true, tar_eq(&t, &t2));
 
     tar_copy(&t, &t2);
 
@@ -91,7 +86,6 @@ static void test_struct_with_array(void) {
     for (size_t i = 0; i < sizeof(t.array) / sizeof(uint8_t); ++i) {
         ASSERT_EQUAL(t.array[i], t2.array[i]);
     }
-    ASSERT_EQUAL(true, tar_eq(&t, &t2));
 
     tar_free(&t2);
     tar_free(&t);
@@ -109,17 +103,21 @@ static void test_vector_of_structs(void) {
     t.i = 10;
     memset(t.array, 'x', sizeof(t.array));
     vec_push_back(&v, t);
-    ASSERT_EQUAL(true, tar_eq(&t, vec_back(&v)));
+    ASSERT_EQUAL(t.i, vec_back(&v)->i);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(t.array, vec_back(&v)->array, 5);
+
 
     t.i = 11;
     memset(t.array, 'y', sizeof(t.array));
     vec_push_back(&v, t);
-    ASSERT_EQUAL(true, tar_eq(&t, vec_back(&v)));
+    ASSERT_EQUAL(t.i, vec_back(&v)->i);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(t.array, vec_back(&v)->array, 5);
 
     t.i = 12;
     memset(t.array, 'z', sizeof(t.array));
     vec_push_back(&v, t);
-    ASSERT_EQUAL(true, tar_eq(&t, vec_back(&v)));
+    ASSERT_EQUAL(t.i, vec_back(&v)->i);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(t.array, vec_back(&v)->array, 5);
 
     ASSERT_EQUAL(3, vec_size(&v));
     ASSERT_EQUAL(10, vec_at(&v, 0)->i);
