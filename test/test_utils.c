@@ -101,9 +101,10 @@ SGC_INIT(VECTOR, tar, vec)
 
 static void test_vector_of_structs(void) {
     vec v;
-    tar t;
-
     vec_init(&v);
+
+    tar t;
+    tar_init(&t);
 
     t.i = 10;
     memset(t.array, 'x', sizeof(t.array));
