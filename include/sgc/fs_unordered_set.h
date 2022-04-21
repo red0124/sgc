@@ -12,7 +12,7 @@
 #define _SGC_INIT_PP_FS_UNORDERED_SET(KV, S, N)                                \
     static struct N##_it _p_##N##_find_by_hash(N* u, const KV* const k,        \
                                                size_t hash);                   \
-    static struct N##_it N##_it_at(const N* const u, size_t at);               \
+    static struct N##_it _p_##N##_it_at(const N* const u, size_t at);               \
     static void _p_##N##_node_free(const N* const m, struct _p_##N##_node* n); \
     static void                                                                \
         _p_##N##_node_copy_values(const N* const m, struct _p_##N##_node* dst, \

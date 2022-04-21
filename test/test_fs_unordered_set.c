@@ -12,7 +12,7 @@
                                                                                \
     void test_fs_unordered_set_insert_erase_combinations_observed##S(void) {   \
         TEST_INSERT_ERASE_COMBINATIONS_SET_MAX(ounordered_set##S, S);          \
-        ASSERT_ALLOCATION_COUNT\
+        ASSERT_ALLOCATION_COUNT                                                \
     }
 
 GENERATE_FS_UNORDERED_SET_TESTS(1)

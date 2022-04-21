@@ -39,7 +39,7 @@ enum _sgc_node_state {
             while (data[position].state_ != _SGC_NODE_STATE_OPEN) {            \
                 if (data[position].state_ == _SGC_NODE_STATE_USED &&           \
                     _p_##N##_node_eq_key(&data[position], key)) {              \
-                    return N##_it_at(ds, position);                            \
+                    return _p_##N##_it_at(ds, position);                       \
                 }                                                              \
                 if (S != 1 && position == S - 1) {                             \
                     position = 0;                                              \
@@ -52,7 +52,7 @@ enum _sgc_node_state {
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        struct N##_it it = {NULL, NULL, NULL, 0};                              \
+        struct N##_it it = {NULL, NULL, NULL, false};                          \
         return it;                                                             \
     }                                                                          \
                                                                                \
@@ -67,17 +67,17 @@ enum _sgc_node_state {
         }                                                                      \
     }                                                                          \
                                                                                \
-    static struct N##_it N##_it_at(const N* const m, size_t at) {              \
+    static struct N##_it _p_##N##_it_at(const N* const m, size_t at) {         \
         N##_it i;                                                              \
         i.begin_ = (struct _p_##N##_node*)(m->data_);                          \
         i.curr_ = i.begin_ + at;                                               \
-        i.end_ = i.begin_ + S;                                                 \
+        i.end_ = i.begin_ + S - 1;                                             \
         i.valid_ = (i.curr_->state_ == _SGC_NODE_STATE_USED) ? 1 : 0;          \
         return i;                                                              \
     }                                                                          \
                                                                                \
     void N##_it_go_next(struct N##_it* i) {                                    \
-        i->valid_ = 0;                                                         \
+        i->valid_ = false;                                                     \
         if (i->curr_ >= i->end_) {                                             \
             return;                                                            \
         }                                                                      \
