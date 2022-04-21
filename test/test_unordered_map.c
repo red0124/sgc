@@ -40,5 +40,19 @@ int main(void) {
     RUN_TEST(test_unordered_map_insert_erase_combinations_observed);
     RUN_TEST(test_unordered_map_insert_erase_combinations_observed_key);
     RUN_TEST(test_unordered_map_insert_erase_combinations_observed_value);
+
+    enable_allocation();
+    enable_moveing();
+    RUN_TEST(test_unordered_map_insert_erase_combinations);
+    RUN_TEST(test_unordered_map_insert_erase_combinations_observed);
+    RUN_TEST(test_unordered_map_insert_erase_combinations_observed_key);
+    RUN_TEST(test_unordered_map_insert_erase_combinations_observed_value);
+
+    disable_moveing();
+    enable_sharing();
+    RUN_TEST(test_unordered_map_insert_erase_combinations);
+    RUN_TEST(test_unordered_map_insert_erase_combinations_observed);
+    RUN_TEST(test_unordered_map_insert_erase_combinations_observed_key);
+    RUN_TEST(test_unordered_map_insert_erase_combinations_observed_value);
     return UNITY_END();
 }

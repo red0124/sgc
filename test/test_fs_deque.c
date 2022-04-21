@@ -16,8 +16,7 @@
         TEST_INSERT_ERASE_COMBINATIONS_ARRAY_MAX(odeque##S,                    \
                                                  TEST_RANDOM_ACCESS_ITERATOR,  \
                                                  S);                           \
-        TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                    \
-        ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);          \
+        ASSERT_ALLOCATION_COUNT\
     }
 
 GENERATE_FS_DEQUE_TESTS(1)
@@ -48,6 +47,15 @@ int main(void) {
     RUN_TEST(test_fs_deque_insert_erase_combinations6);
     RUN_TEST(test_fs_deque_insert_erase_combinations_observed6);
 
+    RUN_TEST(test_fs_deque_insert_erase_combinations256);
+    RUN_TEST(test_fs_deque_insert_erase_combinations_observed256);
+
+    enable_moveing();
+    RUN_TEST(test_fs_deque_insert_erase_combinations256);
+    RUN_TEST(test_fs_deque_insert_erase_combinations_observed256);
+
+    disable_moveing();
+    enable_sharing();
     RUN_TEST(test_fs_deque_insert_erase_combinations256);
     RUN_TEST(test_fs_deque_insert_erase_combinations_observed256);
     return UNITY_END();

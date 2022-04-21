@@ -12,8 +12,7 @@
                                                                                \
     void test_fs_unordered_map_insert_erase_combinations_observed##S(void) {   \
         TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(omap##S, S);                    \
-        TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                    \
-        ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);          \
+        ASSERT_ALLOCATION_COUNT                                                \
     }                                                                          \
                                                                                \
     SGC_INIT_FS_UNORDERED_MAP(oint, int, S, oint_int_map##S)                   \
@@ -21,8 +20,7 @@
     void test_fs_unordered_map_insert_erase_combinations_observed_key##S(      \
         void) {                                                                \
         TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(oint_int_map##S, S);            \
-        TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                    \
-        ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);          \
+        ASSERT_ALLOCATION_COUNT                                                \
     }                                                                          \
                                                                                \
     SGC_INIT_FS_UNORDERED_MAP(int, oint, S, int_oint_map##S)                   \
@@ -30,8 +28,7 @@
     void test_fs_unordered_map_insert_erase_combinations_observed_value##S(    \
         void) {                                                                \
         TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(int_oint_map##S, S);            \
-        TEST_ASSERT_GREATER_THAN(0, oint_allocation_count);                    \
-        ASSERT_EQUAL(oint_allocation_count, oint_deallocation_count);          \
+        ASSERT_ALLOCATION_COUNT                                                \
     }
 
 GENERATE_FS_UNORDERED_MAP_TESTS(1)
@@ -74,6 +71,20 @@ int main(void) {
     RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key6);
     RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value6);
 
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations256);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed256);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key256);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value256);
+
+    enable_allocation();
+    enable_moveing();
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations256);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed256);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key256);
+    RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_value256);
+
+    disable_moveing();
+    enable_sharing();
     RUN_TEST(test_fs_unordered_map_insert_erase_combinations256);
     RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed256);
     RUN_TEST(test_fs_unordered_map_insert_erase_combinations_observed_key256);

@@ -14,12 +14,14 @@ int oint_deallocation_count = 0;
 #define OINT_DANGLING -1
 
 void disable_allocation() {
+    printf("ALLOCATION DISABLED\n");
     _disable_allocation = true;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
 void enable_allocation() {
+    printf("ALLOCATION ENABLED\n");
     _disable_allocation = false;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
@@ -30,12 +32,14 @@ bool allocation_enabled() {
 }
 
 void enable_moveing() {
+    printf("MOVEING ENABLED\n");
     _enable_moveing = true;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
 void disable_moveing() {
+    printf("MOVEING DISABLED\n");
     _enable_moveing = false;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
@@ -46,12 +50,14 @@ bool moveing_enabled() {
 }
 
 void enable_sharing() {
+    printf("SHARING ENABLED\n");
     _enable_sharing = true;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
 void disable_sharing() {
+    printf("SHARING DISABLED\n");
     _enable_sharing = false;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
@@ -640,6 +646,10 @@ void tm_print(tm* tm) {
             tm tm = tm_new();                                                  \
             N ds;                                                              \
             N##_init(&ds);                                                     \
+            if (moveing_enabled() || sharing_enabled()) {                      \
+                N##_set_sharing(&ds);                                          \
+                N##_set_sharing_key(&ds);                                      \
+            }                                                                  \
             for (int i = 0; (size_t)i < n; ++i) {                              \
                 size_t digit = comb_copy % m;                                  \
                 switch (digit) {                                               \
@@ -733,6 +743,10 @@ void tm_print(tm* tm) {
                                                                                \
                 N##_free(&ds_copy);                                            \
                 comb_copy /= m;                                                \
+            }                                                                  \
+            if (moveing_enabled()) {                                           \
+                N##_set_owning(&ds);                                           \
+                N##_set_owning_key(&ds);                                       \
             }                                                                  \
             N##_free(&ds);                                                     \
         }                                                                      \
@@ -872,6 +886,9 @@ void ts_print(ts* ts) {
             ts ts = ts_new();                                                  \
             N ds;                                                              \
             N##_init(&ds);                                                     \
+            if (moveing_enabled() || sharing_enabled()) {                      \
+                N##_set_sharing(&ds);                                          \
+            }                                                                  \
             for (int i = 0; (size_t)i < n; ++i) {                              \
                 size_t digit = comb_copy % m;                                  \
                 switch (digit) {                                               \
@@ -957,6 +974,9 @@ void ts_print(ts* ts) {
                                                                                \
                 comb_copy /= m;                                                \
             }                                                                  \
+            if (moveing_enabled()) {                                           \
+                N##_set_owning(&ds);                                           \
+            }                                                                  \
             N##_free(&ds);                                                     \
         }                                                                      \
     }
@@ -979,6 +999,9 @@ void ts_print(ts* ts) {
             ta ta = ta_new();                                                  \
             N ds;                                                              \
             N##_init(&ds);                                                     \
+            if (moveing_enabled() || sharing_enabled()) {                      \
+                N##_set_sharing(&ds);                                          \
+            }                                                                  \
             for (int i = 0; (size_t)i < n; ++i) {                              \
                 size_t digit = comb_copy % m;                                  \
                 switch (digit) {                                               \
@@ -1019,6 +1042,9 @@ void ts_print(ts* ts) {
                                                                                \
                 N##_free(&ds_copy);                                            \
                 comb_copy /= m;                                                \
+            }                                                                  \
+            if (moveing_enabled()) {                                           \
+                N##_set_owning(&ds);                                           \
             }                                                                  \
             N##_free(&ds);                                                     \
         }                                                                      \

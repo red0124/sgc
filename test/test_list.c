@@ -38,6 +38,7 @@ SGC_INIT_LIST(int, list)
                                                                                \
         N new_list;                                                            \
         N##_init(&new_list);                                                   \
+        new_list.sharing_ = l->sharing_;                                       \
                                                                                \
         for (N##_it curr = N##_begin(l); N##_it_valid(curr);                   \
              N##_it_go_next(&curr)) {                                          \
@@ -63,6 +64,7 @@ SGC_INIT_LIST(int, list)
                                                                                \
         N new_list;                                                            \
         N##_init(&new_list);                                                   \
+        new_list.sharing_ = l->sharing_;                                       \
                                                                                \
         for (N##_it curr = N##_begin(l); N##_it_valid(curr);                   \
              N##_it_go_next(&curr)) {                                          \
@@ -101,10 +103,12 @@ int main(void) {
 
     enable_allocation();
     enable_moveing();
+    RUN_TEST(test_list_insert_erase_combinations);
     RUN_TEST(test_list_insert_erase_combinations_observed);
 
     disable_moveing();
     enable_sharing();
+    RUN_TEST(test_list_insert_erase_combinations);
     RUN_TEST(test_list_insert_erase_combinations_observed);
     return UNITY_END();
 }
