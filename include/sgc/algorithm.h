@@ -1,6 +1,5 @@
 #pragma once
 
-#include "detail/sgc_allocator.h"
 #include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>

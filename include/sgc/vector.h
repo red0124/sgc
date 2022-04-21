@@ -23,7 +23,7 @@
     typedef T N##_type;                                                        \
     typedef T N##_value;                                                       \
                                                                                \
-    void N##_set_sharing(N* v);                                               \
+    void N##_set_sharing(N* v);                                                \
     void N##_set_owning(N* v);                                                 \
     void N##_init(N* v);                                                       \
     size_t N##_size(const N* const v);                                         \

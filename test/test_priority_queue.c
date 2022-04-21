@@ -1,8 +1,6 @@
 #include "test_common.h"
 #include <sgc/priority_queue.h>
 
-#define TEST_ELEMENTS_NUM 50
-
 SGC_INIT_PRIORITY_QUEUE(int, pqueue)
 
 void test_pqueue_push_pop_combinations(void) {

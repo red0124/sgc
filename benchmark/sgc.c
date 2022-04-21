@@ -7,8 +7,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-SGC_INIT_BASIC_TYPE(uint32_t, uint32_t, extern)
-SGC_INIT_BASIC_HASH(uint32_t, uint32_t, extern)
+SGC_INIT_PRIMITIVE_TYPE(uint32_t, uint32_t)
+SGC_INIT_PRIMITIVE_HASH(uint32_t, uint32_t)
 
 SGC_INIT_MAP(uint32_t, uint32_t, map)
 SGC_INIT_UNORDERED_MAP(uint32_t, uint32_t, umap)

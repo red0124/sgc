@@ -22,6 +22,7 @@ tests = [
   ['FS_UNORDERED_MAP', 'fs_unordered_map'],
   ['FS_UNORDERED_SET', 'fs_unordered_set'],
   ['FS_VECTOR', 'fs_vector'],
+  ['UTILS', 'utils'],
   ]
 
 foreach name_file : tests

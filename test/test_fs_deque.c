@@ -16,7 +16,7 @@
         TEST_INSERT_ERASE_COMBINATIONS_ARRAY_MAX(odeque##S,                    \
                                                  TEST_RANDOM_ACCESS_ITERATOR,  \
                                                  S);                           \
-        ASSERT_ALLOCATION_COUNT\
+        ASSERT_ALLOCATION_COUNT                                                \
     }
 
 GENERATE_FS_DEQUE_TESTS(1)

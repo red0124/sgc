@@ -1,7 +1,20 @@
 #pragma once
+#include "sgc_utils.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include "sgc_utils.h"
+
+#define SGC_SET_ALLOCATOR(MALLOC, REALLOC, FREE)                               \
+    static inline void* sgc_malloc(size_t size) {                              \
+        return MALLOC(size);                                                   \
+    }                                                                          \
+                                                                               \
+    static inline void* sgc_realloc(void* ptr, size_t size) {                  \
+        return REALLOC(ptr, size);                                             \
+    }                                                                          \
+                                                                               \
+    static inline void sgc_free(void* ptr) {                                   \
+        FREE(ptr);                                                             \
+    }
 
 #ifndef SGC_USE_CUSTOM_ALLOCATOR
 #ifdef SGC_STRICT_ALLOCATOR
@@ -10,7 +23,7 @@
  * invokes exit(EXIT_FAILURE) on failed allocation
  */
 
-_MAYBE_UNUSED static inline void* sgc_malloc(size_t size) {
+static inline void* sgc_malloc(size_t size) {
     void* ptr = malloc(size);
     if (!ptr) {
         exit(EXIT_FAILURE);
@@ -18,7 +31,7 @@ _MAYBE_UNUSED static inline void* sgc_malloc(size_t size) {
     return ptr
 }
 
-_MAYBE_UNUSED static inline void* sgc_realloc(void* ptr, size_t size) {
+static inline void* sgc_realloc(void* ptr, size_t size) {
     void* new_ptr = realloc(ptr, size);
     if (!new_ptr) {
         exit(EXIT_FAILURE);
@@ -26,7 +39,7 @@ _MAYBE_UNUSED static inline void* sgc_realloc(void* ptr, size_t size) {
     return new_ptr;
 }
 
-_MAYBE_UNUSED static inline void sgc_free(void* ptr) {
+static inline void sgc_free(void* ptr) {
     free(ptr);
 }
 
@@ -40,7 +53,7 @@ _MAYBE_UNUSED static inline void sgc_free(void* ptr) {
 
 bool _sgc_flag_allocation_failed = false;
 
-_MAYBE_UNUSED static inline void* sgc_malloc(size_t size) {
+static inline void* sgc_malloc(size_t size) {
     void* ptr = malloc(size);
     if (!ptr) {
         _sgc_flag_allocation_failed = true;
@@ -48,7 +61,7 @@ _MAYBE_UNUSED static inline void* sgc_malloc(size_t size) {
     return ptr
 }
 
-_MAYBE_UNUSED static inline void* sgc_realloc(void* ptr, size_t size) {
+static inline void* sgc_realloc(void* ptr, size_t size) {
     void* new_ptr = realloc(ptr, size);
     if (!new_ptr) {
         _sgc_flag_allocation_failed = true;
@@ -56,15 +69,15 @@ _MAYBE_UNUSED static inline void* sgc_realloc(void* ptr, size_t size) {
     return new_ptr;
 }
 
-_MAYBE_UNUSED static inline void sgc_free(void* ptr) {
+static inline void sgc_free(void* ptr) {
     free(ptr);
 }
 
-_MAYBE_UNUSED static inline bool sgc_failed_allocation(void) {
+static inline bool sgc_failed_allocation(void) {
     return _sgc_flag_allocation_failed;
 }
 
-_MAYBE_UNUSED static inline bool sgc_clear_allocation_flag(void) {
+static inline bool sgc_clear_allocation_flag(void) {
     _sgc_flag_allocation_failed = false;
 }
 

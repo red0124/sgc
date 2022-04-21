@@ -1,8 +1,6 @@
 #include "test_common.h"
 #include <sgc/list.h>
 
-#define TEST_ELEMENTS_NUM 50
-
 SGC_INIT_LIST(int, list)
 
 #define INIT_ADDITIONAL_LIST_FUNCTIONS(T, N)                                   \

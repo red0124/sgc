@@ -1,8 +1,6 @@
 #include "test_common.h"
 #include <sgc/forward_list.h>
 
-#define TEST_ELEMENTS_NUM 50
-
 SGC_INIT_FORWARD_LIST(int, list)
 
 #define INIT_ADDITIONAL_FORWARD_LIST_FUNCTIONS(T, N)                           \
