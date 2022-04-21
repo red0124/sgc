@@ -22,12 +22,15 @@
 #define SGC_INIT_STRING(N)                                                     \
     SGC_INIT_HEADERS_STRING(N)                                                 \
                                                                                \
-    void N##_copy(N* first, const N* const second) {                           \
-        if (*second) {                                                         \
-            /* TODO replace with sgc_malloc */                                 \
-            *first = strdup(*second);                                          \
+    void N##_copy(N* dst, const N* const src) {                                \
+        if (*src) {                                                            \
+            size_t size = strlen(*src) + 1;                                    \
+            *dst = (char*)sgc_malloc(size);                                    \
+            if (*dst) {                                                        \
+                memcpy(*dst, *src, size);                                      \
+            }                                                                  \
         } else {                                                               \
-            *first = NULL;                                                     \
+            *dst = NULL;                                                       \
         }                                                                      \
     }                                                                          \
                                                                                \
