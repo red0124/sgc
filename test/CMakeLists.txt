@@ -42,7 +42,7 @@ foreach(name IN ITEMS test_algorithm test_deque test_forward_list test_list
         test_fs_deque test_fs_priority_queue test_fs_queue
         test_fs_stack test_fs_unordered_map test_fs_unordered_set
         test_fs_vector test_string test_unordered_map test_unordered_set
-        test_vector, test_utils)
+        test_vector test_utils)
   add_executable("${name}" "${name}.c")
   target_link_libraries("${name}" PRIVATE sgc::sgc unity)
   target_compile_definitions("${name}" PRIVATE CMAKE_GITHUB_CI)
