@@ -26,7 +26,7 @@
         l->size_ = 0;                                                          \
     }                                                                          \
                                                                                \
-    const T* N##_back(const N* const l) {                                      \
+    T* N##_back(const N* const l) {                                            \
         if (l->size_) {                                                        \
             return &l->tail_->data_;                                           \
         }                                                                      \
@@ -39,7 +39,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    const T* N##_front(const N* const l) {                                     \
+    T* N##_front(const N* const l) {                                           \
         if (l->size_) {                                                        \
             return &l->head_->data_;                                           \
         }                                                                      \
@@ -84,12 +84,12 @@
         return i;                                                              \
     }                                                                          \
                                                                                \
-    static void _p_##N##_free_nodes(struct _p_##N##_node* n, bool sharing) {  \
+    static void _p_##N##_free_nodes(struct _p_##N##_node* n, bool sharing) {   \
         struct _p_##N##_node* curr = n;                                        \
         struct _p_##N##_node* next;                                            \
         while (curr) {                                                         \
             next = curr->next_;                                                \
-            _SGC_FREE(T, curr->data_, sharing);                               \
+            _SGC_FREE(T, curr->data_, sharing);                                \
             sgc_free(curr);                                                    \
             curr = next;                                                       \
         }                                                                      \

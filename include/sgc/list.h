@@ -32,7 +32,7 @@
     typedef T N##_type;                                                        \
     typedef T N##_value;                                                       \
                                                                                \
-    void N##_set_sharing(N* v);                                               \
+    void N##_set_sharing(N* v);                                                \
     void N##_set_owning(N* v);                                                 \
     size_t N##_size(const N* const l);                                         \
     void N##_init(N* l);                                                       \
@@ -40,11 +40,11 @@
     bool N##_eq(const N* const first, const N* const second);                  \
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
     void N##_push_back(N* l, T el);                                            \
-    const T* N##_back(const N* const l);                                       \
+    T* N##_back(const N* const l);                                             \
     void N##_set_back(N* l, T new_el);                                         \
     void N##_pop_back(N* l);                                                   \
     void N##_push_front(N* l, const T el);                                     \
-    const T* N##_front(const N* const l);                                      \
+    T* N##_front(const N* const l);                                            \
     void N##_set_front(N* l, T new_el);                                        \
     void N##_pop_front(N* l);                                                  \
     bool N##_empty(const N* l);                                                \

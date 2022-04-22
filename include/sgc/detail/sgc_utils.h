@@ -251,7 +251,7 @@
 #define sgc_for_each(...) _SGC_FOR_EACH(__VA_ARGS__)
 
 #define _SGC_FOR_EACH(EL, C, N)                                                \
-    N##_it _SGC_UNIQUE(curr) = N##_begin(&C);                                  \
+    N##_it _SGC_UNIQUE(curr) = N##_cbegin(&C);                                 \
     for (N##_type* EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr));             \
          N##_it_valid(_SGC_UNIQUE(curr)); N##_it_go_next(&_SGC_UNIQUE(curr)),  \
                    EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr)))
@@ -259,7 +259,7 @@
 #define sgc_for_each_reverse(...) _SGC_FOR_EACH_REVERSE(__VA_ARGS__)
 
 #define _SGC_FOR_EACH_REVERSE(EL, C, N)                                        \
-    N##_it _SGC_UNIQUE(curr) = N##_end(&C);                                    \
+    N##_it _SGC_UNIQUE(curr) = N##_cend(&C);                                   \
     for (N##_type* EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr));             \
          N##_it_valid(_SGC_UNIQUE(curr)); N##_it_go_prev(&_SGC_UNIQUE(curr)),  \
                    EL = (N##_type*)N##_it_data(_SGC_UNIQUE(curr)))
@@ -269,7 +269,7 @@
 // ==============
 
 #define SGC_MOVE(N, DS, ...)                                                   \
-    N##_set_sharing(&DS);                                                     \
+    N##_set_sharing(&DS);                                                      \
     __VA_ARGS__;                                                               \
     N##_set_owning(&DS);
 

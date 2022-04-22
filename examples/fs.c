@@ -6,11 +6,8 @@
 // vec <=> vector<int> with capacity 100
 SGC_INIT_FS(FS_VECTOR, int, 100, vec)
 
-// str <=> char* with init, copy, free and other mandatory sgc functions 
-SGC_INIT_STRING(str)
-
-// umap <=> unordered_map<str> with capacity 5
-SGC_INIT_FS_DICT(FS_UNORDERED_MAP, str, double, 5, umap)
+// umap <=> unordered_map<char, double> with capacity 3
+SGC_INIT_FS_DICT(FS_UNORDERED_MAP, char, double, 3, umap)
 
 void fs_vec_example(void) {
     vec v;
@@ -34,20 +31,18 @@ void fs_unordered_map_example(void) {
     umap u;
     umap_init(&u);
 
-    char buff[32];
-    for (size_t i = 0; i < umap_max(); ++i) {
-        sprintf(buff, "key%zu", i);
-        umap_set(&u, buff, i);
-    }
+    umap_set(&u, 'a', 1);
+    umap_set(&u, 'b', 2);
+    umap_set(&u, 'c', 3);
 
     // will not be inserted since the map is full
-    umap_set(&u, "full", -1);
+    umap_set(&u, 'd', -1);
 
     // will update key0 from 0 to -2
-    umap_set(&u, "key0", -2);
+    umap_set(&u, 'b', -2);
 
     for_each(i IN u AS umap) {
-        printf("%s -> %.2f\n", i->key, i->value);
+        printf("- %c: %.2f\n", i->key, i->value);
     }
 
     // free needs to be called to free the keys which are allocated strings
