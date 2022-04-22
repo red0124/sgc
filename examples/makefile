@@ -3,3 +3,4 @@ all:
 	gcc map.c -o map -I ../include
 	gcc fs.c -o fs -I ../include
 	gcc algorithm.c -o algorithm -I ../include
+	gcc struct.c -o struct -I ../include

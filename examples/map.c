@@ -1,6 +1,7 @@
 #include <sgc/map.h>
 #include <stdio.h>
 
+// map <=> map<int, double>
 SGC_INIT_DICT(MAP, char, double, map)
 
 int main(void) {

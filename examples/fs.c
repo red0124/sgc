@@ -3,9 +3,13 @@
 #include <sgc/string.h>
 #include <stdio.h>
 
+// vec <=> vector<int> with capacity 100
 SGC_INIT_FS(FS_VECTOR, int, 100, vec)
 
+// str <=> char* with init, copy, free and other mandatory sgc functions 
 SGC_INIT_STRING(str)
+
+// umap <=> unordered_map<str> with capacity 5
 SGC_INIT_FS_DICT(FS_UNORDERED_MAP, str, double, 5, umap)
 
 void fs_vec_example(void) {

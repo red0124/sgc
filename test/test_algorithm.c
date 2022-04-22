@@ -145,13 +145,13 @@ void test_vector_sort(void) {
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         vector_push_back(&v, i % TEST_ELEMENTS_NUM / 4);
 
-        vector_sort_default(&v);
+        vector_qsort_default(&v);
         for (size_t j = 1; j < vector_size(&v); ++j) {
             TEST_ASSERT_EQUAL_INT(1,
                                   *vector_at(&v, j - 1) <= *vector_at(&v, j));
         }
 
-        vector_sort(&v, compare_reverse);
+        vector_qsort(&v, compare_reverse);
 
         for (size_t j = 1; j < vector_size(&v); ++j) {
             TEST_ASSERT_EQUAL_INT(1,
@@ -171,12 +171,12 @@ void test_deque_sort(void) {
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         deque_push_back(&d, i % TEST_ELEMENTS_NUM / 4);
 
-        deque_sort_default(&d);
+        deque_qsort_default(&d);
         for (size_t j = 1; j < deque_size(&d); ++j) {
             TEST_ASSERT_EQUAL_INT(1, *deque_at(&d, j - 1) <= *deque_at(&d, j));
         }
 
-        deque_sort(&d, compare_reverse);
+        deque_qsort(&d, compare_reverse);
 
         for (size_t j = 1; j < deque_size(&d); ++j) {
             TEST_ASSERT_EQUAL_INT(1, *deque_at(&d, j) <= *deque_at(&d, j - 1));

@@ -23,7 +23,7 @@ void test_string_copy_eq_compare(void) {
     ASSERT_EQUAL(0, string_compare(&msg, &s));
     ASSERT_EQUAL(0, string_compare(&s, &msg));
 
-    string_sort_default(&s);
+    string_qsort_default(&s);
     ASSERT_EQUAL(false, string_eq(&msg, &s));
     TEST_ASSERT_GREATER_THAN(0, string_compare(&msg, &s));
     TEST_ASSERT_LESS_THAN(0, string_compare(&s, &msg));

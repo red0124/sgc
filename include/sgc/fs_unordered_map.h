@@ -11,7 +11,7 @@
 
 #define _SGC_INIT_PP_FS_UNORDERED_MAP(K, V, S, N)                              \
     static N##_it _p_##N##_find_by_hash(N* u, const K* const k, size_t hash);  \
-    static N##_it _p_##N##_it_at(const N* const u, size_t at);                      \
+    static N##_it _p_##N##_it_at(const N* const u, size_t at);                 \
     static void _p_##N##_node_free(const N* const m, struct _p_##N##_node* n); \
     static void                                                                \
         _p_##N##_node_copy_values(const N* const m, struct _p_##N##_node* dst, \
@@ -54,7 +54,7 @@
                                                                                \
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
-    void N##_set_sharing(N* u);                                               \
+    void N##_set_sharing(N* u);                                                \
     void N##_set_owning(N* u);                                                 \
     void N##_set_share_key(N* u, bool shared);                                 \
     size_t N##_size(const N* const u);                                         \

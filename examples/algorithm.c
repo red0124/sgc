@@ -7,11 +7,6 @@
 // EQ (vec_eq vec_count) algorithms
 SGC_INIT(VECTOR, int, vec, QSORT, EQ)
 
-// Example of seperate initialization, vec2 will be identical to vec1
-SGC_INIT_VECTOR(int, vec2)
-SGC_INIT_EQ(int, vec2)
-SGC_INIT_QSORT(int, vec2)
-
 // map will have access to FIND (find_el, find_it) algorithms
 SGC_INIT_DICT(MAP, int, int, map, FIND)
 
@@ -27,7 +22,7 @@ void vec_algorithms_example(void) {
     vec_copy(&v_copy, &v);
     printf("v == v_copy %s\n", vec_eq(&v, &v_copy) ? "true" : "false");
 
-    vec_sort_default(&v);
+    vec_qsort_default(&v);
     printf("v == v_copy %s\n", vec_eq(&v, &v_copy) ? "true" : "false");
 
     printf("v:");
@@ -47,6 +42,7 @@ void map_algorithms_example(void) {
     *map_at(&m, 1) = 10;
     *map_at(&m, 2) = 20;
 
+    // map_find_el searches by value as opposed to find which searches by key
     map_pair* pair = map_find_el(&m, 1);
     if (pair) {
         printf("error\n");
