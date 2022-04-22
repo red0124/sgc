@@ -101,21 +101,21 @@
 // QSORT
 // ==============
 #define SGC_INIT_HEADERS_QSORT(T, N)                                           \
-    void N##_sort(N* ds, int (*comp)(const void*, const void*));               \
-    void N##_sort_default(N* ds);
+    void N##_qsort(N* ds, int (*comp)(const void*, const void*));              \
+    void N##_qsort_default(N* ds);
 
 // IMPLEMENTATION
 #define SGC_INIT_QSORT(T, N)                                                   \
     SGC_INIT_HEADERS_QSORT(T, N)                                               \
-    void N##_sort(N* ds, int (*comp)(const void*, const void*)) {              \
+    void N##_qsort(N* ds, int (*comp)(const void*, const void*)) {             \
         if (!comp) {                                                           \
             return;                                                            \
         }                                                                      \
         qsort(N##_array(ds), N##_size(ds), sizeof(T), comp);                   \
     }                                                                          \
                                                                                \
-    void N##_sort_default(N* ds) {                                             \
-        N##_sort(ds, T##_void_compare);                                        \
+    void N##_qsort_default(N* ds) {                                            \
+        N##_qsort(ds, T##_void_compare);                                       \
     }
 
 // ==============

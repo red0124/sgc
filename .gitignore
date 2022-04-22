@@ -7,3 +7,6 @@ hbuild/
 test/build/
 subprojects/*
 !subprojects/*.wrap
+benchmark/sgc
+benchmark/std
+benchmark/compile_commands.json

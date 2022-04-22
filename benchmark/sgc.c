@@ -3,7 +3,7 @@
 #include "../include/sgc/priority_queue.h"
 #include "../include/sgc/unordered_map.h"
 #include "../include/sgc/vector.h"
-#include "extern.h"
+#include "benchmark_common.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -85,7 +85,7 @@ static void run_vector_iterate(void) {
     vector v;
     vector_init(&v);
 
-    for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
+    for (size_t i = 0; i < NUM_ELEMENTS_VECTOR; ++i) {
         vector_push_back(&v, i);
     }
 
@@ -102,32 +102,30 @@ static void run_vector_iterate(void) {
 }
 
 static void run_deque_insert(size_t n) {
-    deq d;
-    deq_init(&d);
-
     for (size_t j = 0; j < NUM_TOTAL_INSERTS_DEQUE / n; ++j) {
-        deq_free(&d);
+        deq d;
         deq_init(&d);
+
         for (size_t i = 0; i < n; ++i) {
             size_t delta = deq_size(&d) / 10;
             deq_insert(&d, delta, i);
             deq_insert(&d, deq_size(&d) - delta, i);
         }
-    }
 
-    nop(deq_size(&d));
-    deq_free(&d);
+        nop(deq_size(&d));
+        deq_free(&d);
+    }
 }
 
 static void run_deque_iterate(void) {
     deq d;
     deq_init(&d);
 
-    for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
+    for (size_t i = 0; i < NUM_ELEMENTS_DEQUE; ++i) {
         deq_push_back(&d, i);
     }
 
-    for (size_t i = 0; i < NUM_REPEATS_VECTOR_ITERATE; ++i) {
+    for (size_t i = 0; i < NUM_REPEATS_DEQUE_ITERATE; ++i) {
         size_t sum = 0;
         for_each(el IN d AS deq) {
             sum += *el;
@@ -144,7 +142,7 @@ static void run_unordered_map_of_vectors_insert(void) {
     umap_vector_init(&m);
 
     for (size_t j = 0; j < NUM_REPEATS_UNORDERED_MAP_OF_VECTORS_INSERT; ++j) {
-        for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
+        for (size_t i = 0; i < NUM_ELEMENTS_UNORDERED_MAP; ++i) {
             vector_push_back(umap_vector_at(&m, (i * 19) % 1000), i);
         }
     }

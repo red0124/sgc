@@ -45,28 +45,27 @@
 
 #define SGC_INIT_PRIMITIVE_HASH(T, N)                                          \
     SGC_INIT_HEADERS_PRIMITIVE_HASH(T, N)                                      \
-    size_t N##_hash(const T* const el) {                                       \
+    static inline size_t N##_hash(const T* const el) {                         \
         return (size_t)*el;                                                    \
     }
 
 #define SGC_INIT_HEADERS_PRIMITIVE_STRUCT(T, N)                                \
     typedef T N;                                                               \
-    void N##_init(T* el);                                                      \
-    void N##_free(T* el);                                                      \
-    void N##_copy(T* dst, const T* const src);                                 \
-    int N##_eq(const T* const first, const T* const second);
+    static inline void N##_init(T* el);                                        \
+    static inline void N##_free(T* el);                                        \
+    static inline void N##_copy(T* dst, const T* const src);
 
 #define SGC_INIT_PRIMITIVE_STRUCT(T, N)                                        \
     SGC_INIT_HEADERS_PRIMITIVE_STRUCT(T, N)                                    \
-    void N##_init(T* el) {                                                     \
+    static inline void N##_init(T* el) {                                       \
         memset(el, 0, sizeof(T));                                              \
     }                                                                          \
                                                                                \
-    void N##_free(T* el) {                                                     \
+    static inline void N##_free(T* el) {                                       \
         (void)el;                                                              \
     }                                                                          \
                                                                                \
-    void N##_copy(T* dst, const T* const src) {                                \
+    static inline void N##_copy(T* dst, const T* const src) {                  \
         *dst = *src;                                                           \
     }
 

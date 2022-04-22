@@ -1,4 +1,4 @@
-#include "extern.h"
+#include "benchmark_common.h"
 #include <cstdlib>
 #include <deque>
 #include <iostream>
@@ -40,7 +40,7 @@ static void run_map_iterate() {
 static void run_unordered_map_insert(size_t n) {
     std::unordered_map<uint32_t, uint32_t> m;
 
-    for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
+    for (size_t i = 0; i < NUM_ELEMENTS_UNORDERED_MAP; ++i) {
         m[(i * 19) % n] = i;
     }
 
@@ -68,7 +68,7 @@ static void run_unordered_map_iterate() {
 static void run_vector_iterate() {
     std::vector<uint32_t> v;
 
-    for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
+    for (size_t i = 0; i < NUM_ELEMENTS_VECTOR; ++i) {
         v.push_back(i);
     }
 
@@ -84,28 +84,27 @@ static void run_vector_iterate() {
 }
 
 static void run_deque_insert(size_t n) {
-    std::deque<uint32_t> d;
-
     for (size_t j = 0; j < NUM_TOTAL_INSERTS_DEQUE / n; ++j) {
+        std::deque<uint32_t> d;
+
         for (size_t i = 0; i < n; ++i) {
             size_t delta = d.size() / 10;
             d.insert(d.begin() + delta, i);
             d.insert(d.end() - delta, i);
         }
-        d.clear();
-    }
 
-    nop(d.size());
+        nop(d.size());
+    }
 }
 
 static void run_deque_iterate() {
     std::deque<uint32_t> d;
 
-    for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
+    for (size_t i = 0; i < NUM_ELEMENTS_DEQUE; ++i) {
         d.push_back(i);
     }
 
-    for (size_t i = 0; i < NUM_REPEATS_VECTOR_ITERATE; ++i) {
+    for (size_t i = 0; i < NUM_REPEATS_DEQUE_ITERATE; ++i) {
         size_t sum = 0;
         for (const auto& el : d) {
             sum += el;
