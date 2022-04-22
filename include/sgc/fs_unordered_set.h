@@ -12,7 +12,7 @@
 #define _SGC_INIT_PP_FS_UNORDERED_SET(KV, S, N)                                \
     static struct N##_it _p_##N##_find_by_hash(N* u, const KV* const k,        \
                                                size_t hash);                   \
-    static struct N##_it _p_##N##_it_at(const N* const u, size_t at);               \
+    static struct N##_it _p_##N##_it_at(const N* const u, size_t at);          \
     static void _p_##N##_node_free(const N* const m, struct _p_##N##_node* n); \
     static void                                                                \
         _p_##N##_node_copy_values(const N* const m, struct _p_##N##_node* dst, \
@@ -48,7 +48,7 @@
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
                                                                                \
-    void N##_set_sharing(N* u);                                               \
+    void N##_set_sharing(N* u);                                                \
     void N##_set_owning(N* u);                                                 \
     size_t N##_size(const N* const u);                                         \
     void N##_init(N* u);                                                       \
@@ -89,7 +89,7 @@
             u->data_[position].state_ = _SGC_NODE_STATE_USED;                  \
             ++u->size_;                                                        \
         } else {                                                               \
-            _sgc_no_space_left_handler(u->size_, N##_max());                   \
+            _sgc_no_space_left_handler();                                      \
         }                                                                      \
     }                                                                          \
                                                                                \

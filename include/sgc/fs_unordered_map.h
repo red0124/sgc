@@ -124,7 +124,7 @@
             ++u->size_;                                                        \
             return &u->data_[position].data_.value;                            \
         } else {                                                               \
-            _sgc_no_space_left_handler(u->size_, N##_max());                   \
+            _sgc_no_space_left_handler();                                      \
         }                                                                      \
         return NULL;                                                           \
     }                                                                          \

@@ -4,14 +4,11 @@
 #include <stdlib.h>
 
 #define SGC_SET_NO_SPACE_LEFT_HANDLER(HANDLER)                                 \
-    static inline void _sgc_no_space_left_handler(size_t size, size_t max) {   \
-        HANDLER(size, max);                                                    \
+    static inline void _sgc_no_space_left_handler() {                          \
     }
 
 #ifndef SGC_USE_CUSTOM_NO_SPACE_LEFT_HANDLER
-static inline void _sgc_no_space_left_default_handler(size_t size, size_t max) {
-    (void)size;
-    (void)max;
+static inline void _sgc_no_space_left_default_handler(void) {
 }
 
 SGC_SET_NO_SPACE_LEFT_HANDLER(_sgc_no_space_left_default_handler)
