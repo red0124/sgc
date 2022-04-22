@@ -10,3 +10,6 @@ subprojects/*
 benchmark/sgc
 benchmark/std
 benchmark/compile_commands.json
+examples/*
+!examples/*.c
+!examples/makefile

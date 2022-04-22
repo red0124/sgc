@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON(N)                                                    \
-    void N##_set_sharing(N* c) {                                              \
+    void N##_set_sharing(N* c) {                                               \
         c->sharing_ = true;                                                    \
     }                                                                          \
                                                                                \
@@ -73,7 +73,7 @@
     static bool _p_##N##_resize(const N* const v) {                            \
         (void)(v);                                                             \
         if (v->size_ >= N##_max()) {                                           \
-            _sgc_no_space_left_handler();                   \
+            _sgc_no_space_left_handler();                                      \
             return false;                                                      \
         }                                                                      \
         return true;                                                           \

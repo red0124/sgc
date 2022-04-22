@@ -7,3 +7,6 @@ all:
 	gcc string.c -o string -I ../include
 	gcc list_of_vectors.c -o list_of_vectors -I ../include
 	gcc error.c -o error -I ../include
+
+clean:
+	rm vector map fs algorithm struct string list_of_vectors error
