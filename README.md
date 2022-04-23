@@ -1,6 +1,6 @@
 ﻿
 ```
-  _____ ____________
+   ____  ___________
   / ___// ____/ ____/
   \__ \/ / __/ /     
  ___/ / /_/ / /___   
@@ -40,11 +40,21 @@ Output:
 $ ./vector
 size: 2
 2 5
+
+# Features
+
+ * Easy to use
+ * No dependencies
+ * Able to work witn any type
+ * Data structures and algorithms can be separated into headers and source files
+ * Gives access to fixed size data structures which invoke no allocations convenient for embedded environments
+ * Gives access to memory sharing and 'move semantics'
+ * Allows for the usage of custom allocators and error handlers
 ```
 # Content
  * [Usage](#Usage)
- * [Fixed size data structures](#Fixed Size Data Structures)
- * [Data Structures](#Data Structures)
+ * [Fixed size data structures](#Fixed-Size-Data-Structures)
+ * [Data Structures](#Data-Structures)
  * [Iterators](#Iterators)
  * [Algorithms](#Algorithms)
  * [Benchmarks](#Benchmarks)
