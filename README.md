@@ -40,6 +40,7 @@ Output:
 $ ./vector
 size: 2
 2 5
+```
 
 # Features
 
@@ -50,7 +51,7 @@ size: 2
  * Gives access to fixed size data structures which invoke no allocations convenient for embedded environments
  * Gives access to memory sharing and 'move semantics'
  * Allows for the usage of custom allocators and error handlers
-```
+
 # Content
  * [Usage](#Usage)
  * [Fixed size data structures](#Fixed-Size-Data-Structures)
