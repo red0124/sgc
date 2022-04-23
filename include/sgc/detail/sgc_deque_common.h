@@ -193,12 +193,12 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    T* N##_it_data(N##_it it) {                                                \
-        return &it.deque_->data_[it.curr_];                                    \
+    T* N##_it_data(N##_it* it) {                                               \
+        return &it->deque_->data_[it->curr_];                                   \
     }                                                                          \
                                                                                \
-    T* N##_it_value(N##_it it) {                                               \
-        return &it.deque_->data_[it.curr_];                                    \
+    T* N##_it_value(N##_it* it) {                                              \
+        return &it->deque_->data_[it->curr_];                                   \
     }                                                                          \
                                                                                \
     void N##_it_go_next(N##_it* it) {                                          \
@@ -262,8 +262,9 @@
                     _p_##N##_max(it->deque_);                                  \
     }                                                                          \
                                                                                \
-    bool N##_it_eq(const N##_it first, const N##_it second) {                  \
-        return first.curr_ == second.curr_ && first.deque_ == second.deque_;   \
+    bool N##_it_eq(const N##_it* const first, const N##_it* const second) {    \
+        return first->curr_ == second->curr_ &&                                \
+               first->deque_ == second->deque_;                                \
     }                                                                          \
                                                                                \
     int N##_it_diff(const N##_it first, const N##_it second) {                 \
@@ -275,6 +276,6 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    bool N##_it_valid(const N##_it it) {                                       \
-        return it.valid_;                                                      \
+    bool N##_it_valid(const N##_it* const it) {                                \
+        return it->valid_;                                                     \
     }

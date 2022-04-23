@@ -77,23 +77,24 @@ void test_find(void) {
     }
 
     struct vector_it it = vector_find_it(&v, -1);
-    TEST_ASSERT_EQUAL(vector_it_valid(it), false);
+    TEST_ASSERT_EQUAL(vector_it_valid(&it), false);
     it = vector_find_it(&v, TEST_ELEMENTS_NUM);
-    TEST_ASSERT_EQUAL(vector_it_valid(it), false);
+    TEST_ASSERT_EQUAL(vector_it_valid(&it), false);
 
     TEST_ASSERT_EQUAL_INT(NULL, vector_find_el(&v, -1));
     TEST_ASSERT_EQUAL_INT(NULL, vector_find_el(&v, TEST_ELEMENTS_NUM));
 
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         vector_it it = vector_find_it(&v, i);
-        TEST_ASSERT_EQUAL(vector_it_valid(it), true);
-        TEST_ASSERT_EQUAL_INT(i, *vector_it_data(it));
+        TEST_ASSERT_EQUAL(vector_it_valid(&it), true);
+        TEST_ASSERT_EQUAL_INT(i, *vector_it_data(&it));
 
         TEST_ASSERT_NOT_EQUAL(NULL, vector_find_el(&v, i));
         TEST_ASSERT_EQUAL_INT(i, *vector_find_el(&v, i));
         if (i != TEST_ELEMENTS_NUM - 1) {
             it = vector_find_it(&v, i);
-            TEST_ASSERT_EQUAL_INT(0, vector_it_eq(it, vector_end(&v)));
+            vector_it end = vector_end(&v);
+            TEST_ASSERT_EQUAL_INT(0, vector_it_eq(&it, &end));
         }
     }
 
@@ -124,8 +125,8 @@ void test_binary_find(void) {
     for (size_t i = 0; i < TEST_ELEMENTS_NUM; ++i) {
         TEST_ASSERT_EQUAL_INT(i, *vector_binary_find_el(&v, i));
         vector_it it = vector_binary_find_it(&v, i);
-        if (vector_it_valid(it)) {
-            TEST_ASSERT_EQUAL_INT(i, *vector_it_data(it));
+        if (vector_it_valid(&it)) {
+            TEST_ASSERT_EQUAL_INT(i, *vector_it_data(&it));
         }
     }
 

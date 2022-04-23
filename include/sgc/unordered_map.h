@@ -204,7 +204,7 @@
     }                                                                          \
                                                                                \
     void N##_erase_it(N* u, N##_it* i) {                                       \
-        if (N##_it_valid(*i)) {                                                \
+        if (N##_it_valid(i)) {                                                \
             K key = i->curr_->data_.key;                                       \
             N##_it_go_next(i);                                                 \
             N##_erase(u, key);                                                 \

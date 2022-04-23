@@ -76,12 +76,12 @@
         return v->data_;                                                       \
     }                                                                          \
                                                                                \
-    T* N##_it_data(N##_it i) {                                                 \
-        return i.curr_;                                                        \
+    T* N##_it_data(N##_it* i) {                                                \
+        return &i->data_[i->curr_];                                            \
     }                                                                          \
                                                                                \
-    T* N##_it_value(N##_it i) {                                                \
-        return i.curr_;                                                        \
+    T* N##_it_value(N##_it* i) {                                               \
+        return &i->data_[i->curr_];                                            \
     }                                                                          \
                                                                                \
     void N##_it_go_next(N##_it* i) {                                           \
@@ -94,25 +94,25 @@
                                                                                \
     N##_it N##_begin(N* v) {                                                   \
         N##_it i;                                                              \
-        i.curr_ = (T*)v->data_;                                                \
-        i.begin_ = (T*)v->data_;                                               \
-        i.end_ = (T*)v->data_ + v->size_ - 1;                                  \
+        i.curr_ = 0;                                                           \
+        i.end_ = v->size_;                                                     \
+        i.data_ = (T*)v->data_;                                                \
         return i;                                                              \
     }                                                                          \
                                                                                \
     N##_it N##_end(N* v) {                                                     \
         N##_it i;                                                              \
-        i.curr_ = (T*)v->data_ + v->size_ - 1;                                 \
-        i.begin_ = (T*)v->data_;                                               \
-        i.end_ = (T*)v->data_ + v->size_ - 1;                                  \
+        i.curr_ = v->size_ - 1;                                                \
+        i.end_ = v->size_;                                                     \
+        i.data_ = (T*)v->data_;                                                \
         return i;                                                              \
     }                                                                          \
                                                                                \
     N##_it N##_from(N* v, size_t at) {                                         \
         N##_it i;                                                              \
-        i.curr_ = (T*)v->data_ + at;                                           \
-        i.begin_ = (T*)v->data_;                                               \
-        i.end_ = (T*)v->data_ + v->size_ - 1;                                  \
+        i.curr_ = at;                                                          \
+        i.end_ = v->size_;                                                     \
+        i.data_ = (T*)v->data_;                                                \
         return i;                                                              \
     }                                                                          \
                                                                                \
@@ -120,14 +120,14 @@
         i->curr_ = i->curr_ + range;                                           \
     }                                                                          \
                                                                                \
-    bool N##_it_eq(const N##_it first, const N##_it second) {                  \
-        return first.curr_ == second.curr_;                                    \
+    bool N##_it_eq(const N##_it* const first, const N##_it* const second) {    \
+        return first->curr_ == second->curr_;                                  \
     }                                                                          \
                                                                                \
     int N##_it_diff(const N##_it first, const N##_it second) {                 \
         return second.curr_ - first.curr_;                                     \
     }                                                                          \
                                                                                \
-    bool N##_it_valid(const N##_it i) {                                        \
-        return i.begin_ != NULL && i.curr_ <= i.end_ && i.curr_ >= i.begin_;   \
+    bool N##_it_valid(const N##_it* const i) {                                 \
+        return i->data_ && i->curr_ < i->end_ && i->curr_ >= 0;                \
     }

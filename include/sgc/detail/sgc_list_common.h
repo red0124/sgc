@@ -52,24 +52,24 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    T* N##_it_data(N##_it i) {                                                 \
-        return &i.curr_->data_;                                                \
+    T* N##_it_data(N##_it* i) {                                                \
+        return &i->curr_->data_;                                               \
     }                                                                          \
                                                                                \
-    T* N##_it_value(N##_it i) {                                                \
-        return &i.curr_->data_;                                                \
+    T* N##_it_value(N##_it* i) {                                               \
+        return &i->curr_->data_;                                               \
     }                                                                          \
                                                                                \
     void N##_it_go_next(N##_it* i) {                                           \
         i->curr_ = i->curr_->next_;                                            \
     }                                                                          \
                                                                                \
-    bool N##_it_eq(const N##_it first, const N##_it second) {                  \
-        return first.curr_ == second.curr_;                                    \
+    bool N##_it_eq(const N##_it* const first, const N##_it* const second) {                  \
+        return first->curr_ == second->curr_;                                    \
     }                                                                          \
                                                                                \
-    bool N##_it_valid(const N##_it i) {                                        \
-        return i.curr_ != NULL;                                                \
+    bool N##_it_valid(const N##_it* const i) {                                 \
+        return i->curr_ != NULL;                                               \
     }                                                                          \
                                                                                \
     N##_it N##_end(N* l) {                                                     \

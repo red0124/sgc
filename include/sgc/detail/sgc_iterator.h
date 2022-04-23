@@ -3,8 +3,8 @@
 
 // FORWARD ITERATOR
 #define _SGC_INIT_FWD_IT_PROTOTIPES(N)                                         \
-    N##_type* N##_it_data(N##_it i);                                           \
-    N##_value* N##_it_value(N##_it i);                                         \
+    N##_type* N##_it_data(N##_it* i);                                          \
+    N##_value* N##_it_value(N##_it* i);                                        \
     void N##_it_go_next(N##_it* i);                                            \
     N##_it N##_begin(N* ds);                                                   \
     N##_it N##_cbegin(const N* const ds);                                      \
@@ -12,8 +12,8 @@
     void N##_it_cend(const N* const ds, N##_it* i);                            \
     N##_it N##_end(N* ds);                                                     \
     N##_it N##_cend(const N* const ds);                                        \
-    bool N##_it_eq(const N##_it first, const N##_it second);                   \
-    bool N##_it_valid(const N##_it i);
+    bool N##_it_eq(const N##_it* const first, const N##_it* const second);     \
+    bool N##_it_valid(const N##_it* const i);
 
 // BIDIRECTIONAL ITERATOR
 #define _SGC_INIT_BD_IT_PROTOTIPES(N)                                          \

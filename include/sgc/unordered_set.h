@@ -158,7 +158,7 @@
     }                                                                          \
                                                                                \
     void N##_erase_it(N* u, N##_it* i) {                                       \
-        if (N##_it_valid(*i)) {                                                \
+        if (N##_it_valid(i)) {                                                \
             KV value = i->curr_->value_;                                       \
             N##_it_go_next(i);                                                 \
             N##_erase(u, value);                                               \
