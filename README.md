@@ -1,8 +1,13 @@
-﻿Work In Progress
+﻿
+```
+  _____ ____________
+  / ___// ____/ ____/
+  \__ \/ / __/ /     
+ ___/ / /_/ / /___   
+/____/\____/\____/   
+```
 
-# Semi-Generic C
-
-Header only library for algorithms and data structures written in **`C`** using macros.
+A header only library for algorithms and data structures written in **`C`** using macros.
 The data structures used are similar to the ones present in the **`C++ STL`**.
 
 # Simple Example
