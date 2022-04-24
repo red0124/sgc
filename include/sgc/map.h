@@ -19,6 +19,8 @@
                                                    const V* const v,           \
                                                    bool sharing_key,           \
                                                    bool shared);               \
+    static struct _p_##N##_node* _p_##N##_node_new_default(const K* const k,   \
+                                                           bool sharing_key);  \
     static size_t _p_##N##_stack_size(size_t size);                            \
     static bool                                                                \
         _p_##N##_is_left_child(const struct _p_##N##_node* const n,            \
@@ -92,9 +94,9 @@
     };                                                                         \
                                                                                \
     struct N##_it {                                                            \
+        bool valid_;                                                           \
         struct _p_##N##_node* curr_;                                           \
         struct _p_##N##_node* next_;                                           \
-        int valid_;                                                            \
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
@@ -125,6 +127,21 @@
                                                                                \
         _SGC_COPY(K, n->data_.key, *k, sharing_key);                           \
         _SGC_COPY(V, n->data_.value, *v, sharing_value);                       \
+                                                                               \
+        n->left_ = n->right_ = _SGC_MAP_LEAF;                                  \
+        n->color_ = _SGC_MAP_COLOR_RED;                                        \
+        return n;                                                              \
+    }                                                                          \
+                                                                               \
+    static struct _p_##N##_node* _p_##N##_node_new_default(const K* const k,   \
+                                                           bool sharing_key) { \
+        struct _p_##N##_node* n = sgc_malloc(sizeof(struct _p_##N##_node));    \
+        if (!n) {                                                              \
+            return NULL;                                                       \
+        }                                                                      \
+                                                                               \
+        _SGC_COPY(K, n->data_.key, *k, sharing_key);                           \
+        V##_init(&n->data_.value);                                             \
                                                                                \
         n->left_ = n->right_ = _SGC_MAP_LEAF;                                  \
         n->color_ = _SGC_MAP_COLOR_RED;                                        \
@@ -199,9 +216,7 @@
                                                                                \
             if (compare > 0) {                                                 \
                 if (parent->left_ == _SGC_MAP_LEAF) {                          \
-                    V##_init(v);                                               \
-                    new_node =                                                 \
-                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
+                    new_node = _p_##N##_node_new_default(k, m->sharing_key_);  \
                     if (!new_node) {                                           \
                         return NULL;                                           \
                     }                                                          \
@@ -215,9 +230,7 @@
                 parent = parent->left_;                                        \
             } else if (compare < 0) {                                          \
                 if (parent->right_ == _SGC_MAP_LEAF) {                         \
-                    V##_init(v);                                               \
-                    new_node =                                                 \
-                        _p_##N##_node_new(k, v, m->sharing_key_, m->sharing_); \
+                    new_node = _p_##N##_node_new_default(k, m->sharing_key_);  \
                     if (!new_node) {                                           \
                         return NULL;                                           \
                     }                                                          \
@@ -240,10 +253,8 @@
     V* N##_at(N* m, K k) {                                                     \
         V* ret = NULL;                                                         \
         if (m->root_ == _SGC_MAP_LEAF) {                                       \
-            V v;                                                               \
-            V##_init(&v);                                                      \
             struct _p_##N##_node* new_node =                                   \
-                _p_##N##_node_new(&k, &v, m->sharing_key_, m->sharing_);       \
+                _p_##N##_node_new_default(&k, m->sharing_key_);                \
             if (!new_node) {                                                   \
                 return NULL;                                                   \
             }                                                                  \
@@ -287,5 +298,5 @@
     _SGC_INIT_UNIQUE_MAP(K, V, N)                                              \
     _SGC_INIT_COMMON_DICT_PAIR_BST(K, V, N)                                    \
     _SGC_INIT_COMMON_RBTREE(K, N)                                              \
-    _SGC_INIT_IT_CBEGIN_CEND(N)                                              \
+    _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)

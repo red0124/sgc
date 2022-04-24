@@ -81,9 +81,9 @@
     };                                                                         \
                                                                                \
     struct N##_it {                                                            \
+        bool valid_;                                                           \
         struct _p_##N##_node* curr_;                                           \
         struct _p_##N##_node* next_;                                           \
-        bool valid_;                                                           \
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \

@@ -54,9 +54,9 @@
     T* N##_array(N* d);                                                        \
                                                                                \
     struct N##_it {                                                            \
-        N* deque_;                                                             \
         size_t curr_;                                                          \
         bool valid_;                                                           \
+        N* deque_;                                                             \
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \

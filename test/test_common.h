@@ -13,59 +13,63 @@ static bool _enable_sharing = false;
 int oint_allocation_count = 0;
 int oint_deallocation_count = 0;
 #define OINT_DANGLING -1
+#define OINT_DEFAULT -2
 
-void disable_allocation() {
+void disable_allocation(void) {
     printf("ALLOCATION DISABLED\n");
     _disable_allocation = true;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
-void enable_allocation() {
+void enable_allocation(void) {
     printf("ALLOCATION ENABLED\n");
     _disable_allocation = false;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
-bool allocation_enabled() {
+bool allocation_enabled(void) {
     return _disable_allocation == false;
 }
 
-void enable_moveing() {
+void enable_moveing(void) {
     printf("MOVEING ENABLED\n");
     _enable_moveing = true;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
-void disable_moveing() {
+void disable_moveing(void) {
     printf("MOVEING DISABLED\n");
     _enable_moveing = false;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
-bool moveing_enabled() {
+bool moveing_enabled(void) {
     return _enable_moveing;
 }
 
-void enable_sharing() {
+void enable_sharing(void) {
     printf("SHARING ENABLED\n");
     _enable_sharing = true;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
-void disable_sharing() {
+void disable_sharing(void) {
     printf("SHARING DISABLED\n");
     _enable_sharing = false;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
-bool sharing_enabled() {
+bool sharing_enabled(void) {
     return _enable_sharing;
+}
+
+void increment_allocation(void) {
 }
 
 #define ASSERT_ALLOCATION_COUNT                                                \
@@ -170,19 +174,19 @@ static inline void oint_copy(oint* dst, const oint* const src) {
     ASSERT_EQUAL(false, moveing_enabled());
     ASSERT_EQUAL(false, sharing_enabled());
     ASSERT_NOT_EQUAL(OINT_DANGLING, *src);
-    *dst = *src;
     ++oint_allocation_count;
+    *dst = *src;
 }
 
 static inline void oint_init(oint* o) {
-    *o = 0;
+    *o = OINT_DEFAULT;
 }
 
 static inline void oint_free(oint* o) {
     ASSERT_NOT_EQUAL(OINT_DANGLING, *o);
     ASSERT_EQUAL(false, sharing_enabled());
-    *o = -1;
     ++oint_deallocation_count;
+    *o = OINT_DANGLING;
 }
 
 static inline bool oint_eq(const oint* const first, const oint* const second) {
@@ -545,22 +549,22 @@ tm tm_new(void) {
     return tm;
 }
 
-void tm_set(tm* tm, int key, int value, size_t max) {
+bool tm_set(tm* tm, int key, int value, size_t max) {
     for (size_t i = 0; i < TM_MAX; ++i) {
         if (tm->data[i].key == key) {
             tm->data[i].value = value;
-            return;
+            return true;
         }
     }
     if (tm->size == max || !allocation_enabled()) {
-        return;
+        return false;
     }
     for (size_t i = 0; i < TM_MAX; ++i) {
         if (tm->data[i].key == TM_EMPTY) {
             tm->data[i].key = key;
             tm->data[i].value = value;
             tm->size++;
-            return;
+            return true;
         }
     }
 
@@ -638,12 +642,13 @@ void tm_print(tm* tm) {
 
 #define TEST_INSERT_ERASE_COMBINATIONS_MAP_MAX(N, MAX)                         \
     {                                                                          \
-        size_t n = 5;                                                          \
-        size_t m = 12;                                                         \
+        size_t n = 4;                                                          \
+        size_t m = 15;                                                         \
         size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
+            N##_value* el = NULL;                                              \
             tm tm = tm_new();                                                  \
             N ds;                                                              \
             N##_init(&ds);                                                     \
@@ -653,6 +658,7 @@ void tm_print(tm* tm) {
             }                                                                  \
             for (int i = 0; (size_t)i < n; ++i) {                              \
                 size_t digit = comb_copy % m;                                  \
+                bool updated = false;                                          \
                 switch (digit) {                                               \
                 case (0):                                                      \
                     log("set %d %d\n", i, i + 10);                             \
@@ -680,39 +686,99 @@ void tm_print(tm* tm) {
                     N##_set(&ds, 3, i + 10);                                   \
                     break;                                                     \
                 case (5):                                                      \
-                    log("set 4 %d\n", i + 10);                                 \
-                    tm_set(&tm, 4, i + 10, MAX);                               \
-                    N##_set(&ds, 4, i + 10);                                   \
-                    break;                                                     \
-                case (6):                                                      \
                     log("erase %d\n", i);                                      \
                     tm_erase(&tm, i);                                          \
                     N##_erase(&ds, i);                                         \
                     break;                                                     \
-                case (7):                                                      \
+                case (6):                                                      \
                     log("erase 0\n");                                          \
                     tm_erase(&tm, 0);                                          \
                     N##_erase(&ds, 0);                                         \
                     break;                                                     \
-                case (8):                                                      \
+                case (7):                                                      \
                     log("erase 1\n");                                          \
                     tm_erase(&tm, 1);                                          \
                     N##_erase(&ds, 1);                                         \
                     break;                                                     \
-                case (9):                                                      \
+                case (8):                                                      \
                     log("erase 2\n");                                          \
                     tm_erase(&tm, 2);                                          \
                     N##_erase(&ds, 2);                                         \
                     break;                                                     \
-                case (10):                                                     \
+                case (9):                                                      \
                     log("erase 3\n");                                          \
                     tm_erase(&tm, 3);                                          \
                     N##_erase(&ds, 3);                                         \
                     break;                                                     \
+                case (10):                                                     \
+                    log("set/at %d %d\n", i, i + 10);                          \
+                    updated = tm_set(&tm, i, i + 10, MAX);                     \
+                    el = N##_at(&ds, i);                                       \
+                    if (allocation_enabled() && updated) {                     \
+                        if (*el == OINT_DEFAULT && !moveing_enabled() &&       \
+                            !sharing_enabled()) {                              \
+                            ++oint_allocation_count;                           \
+                        }                                                      \
+                        *el = i + 10;                                          \
+                    } else {                                                   \
+                        ASSERT_EQUAL(NULL, el);                                \
+                    }                                                          \
+                    break;                                                     \
                 case (11):                                                     \
-                    log("erase 4\n");                                          \
-                    tm_erase(&tm, 4);                                          \
-                    N##_erase(&ds, 4);                                         \
+                    log("set/at 0 %d\n", i + 10);                              \
+                    updated = tm_set(&tm, 0, i + 10, MAX);                     \
+                    el = N##_at(&ds, 0);                                       \
+                    if (allocation_enabled() && updated) {                     \
+                        if (*el == OINT_DEFAULT && !moveing_enabled() &&       \
+                            !sharing_enabled()) {                              \
+                            ++oint_allocation_count;                           \
+                        }                                                      \
+                        *el = i + 10;                                          \
+                    } else {                                                   \
+                        ASSERT_EQUAL(NULL, el);                                \
+                    }                                                          \
+                    break;                                                     \
+                case (12):                                                     \
+                    log("set/at 1 %d\n", i + 10);                              \
+                    updated = tm_set(&tm, 1, i + 10, MAX);                     \
+                    el = N##_at(&ds, 1);                                       \
+                    if (allocation_enabled() && updated) {                     \
+                        if (*el == OINT_DEFAULT && !moveing_enabled() &&       \
+                            !sharing_enabled()) {                              \
+                            ++oint_allocation_count;                           \
+                        }                                                      \
+                        *el = i + 10;                                          \
+                    } else {                                                   \
+                        ASSERT_EQUAL(NULL, el);                                \
+                    }                                                          \
+                    break;                                                     \
+                case (13):                                                     \
+                    log("set/at 2 %d\n", i + 10);                              \
+                    updated = tm_set(&tm, 2, i + 10, MAX);                     \
+                    el = N##_at(&ds, 2);                                       \
+                    if (allocation_enabled() && updated) {                     \
+                        if (*el == OINT_DEFAULT && !moveing_enabled() &&       \
+                            !sharing_enabled()) {                              \
+                            ++oint_allocation_count;                           \
+                        }                                                      \
+                        *el = i + 10;                                          \
+                    } else {                                                   \
+                        ASSERT_EQUAL(NULL, el);                                \
+                    }                                                          \
+                    break;                                                     \
+                case (14):                                                     \
+                    log("set/at 3 %d\n", i + 10);                              \
+                    updated = tm_set(&tm, 3, i + 10, MAX);                     \
+                    el = N##_at(&ds, 3);                                       \
+                    if (allocation_enabled() && updated) {                     \
+                        if (*el == OINT_DEFAULT && !moveing_enabled() &&       \
+                            !sharing_enabled()) {                              \
+                            ++oint_allocation_count;                           \
+                        }                                                      \
+                        *el = i + 10;                                          \
+                    } else {                                                   \
+                        ASSERT_EQUAL(NULL, el);                                \
+                    }                                                          \
                     break;                                                     \
                 default:                                                       \
                     log("Unhandled digit %zu\n", digit);                       \
@@ -733,6 +799,7 @@ void tm_print(tm* tm) {
                         ASSERT_EQUAL(false, N##_it_valid(&it));                \
                         ASSERT_EQUAL(false, N##_it_valid(&it_copy));           \
                     } else {                                                   \
+                        ASSERT_EQUAL(*value, *N##_at(&ds, j));                 \
                         ASSERT_EQUAL(true, N##_it_valid(&it));                 \
                         ASSERT_EQUAL(true, N##_it_valid(&it_copy));            \
                         ASSERT_EQUAL(*value, N##_it_data(&it)->value);         \

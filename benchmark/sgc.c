@@ -66,7 +66,7 @@ static void run_unordered_map_iterate(void) {
     umap_init(&m);
 
     for (size_t i = 0; i < NUM_ELEMENTS_UNORDERED_MAP; ++i) {
-        *umap_at(&m, i) = i;
+        umap_set(&m, i, i);
     }
 
     for (size_t i = 0; i < NUM_REPEATS_UNORDERED_MAP_ITERATE; ++i) {

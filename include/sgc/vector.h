@@ -45,9 +45,9 @@
     T* N##_array(N* d);                                                        \
                                                                                \
     struct N##_it {                                                            \
-        T* data_;                                                              \
         int curr_;                                                             \
         int end_;                                                              \
+        T* data_;                                                              \
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \

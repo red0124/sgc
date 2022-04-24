@@ -35,7 +35,7 @@
             }                                                                  \
             i.valid_ = true;                                                   \
         } else {                                                               \
-            i = (N##_it){NULL, NULL, 0, 0, 0};                                 \
+            i.valid_ = false;                                                  \
         }                                                                      \
         return i;                                                              \
     }                                                                          \
@@ -79,15 +79,15 @@
             } else {                                                           \
                 N##_it_go_prev(&i);                                            \
             }                                                                  \
-            i.valid_ = 1;                                                      \
+            i.valid_ = true;                                                   \
         } else {                                                               \
-            i = (N##_it){NULL, NULL, 0, 0, 0};                                 \
+            i.valid_ = false;                                                  \
         }                                                                      \
         return i;                                                              \
     }                                                                          \
                                                                                \
-    bool N##_it_eq(const N##_it* const first, const N##_it* const second) {                  \
-        return first->curr_ == second->curr_;                                    \
+    bool N##_it_eq(const N##_it* const first, const N##_it* const second) {    \
+        return first->curr_ == second->curr_;                                  \
     }                                                                          \
                                                                                \
     bool N##_it_valid(const N##_it* const i) {                                 \
