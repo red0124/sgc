@@ -27,7 +27,7 @@
     void N##_it_cfrom(const N* const ds, N##_it* i, size_t at);                \
     N##_it N##_from(N* ds, size_t at);                                         \
     void N##_it_move(N##_it* i, int range);                                    \
-    int N##_it_diff(const N##_it first, const N##_it second);
+    int N##_it_diff(const N##_it* const first, const N##_it* const second);
 
 #define _SGC_INIT_IT_CBEGIN_CEND(N)                                            \
     N##_it N##_cend(const N* const v) {                                        \

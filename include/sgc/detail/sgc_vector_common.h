@@ -124,8 +124,8 @@
         return first->curr_ == second->curr_;                                  \
     }                                                                          \
                                                                                \
-    int N##_it_diff(const N##_it first, const N##_it second) {                 \
-        return second.curr_ - first.curr_;                                     \
+    int N##_it_diff(const N##_it* const first, const N##_it* const second) {   \
+        return second->curr_ - first->curr_;                                   \
     }                                                                          \
                                                                                \
     bool N##_it_valid(const N##_it* const i) {                                 \

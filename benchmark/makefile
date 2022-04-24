@@ -4,7 +4,7 @@ gcc:
 	gcc sgc.c benchmark_common.c ${FLAGS} -o sgc
 	g++ std.cpp benchmark_common.c ${FLAGS} -o std
 
-all:
+clang:
 	clang sgc.c benchmark_common.c ${FLAGS} -o sgc
 	clang++ std.cpp benchmark_common.c ${FLAGS} -o std
 

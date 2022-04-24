@@ -14,7 +14,7 @@
     static bool _p_##N##_resize(N* d);                                         \
     static void _p_##N##_free_data(N* d);                                      \
     static void _p_##N##_copy_data(N* dst, const N* const src);                \
-    static size_t _p_##N##_it_index(const N##_it it);                          \
+    static size_t _p_##N##_it_index(const N##_it* const it);                   \
     static size_t _p_##N##_max(const N* const q);
 
 #define SGC_INIT_HEADERS_DEQUE(T, N)                                           \
@@ -31,7 +31,7 @@
     typedef T N##_type;                                                        \
     typedef T N##_value;                                                       \
                                                                                \
-    void N##_set_sharing(N* d);                                               \
+    void N##_set_sharing(N* d);                                                \
     void N##_set_owning(N* d);                                                 \
     size_t N##_size(const N* const d);                                         \
     void N##_init(N* d);                                                       \

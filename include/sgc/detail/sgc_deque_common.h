@@ -194,27 +194,27 @@
     }                                                                          \
                                                                                \
     T* N##_it_data(N##_it* it) {                                               \
-        return &it->deque_->data_[it->curr_];                                   \
+        return &it->deque_->data_[it->curr_];                                  \
     }                                                                          \
                                                                                \
     T* N##_it_value(N##_it* it) {                                              \
-        return &it->deque_->data_[it->curr_];                                   \
+        return &it->deque_->data_[it->curr_];                                  \
     }                                                                          \
                                                                                \
     void N##_it_go_next(N##_it* it) {                                          \
-        if (it->curr_ == it->deque_->back_) {                                  \
-            it->valid_ = false;                                                \
+        if (it->curr_ != it->deque_->back_) {                                  \
+            _p_##N##_go_next(&it->curr_, _p_##N##_max(it->deque_));            \
             return;                                                            \
         }                                                                      \
-        _p_##N##_go_next(&it->curr_, _p_##N##_max(it->deque_));                \
+        it->valid_ = false;                                                    \
     }                                                                          \
                                                                                \
     void N##_it_go_prev(N##_it* it) {                                          \
-        if (it->curr_ == it->deque_->front_) {                                 \
-            it->valid_ = false;                                                \
+        if (it->curr_ != it->deque_->front_) {                                 \
+        _p_##N##_go_prev(&it->curr_, _p_##N##_max(it->deque_));                \
             return;                                                            \
         }                                                                      \
-        _p_##N##_go_prev(&it->curr_, _p_##N##_max(it->deque_));                \
+            it->valid_ = false;                                                \
     }                                                                          \
                                                                                \
     N##_it N##_begin(N* d) {                                                   \
@@ -241,16 +241,16 @@
         return it;                                                             \
     }                                                                          \
                                                                                \
-    static size_t _p_##N##_it_index(const N##_it it) {                         \
+    static size_t _p_##N##_it_index(const N##_it* const it) {                  \
         size_t index =                                                         \
-            (it.curr_ >= it.deque_->front_)                                    \
-                ? it.curr_ - it.deque_->front_                                 \
-                : it.deque_->size_ - (it.deque_->back_ - it.curr_) - 1;        \
+            (it->curr_ >= it->deque_->front_)                                  \
+                ? it->curr_ - it->deque_->front_                               \
+                : it->deque_->size_ - (it->deque_->back_ - it->curr_) - 1;     \
         return index;                                                          \
     }                                                                          \
                                                                                \
     void N##_it_move(N##_it* it, int range) {                                  \
-        size_t index = _p_##N##_it_index(*it);                                 \
+        size_t index = _p_##N##_it_index(it);                                  \
         if (range > 0) {                                                       \
             if (index + range >= it->deque_->size_) {                          \
                 it->valid_ = false;                                            \
@@ -267,10 +267,10 @@
                first->deque_ == second->deque_;                                \
     }                                                                          \
                                                                                \
-    int N##_it_diff(const N##_it first, const N##_it second) {                 \
-        N* d = first.deque_;                                                   \
+    int N##_it_diff(const N##_it* const first, const N##_it* const second) {   \
+        N* d = first->deque_;                                                  \
         if (d->back_ > d->front_) {                                            \
-            return second.curr_ - first.curr_;                                 \
+            return second->curr_ - first->curr_;                               \
         } else {                                                               \
             return _p_##N##_it_index(second) - _p_##N##_it_index(first);       \
         }                                                                      \

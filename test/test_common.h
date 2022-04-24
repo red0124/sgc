@@ -318,16 +318,18 @@ void ta_sort(ta* ta) {
         N##_it it = N##_begin(&DS);                                            \
         for (size_t i = 0; i < TA.size; ++i) {                                 \
             N##_it curr_it = N##_from(&DS, i);                                 \
+            N##_it begin = N##_begin(&DS);                                     \
+            N##_it end = N##_end(&DS);                                         \
             ASSERT_EQUAL(true, N##_it_eq(&it, &curr_it));                      \
             ASSERT_EQUAL(true, N##_it_valid(&it));                             \
             ASSERT_EQUAL(true, N##_it_valid(&curr_it));                        \
             ASSERT_EQUAL(TA.data[i], *N##_it_data(&it));                       \
             ASSERT_EQUAL(TA.data[i], *N##_it_data(&curr_it));                  \
-            ASSERT_EQUAL(0, N##_it_diff(it, curr_it));                         \
-            ASSERT_EQUAL(-i, N##_it_diff(it, N##_begin(&DS)));                 \
-            ASSERT_EQUAL(i, N##_it_diff(N##_begin(&DS), it));                  \
-            ASSERT_EQUAL(TA.size - i - 1, N##_it_diff(it, N##_end(&DS)));      \
-            ASSERT_EQUAL(i + 1 - TA.size, N##_it_diff(N##_end(&DS), it));      \
+            ASSERT_EQUAL(0, N##_it_diff(&it, &curr_it));                       \
+            ASSERT_EQUAL(-i, N##_it_diff(&it, &begin));                        \
+            ASSERT_EQUAL(i, N##_it_diff(&begin, &it));                         \
+            ASSERT_EQUAL(TA.size - i - 1, N##_it_diff(&it, &end));             \
+            ASSERT_EQUAL(i + 1 - TA.size, N##_it_diff(&end, &it));             \
             N##_it_move(&it, 1);                                               \
         }                                                                      \
         ASSERT_EQUAL(false, N##_it_valid(&it));                                \
@@ -335,16 +337,18 @@ void ta_sort(ta* ta) {
         it = N##_end(&DS);                                                     \
         for (size_t i = TA.size; i > 0; --i) {                                 \
             N##_it curr_it = N##_from(&DS, i - 1);                             \
+            N##_it begin = N##_begin(&DS);                                     \
+            N##_it end = N##_end(&DS);                                         \
             ASSERT_EQUAL(true, N##_it_eq(&it, &curr_it));                      \
             ASSERT_EQUAL(true, N##_it_valid(&it));                             \
             ASSERT_EQUAL(true, N##_it_valid(&curr_it));                        \
             ASSERT_EQUAL(TA.data[i - 1], *N##_it_data(&it));                   \
             ASSERT_EQUAL(TA.data[i - 1], *N##_it_data(&curr_it));              \
-            ASSERT_EQUAL(0, N##_it_diff(it, curr_it));                         \
-            ASSERT_EQUAL(1 - i, N##_it_diff(it, N##_begin(&DS)));              \
-            ASSERT_EQUAL(i - 1, N##_it_diff(N##_begin(&DS), it));              \
-            ASSERT_EQUAL(TA.size - i, N##_it_diff(it, N##_end(&DS)));          \
-            ASSERT_EQUAL(i - TA.size, N##_it_diff(N##_end(&DS), it));          \
+            ASSERT_EQUAL(0, N##_it_diff(&it, &curr_it));                       \
+            ASSERT_EQUAL(1 - i, N##_it_diff(&it, &begin));                     \
+            ASSERT_EQUAL(i - 1, N##_it_diff(&begin, &it));                     \
+            ASSERT_EQUAL(TA.size - i, N##_it_diff(&it, &end));                 \
+            ASSERT_EQUAL(i - TA.size, N##_it_diff(&end, &it));                 \
             N##_it_move(&it, -1);                                              \
         }                                                                      \
         ASSERT_EQUAL(false, N##_it_valid(&it));                                \
