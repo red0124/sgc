@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 COMMAND="hyperfine -w 1 -s basic -u millisecond --"
 
@@ -43,8 +43,8 @@ for i in "${!CASES[@]}"; do
         time ./std ${i} > /dev/null
     else
         echo "c sgc:"
-        bash -c "${COMMAND} './sgc ${i}'"
+        sh -c "${COMMAND} './sgc ${i}' || true"
         echo "c++ stl:"
-        bash -c "${COMMAND} './std ${i}'"
+        sh -c "${COMMAND} './std ${i}' || true"
     fi
 done

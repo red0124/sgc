@@ -16,12 +16,12 @@
 
 enum benchmark {
     map_insert_10,
-    map_insert_100,
-    map_insert_10000,
+    map_insert_1000,
+    map_insert_100000,
     map_iterate,
     unordered_map_insert_10,
-    unordered_map_insert_100,
-    unordered_map_insert_10000,
+    unordered_map_insert_1000,
+    unordered_map_insert_100000,
     unordered_map_iterate,
     vector_iterate,
     deque_insert_100,

@@ -77,7 +77,7 @@
     }                                                                          \
                                                                                \
     static void _p_##N##_go_prev(size_t* flag, size_t max) {                   \
-        if (*flag == 0) {                                                      \
+        if (UNLIKELY (*flag == 0)) {                                           \
             *flag = max - 1;                                                   \
         } else {                                                               \
             --*flag;                                                           \
@@ -181,7 +181,12 @@
                                                                                \
     T* N##_at(N* d, size_t at) {                                               \
         if (at < d->size_) {                                                   \
-            return &d->data_[(d->front_ + at) % _p_##N##_max(d)];              \
+            size_t pos = d->front_ + at;                                       \
+            size_t max = _p_##N##_max(d);                                      \
+            if (pos > max) {                                                   \
+                pos -= max;                                                    \
+            }                                                                  \
+            return &d->data_[pos];                                             \
         }                                                                      \
         return NULL;                                                           \
     }                                                                          \
@@ -202,7 +207,7 @@
     }                                                                          \
                                                                                \
     void N##_it_go_next(N##_it* it) {                                          \
-        if (it->curr_ != it->deque_->back_) {                                  \
+        if (LIKELY(it->curr_ != it->deque_->back_)) {                          \
             _p_##N##_go_next(&it->curr_, _p_##N##_max(it->deque_));            \
             return;                                                            \
         }                                                                      \
@@ -210,11 +215,11 @@
     }                                                                          \
                                                                                \
     void N##_it_go_prev(N##_it* it) {                                          \
-        if (it->curr_ != it->deque_->front_) {                                 \
-        _p_##N##_go_prev(&it->curr_, _p_##N##_max(it->deque_));                \
+        if (LIKELY(it->curr_ != it->deque_->front_)) {                         \
+            _p_##N##_go_prev(&it->curr_, _p_##N##_max(it->deque_));            \
             return;                                                            \
         }                                                                      \
-            it->valid_ = false;                                                \
+        it->valid_ = false;                                                    \
     }                                                                          \
                                                                                \
     N##_it N##_begin(N* d) {                                                   \

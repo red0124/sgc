@@ -1,4 +1,5 @@
 #pragma once
+#include "sgc_utils.h"
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON_CIRCULAR_BUFFER(T, N)                                 \
@@ -61,10 +62,9 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_go_next(size_t* flag, size_t max) {                   \
-        if (*flag + 1 == max) {                                                \
-            *flag = 0;                                                         \
-        } else {                                                               \
-            ++*flag;                                                           \
+    static void _p_##N##_go_next(size_t* curr, size_t max) {                   \
+        ++*curr;                                                               \
+        if (UNLIKELY(*curr == max)) {                                          \
+            *curr = 0;                                                         \
         }                                                                      \
     }

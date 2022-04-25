@@ -146,7 +146,6 @@
                                                                                \
     static N##_it _p_##N##_find_by_hash(N* u, const K* const k, size_t hash) { \
         N##_it it;                                                             \
-        it.valid_ = false;                                                     \
         if (u->max_) {                                                         \
             size_t position = hash % u->max_;                                  \
             struct _p_##N##_node* tmp = u->data_[position];                    \
@@ -157,11 +156,12 @@
                     it.curr_ = tmp;                                            \
                     it.curr_bucket_ = position;                                \
                     it.max_ = u->max_;                                         \
-                    break;                                                     \
+                    return it;\
                 }                                                              \
                 tmp = tmp->next_;                                              \
             }                                                                  \
-        }                                                                      \
+        }\
+            it.valid_ = false;                                                 \
         return it;                                                             \
     }                                                                          \
                                                                                \

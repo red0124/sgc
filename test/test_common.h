@@ -34,14 +34,14 @@ bool allocation_enabled(void) {
 }
 
 void enable_moveing(void) {
-    printf("MOVEING ENABLED\n");
+    printf("MOVING ENABLED\n");
     _enable_moveing = true;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
 }
 
 void disable_moveing(void) {
-    printf("MOVEING DISABLED\n");
+    printf("MOVING DISABLED\n");
     _enable_moveing = false;
     oint_allocation_count = 0;
     oint_deallocation_count = 0;
@@ -1211,7 +1211,7 @@ void ts_print(ts* ts) {
 
 #define TEST_PUSH_POP_COMBINATIONS_PRIORITY_QUEUE_MAX(N, MAX)                  \
     {                                                                          \
-        size_t n = 7;                                                          \
+        size_t n = 6;                                                          \
         size_t m = 7;                                                          \
         size_t comb_max = (size_t)power(m, n);                                 \
         for (size_t comb = 0; comb < comb_max; ++comb) {                       \

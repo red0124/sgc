@@ -1,0 +1,45 @@
+[35mMAP INSERT SMALL[0m
+c sgc: [32m46.3 [ms][0m -- c++ stl: [31m69.8 [ms][0m
+
+[35mMAP INSERT MEDIUM[0m
+c sgc: [33m327.6 [ms][0m -- c++ stl: [32m260.9 [ms][0m
+
+[35mMAP INSERT LARGE[0m
+c sgc: [32m1152.2 [ms][0m -- c++ stl: [33m1366.3 [ms][0m
+
+[35mMAP ITERATE[0m
+c sgc: [32m1053.1 [ms][0m -- c++ stl: [32m1033.4 [ms][0m
+
+[35mUNORDERED MAP INSERT SMALL[0m
+c sgc: [32m31.9 [ms][0m -- c++ stl: [32m31.5 [ms][0m
+
+[35mUNORDERED MAP INSERT MEDIUM[0m
+c sgc: [32m31.9 [ms][0m -- c++ stl: [32m31.6 [ms][0m
+
+[35mUNORDERED MAP INSERT LARGE[0m
+c sgc: [32m62.2 [ms][0m -- c++ stl: [33m78.1 [ms][0m
+
+[35mUNORDERED MAP ITERATE[0m
+c sgc: [32m185.2 [ms][0m -- c++ stl: [33m199.6 [ms][0m
+
+[35mVECTOR ITERATE[0m
+c sgc: [33m160.1 [ms][0m -- c++ stl: [32m141.8 [ms][0m
+
+[35mDEQUE INSERT SMALL[0m
+c sgc: [33m20.2 [ms][0m -- c++ stl: [32m17.5 [ms][0m
+
+[35mDEQUE INSERT LARGE[0m
+c sgc: [32m1012.4 [ms][0m -- c++ stl: [33m1284.5 [ms][0m
+
+[35mDEQUE ITERATE[0m
+c sgc: [32m379.3 [ms][0m -- c++ stl: [33m458.6 [ms][0m
+
+[35mUNORDERED MAP OF VECTORS[0m
+c sgc: [32m4769.1 [ms][0m -- c++ stl: [33m5019.1 [ms][0m
+
+[35mPRIORITY QUEUE PUSH POP SMALL[0m
+c sgc: [32m305.4 [ms][0m -- c++ stl: [31m718.0 [ms][0m
+
+[35mPRIORITY QUEUE PUSH POP LARGE[0m
+c sgc: [32m1480.4 [ms][0m -- c++ stl: [32m1476.8 [ms][0m
+

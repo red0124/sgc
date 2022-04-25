@@ -252,7 +252,7 @@
 
 #define _SGC_FOR_EACH(EL, C, N)                                                \
     N##_it _SGC_UNIQUE(curr) = N##_cbegin(&C);                                 \
-    for (N##_type* EL = (N##_type*)N##_it_data(&_SGC_UNIQUE(curr));             \
+    for (N##_type* EL = (N##_type*)N##_it_data(&_SGC_UNIQUE(curr));            \
          N##_it_valid(&_SGC_UNIQUE(curr)); N##_it_go_next(&_SGC_UNIQUE(curr)), \
                    EL = (N##_type*)N##_it_data(&_SGC_UNIQUE(curr)))
 
@@ -260,7 +260,7 @@
 
 #define _SGC_FOR_EACH_REVERSE(EL, C, N)                                        \
     N##_it _SGC_UNIQUE(curr) = N##_cend(&C);                                   \
-    for (N##_type* EL = (N##_type*)N##_it_data(&_SGC_UNIQUE(curr));             \
+    for (N##_type* EL = (N##_type*)N##_it_data(&_SGC_UNIQUE(curr));            \
          N##_it_valid(&_SGC_UNIQUE(curr)); N##_it_go_prev(&_SGC_UNIQUE(curr)), \
                    EL = (N##_type*)N##_it_data(&_SGC_UNIQUE(curr)))
 
@@ -272,6 +272,9 @@
     N##_set_sharing(&DS);                                                      \
     __VA_ARGS__;                                                               \
     N##_set_owning(&DS);
+
+#define LIKELY(x) __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
 
 #ifndef SGC_NO_KEYWORDS
 

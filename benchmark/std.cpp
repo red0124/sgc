@@ -14,6 +14,8 @@ static void run_map_insert(size_t n) {
 
     for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
         m[(i * 19) % n] = i;
+        m[(i * 53) % n] = i;
+        m[(i * 257) % n] = i;
     }
 
     nop(m.size());
@@ -42,6 +44,8 @@ static void run_unordered_map_insert(size_t n) {
 
     for (size_t i = 0; i < NUM_ELEMENTS_UNORDERED_MAP; ++i) {
         m[(i * 19) % n] = i;
+        m[(i * 53) % n] = i;
+        m[(i * 257) % n] = i;
     }
 
     nop(m.size());
@@ -121,7 +125,10 @@ static void run_unordered_map_of_vectors_insert(void) {
     for (size_t j = 0; j < NUM_REPEATS_UNORDERED_MAP_OF_VECTORS_INSERT; ++j) {
         for (size_t i = 0; i < NUM_ELEMENTS_MAP; ++i) {
             m[(i * 19) % 1000].push_back(i);
+            m[(i * 53) % 1000].push_back(i);
+            m[(i * 257) % 1000].push_back(i);
         }
+        nop(m.size());
     }
 
     nop(m.size());
@@ -133,6 +140,8 @@ static void run_priority_queue_push_pop(size_t n) {
     for (size_t j = 0; j < NUM_TOTAL_INSERTS_PRIORIRTY_QUEUE / n; ++j) {
         for (size_t i = 0; i < n; ++i) {
             p.push((i * 19) % 1000);
+            p.push((i * 53) % 1000);
+            p.push((i * 257) % 1000);
         }
 
         nop(p.size());
@@ -154,11 +163,11 @@ int main(int argc, char* argv[]) {
     case map_insert_10:
         run_map_insert(10);
         break;
-    case map_insert_100:
-        run_map_insert(100);
+    case map_insert_1000:
+        run_map_insert(1000);
         break;
-    case map_insert_10000:
-        run_map_insert(10000);
+    case map_insert_100000:
+        run_map_insert(100000);
         break;
     case map_iterate:
         run_map_iterate();
@@ -166,11 +175,11 @@ int main(int argc, char* argv[]) {
     case unordered_map_insert_10:
         run_unordered_map_insert(10);
         break;
-    case unordered_map_insert_100:
-        run_unordered_map_insert(100);
+    case unordered_map_insert_1000:
+        run_unordered_map_insert(1000);
         break;
-    case unordered_map_insert_10000:
-        run_unordered_map_insert(10000);
+    case unordered_map_insert_100000:
+        run_unordered_map_insert(100000);
         break;
     case unordered_map_iterate:
         run_unordered_map_iterate();
