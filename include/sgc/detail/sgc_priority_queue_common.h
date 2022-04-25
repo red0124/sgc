@@ -37,7 +37,7 @@
                                                                                \
     static void _p_##N##_fix_erase(N* p) {                                     \
         size_t curr = 0;                                                       \
-        while ((curr + 1) * 2 <= p->size_) {                                   \
+        while ((curr + 1) * 2 - 1< p->size_) {                                \
             size_t right = (curr + 1) * 2;                                     \
             size_t left = right - 1;                                           \
             size_t tmp = right;                                                \

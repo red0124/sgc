@@ -273,9 +273,6 @@
     __VA_ARGS__;                                                               \
     N##_set_owning(&DS);
 
-#define LIKELY(x) __builtin_expect(!!(x), 1)
-#define UNLIKELY(x) __builtin_expect(!!(x), 0)
-
 #ifndef SGC_NO_KEYWORDS
 
 #define IN ,
