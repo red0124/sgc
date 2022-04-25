@@ -8,6 +8,10 @@ clang:
 	clang-13 sgc.c benchmark_common.c ${FLAGS} -o sgc
 	clang++-13 std.cpp benchmark_common.c ${FLAGS} -o std
 
+clang14:
+	clang sgc.c benchmark_common.c ${FLAGS} -o sgc
+	clang++ std.cpp benchmark_common.c ${FLAGS} -o std
+
 clean:
 	rm sgc std
 

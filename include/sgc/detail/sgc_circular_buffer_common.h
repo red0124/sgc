@@ -64,7 +64,7 @@
                                                                                \
     static void _p_##N##_go_next(size_t* curr, size_t max) {                   \
         ++*curr;                                                               \
-        if (*curr == max) {                                                    \
+        if (UNLIKELY(*curr == max)) {                                                    \
             *curr = 0;                                                         \
         }                                                                      \
     }

@@ -202,7 +202,7 @@
     }                                                                          \
                                                                                \
     void N##_it_go_next(N##_it* it) {                                          \
-        if (it->curr_ == it->deque_->back_) {                                  \
+        if (UNLIKELY(it->curr_ == it->deque_->back_)) {                        \
             it->valid_ = false;                                                \
             return;                                                            \
         }                                                                      \
@@ -210,7 +210,7 @@
     }                                                                          \
                                                                                \
     void N##_it_go_prev(N##_it* it) {                                          \
-        if (it->curr_ == it->deque_->front_) {                                 \
+        if (UNLIKELY(it->curr_ == it->deque_->front_)) {                       \
             it->valid_ = false;                                                \
             return;                                                            \
         }                                                                      \

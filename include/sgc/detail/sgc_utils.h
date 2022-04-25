@@ -273,6 +273,14 @@
     __VA_ARGS__;                                                               \
     N##_set_owning(&DS);
 
+#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+#define LIKELY(x) __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else 
+#define LIKELY(x) x
+#define UNLIKELY(x) x
+#endif
+
 #ifndef SGC_NO_KEYWORDS
 
 #define IN ,
