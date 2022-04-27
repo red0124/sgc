@@ -32,4 +32,4 @@ enum benchmark {
     priority_queue_push_pop_100000,
 };
 
-void nop(size_t n);
+void print(size_t n);

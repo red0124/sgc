@@ -1,4 +1,4 @@
-#include "benchmark_common.h"
+#include "common.h"
 #include <cstdlib>
 #include <deque>
 #include <iostream>
@@ -18,7 +18,7 @@ static void run_map_insert(size_t n) {
         m[(i * 257) % n] = i;
     }
 
-    nop(m.size());
+    print(m.size());
 }
 
 static void run_map_iterate() {
@@ -33,10 +33,10 @@ static void run_map_iterate() {
         for (const auto& el : m) {
             sum += el.second;
         }
-        nop(sum);
+        print(sum);
     }
 
-    nop(m.size());
+    print(m.size());
 }
 
 static void run_unordered_map_insert(size_t n) {
@@ -48,7 +48,7 @@ static void run_unordered_map_insert(size_t n) {
         m[(i * 257) % n] = i;
     }
 
-    nop(m.size());
+    print(m.size());
 }
 
 static void run_unordered_map_iterate() {
@@ -63,10 +63,10 @@ static void run_unordered_map_iterate() {
         for (const auto& el : m) {
             sum += el.second;
         }
-        nop(sum);
+        print(sum);
     }
 
-    nop(m.size());
+    print(m.size());
 }
 
 static void run_vector_iterate() {
@@ -81,10 +81,10 @@ static void run_vector_iterate() {
         for (const auto& el : v) {
             sum += el;
         }
-        nop(sum);
+        print(sum);
     }
 
-    nop(v.size());
+    print(v.size());
 }
 
 static void run_deque_insert(size_t n) {
@@ -97,7 +97,7 @@ static void run_deque_insert(size_t n) {
             d.insert(d.end() - delta, i);
         }
 
-        nop(d.size());
+        print(d.size());
     }
 }
 
@@ -113,10 +113,10 @@ static void run_deque_iterate() {
         for (const auto& el : d) {
             sum += el;
         }
-        nop(sum);
+        print(sum);
     }
 
-    nop(d.size());
+    print(d.size());
 }
 
 static void run_unordered_map_of_vectors_insert(void) {
@@ -128,10 +128,10 @@ static void run_unordered_map_of_vectors_insert(void) {
             m[(i * 53) % 1000].push_back(i);
             m[(i * 257) % 1000].push_back(i);
         }
-        nop(m.size());
+        print(m.size());
     }
 
-    nop(m.size());
+    print(m.size());
 }
 
 static void run_priority_queue_push_pop(size_t n) {
@@ -144,12 +144,12 @@ static void run_priority_queue_push_pop(size_t n) {
             p.push((i * 257) % 1000);
         }
 
-        nop(p.size());
+        print(p.size());
 
         while (!p.empty()) {
             p.pop();
         }
-        nop(p.size());
+        print(p.size());
     }
 }
 

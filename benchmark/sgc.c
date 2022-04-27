@@ -3,7 +3,7 @@
 #include "../include/sgc/priority_queue.h"
 #include "../include/sgc/unordered_map.h"
 #include "../include/sgc/vector.h"
-#include "benchmark_common.h"
+#include "common.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -27,7 +27,7 @@ static void run_map_insert(size_t n) {
         *map_at(&m, (i * 257) % n) = i;
     }
 
-    nop(map_size(&m));
+    print(map_size(&m));
     map_free(&m);
 }
 
@@ -44,10 +44,10 @@ static void run_map_iterate(void) {
         for_each(el IN m AS map) {
             sum += el->value;
         }
-        nop(sum);
+        print(sum);
     }
 
-    nop(map_size(&m));
+    print(map_size(&m));
     map_free(&m);
 }
 
@@ -61,7 +61,7 @@ static void run_unordered_map_insert(size_t n) {
         *umap_at(&m, (i * 257) % n) = i;
     }
 
-    nop(umap_size(&m));
+    print(umap_size(&m));
     umap_free(&m);
 }
 
@@ -78,10 +78,10 @@ static void run_unordered_map_iterate(void) {
         for_each(el IN m AS umap) {
             sum += el->value;
         }
-        nop(sum);
+        print(sum);
     }
 
-    nop(umap_size(&m));
+    print(umap_size(&m));
     umap_free(&m);
 }
 
@@ -98,10 +98,10 @@ static void run_vector_iterate(void) {
         for_each(el IN v AS vector) {
             sum += *el;
         }
-        nop(sum);
+        print(sum);
     }
 
-    nop(vector_size(&v));
+    print(vector_size(&v));
     vector_free(&v);
 }
 
@@ -116,7 +116,7 @@ static void run_deque_insert(size_t n) {
             deq_insert(&d, deq_size(&d) - delta, i);
         }
 
-        nop(deq_size(&d));
+        print(deq_size(&d));
         deq_free(&d);
     }
 }
@@ -134,10 +134,10 @@ static void run_deque_iterate(void) {
         for_each(el IN d AS deq) {
             sum += *el;
         }
-        nop(sum);
+        print(sum);
     }
 
-    nop(deq_size(&d));
+    print(deq_size(&d));
     deq_free(&d);
 }
 
@@ -152,10 +152,10 @@ static void run_unordered_map_of_vectors_insert(void) {
             vector_push_back(umap_vector_at(&m, (i * 257) % 1000), i);
         }
 
-        nop(umap_vector_size(&m));
+        print(umap_vector_size(&m));
     }
 
-    nop(umap_vector_size(&m));
+    print(umap_vector_size(&m));
     umap_vector_free(&m);
 }
 
@@ -169,12 +169,12 @@ static void run_priority_queue_push_pop(size_t n) {
             pqueue_push(&p, (i * 53) % 1000);
             pqueue_push(&p, (i * 257) % 1000);
         }
-        nop(pqueue_size(&p));
+        print(pqueue_size(&p));
 
         while (!pqueue_empty(&p)) {
             pqueue_pop(&p);
         }
-        nop(pqueue_size(&p));
+        print(pqueue_size(&p));
     }
 
     pqueue_free(&p);
