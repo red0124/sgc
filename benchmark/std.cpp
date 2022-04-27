@@ -92,7 +92,7 @@ static void run_deque_insert(size_t n) {
         std::deque<uint32_t> d;
 
         for (size_t i = 0; i < n; ++i) {
-            size_t delta = d.size() / 10;
+            size_t delta = d.size() / 20;
             d.insert(d.begin() + delta, i);
             d.insert(d.end() - delta, i);
         }

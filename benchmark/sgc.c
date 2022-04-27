@@ -111,7 +111,7 @@ static void run_deque_insert(size_t n) {
         deq_init(&d);
 
         for (size_t i = 0; i < n; ++i) {
-            size_t delta = deq_size(&d) / 10;
+            size_t delta = deq_size(&d) / 20;
             deq_insert(&d, delta, i);
             deq_insert(&d, deq_size(&d) - delta, i);
         }

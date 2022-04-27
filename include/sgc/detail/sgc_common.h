@@ -28,10 +28,10 @@
 
 #define _SGC_INIT_RESIZE(T, N)                                                 \
     static bool _p_##N##_resize(N* v) {                                        \
-        if (v->size_ == v->max_) {                                             \
+        if (UNLIKELY(v->size_ == v->max_)) {                                   \
             v->max_ = (v->max_ == 0) ? 1 : v->max_ * 2;                        \
             T* tmp_data_ = (T*)sgc_realloc(v->data_, sizeof(T) * v->max_);     \
-            if (!tmp_data_) {                                                  \
+            if (UNLIKELY(!tmp_data_)) {                                        \
                 v->max_ = v->size_;                                            \
                 return false;                                                  \
             }                                                                  \
@@ -42,11 +42,11 @@
 
 #define _SGC_INIT_RESIZE_CIRCULAR_BUFFER(T, N)                                 \
     static bool _p_##N##_resize(N* d) {                                        \
-        if (d->size_ == d->max_) {                                             \
+        if (UNLIKELY(d->size_ == d->max_)) {                                   \
             size_t max = d->max_;                                              \
             d->max_ = (d->max_ == 0) ? 1 : d->max_ * 2;                        \
             T* tmp_data = (T*)sgc_realloc(d->data_, sizeof(T) * d->max_);      \
-            if (!tmp_data) {                                                   \
+            if (UNLIKELY(!tmp_data)) {                                         \
                 d->max_ = d->size_;                                            \
                 return false;                                                  \
             }                                                                  \
@@ -72,7 +72,7 @@
 #define _SGC_INIT_FS_RESIZE(T, S, N)                                           \
     static bool _p_##N##_resize(const N* const v) {                            \
         (void)(v);                                                             \
-        if (v->size_ >= N##_max()) {                                           \
+        if (UNLIKELY(v->size_ >= N##_max())) {                                 \
             _sgc_no_space_left_handler();                                      \
             return false;                                                      \
         }                                                                      \
