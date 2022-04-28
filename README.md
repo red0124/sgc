@@ -38,7 +38,6 @@ int main(void) {
 Output:
 ```bash
 $ ./vector
-size: 2
 2 5
 ```
 
@@ -178,7 +177,7 @@ Now follows a table showing which data structures have which functionalities def
 | array        | **x**      | **x**     |      |                 |       |       |                   |     |                  |     |                  |
 | from_array   | **x**      |       |      |                 |       |       | **x**                 |     |                  |     |                  |
 
-The functions are mostly identical to methods within the c++ STL with a few exceptions.
+The functions are mostly identical to methods within the **`C++ STL`** with a few exceptions.
 The **`at`** functions correspond to **`operator[]`**.
 **`insert`**, **`erase`**, **`at`** and **`set`** for **`vector`** and **`deque`** are used to insert
 element at specified position as opposed to **`map`** and **`unordered_map`** functions
@@ -214,7 +213,7 @@ This table shows which data structure has access to which iterator:
 
 # Algorithms
 
-The library gives access some algorithms most of which require an iterator to be able to work.
+The library gives access to some algorithms most of which require an iterator to be able to work.
 If we for example wanted to initialize the vector to have access to **`qsort`** and **`eq`** functions they could be initialized like this:
 ```c
 #include <sgc/vector.h>
@@ -240,15 +239,15 @@ The qsort algorithm does not require an iterator but an array function instead.
 # Benchmarks 
 
 A few simple benchmarks are made to compare the performance of the library with 
-the C++ stl implementations of `**clang**` and `**gcc**`.
+the **`C++ stl`** implementations of **`clang`** and **`gcc`**.
 
-The benchmarks were ran on (TODO insert OS and CPU):<br>
+The benchmarks were ran using *hyperfine* on *openSUSE Tumbleweed 20220413*, *AMD Ryzen 5 3600*:<br>
 
 ![](https://github.com/red0124/sgc/blob/master/benchmark/img/gcc.png)
-*gcc 11.2 TODO check*<br>
+*gcc 11.2*.1<br>
 
 ![](https://github.com/red0124/sgc/blob/master/benchmark/img/clang.png)
-*clang 14.1 TODO check*<br>
+*clang 14.0*<br>
 
 The code for the benchmarks can be found in the benchmarks directory.
 
