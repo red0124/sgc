@@ -8,7 +8,7 @@
 ```
 
 A header only library for algorithms and data structures written in **`C`** using macros.
-The data structures used are similar to the ones present in the **`C++ STL`**.
+The data structures are meant to be similar to the **`C++ STL`**.
 
 # Simple Example
 ```c
@@ -48,9 +48,10 @@ size: 2
  * No dependencies
  * Able to work with any type
  * Data structures and algorithms can be separated into headers and source files
- * Gives access to fixed size data structures which invoke no allocations convenient for embedded environments
+ * Gives access to fixed size data structures which invoke no allocations convenient for **embedded** environments
  * Gives access to memory sharing and 'move semantics'
  * Allows for the usage of custom allocators and error handlers
+ * Fast
 
 # Content
  * [Usage](#Usage)
@@ -239,7 +240,7 @@ The qsort algorithm does not require an iterator but an array function instead.
 # Benchmarks 
 
 A few simple benchmarks are made to compare the performance of the library with 
-the C++ stl implementations of **clang** and **gcc**.
+the C++ stl implementations of `**clang**` and `**gcc**`.
 
 The benchmarks were ran on (TODO insert OS and CPU):<br>
 
