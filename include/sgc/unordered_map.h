@@ -39,7 +39,9 @@
                                      const K* const key);                      \
     struct _p_##N##_node* _p_##N##_node_new(const K* key,                      \
                                             const V* const value,              \
-                                            bool sharing_key, bool shared);
+                                            bool sharing_key, bool shared);    \
+    struct _p_##N##_node* _p_##N##_node_new_default(const K* key,              \
+                                                    bool sharing_key);
 
 #define SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                \
                                                                                \
@@ -71,19 +73,19 @@
     size_t N##_buckets_used(const N* const u);                                 \
                                                                                \
     struct N##_it {                                                            \
-        struct _p_##N##_node** data_;                                          \
-        struct _p_##N##_node* curr_;                                           \
         size_t curr_bucket_;                                                   \
         size_t max_;                                                           \
         bool valid_;                                                           \
+        struct _p_##N##_node** data_;                                          \
+        struct _p_##N##_node* curr_;                                           \
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
                                                                                \
-    void N##_set_sharing(N* u);                                               \
+    void N##_set_sharing(N* u);                                                \
     void N##_set_owning(N* u);                                                 \
-    void N##_set_sharing_key(N* u);                                           \
+    void N##_set_sharing_key(N* u);                                            \
     void N##_set_owning_key(N* u);                                             \
     size_t N##_size(const N* const u);                                         \
     void N##_init(N* u);                                                       \
@@ -112,6 +114,19 @@
         return new_node;                                                       \
     }                                                                          \
                                                                                \
+    struct _p_##N##_node* _p_##N##_node_new_default(const K* key,              \
+                                                    bool sharing_key) {        \
+        struct _p_##N##_node* new_node =                                       \
+            (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
+        if (!new_node) {                                                       \
+            return NULL;                                                       \
+        }                                                                      \
+        _SGC_COPY(K, new_node->data_.key, *key, sharing_key);                  \
+        V##_init(&new_node->data_.value);                                      \
+        new_node->next_ = NULL;                                                \
+        return new_node;                                                       \
+    }                                                                          \
+                                                                               \
     void N##_init(N* u) {                                                      \
         u->sharing_ = u->sharing_key_ = false;                                 \
         u->size_ = u->max_ = 0;                                                \
@@ -130,19 +145,24 @@
     }                                                                          \
                                                                                \
     static N##_it _p_##N##_find_by_hash(N* u, const K* const k, size_t hash) { \
-        N##_it ret = {NULL, NULL, 0, 0, false};                                \
+        N##_it it;                                                             \
         if (u->max_) {                                                         \
             size_t position = hash % u->max_;                                  \
             struct _p_##N##_node* tmp = u->data_[position];                    \
             while (tmp) {                                                      \
                 if (K##_eq(&tmp->data_.key, k)) {                              \
-                    ret = (N##_it){u->data_, tmp, position, u->max_, 1};       \
-                    break;                                                     \
+                    it.valid_ = true;                                          \
+                    it.data_ = u->data_;                                       \
+                    it.curr_ = tmp;                                            \
+                    it.curr_bucket_ = position;                                \
+                    it.max_ = u->max_;                                         \
+                    return it;\
                 }                                                              \
                 tmp = tmp->next_;                                              \
             }                                                                  \
-        }                                                                      \
-        return ret;                                                            \
+        }\
+            it.valid_ = false;                                                 \
+        return it;                                                             \
     }                                                                          \
                                                                                \
     N##_it N##_find(N* u, const K k) {                                         \
@@ -178,16 +198,14 @@
         size_t hash = K##_hash(&k);                                            \
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
         V* ret;                                                                \
-        if (i.curr_) {                                                         \
+        if (i.valid_) {                                                        \
             ret = &i.curr_->data_.value;                                       \
         } else {                                                               \
-            V v;                                                               \
             if (!_p_##N##_resize(u)) {                                         \
                 return NULL;                                                   \
             }                                                                  \
-            V##_init(&v);                                                      \
             struct _p_##N##_node* new_node =                                   \
-                _p_##N##_node_new(&k, &v, u->sharing_key_, u->sharing_);       \
+                _p_##N##_node_new_default(&k, u->sharing_key_);                \
             if (!new_node) {                                                   \
                 return NULL;                                                   \
             }                                                                  \
@@ -204,7 +222,7 @@
     }                                                                          \
                                                                                \
     void N##_erase_it(N* u, N##_it* i) {                                       \
-        if (N##_it_valid(*i)) {                                                \
+        if (N##_it_valid(i)) {                                                 \
             K key = i->curr_->data_.key;                                       \
             N##_it_go_next(i);                                                 \
             N##_erase(u, key);                                                 \

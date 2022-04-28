@@ -18,7 +18,7 @@ enum _sgc_map_color {
     }                                                                          \
                                                                                \
     bool N##_erase_it(N* m, N##_it* i) {                                       \
-        N##_it tmp = {i->curr_, i->next_, i->valid_};                          \
+        N##_it tmp = *i;                                                       \
         N##_it_go_next(&tmp);                                                  \
         bool valid = i->valid_;                                                \
         if (valid) {                                                           \
@@ -361,12 +361,12 @@ enum _sgc_map_color {
         return i;                                                              \
     }                                                                          \
                                                                                \
-    bool N##_it_eq(const N##_it first, const N##_it second) {                  \
-        return first.curr_ == second.curr_;                                    \
+    bool N##_it_eq(const N##_it* const first, const N##_it* const second) {    \
+        return first->curr_ == second->curr_;                                  \
     }                                                                          \
                                                                                \
-    bool N##_it_valid(const N##_it i) {                                        \
-        return i.valid_;                                                       \
+    bool N##_it_valid(const N##_it* const i) {                                 \
+        return i->valid_;                                                      \
     }                                                                          \
                                                                                \
     static size_t _p_##N##_stack_size(size_t size) {                           \

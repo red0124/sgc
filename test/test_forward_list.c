@@ -7,16 +7,16 @@ SGC_INIT_FORWARD_LIST(int, list)
     const T* N##_at(N* l, size_t at) {                                         \
         N##_it curr = N##_begin(l);                                            \
                                                                                \
-        while (N##_it_valid(curr)) {                                           \
+        while (N##_it_valid(&curr)) {                                          \
             if (at == 0) {                                                     \
-                return N##_it_data(curr);                                      \
+                return N##_it_data(&curr);                                     \
             }                                                                  \
             N##_it_go_next(&curr);                                             \
             --at;                                                              \
         }                                                                      \
                                                                                \
         if (at == 0) {                                                         \
-            return N##_it_data(curr);                                          \
+            return N##_it_data(&curr);                                         \
         }                                                                      \
                                                                                \
         return NULL;                                                           \
@@ -38,12 +38,12 @@ SGC_INIT_FORWARD_LIST(int, list)
         N##_init(&new_list);                                                   \
         new_list.sharing_ = l->sharing_;                                       \
                                                                                \
-        for (N##_it curr = N##_begin(l); N##_it_valid(curr);                   \
+        for (N##_it curr = N##_begin(l); N##_it_valid(&curr);                  \
              N##_it_go_next(&curr)) {                                          \
             if (at == 0) {                                                     \
                 N##_push_back(&new_list, el);                                  \
             }                                                                  \
-            N##_push_back(&new_list, *N##_it_data(curr));                      \
+            N##_push_back(&new_list, *N##_it_data(&curr));                     \
             --at;                                                              \
         }                                                                      \
                                                                                \
@@ -64,10 +64,10 @@ SGC_INIT_FORWARD_LIST(int, list)
         N##_init(&new_list);                                                   \
         new_list.sharing_ = l->sharing_;                                       \
                                                                                \
-        for (N##_it curr = N##_begin(l); N##_it_valid(curr);                   \
+        for (N##_it curr = N##_begin(l); N##_it_valid(&curr);                  \
              N##_it_go_next(&curr)) {                                          \
             if (at != 0) {                                                     \
-                N##_push_back(&new_list, *N##_it_data(curr));                  \
+                N##_push_back(&new_list, *N##_it_data(&curr));                 \
             }                                                                  \
             --at;                                                              \
         }                                                                      \

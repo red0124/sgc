@@ -10,7 +10,7 @@ enum _sgc_node_state {
 
 #define _SGC_INIT_COMMON_FS_HASH_MAP(T, S, N)                                  \
     void N##_erase_it(N* ds, struct N##_it* it) {                              \
-        if (N##_it_valid(*it)) {                                               \
+        if (N##_it_valid(it)) {                                                \
             _p_##N##_node_free(ds, it->curr_);                                 \
             it->curr_->state_ = _SGC_NODE_STATE_ERASED;                        \
             N##_it_go_next(it);                                                \
@@ -32,7 +32,7 @@ enum _sgc_node_state {
                                                                                \
     static struct N##_it _p_##N##_find_by_hash(N* ds, const T* const key,      \
                                                size_t hash) {                  \
-        if (ds->size_) {                                                       \
+        if (ds->size_ > 0) {                                                   \
             size_t position = hash % S;                                        \
             size_t starting_position = S;                                      \
             struct _p_##N##_node* data = ds->data_;                            \
@@ -52,7 +52,8 @@ enum _sgc_node_state {
                 }                                                              \
             }                                                                  \
         }                                                                      \
-        struct N##_it it = {NULL, NULL, NULL, false};                          \
+        struct N##_it it;                                                      \
+        it.valid_ = false;                                                     \
         return it;                                                             \
     }                                                                          \
                                                                                \
@@ -72,7 +73,7 @@ enum _sgc_node_state {
         i.begin_ = (struct _p_##N##_node*)(m->data_);                          \
         i.curr_ = i.begin_ + at;                                               \
         i.end_ = i.begin_ + S - 1;                                             \
-        i.valid_ = (i.curr_->state_ == _SGC_NODE_STATE_USED) ? 1 : 0;          \
+        i.valid_ = (i.curr_->state_ == _SGC_NODE_STATE_USED);                  \
         return i;                                                              \
     }                                                                          \
                                                                                \
@@ -130,10 +131,10 @@ enum _sgc_node_state {
         return i;                                                              \
     }                                                                          \
                                                                                \
-    bool N##_it_eq(const struct N##_it first, const struct N##_it second) {    \
-        return first.curr_ == second.curr_;                                    \
+    bool N##_it_eq(const N##_it* const first, const N##_it* const second) {    \
+        return first->curr_ == second->curr_;                                  \
     }                                                                          \
                                                                                \
-    bool N##_it_valid(const struct N##_it i) {                                 \
-        return i.valid_;                                                       \
+    bool N##_it_valid(const N##_it* const i) {                                 \
+        return i->valid_;                                                      \
     }

@@ -20,16 +20,16 @@
     void N##_accumulate(const N* const ds,                                     \
                         void (*fun)(const N##_type* const, void*),             \
                         void* acc) {                                           \
-        for (N##_it curr = N##_cbegin(ds); N##_it_valid(curr);                 \
+        for (N##_it curr = N##_cbegin(ds); N##_it_valid(&curr);                \
              N##_it_go_next(&curr)) {                                          \
-            fun(N##_it_data(curr), acc);                                       \
+            fun(N##_it_data(&curr), acc);                                      \
         }                                                                      \
     }                                                                          \
                                                                                \
     void N##_foreach(const N* const ds, void (*fun)(const N##_type* const)) {  \
-        for (N##_it curr = N##_cbegin(ds); N##_it_valid(curr);                 \
+        for (N##_it curr = N##_cbegin(ds); N##_it_valid(&curr);                \
              N##_it_go_next(&curr)) {                                          \
-            fun(N##_it_data(curr));                                            \
+            fun(N##_it_data(&curr));                                           \
         }                                                                      \
     }
 
@@ -47,7 +47,7 @@
     N##_it N##_find_it(const N* const ds, const N##_value el) {                \
         N##_it curr;                                                           \
         for (curr = N##_cbegin(ds);                                            \
-             N##_it_valid(curr) && !T##_eq(N##_it_value(curr), &el);           \
+             N##_it_valid(&curr) && !T##_eq(N##_it_value(&curr), &el);          \
              N##_it_go_next(&curr))                                            \
             ;                                                                  \
         return curr;                                                           \
@@ -55,7 +55,7 @@
                                                                                \
     N##_type* N##_find_el(const N* const ds, const N##_value el) {             \
         N##_it it = N##_find_it(ds, el);                                       \
-        return N##_it_valid(it) ? N##_it_data(it) : NULL;                      \
+        return N##_it_valid(&it) ? N##_it_data(&it) : NULL;                    \
     }
 
 // ==============
@@ -94,7 +94,7 @@
                                                                                \
     N##_type* N##_binary_find_el(const N* const ds, const N##_type el) {       \
         N##_it it = N##_binary_find_it(ds, el);                                \
-        return N##_it_valid(it) ? N##_it_data(it) : NULL;                      \
+        return N##_it_valid(&it) ? N##_it_data(&it) : NULL;                    \
     }
 
 // ==============
@@ -129,9 +129,9 @@
     SGC_INIT_HEADERS_EQ(T, N)                                                  \
     bool N##_eq(const N* const ds1, const N* const ds2) {                      \
         for (N##_it it1 = N##_cbegin(ds1), it2 = N##_cbegin(ds2);              \
-             N##_it_valid(it1) && N##_it_valid(it2);                           \
+             N##_it_valid(&it1) && N##_it_valid(&it2);                         \
              N##_it_go_next(&it1), N##_it_go_next(&it2)) {                     \
-            if (!T##_eq(N##_it_data(it1), N##_it_data(it2))) {                 \
+            if (!T##_eq(N##_it_data(&it1), N##_it_data(&it2))) {               \
                 return false;                                                  \
             }                                                                  \
         }                                                                      \
@@ -141,9 +141,9 @@
                                                                                \
     size_t N##_count(const N* const ds, const N##_type el) {                   \
         size_t count = 0;                                                      \
-        for (N##_it curr = N##_cbegin(ds); N##_it_valid(curr);                 \
+        for (N##_it curr = N##_cbegin(ds); N##_it_valid(&curr);                \
              N##_it_go_next(&curr)) {                                          \
-            if (T##_eq(N##_it_data(curr), &el)) {                              \
+            if (T##_eq(N##_it_data(&curr), &el)) {                             \
                 ++count;                                                       \
             }                                                                  \
         }                                                                      \
@@ -159,10 +159,10 @@
 #define SGC_INIT_COMPARE(T, N)                                                 \
     int N##_compare(const N* const ds1, const N* const ds2) {                  \
         for (N##_it it1 = N##_cbegin(ds1), it2 = N##_cbegin(ds2);              \
-             N##_it_valid(it1) && N##_it_valid(it2);                           \
+             N##_it_valid(&it1) && N##_it_valid(&it2);                         \
              N##_it_go_next(&it1), N##_it_go_next(&it2)) {                     \
             int compare_value =                                                \
-                T##_compare(N##_it_data(it1), N##_it_data(it2));               \
+                T##_compare(N##_it_data(&it1), N##_it_data(&it2));             \
             if (compare_value != 0) {                                          \
                 return compare_value;                                          \
             }                                                                  \

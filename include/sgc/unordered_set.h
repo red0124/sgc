@@ -62,16 +62,16 @@
     size_t N##_buckets_used(const N* const u);                                 \
                                                                                \
     struct N##_it {                                                            \
-        struct _p_##N##_node** data_;                                          \
-        struct _p_##N##_node* curr_;                                           \
         size_t curr_bucket_;                                                   \
         size_t max_;                                                           \
         bool valid_;                                                           \
+        struct _p_##N##_node** data_;                                          \
+        struct _p_##N##_node* curr_;                                           \
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
-    void N##_set_sharing(N* u);                                               \
+    void N##_set_sharing(N* u);                                                \
     void N##_set_owning(N* u);                                                 \
     size_t N##_size(const N* const u);                                         \
     void N##_init(N* u);                                                       \
@@ -116,18 +116,24 @@
                                                                                \
     static N##_it _p_##N##_find_by_hash(N* u, const KV* const v,               \
                                         size_t hash) {                         \
-        N##_it ret = {NULL, NULL, 0, 0, 0};                                    \
+        N##_it it;                                                             \
+        it.valid_ = false;                                                     \
         if (u->max_) {                                                         \
             size_t position = hash % u->max_;                                  \
             struct _p_##N##_node* tmp = u->data_[position];                    \
             while (tmp) {                                                      \
                 if (KV##_eq(&tmp->value_, v)) {                                \
-                    ret = (N##_it){u->data_, tmp, position, u->max_, 1};       \
+                    it.valid_ = true;                                          \
+                    it.data_ = u->data_;                                       \
+                    it.curr_ = tmp;                                            \
+                    it.curr_bucket_ = position;                                \
+                    it.max_ = u->max_;                                         \
+                    break;                                                     \
                 }                                                              \
                 tmp = tmp->next_;                                              \
             }                                                                  \
         }                                                                      \
-        return ret;                                                            \
+        return it;                                                             \
     }                                                                          \
                                                                                \
     N##_it N##_find(N* u, const KV v) {                                        \
@@ -138,7 +144,7 @@
     void N##_insert(N* u, const KV v) {                                        \
         size_t hash = KV##_hash(&v);                                           \
         N##_it i = _p_##N##_find_by_hash(u, &v, hash);                         \
-        if (!i.curr_) {                                                        \
+        if (!i.valid_) {                                                        \
             if (!_p_##N##_resize(u)) {                                         \
                 return;                                                        \
             }                                                                  \
@@ -158,7 +164,7 @@
     }                                                                          \
                                                                                \
     void N##_erase_it(N* u, N##_it* i) {                                       \
-        if (N##_it_valid(*i)) {                                                \
+        if (N##_it_valid(i)) {                                                 \
             KV value = i->curr_->value_;                                       \
             N##_it_go_next(i);                                                 \
             N##_erase(u, value);                                               \

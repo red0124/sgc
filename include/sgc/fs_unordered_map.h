@@ -46,10 +46,10 @@
     size_t N##_max(void);                                                      \
                                                                                \
     struct N##_it {                                                            \
+        bool valid_;                                                           \
         struct _p_##N##_node* begin_;                                          \
         struct _p_##N##_node* curr_;                                           \
         struct _p_##N##_node* end_;                                            \
-        bool valid_;                                                           \
     };                                                                         \
                                                                                \
     typedef struct N##_it N##_it;                                              \
@@ -107,9 +107,7 @@
         N##_it i = _p_##N##_find_by_hash(u, &k, hash);                         \
         if (i.valid_) {                                                        \
             return &i.curr_->data_.value;                                      \
-        } else if (u->size_ + 1 < S) {                                         \
-            V v;                                                               \
-            V##_init(&v);                                                      \
+        } else if (u->size_ < S) {                                             \
             size_t position = hash % S;                                        \
             while (u->data_[position].state_ == _SGC_NODE_STATE_USED) {        \
                 if (position == S - 1) {                                       \
@@ -119,10 +117,11 @@
                 }                                                              \
             }                                                                  \
             _SGC_COPY(K, u->data_[position].data_.key, k, u->sharing_key_);    \
-            _SGC_COPY(V, u->data_[position].data_.value, v, u->sharing_);      \
             u->data_[position].state_ = _SGC_NODE_STATE_USED;                  \
             ++u->size_;                                                        \
-            return &u->data_[position].data_.value;                            \
+            V* v = &u->data_[position].data_.value;                            \
+            V##_init(v);                                                       \
+            return v;                                                          \
         } else {                                                               \
             _sgc_no_space_left_handler();                                      \
         }                                                                      \
