@@ -144,7 +144,7 @@
     void N##_insert(N* u, const KV v) {                                        \
         size_t hash = KV##_hash(&v);                                           \
         N##_it i = _p_##N##_find_by_hash(u, &v, hash);                         \
-        if (!i.valid_) {                                                        \
+        if (!i.valid_) {                                                       \
             if (!_p_##N##_resize(u)) {                                         \
                 return;                                                        \
             }                                                                  \
@@ -178,11 +178,14 @@
         dst->sharing_ = src->sharing_;                                         \
     }
 
-#define SGC_INIT_UNORDERED_SET(KV, N)                                          \
-    SGC_INIT_HEADERS_UNORDERED_SET(KV, N)                                      \
+#define SGC_INIT_DEFINITIONS_UNORDERED_SET(KV, N)                              \
     _SGC_INIT_PP_UNORDERED_SET(KV, N)                                          \
     _SGC_INIT_UNIQUE_UNORDERED_SET(KV, N)                                      \
     _SGC_INIT_COMMON_DICT_NONE_PAIR_HASH(KV, N)                                \
     _SGC_INIT_COMMON_HASH_MAP(KV, N)                                           \
     _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_UNORDERED_SET(KV, N)                                          \
+    SGC_INIT_HEADERS_UNORDERED_SET(KV, N)                                      \
+    SGC_INIT_DEFINITIONS_UNORDERED_SET(KV, N)

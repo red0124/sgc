@@ -183,10 +183,13 @@
         i->curr_ = i->curr_->prev_;                                            \
     }
 
-#define SGC_INIT_LIST(T, N)                                                    \
-    SGC_INIT_HEADERS_LIST(T, N)                                                \
+#define SGC_INIT_DEFINITIONS_LIST(T, N)                                        \
     _SGC_INIT_PP_LIST(T, N)                                                    \
     _SGC_INIT_UNIQUE_LIST(T, N)                                                \
     _SGC_INIT_COMMON_LIST(T, N)                                                \
     _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_LIST(T, N)                                                    \
+    SGC_INIT_HEADERS_LIST(T, N)                                                \
+    SGC_INIT_DEFINITIONS_LIST(T, N)

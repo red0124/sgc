@@ -21,7 +21,7 @@
     typedef T N##_type;                                                        \
     typedef T N##_value;                                                       \
                                                                                \
-    void N##_set_sharing(N* s);                                               \
+    void N##_set_sharing(N* s);                                                \
     void N##_set_owning(N* s);                                                 \
     size_t N##_size(const N* const s);                                         \
     void N##_init(N* const s);                                                 \
@@ -66,9 +66,12 @@
         }                                                                      \
     }
 
-#define SGC_INIT_STACK(T, N)                                                   \
-    SGC_INIT_HEADERS_STACK(T, N)                                               \
+#define SGC_INIT_DEFINITIONS_STACK(T, N)                                       \
     _SGC_INIT_PP_STACK(T, N)                                                   \
     _SGC_INIT_UNIQUE_STACK(T, N)                                               \
     _SGC_INIT_COMMON_STACK(T, N)                                               \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_STACK(T, N)                                                   \
+    SGC_INIT_HEADERS_STACK(T, N)                                               \
+    SGC_INIT_DEFINITIONS_STACK(T, N)\

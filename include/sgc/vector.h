@@ -101,10 +101,13 @@
         }                                                                      \
     }
 
-#define SGC_INIT_VECTOR(T, N)                                                  \
-    SGC_INIT_HEADERS_VECTOR(T, N)                                              \
+#define SGC_INIT_DEFINITIONS_VECTOR(T, N)                                      \
     _SGC_INIT_PP_VECTOR(T, N)                                                  \
     _SGC_INIT_UNIQUE_VECTOR(T, N)                                              \
     _SGC_INIT_COMMON_VECTOR(T, N)                                              \
     _SGC_INIT_IT_CBEGIN_CEND_CFROM(N)                                          \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_VECTOR(T, N)                                                  \
+    SGC_INIT_HEADERS_VECTOR(T, N)                                              \
+    SGC_INIT_DEFINITIONS_VECTOR(T, N)

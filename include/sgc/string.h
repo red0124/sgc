@@ -19,9 +19,7 @@
     size_t N##_hash(const N* const s);                                         \
     N##_type* N##_array(N*);
 
-#define SGC_INIT_STRING(N)                                                     \
-    SGC_INIT_HEADERS_STRING(N)                                                 \
-                                                                               \
+#define SGC_INIT_DEFINITIONS_STRING(N)                                         \
     void N##_copy(N* dst, const N* const src) {                                \
         if (*src) {                                                            \
             size_t size = strlen(*src) + 1;                                    \
@@ -82,3 +80,7 @@
     N##_type* N##_array(N* s) {                                                \
         return *s;                                                             \
     }
+
+#define SGC_INIT_STRING(N)                                                     \
+    SGC_INIT_HEADERS_STRING(N)                                                 \
+    SGC_INIT_DEFINITIONS_STRING(N)

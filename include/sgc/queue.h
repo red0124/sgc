@@ -1,11 +1,11 @@
 #pragma once
 
 #include "detail/sgc_allocator.h"
+#include "detail/sgc_circular_buffer_common.h"
 #include "detail/sgc_common.h"
 #include "detail/sgc_primitive_types.h"
 #include "detail/sgc_queue_common.h"
 #include "detail/sgc_utils.h"
-#include "detail/sgc_circular_buffer_common.h"
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_QUEUE(T, N)                                               \
@@ -30,7 +30,7 @@
     typedef T N##_type;                                                        \
     typedef T N##_value;                                                       \
                                                                                \
-    void N##_set_sharing(N* q);                                               \
+    void N##_set_sharing(N* q);                                                \
     void N##_set_owning(N* q);                                                 \
     size_t N##_size(const N* const q);                                         \
     void N##_init(N* q);                                                       \
@@ -81,9 +81,12 @@
         }                                                                      \
     }
 
-#define SGC_INIT_QUEUE(T, N)                                                   \
-    SGC_INIT_HEADERS_QUEUE(T, N)                                               \
+#define SGC_INIT_DEFINITIONS_QUEUE(T, N)                                       \
     _SGC_INIT_PP_QUEUE(T, N)                                                   \
     _SGC_INIT_UNIQUE_QUEUE(T, N)                                               \
     _SGC_INIT_COMMON_QUEUE(T, N)                                               \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_QUEUE(T, N)                                                   \
+    SGC_INIT_HEADERS_QUEUE(T, N)                                               \
+    SGC_INIT_DEFINITIONS_QUEUE(T, N)

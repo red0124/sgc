@@ -1,8 +1,8 @@
 #pragma once
 
 #include "detail/sgc_common.h"
-#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_error_handlers.h"
+#include "detail/sgc_primitive_types.h"
 #include "detail/sgc_priority_queue_common.h"
 #include "detail/sgc_utils.h"
 #include <stdbool.h>
@@ -26,7 +26,7 @@
     typedef T N##_value;                                                       \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_sharing(N* p);                                               \
+    void N##_set_sharing(N* p);                                                \
     void N##_set_owning(N* p);                                                 \
     void N##_init(N* p);                                                       \
     size_t N##_size(const N* p);                                               \
@@ -63,9 +63,12 @@
         }                                                                      \
     }
 
-#define SGC_INIT_FS_PRIORITY_QUEUE(T, S, N)                                    \
-    SGC_INIT_HEADERS_FS_PRIORITY_QUEUE(T, S, N)                                \
+#define SGC_INIT_DEFINITIONS_FS_PRIORITY_QUEUE(T, S, N)                        \
     _SGC_INIT_PP_FS_PRIORITY_QUEUE(T, S, N)                                    \
     _SGC_INIT_UNIQUE_FS_PRIORITY_QUEUE(T, S, N)                                \
     _SGC_INIT_COMMON_PRIORITY_QUEUE(T, N)                                      \
     _SGC_INIT_FS_COMMON(S, N)
+
+#define SGC_INIT_FS_PRIORITY_QUEUE(T, S, N)                                    \
+    SGC_INIT_HEADERS_FS_PRIORITY_QUEUE(T, S, N)                                \
+    SGC_INIT_DEFINITIONS_FS_PRIORITY_QUEUE(T, S, N)

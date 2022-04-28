@@ -149,10 +149,13 @@
         }                                                                      \
     }
 
-#define SGC_INIT_FORWARD_LIST(T, N)                                            \
-    SGC_INIT_HEADERS_FORWARD_LIST(T, N)                                        \
+#define SGC_INIT_DEFINITIONS_FORWARD_LIST(T, N)                                \
     _SGC_INIT_PP_FORWARD_LIST(T, N)                                            \
     _SGC_INIT_UNIQUE_FORWARD_LIST(T, N)                                        \
     _SGC_INIT_COMMON_LIST(T, N)                                                \
     _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_FORWARD_LIST(T, N)                                            \
+    SGC_INIT_HEADERS_FORWARD_LIST(T, N)                                        \
+    SGC_INIT_DEFINITIONS_FORWARD_LIST(T, N)

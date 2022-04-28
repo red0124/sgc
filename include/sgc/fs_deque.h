@@ -93,10 +93,13 @@
         }                                                                      \
     }
 
-#define SGC_INIT_FS_DEQUE(T, S, N)                                             \
-    SGC_INIT_HEADERS_FS_DEQUE(T, S, N)                                         \
+#define SGC_INIT_DEFINITIONS_FS_DEQUE(T, S, N)                                 \
     _SGC_INIT_PP_FS_DEQUE(T, S, N)                                             \
     _SGC_INIT_UNIQUE_FS_DEQUE(T, S, N)                                         \
     _SGC_INIT_COMMON_DEQUE(T, N)                                               \
     _SGC_INIT_IT_CBEGIN_CEND_CFROM(N)                                          \
     _SGC_INIT_FS_COMMON(S, N)
+
+#define SGC_INIT_FS_DEQUE(T, S, N)                                             \
+    SGC_INIT_HEADERS_FS_DEQUE(T, S, N)                                         \
+    SGC_INIT_DEFINITIONS_FS_DEQUE(T, S, N)

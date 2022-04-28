@@ -2,18 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SGC_INIT_HEADERS_PRIMITIVE_TYPE(T, N)                                  \
-    static inline void N##_init(T* el);                                        \
-    static inline void N##_free(T* el);                                        \
-    static inline void N##_copy(T* dst, const T* const src);                   \
-    static inline int N##_eq(const T* const first, const T* const second);     \
-    static inline int N##_compare(const T* const first,                        \
-                                  const T* const second);                      \
-    static inline int N##_void_compare(const void* const first,                \
-                                       const void* const second);
-
+// ==============
+// PRIMITIVE TYPE
+// ==============
 #define SGC_INIT_PRIMITIVE_TYPE(T, N)                                          \
-    SGC_INIT_HEADERS_PRIMITIVE_TYPE(T, N)                                      \
     static inline void N##_init(T* el) {                                       \
         *el = 0;                                                               \
     }                                                                          \
@@ -40,23 +32,20 @@
         return (int)(*(T*)first - *(T*)second);                                \
     }
 
-#define SGC_INIT_HEADERS_PRIMITIVE_HASH(T, N)                                  \
-    static inline size_t N##_hash(const T* const el);
-
+// ==============
+// PRIMITIVE TYPE HASH
+// ==============
 #define SGC_INIT_PRIMITIVE_HASH(T, N)                                          \
-    SGC_INIT_HEADERS_PRIMITIVE_HASH(T, N)                                      \
     static inline size_t N##_hash(const T* const el) {                         \
         return (size_t)*el;                                                    \
     }
 
-#define SGC_INIT_HEADERS_PRIMITIVE_STRUCT(T, N)                                \
-    typedef T N;                                                               \
-    static inline void N##_init(T* el);                                        \
-    static inline void N##_free(T* el);                                        \
-    static inline void N##_copy(T* dst, const T* const src);
-
+// ==============
+// PRIMITIVE STRUCT
+// ==============
 #define SGC_INIT_PRIMITIVE_STRUCT(T, N)                                        \
-    SGC_INIT_HEADERS_PRIMITIVE_STRUCT(T, N)                                    \
+    typedef T N;                                                        \
+                                                                               \
     static inline void N##_init(T* el) {                                       \
         memset(el, 0, sizeof(T));                                              \
     }                                                                          \

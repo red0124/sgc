@@ -59,9 +59,12 @@
         }                                                                      \
     }
 
-#define SGC_INIT_FS_STACK(T, S, N)                                             \
-    SGC_INIT_HEADERS_FS_STACK(T, S, N)                                         \
+#define SGC_INIT_DEFINITIONS_FS_STACK(T, S, N)                                             \
     _SGC_INIT_PP_FS_STACK(T, N)                                                \
     _SGC_INIT_UNIQUE_FS_STACK(T, S, N)                                         \
     _SGC_INIT_COMMON_STACK(T, N)                                               \
     _SGC_INIT_FS_COMMON(S, N)
+
+#define SGC_INIT_FS_STACK(T, S, N)                                             \
+    SGC_INIT_HEADERS_FS_STACK(T, S, N)                                         \
+    SGC_INIT_DEFINITIONS_FS_STACK(T, S, N)  

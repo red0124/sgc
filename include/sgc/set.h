@@ -89,7 +89,7 @@
     typedef struct N##_it N##_it;                                              \
     _SGC_INIT_BD_IT_PROTOTIPES(N)                                              \
                                                                                \
-    void N##_set_sharing(N* s);                                               \
+    void N##_set_sharing(N* s);                                                \
     void N##_set_owning(N* s);                                                 \
     struct N##_it N##_find(N* s, const KV v);                                  \
     size_t N##_size(const N* const s);                                         \
@@ -189,11 +189,14 @@
         dst->sharing_ = src->sharing_;                                         \
     }
 
-#define SGC_INIT_SET(KV, N)                                                    \
-    SGC_INIT_HEADERS_SET(KV, N)                                                \
+#define SGC_INIT_DEFINITIONS_SET(KV, N)                                        \
     _SGC_INIT_PP_SET(KV, N)                                                    \
     _SGC_INIT_UNIQUE_SET(KV, N)                                                \
     _SGC_INIT_COMMON_DICT_NONE_PAIR_BST(KV, N)                                 \
     _SGC_INIT_COMMON_RBTREE(KV, N)                                             \
     _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_SET(KV, N)                                                    \
+    SGC_INIT_HEADERS_SET(KV, N)                                                \
+    SGC_INIT_DEFINITIONS_SET(KV, N)

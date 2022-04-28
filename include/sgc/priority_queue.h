@@ -25,7 +25,7 @@
     typedef T N##_type;                                                        \
     typedef T N##_value;                                                       \
                                                                                \
-    void N##_set_sharing(N* p);                                               \
+    void N##_set_sharing(N* p);                                                \
     void N##_set_owning(N* p);                                                 \
     void N##_init(N* p);                                                       \
     size_t N##_size(const N* p);                                               \
@@ -70,9 +70,12 @@
         }                                                                      \
     }
 
-#define SGC_INIT_PRIORITY_QUEUE(T, N)                                          \
-    SGC_INIT_HEADERS_PRIORITY_QUEUE(T, N)                                      \
+#define SGC_INIT_DEFINITIONS_PRIORITY_QUEUE(T, N)                              \
     _SGC_INIT_PP_PRIORITY_QUEUE(T, N)                                          \
     _SGC_INIT_UNIEUE_PRIORITY_QUEUE(T, N)                                      \
     _SGC_INIT_COMMON_PRIORITY_QUEUE(T, N)                                      \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_PRIORITY_QUEUE(T, N)                                          \
+    SGC_INIT_HEADERS_PRIORITY_QUEUE(T, N)                                      \
+    SGC_INIT_DEFINITIONS_PRIORITY_QUEUE(T, N)

@@ -292,11 +292,14 @@
         dst->sharing_ = src->sharing_;                                         \
     }
 
-#define SGC_INIT_MAP(K, V, N)                                                  \
-    SGC_INIT_HEADERS_MAP(K, V, N)                                              \
+#define SGC_INIT_DEFINITIONS_MAP(K, V, N)                                      \
     _SGC_INIT_PP_MAP(K, V, N)                                                  \
     _SGC_INIT_UNIQUE_MAP(K, V, N)                                              \
     _SGC_INIT_COMMON_DICT_PAIR_BST(K, V, N)                                    \
     _SGC_INIT_COMMON_RBTREE(K, N)                                              \
     _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_MAP(K, V, N)                                                  \
+    SGC_INIT_HEADERS_MAP(K, V, N)                                              \
+    SGC_INIT_DEFINITIONS_MAP(K, V, N)

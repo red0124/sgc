@@ -12,7 +12,7 @@ int main(void) {
     *map_at(&m, 'b') = 11.1;
 
     map_it it = map_find(&m, 'c');
-    if (map_it_valid(it)) {
+    if (map_it_valid(&it)) {
         return 1;
     }
 

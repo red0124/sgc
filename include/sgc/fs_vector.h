@@ -1,10 +1,10 @@
 #pragma once
 
 #include "detail/sgc_common.h"
+#include "detail/sgc_error_handlers.h"
 #include "detail/sgc_iterator.h"
 #include "detail/sgc_primitive_types.h"
 #include "detail/sgc_utils.h"
-#include "detail/sgc_error_handlers.h"
 #include "detail/sgc_vector_common.h"
 #include <stdbool.h>
 
@@ -23,7 +23,7 @@
     typedef T N##_value;                                                       \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_sharing(N* v);                                               \
+    void N##_set_sharing(N* v);                                                \
     void N##_set_owning(N* v);                                                 \
     void N##_init(N* v);                                                       \
     size_t N##_size(const N* const v);                                         \
@@ -77,10 +77,13 @@
         }                                                                      \
     }
 
-#define SGC_INIT_FS_VECTOR(T, S, N)                                            \
-    SGC_INIT_HEADERS_FS_VECTOR(T, S, N)                                        \
+#define SGC_INIT_DEFINITIONS_FS_VECTOR(T, S, N)                                \
     _SGC_INIT_PP_FS_VECTOR(T, N)                                               \
     _SGC_INIT_UNIQUE_FS_VECTOR(T, S, N)                                        \
     _SGC_INIT_COMMON_VECTOR(T, N)                                              \
     _SGC_INIT_IT_CBEGIN_CEND_CFROM(N)                                          \
     _SGC_INIT_FS_COMMON(S, N)
+
+#define SGC_INIT_FS_VECTOR(T, S, N)                                            \
+    SGC_INIT_HEADERS_FS_VECTOR(T, S, N)                                        \
+    SGC_INIT_DEFINITIONS_FS_VECTOR(T, S, N)

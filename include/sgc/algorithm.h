@@ -14,9 +14,7 @@
                         void* argout);                                         \
     void N##_foreach(const N* const ds, void (*fun)(const N##_type* const));
 
-// IMPLEMENTATION
-#define SGC_INIT_ITERATE(T, N)                                                 \
-    SGC_INIT_HEADERS_ITERATE(T, N)                                             \
+#define SGC_INIT_DEFINITIONS_ITERATE(T, N)                                     \
     void N##_accumulate(const N* const ds,                                     \
                         void (*fun)(const N##_type* const, void*),             \
                         void* acc) {                                           \
@@ -33,6 +31,10 @@
         }                                                                      \
     }
 
+#define SGC_INIT_ITERATE(T, N)                                                 \
+    SGC_INIT_HEADERS_ITERATE(T, N)                                             \
+    SGC_INIT_DEFINITIONS_ITERATE(T, N)
+
 // ==============
 // FIND
 // ==============
@@ -40,14 +42,11 @@
     N##_type* N##_find_el(const N* const ds, const N##_value el);              \
     N##_it N##_find_it(const N* const c, const N##_value el);
 
-// IMPLEMENTATION
-#define SGC_INIT_FIND(T, N)                                                    \
-    SGC_INIT_HEADERS_FIND(T, N)                                                \
-                                                                               \
+#define SGC_INIT_DEFINITIONS_FIND(T, N)                                        \
     N##_it N##_find_it(const N* const ds, const N##_value el) {                \
         N##_it curr;                                                           \
         for (curr = N##_cbegin(ds);                                            \
-             N##_it_valid(&curr) && !T##_eq(N##_it_value(&curr), &el);          \
+             N##_it_valid(&curr) && !T##_eq(N##_it_value(&curr), &el);         \
              N##_it_go_next(&curr))                                            \
             ;                                                                  \
         return curr;                                                           \
@@ -58,6 +57,10 @@
         return N##_it_valid(&it) ? N##_it_data(&it) : NULL;                    \
     }
 
+#define SGC_INIT_FIND(T, N)                                                    \
+    SGC_INIT_HEADERS_FIND(T, N)                                                \
+    SGC_INIT_DEFINITIONS_FIND(T, N)
+
 // ==============
 // BINARY FIND
 // ==============
@@ -65,8 +68,7 @@
     N##_type* N##_binary_find_el(const N* const ds, const N##_type el);        \
     N##_it N##_binary_find_it(const N* const ds, const N##_type el);
 
-#define SGC_INIT_BINARY_FIND(T, N)                                             \
-    SGC_INIT_HEADERS_BINARY_FIND(T, N)                                         \
+#define SGC_INIT_DEFINITIONS_BINARY_FIND(T, N)                                 \
     N##_it N##_binary_find_it(const N* const ds, const N##_type el) {          \
         if (!N##_empty(ds)) {                                                  \
             int l = 0;                                                         \
@@ -97,6 +99,10 @@
         return N##_it_valid(&it) ? N##_it_data(&it) : NULL;                    \
     }
 
+#define SGC_INIT_BINARY_FIND(T, N)                                             \
+    SGC_INIT_HEADERS_BINARY_FIND(T, N)                                         \
+    SGC_INIT_DEFINITIONS_BINARY_FIND(T, N)
+
 // ==============
 // QSORT
 // ==============
@@ -104,9 +110,7 @@
     void N##_qsort(N* ds, int (*comp)(const void*, const void*));              \
     void N##_qsort_default(N* ds);
 
-// IMPLEMENTATION
-#define SGC_INIT_QSORT(T, N)                                                   \
-    SGC_INIT_HEADERS_QSORT(T, N)                                               \
+#define SGC_INIT_DEFINITIONS_QSORT(T, N)                                       \
     void N##_qsort(N* ds, int (*comp)(const void*, const void*)) {             \
         if (!comp) {                                                           \
             return;                                                            \
@@ -118,6 +122,10 @@
         N##_qsort(ds, T##_void_compare);                                       \
     }
 
+#define SGC_INIT_QSORT(T, N)                                                   \
+    SGC_INIT_HEADERS_QSORT(T, N)                                               \
+    SGC_INIT_DEFINITIONS_QSORT(T, N)
+
 // ==============
 // EQ
 // ==============
@@ -125,8 +133,7 @@
     bool N##_eq(const N* const ds1, const N* const ds2);                       \
     size_t N##_count(const N* const ds, const N##_type el);
 
-#define SGC_INIT_EQ(T, N)                                                      \
-    SGC_INIT_HEADERS_EQ(T, N)                                                  \
+#define SGC_INIT_DEFINITIONS_EQ(T, N)                                          \
     bool N##_eq(const N* const ds1, const N* const ds2) {                      \
         for (N##_it it1 = N##_cbegin(ds1), it2 = N##_cbegin(ds2);              \
              N##_it_valid(&it1) && N##_it_valid(&it2);                         \
@@ -150,13 +157,17 @@
         return count;                                                          \
     }
 
+#define SGC_INIT_EQ(T, N)                                                      \
+    SGC_INIT_HEADERS_EQ(T, N)                                                  \
+    SGC_INIT_DEFINITIONS_EQ(T, N)
+
 // ==============
 // COMPARE
 // ==============
 #define SGC_INIT_HEADERS_COMPARE(T, N)                                         \
     int N##_compare(const N* const ds1, const N* const ds2);
 
-#define SGC_INIT_COMPARE(T, N)                                                 \
+#define SGC_INIT_DEFINITIONS_COMPARE(T, N)                                     \
     int N##_compare(const N* const ds1, const N* const ds2) {                  \
         for (N##_it it1 = N##_cbegin(ds1), it2 = N##_cbegin(ds2);              \
              N##_it_valid(&it1) && N##_it_valid(&it2);                         \
@@ -173,3 +184,7 @@
         }                                                                      \
         return (N##_size(ds1) > N##_size(ds2)) ? 1 : -1;                       \
     }
+
+#define SGC_INIT_COMPARE(T, N)                                                 \
+    SGC_INIT_HEADERS_COMPARE(T, N)                                             \
+    SGC_INIT_DEFINITIONS_COMPARE(T, N)

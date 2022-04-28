@@ -156,12 +156,12 @@
                     it.curr_ = tmp;                                            \
                     it.curr_bucket_ = position;                                \
                     it.max_ = u->max_;                                         \
-                    return it;\
+                    return it;                                                 \
                 }                                                              \
                 tmp = tmp->next_;                                              \
             }                                                                  \
-        }\
-            it.valid_ = false;                                                 \
+        }                                                                      \
+        it.valid_ = false;                                                     \
         return it;                                                             \
     }                                                                          \
                                                                                \
@@ -237,11 +237,14 @@
         dst->sharing_ = src->sharing_;                                         \
     }
 
-#define SGC_INIT_UNORDERED_MAP(K, V, N)                                        \
-    SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                    \
+#define SGC_INIT_DEFINITIONS_UNORDERED_MAP(K, V, N)                            \
     _SGC_INIT_PP_UNORDERED_MAP(K, V, N)                                        \
     _SGC_INIT_UNIQUE_UNORDERED_MAP(K, V, N)                                    \
     _SGC_INIT_COMMON_DICT_PAIR_HASH(K, V, N)                                   \
     _SGC_INIT_COMMON_HASH_MAP(K, N)                                            \
     _SGC_INIT_IT_CBEGIN_CEND(N)                                                \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_UNORDERED_MAP(K, V, N)                                        \
+    SGC_INIT_HEADERS_UNORDERED_MAP(K, V, N)                                    \
+    SGC_INIT_DEFINITIONS_UNORDERED_MAP(K, V, N)

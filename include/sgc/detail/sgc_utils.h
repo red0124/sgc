@@ -108,6 +108,124 @@
     _SGC_INIT_HEADERS_FS_PAIR8(C, K, V, S, N, A1, A2, A3) SGC_INIT_##A4(V, N)
 
 // ==============
+// INIT DEFINITIONS
+// ==============
+#define _SGC_INIT_DEFINITIONS_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
+
+#define SGC_INIT_DEFINITIONS(...)                                              \
+    _SGC_INIT_DEFINITIONS_N(__VA_ARGS__, _SGC_INIT_DEFINITIONS7,               \
+                            _SGC_INIT_DEFINITIONS6, _SGC_INIT_DEFINITIONS5,    \
+                            _SGC_INIT_DEFINITIONS4, _SGC_INIT_DEFINITIONS3)    \
+    (__VA_ARGS__)
+
+#define _SGC_INIT_DEFINITIONS3(C, T, N) SGC_INIT_DEFINITIONS_##C(T, N)
+
+#define _SGC_INIT_DEFINITIONS4(C, T, N, A1)                                    \
+    _SGC_INIT_DEFINITIONS3(C, T, N) SGC_INIT_DEFINITIONS_##A1(T, N)
+
+#define _SGC_INIT_DEFINITIONS5(C, T, N, A1, A2)                                \
+    _SGC_INIT_DEFINITIONS4(C, T, N, A1) SGC_INIT_DEFINITIONS_##A2(T, N)
+
+#define _SGC_INIT_DEFINITIONS6(C, T, N, A1, A2, A3)                            \
+    _SGC_INIT_DEFINITIONS5(C, T, N, A1, A2) SGC_INIT_DEFINITIONS_##A3(T, N)
+
+#define _SGC_INIT_DEFINITIONS7(C, T, N, A1, A2, A3, A4)                        \
+    _SGC_INIT_DEFINITIONS6(C, T, N, A1, A2, A3) SGC_INIT_DEFINITIONS_##A4(T, N)
+
+// ==============
+// INIT DEFINITIONS FS
+// ==============
+#define _SGC_INIT_DEFINITIONS_FS_N(_1, _2, _3, _4, _5, _6, _7, _8, NAME, ...)  \
+    NAME
+
+#define SGC_INIT_DEFINITIONS_FS(...)                                           \
+    _SGC_INIT_DEFINITIONS_FS_N(__VA_ARGS__, _SGC_INIT_DEFINITIONS_FS8,         \
+                               _SGC_INIT_DEFINITIONS_FS7,                      \
+                               _SGC_INIT_DEFINITIONS_FS6,                      \
+                               _SGC_INIT_DEFINITIONS_FS5,                      \
+                               _SGC_INIT_DEFINITIONS_FS4, )                    \
+    (__VA_ARGS__)
+
+#define _SGC_INIT_DEFINITIONS_FS4(C, T, S, N) SGC_INIT_DEFINITIONS_##C(T, S, N)
+
+#define _SGC_INIT_DEFINITIONS_FS5(C, T, S, N, A1)                              \
+    _SGC_INIT_DEFINITIONS_FS4(C, T, S, N) SGC_INIT_##A1(T, N)
+
+#define _SGC_INIT_DEFINITIONS_FS6(C, T, S, N, A1, A2)                          \
+    _SGC_INIT_DEFINITIONS_FS5(C, T, S, N, A1) SGC_INIT_##A2(T, N)
+
+#define _SGC_INIT_DEFINITIONS_FS7(C, T, S, N, A1, A2, A3)                      \
+    _SGC_INIT_DEFINITIONS_FS6(C, T, S, N, A1, A2) SGC_INIT_##A3(T, N)
+
+#define _SGC_INIT_DEFINITIONS_FS8(C, T, S, N, A1, A2, A3, A4)                  \
+    _SGC_INIT_DEFINITIONS_FS7(C, T, S, N, A1, A2, A3) SGC_INIT_##A4(T, N)
+
+// ==============
+// INIT DEFINITIONS PAIR
+// ==============
+#define _SGC_INIT_DEFINITIONS_PAIR_N(_1, _2, _3, _4, _5, _6, _7, _8, NAME,     \
+                                     ...)                                      \
+    NAME
+
+#define SGC_INIT_DEFINITIONS_PAIR(...)                                         \
+    _SGC_INIT_DEFINITIONS_PAIR_N(__VA_ARGS__, _SGC_INIT_DEFINITIONS_PAIR8,     \
+                                 _SGC_INIT_DEFINITIONS_PAIR7,                  \
+                                 _SGC_INIT_DEFINITIONS_PAIR6,                  \
+                                 _SGC_INIT_DEFINITIONS_PAIR5,                  \
+                                 _SGC_INIT_DEFINITIONS_PAIR4)                  \
+    (__VA_ARGS__)
+
+#define _SGC_INIT_DEFINITIONS_PAIR4(C, K, V, N)                                \
+    SGC_INIT_DEFINITIONS_##C(K, V, N)
+
+#define _SGC_INIT_DEFINITIONS_PAIR5(C, K, V, N, A1)                            \
+    _SGC_INIT_DEFINITIONS_PAIR4(C, K, V, N) SGC_INIT_DEFINITIONS_##A1(V, N)
+
+#define _SGC_INIT_DEFINITIONS_PAIR6(C, K, V, N, A1, A2)                        \
+    _SGC_INIT_DEFINITIONS_PAIR5(C, K, V, N, A1) SGC_INIT_DEFINITIONS_##A2(V, N)
+
+#define _SGC_INIT_DEFINITIONS_PAIR7(C, K, V, N, A1, A2, A3)                    \
+    _SGC_INIT_DEFINITIONS_PAIR6(C, K, V, N, A1, A2)                            \
+    SGC_INIT_DEFINITIONS_##A3(V, N)
+
+#define _SGC_INIT_DEFINITIONS_PAIR8(C, K, V, N, A1, A2, A3, A4)                \
+    _SGC_INIT_DEFINITIONS_PAIR7(C, K, V, N, A1, A2, A3)                        \
+    SGC_INIT_DEFINITIONS_##A4(V, N)
+
+// ==============
+// INIT DEFINITIONS FS PAIR
+// ==============
+#define _SGC_INIT_DEFINITIONS_FS_PAIR_N(_1, _2, _3, _4, _5, _6, _7, _8, _9,    \
+                                        NAME, ...)                             \
+    NAME
+
+#define SGC_INIT_DEFINITIONS_FS_PAIR(...)                                      \
+    _SGC_INIT_DEFINITIONS_FS_PAIR_N(__VA_ARGS__,                               \
+                                    _SGC_INIT_DEFINITIONS_FS_PAIR9,            \
+                                    _SGC_INIT_DEFINITIONS_FS_PAIR8,            \
+                                    _SGC_INIT_DEFINITIONS_FS_PAIR7,            \
+                                    _SGC_INIT_DEFINITIONS_FS_PAIR6,            \
+                                    _SGC_INIT_DEFINITIONS_FS_PAIR5, )          \
+    (__VA_ARGS__)
+
+#define _SGC_INIT_DEFINITIONS_FS_PAIR5(C, K, V, S, N)                          \
+    SGC_INIT_DEFINITIONS_##C(K, V, S, N)
+
+#define _SGC_INIT_DEFINITIONS_FS_PAIR6(C, K, V, S, N, A1)                      \
+    _SGC_INIT_DEFINITIONS_FS_PAIR5(C, K, V, S, N)                              \
+    SGC_DEFINITIONS_INIT_##A1(V, N)
+
+#define _SGC_INIT_DEFINITIONS_FS_PAIR7(C, K, V, S, N, A1, A2)                  \
+    _SGC_INIT_DEFINITIONS_FS_PAIR6(C, K, V, S, N, A1) SGC_INIT_##A2(V, N)
+
+#define _SGC_INIT_DEFINITIONS_FS_PAIR8(C, K, V, S, N, A1, A2, A3)              \
+    _SGC_INIT_DEFINITIONS_FS_PAIR7(C, K, V, S, N, A1, A2) SGC_INIT_##A3(V, N)
+
+#define _SGC_INIT_DEFINITIONS_FS_PAIR9(C, K, V, S, N, A1, A2, A3, A4)          \
+    _SGC_INIT_DEFINITIONS_FS_PAIR8(C, K, V, S, N, A1, A2, A3)                  \
+    SGC_INIT_##A4(V, N)
+
+// ==============
 // INIT
 // ==============
 #define _SGC_INIT_N(_1, _2, _3, _4, _5, _6, _7, NAME, ...) NAME
@@ -276,7 +394,7 @@
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
 #define LIKELY(x) __builtin_expect(!!(x), 1)
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
-#else 
+#else
 #define LIKELY(x) x
 #define UNLIKELY(x) x
 #endif

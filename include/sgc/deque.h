@@ -98,10 +98,13 @@
         }                                                                      \
     }
 
-#define SGC_INIT_DEQUE(T, N)                                                   \
-    SGC_INIT_HEADERS_DEQUE(T, N)                                               \
+#define SGC_INIT_DEFINITIONS_DEQUE(T, N)                                       \
     _SGC_INIT_PP_DEQUE(T, N)                                                   \
     _SGC_INIT_UNIQUE_DEQUE(T, N)                                               \
     _SGC_INIT_COMMON_DEQUE(T, N)                                               \
     _SGC_INIT_IT_CBEGIN_CEND_CFROM(N)                                          \
     _SGC_INIT_COMMON(N)
+
+#define SGC_INIT_DEQUE(T, N)                                                   \
+    SGC_INIT_HEADERS_DEQUE(T, N)                                               \
+    SGC_INIT_DEFINITIONS_DEQUE(T, N)
