@@ -49,7 +49,7 @@ def plot(sgc, std):
     pp.legend(["c sgc", "c++ std"])
     pp.grid()
     pp.xticks(labels=TEST_NAMES, ticks=range(0, TEST_NUM), rotation=45, ha="right")
-    pp.ylabel(ylabel='[ms]', rotation='horizontal', loc='top')
+    pp.ylabel(ylabel='time [ms]', rotation='horizontal', loc='top')
     pp.subplots_adjust(bottom=0.30)
     pp.show()
 

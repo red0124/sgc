@@ -46,7 +46,7 @@ size: 2
 
  * Easy to use
  * No dependencies
- * Able to work witn any type
+ * Able to work with any type
  * Data structures and algorithms can be separated into headers and source files
  * Gives access to fixed size data structures which invoke no allocations convenient for embedded environments
  * Gives access to memory sharing and 'move semantics'
@@ -67,7 +67,7 @@ To initialize the vector we simply used the **`SGC_INIT`** macro. It will genera
 the **`vec`** structure and corresponding functions which all start with **vec_**.
 
 *Note: the macro will also generate some functions with the \_p\_ prefix.
-Those funcions are ment to be private and should only be invoked internaly.*
+Those functions are meant to be private and should only be invoked internally.*
 
 In order to generate a vector of a type some functions may need to exist
 so the library can know how to work with the type. For **`int`** those functions
@@ -91,7 +91,7 @@ int main(void) {
     *map_at(&m, 'b') = 11.1;
 
     map_it it = map_find(&m, 'c');
-    if (map_it_valid(it)) {
+    if (map_it_valid(&it)) {
         return 1;
     }
 
@@ -115,8 +115,7 @@ It is identical to **`SGC_INIT`** but takes one more type parameter for the key.
 # Fixed Size Data Structures
 
 The library supports a few fixed size (fs) data structures. Most have identical implementations to their dynamic
-counterparts, only **`fs_unordered_map`** and **`fs_unordered_set`** are different since they are implemented using 
-closed hashing as oposed to their dynamic variants which are implemnted using open hashing.
+counterparts.
 
 All fixed size containers are named with the **`fs_`** prefix. To use a fixed size vector identical to the one above the
 **`SGC_INIT_FS`** macro can be used:
@@ -145,10 +144,10 @@ Every data structure defines the following functions:
 Dictionary data structures also have:
 **`set_sharing_key`** and **`set_owning_key`**
 
-Fixed size data structurs also have:
+Fixed size data structures also have:
 **`max`**
 
-Now follows a table showing which data stuctures have which functionalities defined:
+Now follows a table showing which data structures have which functionalities defined:
 
 |              | vector | deque | list | forward<br>list | queue | stack | priority<br>queue | map | unordered<br>map | set | unordered<br>set |
 | ------------ | :----: | :---: | :--: | :-------------: | :---: | :---: | :---------------: | :-: | :--------------: | :-: | :--------------: |
@@ -186,7 +185,7 @@ which work with keys.
 
 # Iterators
 
-Some data structures have iterators binded to them, there is three types of iterators, 
+Some data structures have iterators bound to them, there is three types of iterators, 
 **random access iterator**, **bidirectional iterator** and **forward iterator**. The iterator
 structure for the associated data structure had the same name as the data structure
 with **_it** attacked to the end of it, eg for **vec** it would be **vec_it**.
@@ -199,7 +198,7 @@ Functions starting with **`it`** take the iterator as input parameter instead of
 - **Random access iterator** is associated with all the function from bidirectional iterator and also the following:
 **`from`** **`cfrom`** **`it_move`** and **`it_diff`**
 
-This table shows which data stucture has access to which iterator:
+This table shows which data structure has access to which iterator:
 
 |               | random access iterator | bidirectional iterator | forward iterator |
 | ------------- | :--------------------: | :--------------------: | :--------------: |
@@ -221,6 +220,7 @@ If we for example wanted to initialize the vector to have access to **`qsort`** 
 #include <sgc/algorithm.h>
 SGC_INIT(VECTOR, int, vec, QSORT, EQ)
 ```
+The **`SGC_INIT`** function may take additional argument which represent algorithms we want to use.
 This will generate functions such as **`vec_qsort`** and **`vec_eq`** among others.
 This table shows which algorithms are generated with which initializer group:
 
@@ -234,11 +234,22 @@ This table shows which algorithms are generated with which initializer group:
 | find_el<br>find_it                                                          | FIND               | forward iterator                        |
 | binary_find_el<br>binary_find_it                                            | BINARY_FIND        | random access iterator, element compare |
 
-The sort algorithm does not require an iterator but an array function instead.
+The qsort algorithm does not require an iterator but an array function instead.
 
 # Benchmarks 
 
-TODO
+A few simple benchmarks are made to compare the performance of the library with 
+stl implementations of clang and gcc.
+
+The benchmarks were ran on (TODO insert OS and CPU)
+
+![](https://github.com/red0124/sgc/master/benchmarks/img/gcc.png)
+*gcc 11.2 TODO check*
+
+![](https://github.com/red0124/sgc/master/benchmarks/img/clang.png)
+*clang 14.1 TODO check*
+
+The code for the benchmarks can be found in the benchmarks directory.
 
 # Installation 
 ```shell
