@@ -241,12 +241,13 @@ The qsort algorithm does not require an iterator but an array function instead.
 A few simple benchmarks are made to compare the performance of the library with 
 the C++ stl implementations of **clang** and **gcc**.
 
-The benchmarks were ran on (TODO insert OS and CPU)
+The benchmarks were ran on (TODO insert OS and CPU):<br>
+
 ![](https://github.com/red0124/sgc/blob/master/benchmark/img/gcc.png)
-*gcc 11.2 TODO check*
+*gcc 11.2 TODO check*<br>
 
 ![](https://github.com/red0124/sgc/blob/master/benchmark/img/clang.png)
-*clang 14.1 TODO check*
+*clang 14.1 TODO check*<br>
 
 The code for the benchmarks can be found in the benchmarks directory.
 
