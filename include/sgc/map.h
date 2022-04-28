@@ -120,7 +120,8 @@
                                                    const V* const v,           \
                                                    bool sharing_key,           \
                                                    bool sharing_value) {       \
-        struct _p_##N##_node* n = sgc_malloc(sizeof(struct _p_##N##_node));    \
+        struct _p_##N##_node* n =                                              \
+            (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
         if (!n) {                                                              \
             return NULL;                                                       \
         }                                                                      \
@@ -135,7 +136,8 @@
                                                                                \
     static struct _p_##N##_node* _p_##N##_node_new_default(const K* const k,   \
                                                            bool sharing_key) { \
-        struct _p_##N##_node* n = sgc_malloc(sizeof(struct _p_##N##_node));    \
+        struct _p_##N##_node* n =                                              \
+            (struct _p_##N##_node*)sgc_malloc(sizeof(struct _p_##N##_node));   \
         if (!n) {                                                              \
             return NULL;                                                       \
         }                                                                      \

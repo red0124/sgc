@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #define _SGC_INIT_COMMON_LIST(T, N)                                            \
-    static struct _p_##N##_node* _p_##N##_node_alloc() {                       \
+    static struct _p_##N##_node* _p_##N##_node_alloc(void) {                   \
         return (struct _p_##N##_node*)sgc_malloc(                              \
             sizeof(struct _p_##N##_node));                                     \
     }                                                                          \
@@ -64,8 +64,8 @@
         i->curr_ = i->curr_->next_;                                            \
     }                                                                          \
                                                                                \
-    bool N##_it_eq(const N##_it* const first, const N##_it* const second) {                  \
-        return first->curr_ == second->curr_;                                    \
+    bool N##_it_eq(const N##_it* const first, const N##_it* const second) {    \
+        return first->curr_ == second->curr_;                                  \
     }                                                                          \
                                                                                \
     bool N##_it_valid(const N##_it* const i) {                                 \

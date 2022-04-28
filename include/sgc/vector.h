@@ -67,7 +67,7 @@
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->max_ = src->size_;                                            \
-            dst->data_ = sgc_malloc(dst->max_ * sizeof(T));                    \
+            dst->data_ = (T*)sgc_malloc(dst->max_ * sizeof(T));                \
             if (!dst->data_) {                                                 \
                 N##_init(dst);                                                 \
                 return;                                                        \

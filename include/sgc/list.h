@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_LIST(T, N)                                                \
-    static struct _p_##N##_node* _p_##N##_node_alloc();                        \
+    static struct _p_##N##_node* _p_##N##_node_alloc(void);                    \
     static void _p_##N##_free_nodes(struct _p_##N##_node* n, bool sharing);
 
 /* TODO add iterator insert/erase, add sort */
@@ -60,7 +60,7 @@
     void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
         if (src->size_ != 0) {                                                 \
             dst->sharing_ = src->sharing_;                                     \
-            dst->head_ = _p_##N##_node_alloc(dst);                             \
+            dst->head_ = _p_##N##_node_alloc();                                \
             if (!dst->head_) {                                                 \
                 N##_init(dst);                                                 \
                 return;                                                        \
@@ -76,7 +76,7 @@
                 if (!tmp_src) {                                                \
                     break;                                                     \
                 }                                                              \
-                tmp_dst = _p_##N##_node_alloc(dst);                            \
+                tmp_dst = _p_##N##_node_alloc();                               \
                 if (!tmp_dst) {                                                \
                     _p_##N##_free_nodes(dst->head_, src->sharing_);            \
                     N##_init(dst);                                             \
@@ -96,7 +96,7 @@
     }                                                                          \
                                                                                \
     void N##_push_back(N* l, T el) {                                           \
-        struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
+        struct _p_##N##_node* new_el = _p_##N##_node_alloc();                  \
         if (!new_el) {                                                         \
             return;                                                            \
         }                                                                      \
@@ -138,7 +138,7 @@
     }                                                                          \
                                                                                \
     void N##_push_front(N* l, const T el) {                                    \
-        struct _p_##N##_node* new_el = _p_##N##_node_alloc(l);                 \
+        struct _p_##N##_node* new_el = _p_##N##_node_alloc();                  \
         if (!new_el) {                                                         \
             return;                                                            \
         }                                                                      \
