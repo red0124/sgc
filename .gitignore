@@ -13,4 +13,5 @@ benchmark/compile_commands.json
 benchmark/out.json
 examples/*
 !examples/*.c
+!examples/*.h
 !examples/makefile
