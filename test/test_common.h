@@ -1134,7 +1134,7 @@ void ts_print(ts* ts) {
         size_t n = 10;                                                         \
         size_t m = 4;                                                          \
         size_t comb_max = (size_t)power(m, n);                                 \
-        for (size_t comb = 80000; comb < comb_max; ++comb) {                   \
+        for (size_t comb = 0; comb < comb_max; ++comb) {                       \
             log("Combination: %zu\n", comb);                                   \
             size_t comb_copy = comb;                                           \
             ta ta = ta_new();                                                  \
