@@ -5,7 +5,7 @@ project(
     ['warning_level=3',
      'buildtype=debugoptimized',
      'wrap_mode=forcefallback'],
-  version: '1.0.0',
+  version: '1.1.0',
   meson_version: '>=0.54.0')
 
 sgc_dep = declare_dependency(
