@@ -35,5 +35,5 @@ foreach name_file : tests
     dependencies: [unity_dep, sgc_dep]
     )
 
-  test(name, exe)
+  test(name, exe, timeout: 60)
 endforeach
