@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 
 project(
     sgc
-    VERSION 0.0.1
-    DESCRIPTION "Static split parser"
+    VERSION 1.0.0
+    DESCRIPTION "generic algorithms and data structures"
     HOMEPAGE_URL "https://github.com/red0124/sgc"
     LANGUAGES C
 )
@@ -11,9 +11,9 @@ project(
 # ---- Warning guard ----
 
 # Protect dependents from this project's warnings if the guard isn't disabled
-set(sgc_warning_guard SYSTEM)
+set(SGC_WARNING_GUARD SYSTEM)
 if(sgc_INCLUDE_WITHOUT_SYSTEM)
-  set(sgc_warning_guard "")
+    set(SGC_WARNING_GUARD "")
 endif()
 
 # ---- Declare library ----
@@ -23,36 +23,32 @@ add_library(sgc::sgc ALIAS sgc)
 
 target_include_directories(
     sgc
-    ${sgc_warning_guard}
-    INTERFACE
-    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
+    ${SGC_WARNING_GUARD}
+    INTERFACE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
 )
 
 target_compile_features(sgc INTERFACE)
 
-target_link_libraries(
-    sgc
-    INTERFACE
-)
+target_link_libraries(sgc INTERFACE)
 
 # ---- Install ----
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
-set(sgc_directory "sgc-${PROJECT_VERSION}")
-set(sgc_include_directory "${CMAKE_INSTALL_INCLUDEDIR}")
+set(SGC_DIRECTORY "sgc-${PROJECT_VERSION}")
+set(SGC_INCLUDE_DIRECTORY "${CMAKE_INSTALL_INCLUDEDIR}")
 
 install(
     DIRECTORY "${PROJECT_SOURCE_DIR}/include/"
-    DESTINATION "${sgc_include_directory}"
+    DESTINATION "${SGC_INCLUDE_DIRECTORY}"
     COMPONENT sgc_Development
 )
 
 install(
     TARGETS sgc
     EXPORT sgcTargets
-    INCLUDES DESTINATION "${sgc_include_directory}"
+    INCLUDES DESTINATION "${SGC_INCLUDE_DIRECTORY}"
 )
 
 write_basic_package_version_file(
@@ -61,11 +57,11 @@ write_basic_package_version_file(
     ARCH_INDEPENDENT
 )
 
-set(sgc_install_cmakedir "${CMAKE_INSTALL_LIBDIR}/cmake/${sgc_directory}")
+set(SGC_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${SGC_DIRECTORY}")
 
 install(
     FILES "${PROJECT_BINARY_DIR}/sgc-config-version.cmake"
-    DESTINATION "${sgc_install_cmakedir}"
+    DESTINATION "${SGC_INSTALL_CMAKEDIR}"
     COMPONENT sgc_Development
 )
 
@@ -73,10 +69,10 @@ install(
     EXPORT sgcTargets
     FILE sgc-config.cmake
     NAMESPACE sgc::
-    DESTINATION "${sgc_install_cmakedir}"
+    DESTINATION "${SGC_INSTALL_CMAKEDIR}"
     COMPONENT sgc_Development
 )
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  include(CPack)
+    include(CPack)
 endif()
