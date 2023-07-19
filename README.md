@@ -61,8 +61,8 @@ $ ./vector
 
 # Content
  * [Usage](#usage)
- * [Fixed size data structures](#fixed-Size-Data-Structures)
- * [Data Structures](#data-Structures)
+ * [Fixed size data structures](#fixed-size-data-structures)
+ * [Data Structures](#data-structures)
  * [Iterators](#iterators)
  * [Algorithms](#algorithms)
  * [Benchmarks](#benchmarks)
