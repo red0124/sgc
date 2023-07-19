@@ -60,13 +60,13 @@ $ ./vector
  * Fast
 
 # Content
- * [Usage](#Usage)
- * [Fixed size data structures](#Fixed-Size-Data-Structures)
- * [Data Structures](#Data-Structures)
- * [Iterators](#Iterators)
- * [Algorithms](#Algorithms)
- * [Benchmarks](#Benchmarks)
- * [Installation](#Installation)
+ * [Usage](#usage)
+ * [Fixed size data structures](#fixed-Size-Data-Structures)
+ * [Data Structures](#data-Structures)
+ * [Iterators](#iterators)
+ * [Algorithms](#algorithms)
+ * [Benchmarks](#benchmarks)
+ * [Installation](#installation)
 
 # Usage
 
