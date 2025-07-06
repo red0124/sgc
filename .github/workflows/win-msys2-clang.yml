@@ -48,16 +48,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - uses: msys2/setup-msys2@v2
         with:
           update: true
-          msystem: ${{ matrix.msystem }}
-          install: ${{ matrix.install }}
+          msystem: ${{matrix.config.msystem}}
+          install: ${{matrix.config.install}}
 
       - name: Configure
-        run: >-
-          cmake -DCMAKE_CXX_COMPILER=clang++ -S test -B build
-          -DCMAKE_BUILD_TYPE=${{matrix.type}}
+        run: cmake -S test -B build -D CMAKE_BUILD_TYPE=${{matrix.type}}
 
       - name: Build
         run: cmake --build build -j ${{steps.cores.outputs.count}}
