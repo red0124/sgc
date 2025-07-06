@@ -1,6 +1,8 @@
 name: ubuntu-latest-clang-ci
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - master
@@ -23,19 +25,19 @@ jobs:
 
     strategy:
       matrix:
-        version: [11, 10, 9, 8, 7]
+        version: ['latest', '15', '14', '9', '8', '7']
+        type: [Release, Debug]
 
     runs-on: ubuntu-latest
 
-    name: Clang ${{ matrix.version }}
+    name: "Clang ${{matrix.version}}: ${{matrix.type}}"
 
     container:
-      image: teeks99/clang-ubuntu:${{ matrix.version }}
-
+      image: silkeh/clang:${{matrix.version}}
       options: -v /usr/local:/host_usr_local
 
     env:
-      CC: clang-${{ matrix.version }}
+      CC: clang
 
     steps:
       - uses: actions/checkout@v1
@@ -52,10 +54,10 @@ jobs:
           apt-get install -y git
 
       - name: Configure
-        run: cmake -S test -B build -D CMAKE_BUILD_TYPE=Debug
+        run: cmake -S test -B build -DCMAKE_BUILD_TYPE=${{matrix.type}}
 
       - name: Build
-        run: cmake --build build -j ${{ steps.cores.outputs.count }}
+        run: cmake --build build -j ${{steps.cores.outputs.count}}
 
       - name: Run
         working-directory: build

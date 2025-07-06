@@ -1,4 +1,4 @@
-name: ubuntu-latest-gcc-ci
+name: macos-apple-clang-ci
 
 on:
   workflow_dispatch:
@@ -18,35 +18,31 @@ on:
       - bugfix/**
 
 jobs:
-  gcc_tests:
+  clang_tests:
     if: >-
       ! contains(toJSON(github.event.commits.*.message), '[skip ci]') &&
       ! contains(toJSON(github.event.commits.*.message), '[skip github]')
 
     strategy:
       matrix:
-        version: ['latest', '12', '11', '10', '9', '8']
+        xcode: ['15.2']
         type: [Release, Debug]
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
-    name: "GCC ${{matrix.version}}: ${{matrix.type}}"
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer
 
-    container:
-      image: gcc:${{matrix.version}}
-      options: -v /usr/local:/host_usr_local
+    name: "Xcode ${{matrix.xcode}}: ${{matrix.type}}"
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
       - uses: friendlyanon/fetch-core-count@v1
         id: cores
 
-      - name: CMake
-        run: echo "/host_usr_local/bin" >> $GITHUB_PATH
-
       - name: Configure
-        run: cmake -S test -B build -D CMAKE_BUILD_TYPE=${{matrix.type}}
+        run: cmake -S test -B build -DCMAKE_BUILD_TYPE=${{matrix.type}}
 
       - name: Build
         run: cmake --build build -j ${{steps.cores.outputs.count}}
