@@ -10,7 +10,6 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![ubuntu-latest-gcc](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-gcc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-gcc.yml)
 [![ubuntu-latest-clang](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-clang.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-clang.yml)
-[![ubuntu-latest-icc](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-icc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-icc.yml)
 [![windows-msys2-gcc](https://github.com/red0124/sgc/actions/workflows/win-msys2-gcc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/win-msys2-gcc.yml)
 [![windows-msys2-clang](https://github.com/red0124/sgc/actions/workflows/win-msys2-clang.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/win-msys2-clang.yml)
 [![macos-apple-clang](https://github.com/red0124/sgc/actions/workflows/macos-apple-clang.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/macos-apple-clang.yml)
