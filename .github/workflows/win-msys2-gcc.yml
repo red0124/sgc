@@ -52,8 +52,8 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           update: true
-          msystem: ${{ matrix.msystem }}
-          install: ${{ matrix.install }}
+          msystem: ${{matrix.config.msystem}}
+          install: ${{matrix.config.install}}
 
       - name: Configure
         run: cmake -S test -B build -D CMAKE_BUILD_TYPE=${{matrix.type}}
