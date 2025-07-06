@@ -1,0 +1,59 @@
+name: win-msvc-ci
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - master
+      - feature/**
+      - improvement/**
+      - bugfix/**
+
+  pull_request:
+    branches:
+      - master
+      - feature/**
+      - improvement/**
+      - bugfix/**
+
+jobs:
+  ci:
+    if: >-
+      ! contains(toJSON(github.event.commits.*.message), '[skip ci]') &&
+      ! contains(toJSON(github.event.commits.*.message), '[skip github]')
+
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - os: windows-latest
+            vs: "Visual Studio 17 2022"
+
+        build: [Debug, Release]
+        platform: [x64]
+
+    runs-on: ${{matrix.config.os}}
+
+    name: "${{matrix.config.vs}}: ${{matrix.platform}}: ${{matrix.build}}"
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Configure
+        run: >-
+          cmake -S test -B build -D CMAKE_BUILD_TYPE=${{matrix.build}}
+          -G "${{matrix.config.vs}}" -A ${{matrix.platform}}
+
+      - name: Build
+        run: cmake --build build -j ${{steps.cores.outputs.count}}
+
+      - name: Run
+        working-directory: build
+        run: >-
+          ctest -C Debug --output-on-failure
