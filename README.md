@@ -8,11 +8,13 @@
 ```
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![ubuntu-latest-gcc](https://github.com/red0124/sgc/workflows/ubuntu-latest-gcc-ci/badge.svg)](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-gcc.yml)
-[![ubuntu-latest-clang](https://github.com/red0124/sgc/workflows/ubuntu-latest-clang-ci/badge.svg)](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-clang.yml)
-[![ubuntu-latest-icc](https://github.com/red0124/sgc/workflows/ubuntu-latest-icc-ci/badge.svg)](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-icc.yml)
-[![windows-msys2-gcc](https://github.com/red0124/sgc/workflows/win-msys2-gcc-ci/badge.svg)](https://github.com/red0124/sgc/actions/workflows/win-msys2-gcc.yml)
-[![windows-msys2-clang](https://github.com/red0124/sgc/workflows/win-msys2-clang-ci/badge.svg)](https://github.com/red0124/sgc/actions/workflows/win-msys2-clang.yml)
+[![ubuntu-latest-gcc](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-gcc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-gcc.yml)
+[![ubuntu-latest-clang](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-clang.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-clang.yml)
+[![ubuntu-latest-icc](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-icc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/ubuntu-latest-icc.yml)
+[![windows-msys2-gcc](https://github.com/red0124/sgc/actions/workflows/win-msys2-gcc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/win-msys2-gcc.yml)
+[![windows-msys2-clang](https://github.com/red0124/sgc/actions/workflows/win-msys2-clang.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/win-msys2-clang.yml)
+[![macos-apple-clang](https://github.com/red0124/sgc/actions/workflows/macos-apple-clang.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/macos-apple-clang.yml)
+<!-- [![windows-msvc](https://github.com/red0124/sgc/actions/workflows/win-msvc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/win-msvc.yml) -->
 
 A header only library for algorithms and data structures written in **`C`** using macros.
 The data structures are meant to be similar to the **`C++ STL`**.
