@@ -399,7 +399,7 @@
 #endif
 
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-#define _SGC_RESTRICT _SGC_RESTRICT
+#define _SGC_RESTRICT __restrict__
 #elif defined(_MSC_VER)
 #define _SGC_RESTRICT __restrict
 #else
