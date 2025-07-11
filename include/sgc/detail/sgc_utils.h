@@ -385,7 +385,6 @@
 // ==============
 // USER MACROS
 // ==============
-
 #define SGC_MOVE(N, DS, ...)                                                   \
     N##_set_sharing(&DS);                                                      \
     __VA_ARGS__;                                                               \
@@ -397,6 +396,14 @@
 #else
 #define LIKELY(x) x
 #define UNLIKELY(x) x
+#endif
+
+#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+#define _SGC_RESTRICT _SGC_RESTRICT
+#elif defined(_MSC_VER)
+#define _SGC_RESTRICT __restrict
+#else
+#define _SGC_RESTRICT
 #endif
 
 #ifndef SGC_NO_KEYWORDS

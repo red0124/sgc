@@ -47,4 +47,3 @@ int main(void) {
     deq_free(&d);
     return 0;
 }
-

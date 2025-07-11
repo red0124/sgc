@@ -374,7 +374,7 @@ enum _sgc_map_color {
         return sizeof(struct _p_##N##_node*) * (size * 2);                     \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ != 0) {                                                 \
             _p_##N##_copy_base_data(dst, src);                                 \
             _p_##N##_copy_nodes(dst, src);                                     \
@@ -383,8 +383,8 @@ enum _sgc_map_color {
         }                                                                      \
     }                                                                          \
                                                                                \
-    static void _p_##N##_copy_nodes(N* __restrict__ dst,                       \
-                                    const N* __restrict__ const src) {         \
+    static void _p_##N##_copy_nodes(N* _SGC_RESTRICT dst,                      \
+                                    const N* _SGC_RESTRICT const src) {        \
         if (src->size_ != 0) {                                                 \
             dst->root_ = _p_##N##_node_duplicate(src, src->root_);             \
             if (!dst->root_) {                                                 \

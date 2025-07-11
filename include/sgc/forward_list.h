@@ -35,7 +35,7 @@
     void N##_init(N* l);                                                       \
     void N##_free(N* l);                                                       \
     bool N##_eq(const N* const first, const N* const second);                  \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_push_back(N* l, T el);                                            \
     T* N##_back(const N* const l);                                             \
     void N##_set_back(N* l, T new_el);                                         \
@@ -53,7 +53,7 @@
     _SGC_INIT_FWD_IT_PROTOTIPES(N)
 
 #define _SGC_INIT_UNIQUE_FORWARD_LIST(T, N)                                    \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \

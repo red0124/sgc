@@ -31,7 +31,7 @@
     void N##_init(N* p);                                                       \
     size_t N##_size(const N* p);                                               \
     void N##_free(N* p);                                                       \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_push(N* p, T el);                                                 \
     void N##_pop(N* p);                                                        \
     const T* N##_top(const N* const p);                                        \
@@ -52,7 +52,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \

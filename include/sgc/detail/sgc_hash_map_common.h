@@ -162,7 +162,7 @@
         return ret;                                                            \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_) {                                                      \
             _p_##N##_copy_base_data(dst, src);                                 \
             _p_##N##_copy_nodes(dst, src);                                     \
@@ -210,8 +210,8 @@
         return true;                                                           \
     }                                                                          \
                                                                                \
-    static void _p_##N##_copy_nodes(N* __restrict__ dst,                       \
-                                    const N* __restrict__ const src) {         \
+    static void _p_##N##_copy_nodes(N* _SGC_RESTRICT dst,                      \
+                                    const N* _SGC_RESTRICT const src) {        \
         dst->data_ = (struct _p_##N##_node**)sgc_malloc(                       \
             sizeof(struct _p_##N##_node*) * dst->max_);                        \
         if (!dst->data_) {                                                     \
