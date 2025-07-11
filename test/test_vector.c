@@ -1,6 +1,5 @@
 #include "test_common.h"
 #include <sgc/vector.h>
-#include <unistd.h>
 
 SGC_INIT_VECTOR(int, vector)
 

@@ -13,6 +13,11 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(sgc INTERFACE -Wall -Wextra)
 endif()
 
+if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
+    add_compile_options(/Zc:preprocessor)
+endif()
+
+
 # ---- Dependencies ----
 
 include(FetchContent)
