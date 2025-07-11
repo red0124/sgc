@@ -142,10 +142,10 @@ SGC_SET_ALLOCATOR(test_malloc, test_realloc, test_free)
         }                                                                      \
     }
 
-inline void setUp(void) {
+void setUp(void) {
 }
 
-inline void tearDown(void) {
+void tearDown(void) {
 }
 
 size_t power(size_t base, size_t exp) {
