@@ -13,7 +13,7 @@
 [![windows-msys2-gcc](https://github.com/red0124/sgc/actions/workflows/win-msys2-gcc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/win-msys2-gcc.yml)
 [![windows-msys2-clang](https://github.com/red0124/sgc/actions/workflows/win-msys2-clang.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/win-msys2-clang.yml)
 [![macos-apple-clang](https://github.com/red0124/sgc/actions/workflows/macos-apple-clang.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/macos-apple-clang.yml)
-<!-- [![windows-msvc](https://github.com/red0124/sgc/actions/workflows/win-msvc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/win-msvc.yml) -->
+[![windows-msvc](https://github.com/red0124/sgc/actions/workflows/win-msvc.yml/badge.svg?branch=master)](https://github.com/red0124/sgc/actions/workflows/win-msvc.yml)
 
 A header only library for algorithms and data structures written in **`C`** using macros.
 The data structures are meant to be similar to the **`C++ STL`**.
