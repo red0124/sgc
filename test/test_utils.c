@@ -106,7 +106,6 @@ static void test_vector_of_structs(void) {
     ASSERT_EQUAL(t.i, vec_back(&v)->i);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(t.array, vec_back(&v)->array, 5);
 
-
     t.i = 11;
     memset(t.array, 'y', sizeof(t.array));
     vec_push_back(&v, t);

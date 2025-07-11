@@ -351,7 +351,7 @@ void test_compare(void) {
         vector_pop_back(&v_copy);
         TEST_ASSERT_GREATER_THAN(0, vector_compare(&v, &v_copy));
         TEST_ASSERT_LESS_THAN(0, vector_compare(&v_copy, &v));
-        
+
         vector_free(&v_copy);
     }
 

@@ -36,7 +36,7 @@
     size_t N##_size(const N* const d);                                         \
     void N##_init(N* d);                                                       \
     void N##_free(N* d);                                                       \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_push_back(N* d, T el);                                            \
     void N##_push_front(N* d, T el);                                           \
     T* N##_front(N* d);                                                        \
@@ -81,7 +81,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ != 0) {                                                 \
             dst->data_ = (T*)sgc_malloc(src->size_ * sizeof(T));               \
             if (!dst->data_) {                                                 \

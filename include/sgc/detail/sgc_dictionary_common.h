@@ -72,12 +72,12 @@
         _SGC_FREE(KV, n->value_, ds->sharing_);                                \
     }                                                                          \
                                                                                \
-    KV* N##_it_data(N##_it* i) {                                                \
-        return &i->curr_->value_;                                               \
+    KV* N##_it_data(N##_it* i) {                                               \
+        return &i->curr_->value_;                                              \
     }                                                                          \
                                                                                \
-    KV* N##_it_value(N##_it* i) {                                               \
-        return &i->curr_->value_;                                               \
+    KV* N##_it_value(N##_it* i) {                                              \
+        return &i->curr_->value_;                                              \
     }
 
 #define _SGC_INIT_COMMON_DICT_NONE_PAIR_FS_HASH(KV, N)                         \

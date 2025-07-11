@@ -33,7 +33,7 @@
     size_t N##_size(const N* const q);                                         \
     void N##_init(N* q);                                                       \
     void N##_free(N* q);                                                       \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_push(N* q, T el);                                                 \
     T* N##_front(N* q);                                                        \
     void N##_set_front(N* q, T new_el);                                        \
@@ -61,7 +61,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->back_ = src->size_ - 1;                                       \

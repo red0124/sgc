@@ -44,7 +44,7 @@
 // PRIMITIVE STRUCT
 // ==============
 #define SGC_INIT_PRIMITIVE_STRUCT(T, N)                                        \
-    typedef T N;                                                        \
+    typedef T N;                                                               \
                                                                                \
     static inline void N##_init(T* el) {                                       \
         memset(el, 0, sizeof(T));                                              \

@@ -52,7 +52,7 @@
     void N##_set_owning(N* u);                                                 \
     size_t N##_size(const N* const u);                                         \
     void N##_init(N* u);                                                       \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_free(N* u);                                                       \
     struct N##_it N##_find(N* u, const KV v);                                  \
     void N##_insert(N* u, const KV v);                                         \
@@ -93,7 +93,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \
@@ -109,7 +109,7 @@
         }                                                                      \
     }
 
-#define SGC_INIT_DEFINITIONS_FS_UNORDERED_SET(KV, S, N)                                    \
+#define SGC_INIT_DEFINITIONS_FS_UNORDERED_SET(KV, S, N)                        \
     _SGC_INIT_PP_FS_UNORDERED_SET(KV, S, N)                                    \
     _SGC_INIT_UNIQUE_FS_UNORDERED_SET(KV, S, N)                                \
     _SGC_INIT_COMMON_DICT_NONE_PAIR_FS_HASH(KV, N)                             \

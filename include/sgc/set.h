@@ -52,10 +52,10 @@
     static struct _p_##N##_node*                                               \
         _p_##N##_node_duplicate(const N* const m,                              \
                                 const struct _p_##N##_node* const n);          \
-    static void _p_##N##_copy_base_data(N* __restrict__ dst,                   \
-                                        const N* __restrict__ const src);      \
-    static void _p_##N##_copy_nodes(N* __restrict__ dst,                       \
-                                    const N* __restrict__ const src);          \
+    static void _p_##N##_copy_base_data(N* _SGC_RESTRICT dst,                  \
+                                        const N* _SGC_RESTRICT const src);     \
+    static void _p_##N##_copy_nodes(N* _SGC_RESTRICT dst,                      \
+                                    const N* _SGC_RESTRICT const src);         \
     static void _p_##N##_node_free(const N* const m, struct _p_##N##_node* n); \
     static void _p_##N##_node_replace_data(const N* const m,                   \
                                            struct _p_##N##_node* dst,          \
@@ -95,7 +95,7 @@
     size_t N##_size(const N* const s);                                         \
     void N##_init(N* s);                                                       \
     void N##_free(N* s);                                                       \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_insert(N* s, KV v);                                               \
     bool N##_erase(N* m, const KV value);                                      \
     bool N##_erase_it(N* m, N##_it* i);                                        \
@@ -182,8 +182,8 @@
         s->sharing_ = 0;                                                       \
     }                                                                          \
                                                                                \
-    static void _p_##N##_copy_base_data(N* __restrict__ dst,                   \
-                                        const N* __restrict__ const src) {     \
+    static void _p_##N##_copy_base_data(N* _SGC_RESTRICT dst,                  \
+                                        const N* _SGC_RESTRICT const src) {    \
         dst->size_ = src->size_;                                               \
         dst->root_ = _SGC_MAP_LEAF;                                            \
         dst->sharing_ = src->sharing_;                                         \

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "detail/sgc_common.h"
+#include "detail/sgc_error_handlers.h"
 #include "detail/sgc_primitive_types.h"
 #include "detail/sgc_stack_common.h"
 #include "detail/sgc_utils.h"
-#include "detail/sgc_error_handlers.h"
 #include <stdbool.h>
 
 #define _SGC_INIT_PP_FS_STACK(T, N)                                            \
@@ -22,12 +22,12 @@
     typedef T N##_value;                                                       \
                                                                                \
     size_t N##_max(void);                                                      \
-    void N##_set_sharing(N* s);                                               \
+    void N##_set_sharing(N* s);                                                \
     void N##_set_owning(N* s);                                                 \
     void N##_init(N* s);                                                       \
     size_t N##_size(const N* s);                                               \
     void N##_free(N* s);                                                       \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_push(N* s, T el);                                                 \
     void N##_pop(N* s);                                                        \
     T* N##_top(N* s);                                                          \
@@ -48,7 +48,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \
@@ -59,7 +59,7 @@
         }                                                                      \
     }
 
-#define SGC_INIT_DEFINITIONS_FS_STACK(T, S, N)                                             \
+#define SGC_INIT_DEFINITIONS_FS_STACK(T, S, N)                                 \
     _SGC_INIT_PP_FS_STACK(T, N)                                                \
     _SGC_INIT_UNIQUE_FS_STACK(T, S, N)                                         \
     _SGC_INIT_COMMON_STACK(T, N)                                               \
@@ -67,4 +67,4 @@
 
 #define SGC_INIT_FS_STACK(T, S, N)                                             \
     SGC_INIT_HEADERS_FS_STACK(T, S, N)                                         \
-    SGC_INIT_DEFINITIONS_FS_STACK(T, S, N)  
+    SGC_INIT_DEFINITIONS_FS_STACK(T, S, N)

@@ -26,7 +26,7 @@
     size_t N##_size(const N* const s);                                         \
     void N##_init(N* const s);                                                 \
     void N##_free(N* s);                                                       \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_push(N* s, T el);                                                 \
     void N##_pop(N* s);                                                        \
     T* N##_top(N* s);                                                          \
@@ -49,7 +49,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->max_ = src->size_;                                            \

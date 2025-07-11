@@ -28,7 +28,7 @@
     void N##_init(N* v);                                                       \
     size_t N##_size(const N* const v);                                         \
     void N##_free(N* v);                                                       \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_push_back(N* v, T el);                                            \
     void N##_pop_back(N* v);                                                   \
     void N##_insert(N* v, size_t at, T el);                                    \
@@ -66,7 +66,7 @@
         }                                                                      \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ != 0) {                                                 \
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \

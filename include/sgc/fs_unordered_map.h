@@ -59,7 +59,7 @@
     void N##_set_share_key(N* u, bool shared);                                 \
     size_t N##_size(const N* const u);                                         \
     void N##_init(N* u);                                                       \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src);       \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src);     \
     void N##_free(N* u);                                                       \
     N##_it N##_find(N* u, const K k);                                          \
     void N##_set(N* u, const K k, const V v);                                  \
@@ -128,7 +128,7 @@
         return NULL;                                                           \
     }                                                                          \
                                                                                \
-    void N##_copy(N* __restrict__ dst, const N* __restrict__ const src) {      \
+    void N##_copy(N* _SGC_RESTRICT dst, const N* _SGC_RESTRICT const src) {    \
         if (src->size_ > 0) {                                                  \
             dst->size_ = src->size_;                                           \
             dst->sharing_ = src->sharing_;                                     \
